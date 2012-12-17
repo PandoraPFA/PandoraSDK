@@ -1,17 +1,55 @@
 ########################################################
-# cmake file for building Pandora Framework
+# cmake file for building PandoraSDK
+# @author Jan Engels, DESY
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.2 FATAL_ERROR)
 ########################################################
 
-INCLUDE_DIRECTORIES( ./include )
 
-AUX_SOURCE_DIRECTORY( ./src Framework_SRCS )
-AUX_SOURCE_DIRECTORY( ./src/Api Framework_SRCS )
-AUX_SOURCE_DIRECTORY( ./src/Helpers Framework_SRCS )
-AUX_SOURCE_DIRECTORY( ./src/Managers Framework_SRCS )
-AUX_SOURCE_DIRECTORY( ./src/Objects Framework_SRCS )
-AUX_SOURCE_DIRECTORY( ./src/Pandora Framework_SRCS )
-AUX_SOURCE_DIRECTORY( ./src/Persistency Framework_SRCS )
-AUX_SOURCE_DIRECTORY( ./src/Xml Framework_SRCS )
+# project name
+PROJECT( PandoraSDK )
+
+
+# project version
+SET( PandoraSDK_VERSION_MAJOR 0 )
+SET( PandoraSDK_VERSION_MINOR 11 )
+SET( PandoraSDK_VERSION_PATCH 0 )
+
+
+
+### DEPENDENCIES ############################################################
+
+# load default settings from ILCSOFT_CMAKE_MODULES
+INCLUDE( ilcsoft_default_settings )
+
+
+### DOCUMENTATION ############################################################
+OPTION( INSTALL_DOC "Set to OFF to skip build/install Documentation" OFF )
+
+IF( INSTALL_DOC AND EXISTS "${PROJECT_SOURCE_DIR}/doc/CMakeLists.txt" )
+    ADD_SUBDIRECTORY( ./doc )
+ELSE()
+    MESSAGE( STATUS "INSTALL_DOC set to OFF" )
+    SET( INSTALL_DOC OFF )
+ENDIF()
+
+
+### LIBRARY AND TOOLS #######################################################
+
+#include directories
+INCLUDE_DIRECTORIES( ./include )
+INSTALL_DIRECTORY( ./include DESTINATION . FILES_MATCHING PATTERN "*.h" )
+
+ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
+ADD_DEFINITIONS( "-Wno-long-long" )
+
+AUX_SOURCE_DIRECTORY( ./src SDK_SRCS )
+AUX_SOURCE_DIRECTORY( ./src/Api SDK_SRCS )
+AUX_SOURCE_DIRECTORY( ./src/Helpers SDK_SRCS )
+AUX_SOURCE_DIRECTORY( ./src/Managers SDK_SRCS )
+AUX_SOURCE_DIRECTORY( ./src/Objects SDK_SRCS )
+AUX_SOURCE_DIRECTORY( ./src/Pandora SDK_SRCS )
+AUX_SOURCE_DIRECTORY( ./src/Persistency SDK_SRCS )
+AUX_SOURCE_DIRECTORY( ./src/Xml SDK_SRCS )
 
 # require proper C++
 ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
@@ -20,10 +58,16 @@ ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
 ADD_DEFINITIONS( "-Wno-long-long -Wno-sign-compare -fno-strict-aliasing" )
 
 # add library
-ADD_SHARED_LIBRARY( PandoraFramework ${Framework_SRCS} )
+ADD_SHARED_LIBRARY( PandoraSDK ${SDK_SRCS} )
 
 # install library
-INSTALL_SHARED_LIBRARY( PandoraFramework DESTINATION lib )
+INSTALL_SHARED_LIBRARY( PandoraSDK DESTINATION lib )
 
 # install header files
 INSTALL_DIRECTORY( ./include DESTINATION . )
+
+# display some variables and write them to cache
+DISPLAY_STD_VARIABLES()
+
+# generate and install cmake configuration files
+GENERATE_PACKAGE_CONFIGURATION_FILES( PandoraSDKConfig.cmake PandoraSDKConfigVersion.cmake PandoraSDKLibDeps.cmake )
