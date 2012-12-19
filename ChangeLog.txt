@@ -1,0 +1,16 @@
+************************************************************************
+TAG V00-11 FOLLOWING REPOSITORY RESTRUCTURING
+************************************************************************
+Up to V00-11, the PandoraSDK was the core part of the PandoraPFANew parent package.
+PandoraPFANew is now a "metadata" package containing only Makefiles for downloading and building relevant Pandora libraries.
+The PandoraSDK is now maintained and released separately.
+
+GENERAL INFO:
+Pandora consists of the PandoraSDK (Software Development Kit), which comprises a single library and header files with flexible APIs.
+There is also an optional PandoraMonitoring library, which contains event display and tree/histogram-writing functionality.
+The PandoraMonitoring library depends on the PandoraSDK and ROOT.
+Pandora algorithms will necessarily depend upon the PandoraSDK (and also PandoraMonitoring, if desired).
+The algorithms can be built as part of a Pandora client application, such as MarlinPandora, or the standalone TestPandora binary.
+Algorithms declared to be suitably generic may be designed for use by multiple client applications.
+Such re-usable algorithms are best bundled together into a Pandora "content" library.
+Algorithms are always registered via the client application, using the PandoraAPIs, but the client app can link against as many content libraries as required.
