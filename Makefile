@@ -40,6 +40,14 @@ $(LIBRARY): $(OBJECTS)
 %.o:%.cc
 	$(CC) $(CFLAGS) $(INCLUDES) $(DEFINES) -MP -MMD -MT $*.o -MT $*.d -MF $*.d -o $*.o $*.cc
 
+install:
+ifdef INCLUDE_TARGET
+	cp -r $(PANDORA_DIR)/PandoraSDK/include/* ${INCLUDE_TARGET}
+endif
+ifdef LIB_TARGET
+	cp $(PANDORA_DIR)/lib/libPandoraSDK.so ${LIB_TARGET}
+endif
+
 clean:
 	rm -f $(OBJECTS)
 	rm -f $(DEPENDS)
