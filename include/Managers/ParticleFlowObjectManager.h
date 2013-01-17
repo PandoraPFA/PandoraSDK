@@ -38,8 +38,10 @@ private:
      *  @brief  Create a particle flow object
      * 
      *  @param  particleFlowObjectParameters the particle flow object parameters
+     *  @param  pPfo to receive the address of the particle flow object created
      */
-    StatusCode CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObjectParameters &particleFlowObjectParameters);
+    StatusCode CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObjectParameters &particleFlowObjectParameters,
+        ParticleFlowObject *&pPfo);
 
     /**
      *  @brief  Add a cluster to a particle flow object

@@ -67,7 +67,8 @@ StatusCode PandoraContentApiImpl::CreateCluster(Track *pTrack, Cluster *&pCluste
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraContentApiImpl::CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObjectParameters &particleFlowObjectParameters) const
+StatusCode PandoraContentApiImpl::CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObjectParameters &particleFlowObjectParameters,
+    ParticleFlowObject *&pPfo) const
 {
     const TrackList &trackList(particleFlowObjectParameters.m_trackList);
     const ClusterList &clusterList(particleFlowObjectParameters.m_clusterList);
@@ -84,7 +85,7 @@ StatusCode PandoraContentApiImpl::CreateParticleFlowObject(const PandoraContentA
             return STATUS_CODE_NOT_ALLOWED;
     }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->CreateParticleFlowObject(particleFlowObjectParameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->CreateParticleFlowObject(particleFlowObjectParameters, pPfo));
 
     for (TrackList::const_iterator iter = trackList.begin(), iterEnd = trackList.end(); iter != iterEnd; ++iter)
         (*iter)->SetAvailability(false);

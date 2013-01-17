@@ -27,9 +27,10 @@ ParticleFlowObjectManager::~ParticleFlowObjectManager()
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObjectManager::CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObjectParameters &particleFlowObjectParameters)
+StatusCode ParticleFlowObjectManager::CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObjectParameters &particleFlowObjectParameters,
+    ParticleFlowObject *&pPfo)
 {
-    ParticleFlowObject *pPfo = NULL;
+    pPfo = NULL;
 
     try
     {

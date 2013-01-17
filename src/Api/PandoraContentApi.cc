@@ -32,7 +32,16 @@ pandora::StatusCode PandoraContentApi::Cluster::Create(const pandora::Algorithm 
 
 pandora::StatusCode PandoraContentApi::ParticleFlowObject::Create(const pandora::Algorithm &algorithm, const Parameters &parameters)
 {
-    return algorithm.GetPandoraContentApiImpl()->CreateParticleFlowObject(parameters);
+    pandora::ParticleFlowObject *pPfo = NULL;
+    return algorithm.GetPandoraContentApiImpl()->CreateParticleFlowObject(parameters, pPfo);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+pandora::StatusCode PandoraContentApi::ParticleFlowObject::Create(const pandora::Algorithm &algorithm, const Parameters &parameters,
+    pandora::ParticleFlowObject *&pPfo)
+{
+    return algorithm.GetPandoraContentApiImpl()->CreateParticleFlowObject(parameters, pPfo);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
