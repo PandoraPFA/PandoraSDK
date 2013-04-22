@@ -15,10 +15,6 @@ SET( PandoraSDK_VERSION_MINOR 11 )
 SET( PandoraSDK_VERSION_PATCH 0 )
 
 
-
-### DEPENDENCIES ############################################################
-FIND_PACKAGE( ILCUTIL COMPONENTS ILCSOFT_CMAKE_MODULES REQUIRED )
-
 # load default settings from ILCSOFT_CMAKE_MODULES
 INCLUDE( ilcsoft_default_settings )
 
@@ -34,7 +30,7 @@ ELSE()
 ENDIF()
 
 
-### LIBRARY AND TOOLS #######################################################
+### SOURCE ##################################################################
 
 #include directories
 INCLUDE_DIRECTORIES( ./include )
@@ -57,6 +53,14 @@ ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
 
 # need long long for int64 for now
 ADD_DEFINITIONS( "-Wno-long-long -Wno-sign-compare -fno-strict-aliasing" )
+
+
+### DEPENDENCIES ############################################################
+
+FIND_PACKAGE( ILCUTIL COMPONENTS ILCSOFT_CMAKE_MODULES REQUIRED )
+
+
+### LIBRARY #################################################################
 
 # add library
 ADD_SHARED_LIBRARY( PandoraSDK ${SDK_SRCS} )
