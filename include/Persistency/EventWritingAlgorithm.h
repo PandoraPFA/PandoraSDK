@@ -9,6 +9,7 @@
 #define EVENT_WRITING_ALGORITHM_H 1
 
 #include "Pandora/Algorithm.h"
+#include "Pandora/PandoraIO.h"
 
 namespace pandora {class FileWriter;}
 
@@ -43,6 +44,9 @@ private:
     pandora::StatusCode Initialize();
     pandora::StatusCode Run();
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
+
+    pandora::FileType       m_geometryFileType;             ///< The geometry file type
+    pandora::FileType       m_eventFileType;                ///< The event file type
 
     bool                    m_shouldWriteGeometry;          ///< Whether to write geometry to a specified file
     std::string             m_geometryFileName;             ///< Name of the output geometry file

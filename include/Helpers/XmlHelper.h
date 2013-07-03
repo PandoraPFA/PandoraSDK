@@ -126,6 +126,57 @@ inline StatusCode XmlHelper::ReadValue(const TiXmlHandle &xmlHandle, const std::
 }
 
 template <>
+inline StatusCode XmlHelper::ReadValue<CartesianVector>(const TiXmlHandle &xmlHandle, const std::string &xmlElementName, CartesianVector &t)
+{
+    const TiXmlElement *const pXmlElement = xmlHandle.FirstChild(xmlElementName).Element();
+
+    if (NULL == pXmlElement)
+        return STATUS_CODE_NOT_FOUND;
+
+    StringVector tokens;
+    TokenizeString(pXmlElement->GetText(), tokens);
+
+    if (tokens.size() != 3)
+        return STATUS_CODE_FAILURE;
+
+    float x(0.f), y(0.f), z(0.f);
+
+    if (!StringToType(tokens[0], x) || !StringToType(tokens[1], y) || !StringToType(tokens[2], z))
+        return STATUS_CODE_FAILURE;
+
+    t = CartesianVector(x, y, z);
+
+    return STATUS_CODE_SUCCESS;
+}
+
+template <>
+inline StatusCode XmlHelper::ReadValue<TrackState>(const TiXmlHandle &xmlHandle, const std::string &xmlElementName, TrackState &t)
+{
+    const TiXmlElement *const pXmlElement = xmlHandle.FirstChild(xmlElementName).Element();
+
+    if (NULL == pXmlElement)
+        return STATUS_CODE_NOT_FOUND;
+
+    StringVector tokens;
+    TokenizeString(pXmlElement->GetText(), tokens);
+
+    if (tokens.size() != 6)
+        return STATUS_CODE_FAILURE;
+
+    float x(0.f), y(0.f), z(0.f), px(0.f), py(0.f), pz(0.f);
+
+    if (!StringToType(tokens[0], x) || !StringToType(tokens[1], y) || !StringToType(tokens[2], z) ||
+        !StringToType(tokens[3], px) || !StringToType(tokens[4], py) || !StringToType(tokens[5], pz))
+    {
+        return STATUS_CODE_FAILURE;
+    }
+
+    t = TrackState(x, y, z, px, py, pz);
+
+    return STATUS_CODE_SUCCESS;
+}
+
+template <>
 inline StatusCode XmlHelper::ReadValue<bool>(const TiXmlHandle &xmlHandle, const std::string &xmlElementName, bool &t)
 {
     const TiXmlElement *const pXmlElement = xmlHandle.FirstChild(xmlElementName).Element();

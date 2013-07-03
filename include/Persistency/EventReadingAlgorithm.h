@@ -9,6 +9,7 @@
 #define EVENT_READING_ALGORITHM_H 1
 
 #include "Pandora/Algorithm.h"
+#include "Pandora/PandoraIO.h"
 
 namespace pandora {class FileReader;}
 
@@ -43,6 +44,9 @@ private:
     pandora::StatusCode Initialize();
     pandora::StatusCode Run();
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
+
+    pandora::FileType       m_geometryFileType;             ///< The geometry file type
+    pandora::FileType       m_eventFileType;                ///< The event file type
 
     bool                    m_shouldReadGeometry;           ///< Whether to read geometry from a specified file
     std::string             m_geometryFileName;             ///< Name of the file containing geometry information
