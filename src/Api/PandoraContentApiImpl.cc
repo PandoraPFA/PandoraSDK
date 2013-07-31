@@ -521,7 +521,7 @@ StatusCode PandoraContentApiImpl::DeleteClusters(const ClusterList &clusterList,
 
 StatusCode PandoraContentApiImpl::MergeAndDeleteClusters(Cluster *pClusterToEnlarge, Cluster *pClusterToDelete) const
 {
-    if ((pClusterToEnlarge == pClusterToDelete) || !pClusterToEnlarge->IsAvailable() || !pClusterToDelete->IsAvailable())
+    if ((pClusterToEnlarge == pClusterToDelete) || !pClusterToDelete->IsAvailable())
         return STATUS_CODE_NOT_ALLOWED;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pTrackManager->RemoveClusterAssociations(pClusterToDelete->GetAssociatedTrackList()));
@@ -535,7 +535,7 @@ StatusCode PandoraContentApiImpl::MergeAndDeleteClusters(Cluster *pClusterToEnla
 StatusCode PandoraContentApiImpl::MergeAndDeleteClusters(Cluster *pClusterToEnlarge, Cluster *pClusterToDelete, const std::string &enlargeListName,
     const std::string &deleteListName) const
 {
-    if ((pClusterToEnlarge == pClusterToDelete) || !pClusterToEnlarge->IsAvailable() || !pClusterToDelete->IsAvailable())
+    if ((pClusterToEnlarge == pClusterToDelete) || !pClusterToDelete->IsAvailable())
         return STATUS_CODE_NOT_ALLOWED;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pTrackManager->RemoveClusterAssociations(pClusterToDelete->GetAssociatedTrackList()));
