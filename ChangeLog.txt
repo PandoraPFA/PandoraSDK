@@ -1,4 +1,12 @@
 ************************************************************************
+TAG V00-12 FOR ILCSOFT USAGE
+************************************************************************
+Updated Pandora persistency, with separate binary and xml file writers and readers.
+Relaxed restriction on merging a cluster with a parent cluster that happens to already be part of a PFO.
+Provided opportunity to receive address of newly-constructed PFOs in algorithms.
+Ensured local include directory is first in include path.
+
+************************************************************************
 TAG V00-11 FOLLOWING REPOSITORY RESTRUCTURING
 ************************************************************************
 Up to V00-11, the PandoraSDK was the core part of the PandoraPFANew parent package.
