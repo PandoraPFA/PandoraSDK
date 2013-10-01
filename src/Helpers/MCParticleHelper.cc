@@ -17,9 +17,7 @@ namespace pandora
 
 const MCParticle *MCParticleHelper::GetMainMCParticle(const Cluster *const pCluster)
 {
-    typedef std::map<const pandora::MCParticle*, float> MCParticleToEnergyMap;
-    MCParticleToEnergyMap mcParticleToEnergyMap;
-
+    MCParticleWeightMap mcParticleWeightMap;
     const OrderedCaloHitList &orderedCaloHitList(pCluster->GetOrderedCaloHitList());
 
     for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
@@ -27,25 +25,13 @@ const MCParticle *MCParticleHelper::GetMainMCParticle(const Cluster *const pClus
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
             CaloHit *pCaloHit = *hitIter;
+            const MCParticleWeightMap &hitMCParticleWeightMap(pCaloHit->GetMCParticleWeightMap());
 
-            const MCParticle *pMCParticle(NULL);
-            (void) pCaloHit->GetMCParticle(pMCParticle);
-
-            if (NULL == pMCParticle)
-                continue;
-
-            const float hitEnergy(pCaloHit->GetHadronicEnergy());
-
-            MCParticleToEnergyMap::iterator itMCParticleToEnergy = mcParticleToEnergyMap.find(pMCParticle);
-
-            if (itMCParticleToEnergy == mcParticleToEnergyMap.end())
+            for (MCParticleWeightMap::const_iterator weightIter = hitMCParticleWeightMap.begin(), weightIterEnd = hitMCParticleWeightMap.end();
+                weightIter != weightIterEnd; ++weightIter)
             {
-                if (!mcParticleToEnergyMap.insert(MCParticleToEnergyMap::value_type(pMCParticle, hitEnergy)).second)
-                    throw StatusCodeException(STATUS_CODE_FAILURE);
-            }
-            else
-            {
-                itMCParticleToEnergy->second += hitEnergy;
+                const float weight(weightIter->second);
+                mcParticleWeightMap[weightIter->first] += weight;
             }
         }
     }
@@ -53,7 +39,7 @@ const MCParticle *MCParticleHelper::GetMainMCParticle(const Cluster *const pClus
     const MCParticle *pMainMCParticle(NULL);
     float energyOfSelectedMCParticle(0.f);
 
-    for (MCParticleToEnergyMap::const_iterator iter = mcParticleToEnergyMap.begin(), iterEnd = mcParticleToEnergyMap.end(); iter != iterEnd; ++iter)
+    for (MCParticleWeightMap::const_iterator iter = mcParticleWeightMap.begin(), iterEnd = mcParticleWeightMap.end(); iter != iterEnd; ++iter)
     {
         const MCParticle *const pCurrentMCParticle = iter->first;
         const float currentEnergy = iter->second;
@@ -64,6 +50,9 @@ const MCParticle *MCParticleHelper::GetMainMCParticle(const Cluster *const pClus
             energyOfSelectedMCParticle = currentEnergy;
         }
     }
+
+    if (NULL == pMainMCParticle)
+        throw StatusCodeException(STATUS_CODE_NOT_FOUND);
 
     return pMainMCParticle;
 }

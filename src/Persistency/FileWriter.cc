@@ -211,14 +211,15 @@ StatusCode FileWriter::WriteCaloHitToMCParticleRelationship(const CaloHit *const
     if (EVENT != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    const MCParticle *pMCParticle = NULL;
-    (void) pCaloHit->GetMCParticle(pMCParticle);
+    const MCParticleWeightMap &mcParticleWeightMap(pCaloHit->GetMCParticleWeightMap());
 
-    // Allow cases where mc particle links not formed
-    if (NULL == pMCParticle)
-        return STATUS_CODE_SUCCESS;
+    for (MCParticleWeightMap::const_iterator iter = mcParticleWeightMap.begin(), iterEnd = mcParticleWeightMap.end(); iter != iterEnd; ++iter)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteRelationship(CALO_HIT_TO_MC, pCaloHit->GetParentCaloHitAddress(),
+            iter->first->GetUid(), iter->second));
+    }
 
-    return this->WriteRelationship(CALO_HIT_TO_MC, pCaloHit->GetParentCaloHitAddress(), pMCParticle->GetUid());
+    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -228,14 +229,15 @@ StatusCode FileWriter::WriteTrackToMCParticleRelationship(const Track *const pTr
     if (EVENT != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    const MCParticle *pMCParticle = NULL;
-    (void) pTrack->GetMCParticle(pMCParticle);
+    const MCParticleWeightMap &mcParticleWeightMap(pTrack->GetMCParticleWeightMap());
 
-    // Allow cases where mc particle links not formed
-    if (NULL == pMCParticle)
-        return STATUS_CODE_SUCCESS;
+    for (MCParticleWeightMap::const_iterator iter = mcParticleWeightMap.begin(), iterEnd = mcParticleWeightMap.end(); iter != iterEnd; ++iter)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteRelationship(TRACK_TO_MC, pTrack->GetParentTrackAddress(),
+            iter->first->GetUid(), iter->second));
+    }
 
-    return this->WriteRelationship(TRACK_TO_MC, pTrack->GetParentTrackAddress(), pMCParticle->GetUid());
+    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

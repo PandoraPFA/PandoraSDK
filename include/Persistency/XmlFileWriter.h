@@ -49,7 +49,7 @@ private:
     StatusCode WriteCaloHit(const CaloHit *const pCaloHit);
     StatusCode WriteTrack(const Track *const pTrack);
     StatusCode WriteMCParticle(const MCParticle *const pMCParticle);
-    StatusCode WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2);
+    StatusCode WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight);
 
     /**
      *  @brief  Write a variable to the file

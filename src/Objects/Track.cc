@@ -17,6 +17,28 @@
 namespace pandora
 {
 
+const MCParticle *Track::GetMainMCParticle() const
+{
+    float bestWeight(0.f);
+    const MCParticle *pBestMCParticle = NULL;
+
+    for (MCParticleWeightMap::const_iterator iter = m_mcParticleWeightMap.begin(), iterEnd = m_mcParticleWeightMap.end(); iter != iterEnd; ++iter)
+    {
+        if (iter->second > bestWeight)
+        {
+            bestWeight = iter->second;
+            pBestMCParticle = iter->first;
+        }
+    }
+
+    if (NULL == pBestMCParticle)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
+    return pBestMCParticle;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 Track::Track(const PandoraApi::TrackParameters &trackParameters) :
     m_d0(trackParameters.m_d0.Get()),
     m_z0(trackParameters.m_z0.Get()),
@@ -35,7 +57,6 @@ Track::Track(const PandoraApi::TrackParameters &trackParameters) :
     m_canFormPfo(trackParameters.m_canFormPfo.Get()),
     m_canFormClusterlessPfo(trackParameters.m_canFormClusterlessPfo.Get()),
     m_pAssociatedCluster(NULL),
-    m_pMCParticle(NULL),
     m_pParentAddress(trackParameters.m_pParentAddress.Get()),
     m_isAvailable(true)
 {
@@ -64,14 +85,16 @@ Track::~Track()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Track::SetMCParticle(MCParticle *const pMCParticle)
+void Track::SetMCParticleWeightMap(const MCParticleWeightMap &mcParticleWeightMap)
 {
-    if (NULL == pMCParticle)
-        return STATUS_CODE_FAILURE;
+    m_mcParticleWeightMap = mcParticleWeightMap;
+}
 
-    m_pMCParticle = pMCParticle;
+//------------------------------------------------------------------------------------------------------------------------------------------
 
-    return STATUS_CODE_SUCCESS;
+void Track::RemoveMCParticles()
+{
+    m_mcParticleWeightMap.clear();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -97,15 +120,6 @@ StatusCode Track::RemoveAssociatedCluster(Cluster *const pCluster)
         return STATUS_CODE_NOT_FOUND;
 
     m_pAssociatedCluster = NULL;
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode Track::RemoveMCParticle()
-{
-    m_pMCParticle = NULL;
 
     return STATUS_CODE_SUCCESS;
 }

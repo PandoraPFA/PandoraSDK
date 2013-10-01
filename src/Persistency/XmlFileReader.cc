@@ -654,13 +654,15 @@ StatusCode XmlFileReader::ReadRelationship()
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Address1", address1));
     void *address2(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Address2", address2));
+    float weight(1.f);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Weight", weight));
 
     switch (relationshipId)
     {
     case CALO_HIT_TO_MC:
-        return PandoraApi::SetCaloHitToMCParticleRelationship(*m_pPandora, address1, address2);
+        return PandoraApi::SetCaloHitToMCParticleRelationship(*m_pPandora, address1, address2, weight);
     case TRACK_TO_MC:
-        return PandoraApi::SetTrackToMCParticleRelationship(*m_pPandora, address1, address2);
+        return PandoraApi::SetTrackToMCParticleRelationship(*m_pPandora, address1, address2, weight);
     case MC_PARENT_DAUGHTER:
         return PandoraApi::SetMCParentDaughterRelationship(*m_pPandora, address1, address2);
     case TRACK_PARENT_DAUGHTER:

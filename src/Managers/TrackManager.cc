@@ -70,9 +70,9 @@ StatusCode TrackManager::EraseAllContent()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode TrackManager::MatchTracksToMCPfoTargets(const UidToMCParticleMap &trackToPfoTargetMap)
+StatusCode TrackManager::MatchTracksToMCPfoTargets(const UidToMCParticleWeightMap &trackToPfoTargetsMap)
 {
-    if (trackToPfoTargetMap.empty())
+    if (trackToPfoTargetsMap.empty())
         return STATUS_CODE_SUCCESS;
 
     NameToListMap::const_iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
@@ -82,10 +82,12 @@ StatusCode TrackManager::MatchTracksToMCPfoTargets(const UidToMCParticleMap &tra
 
     for (TrackList::const_iterator iter = inputIter->second->begin(), iterEnd = inputIter->second->end(); iter != iterEnd; ++iter)
     {
-        UidToMCParticleMap::const_iterator pfoTargetIter = trackToPfoTargetMap.find((*iter)->GetParentTrackAddress());
+        UidToMCParticleWeightMap::const_iterator pfoTargetIter = trackToPfoTargetsMap.find((*iter)->GetParentTrackAddress());
 
-        if (trackToPfoTargetMap.end() != pfoTargetIter)
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, (*iter)->SetMCParticle(pfoTargetIter->second));
+        if (trackToPfoTargetsMap.end() == pfoTargetIter)
+            continue;
+
+        (*iter)->SetMCParticleWeightMap(pfoTargetIter->second);
     }
 
     return STATUS_CODE_SUCCESS;
@@ -101,7 +103,7 @@ StatusCode TrackManager::RemoveAllMCParticleRelationships()
         return STATUS_CODE_FAILURE;
 
     for (TrackList::const_iterator iter = inputIter->second->begin(), iterEnd = inputIter->second->end(); iter != iterEnd; ++iter)
-        (*iter)->RemoveMCParticle();
+        (*iter)->RemoveMCParticles();
 
     return STATUS_CODE_SUCCESS;
 }

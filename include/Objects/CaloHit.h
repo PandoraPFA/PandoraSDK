@@ -201,9 +201,16 @@ public:
     /**
      *  @brief  Get address of the mc particle associated with the calo hit
      * 
-     *  @param  pMCParticle to receive the address of the mc particle
+     *  @return the address of the mc particle
      */
-    StatusCode GetMCParticle(const MCParticle *&pMCParticle) const;
+    const MCParticle *GetMainMCParticle() const;
+
+    /**
+     *  @brief  Get mc particle weight map for the calo hit
+     * 
+     *  @return the mc particle weight map
+     */
+    const MCParticleWeightMap &GetMCParticleWeightMap() const;
 
     /**
      *  @brief  Get the address of the parent calo hit in the user framework
@@ -281,16 +288,16 @@ protected:
     void SetPossibleMipFlag(bool possibleMipFlag);
 
     /**
-     *  @brief  Set the mc particle associated with the calo hit
+     *  @brief  Set the mc particles associated with the calo hit
      * 
-     *  @param  pMCParticle address of the mc particle
+     *  @param  mcParticleWeightMap the mc particle weight map
      */
-    StatusCode SetMCParticle(MCParticle *const pMCParticle);
+    void SetMCParticleWeightMap(const MCParticleWeightMap &mcParticleWeightMap);
 
     /**
-     *  @brief  Remove the mc particle associated with the calo hit
+     *  @brief  Remove the mc particles associated with the calo hit
      */
-    StatusCode RemoveMCParticle();
+    void RemoveMCParticles();
 
     const CartesianVector   m_positionVector;           ///< Position vector of center of calorimeter cell, units mm
     const CartesianVector   m_expectedDirection;        ///< Unit vector in direction of expected hit propagation
@@ -322,7 +329,7 @@ protected:
 
     CellGeometry            m_cellGeometry;             ///< The cell geometry
 
-    const MCParticle       *m_pMCParticle;              ///< The associated MC particle
+    MCParticleWeightMap     m_mcParticleWeightMap;      ///< The mc particle weight map
     const void             *m_pParentAddress;           ///< The address of the parent calo hit in the user framework
 
     friend class CaloHitHelper;
@@ -624,14 +631,9 @@ inline CellGeometry CaloHit::GetCellGeometry() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline StatusCode CaloHit::GetMCParticle(const MCParticle *&pMCParticle) const
+inline const MCParticleWeightMap &CaloHit::GetMCParticleWeightMap() const
 {
-    if (NULL == m_pMCParticle)
-        return STATUS_CODE_NOT_INITIALIZED;
-
-    pMCParticle = m_pMCParticle;
-
-    return STATUS_CODE_SUCCESS;
+    return m_mcParticleWeightMap;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

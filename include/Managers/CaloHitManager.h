@@ -78,9 +78,9 @@ private:
     /**
      *  @brief  Match calo hits to their correct mc particles for particle flow
      * 
-     *  @param  caloHitToPfoTargetMap the calo hit uid to mc pfo target map
+     *  @param  caloHitToPfoTargetsMap the calo hit uid to mc pfo target map
      */
-    StatusCode MatchCaloHitsToMCPfoTargets(const UidToMCParticleMap &caloHitToPfoTargetMap);
+    StatusCode MatchCaloHitsToMCPfoTargets(const UidToMCParticleWeightMap &caloHitToPfoTargetsMap);
 
     /**
      *  @brief  Remove all mc particle associations that have been registered with calo hits

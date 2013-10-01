@@ -154,9 +154,9 @@ StatusCode CaloHitManager::EraseAllContent()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHitManager::MatchCaloHitsToMCPfoTargets(const UidToMCParticleMap &caloHitToPfoTargetMap)
+StatusCode CaloHitManager::MatchCaloHitsToMCPfoTargets(const UidToMCParticleWeightMap &caloHitToPfoTargetsMap)
 {
-    if (caloHitToPfoTargetMap.empty())
+    if (caloHitToPfoTargetsMap.empty())
         return STATUS_CODE_SUCCESS;
 
     NameToListMap::const_iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
@@ -166,10 +166,12 @@ StatusCode CaloHitManager::MatchCaloHitsToMCPfoTargets(const UidToMCParticleMap 
 
     for (CaloHitList::iterator iter = inputIter->second->begin(), iterEnd = inputIter->second->end(); iter != iterEnd; ++iter)
     {
-        UidToMCParticleMap::const_iterator pfoTargetIter = caloHitToPfoTargetMap.find((*iter)->GetParentCaloHitAddress());
+        UidToMCParticleWeightMap::const_iterator pfoTargetIter = caloHitToPfoTargetsMap.find((*iter)->GetParentCaloHitAddress());
 
-        if (caloHitToPfoTargetMap.end() != pfoTargetIter)
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, (*iter)->SetMCParticle(pfoTargetIter->second));
+        if (caloHitToPfoTargetsMap.end() == pfoTargetIter)
+            continue;
+
+        (*iter)->SetMCParticleWeightMap(pfoTargetIter->second);
     }
 
     return STATUS_CODE_SUCCESS;
@@ -185,7 +187,7 @@ StatusCode CaloHitManager::RemoveAllMCParticleRelationships()
         return STATUS_CODE_FAILURE;
 
     for (CaloHitList::const_iterator iter = inputIter->second->begin(), iterEnd = inputIter->second->end(); iter != iterEnd; ++iter)
-        (*iter)->RemoveMCParticle();
+        (*iter)->RemoveMCParticles();
 
     return STATUS_CODE_SUCCESS;
 }

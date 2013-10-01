@@ -49,9 +49,9 @@ private:
     /**
      *  @brief  Match tracks to their correct mc particles for particle flow
      *
-     *  @param  trackToPfoTargetMap the track uid to mc pfo target map
+     *  @param  trackToPfoTargetsMap the track uid to mc pfo target map
      */
-    StatusCode MatchTracksToMCPfoTargets(const UidToMCParticleMap &trackToPfoTargetMap);
+    StatusCode MatchTracksToMCPfoTargets(const UidToMCParticleWeightMap &trackToPfoTargetsMap);
 
     /**
      *  @brief  Remove all mc particle associations that have been registered with tracks

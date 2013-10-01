@@ -114,9 +114,9 @@ public:
     /**
      *  @brief  Get pfo target particle
      * 
-     *  @param  pMCParticle to receive the address of the pfo target
+     *  @return the address of the pfo target
      */
-    StatusCode GetPfoTarget(const MCParticle *&pMCParticle) const;
+    const MCParticle *GetPfoTarget() const;
 
     /**
      *  @brief  Get the mc particle unique identifier
@@ -251,14 +251,12 @@ inline bool MCParticle::IsPfoTargetSet() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline StatusCode MCParticle::GetPfoTarget(const MCParticle *&pMCParticle) const
+inline const MCParticle *MCParticle::GetPfoTarget() const
 {
     if (NULL == m_pPfoTarget)
-        return STATUS_CODE_NOT_INITIALIZED;
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
-    pMCParticle = m_pPfoTarget;
-
-    return STATUS_CODE_SUCCESS;
+    return m_pPfoTarget;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
