@@ -14,6 +14,28 @@
 namespace pandora
 {
 
+const MCParticle *CaloHit::GetMainMCParticle() const
+{
+    float bestWeight(0.f);
+    const MCParticle *pBestMCParticle = NULL;
+
+    for (MCParticleWeightMap::const_iterator iter = m_mcParticleWeightMap.begin(), iterEnd = m_mcParticleWeightMap.end(); iter != iterEnd; ++iter)
+    {
+        if (iter->second > bestWeight)
+        {
+            bestWeight = iter->second;
+            pBestMCParticle = iter->first;
+        }
+    }
+
+    if (NULL == pBestMCParticle)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
+    return pBestMCParticle;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 CaloHit::CaloHit(const PandoraApi::CaloHitBaseParameters &caloHitParameters) :
     m_positionVector(caloHitParameters.m_positionVector.Get()),
     m_expectedDirection(caloHitParameters.m_expectedDirection.Get().GetUnitVector()),
@@ -36,7 +58,6 @@ CaloHit::CaloHit(const PandoraApi::CaloHitBaseParameters &caloHitParameters) :
     m_isAvailable(true),
     m_weight(1.f),
     m_cellGeometry(UNKNOWN_CELL_GEOMETRY),
-    m_pMCParticle(NULL),
     m_pParentAddress(caloHitParameters.m_pParentAddress.Get())
 {
 }
@@ -68,9 +89,11 @@ CaloHit::CaloHit(CaloHit *pCaloHit, const float weight) :
     m_isAvailable(pCaloHit->m_isAvailable),
     m_weight(weight * pCaloHit->m_weight),
     m_cellGeometry(pCaloHit->m_cellGeometry),
-    m_pMCParticle(pCaloHit->m_pMCParticle),
+    m_mcParticleWeightMap(pCaloHit->m_mcParticleWeightMap),
     m_pParentAddress(pCaloHit->m_pParentAddress)
 {
+    for (MCParticleWeightMap::iterator iter = m_mcParticleWeightMap.begin(), iterEnd = m_mcParticleWeightMap.end(); iter != iterEnd; ++iter)
+        iter->second = iter->second * weight;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -125,23 +148,16 @@ void CaloHit::SetPossibleMipFlag(bool possibleMipFlag)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHit::SetMCParticle(MCParticle *const pMCParticle)
+void CaloHit::SetMCParticleWeightMap(const MCParticleWeightMap &mcParticleWeightMap)
 {
-    if (NULL == pMCParticle)
-        return STATUS_CODE_FAILURE;
-
-    m_pMCParticle = pMCParticle;
-
-    return STATUS_CODE_SUCCESS;
+    m_mcParticleWeightMap = mcParticleWeightMap;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHit::RemoveMCParticle()
+void CaloHit::RemoveMCParticles()
 {
-    m_pMCParticle = NULL;
-
-    return STATUS_CODE_SUCCESS;
+    m_mcParticleWeightMap.clear();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

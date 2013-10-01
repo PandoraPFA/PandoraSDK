@@ -142,6 +142,10 @@ typedef std::vector<CartesianVector> CartesianPointList;
 
 typedef const void * Uid;
 typedef std::map<Uid, MCParticle *> UidToMCParticleMap;
+
+typedef std::map<MCParticle *, float> MCParticleWeightMap;
+typedef std::map<Uid, MCParticleWeightMap> UidToMCParticleWeightMap;
+
 typedef std::map<Track *, Cluster *> TrackToClusterMap;
 
 } // namespace pandora

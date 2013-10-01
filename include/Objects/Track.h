@@ -163,16 +163,23 @@ public:
     /**
      *  @brief  Get address of the cluster associated with the track
      * 
-     *  @param  pCluster to receive the address of the cluster
+     *  @return the address of the cluster
      */
-    StatusCode GetAssociatedCluster(Cluster *&pCluster) const;
+    Cluster *GetAssociatedCluster() const;
 
     /**
      *  @brief  Get address of the mc particle associated with the track
      * 
      *  @param  pMCParticle to receive the address of the mc particle
      */
-    StatusCode GetMCParticle(const MCParticle *&pMCParticle) const;
+    const MCParticle *GetMainMCParticle() const;
+
+    /**
+     *  @brief  Get mc particle weight map for the track
+     * 
+     *  @return the mc particle weight map
+     */
+    const MCParticleWeightMap &GetMCParticleWeightMap() const;
 
     /**
      *  @brief  Get the address of the parent track in the user framework
@@ -223,16 +230,16 @@ private:
     ~Track();
 
     /**
-     *  @brief  Set the mc particle associated with the track
+     *  @brief  Set the mc particles associated with the track
      * 
-     *  @param  pMCParticle the address of the mc particle
+     *  @param  mcParticleWeightMap the mc particle weight map
      */
-    StatusCode SetMCParticle(MCParticle *const pMCParticle);
+    void SetMCParticleWeightMap(const MCParticleWeightMap &mcParticleWeightMap);
 
     /**
-     *  @brief  Remove the mc particle associated with the track
+     *  @brief  Remove the mc particles associated with the track
      */
-    StatusCode RemoveMCParticle();
+    void RemoveMCParticles();
 
     /**
      *  @brief  Set the cluster associated with the track
@@ -298,11 +305,11 @@ private:
     const bool              m_canFormPfo;               ///< Whether track should form a pfo, if it has an associated cluster
     const bool              m_canFormClusterlessPfo;    ///< Whether track should form a pfo, even if it has no associated cluster
 
-    const Helix             *m_pHelixFitAtCalorimeter;  ///< Helix fit to the calorimeter track state
+    const Helix            *m_pHelixFitAtCalorimeter;   ///< Helix fit to the calorimeter track state
 
-    Cluster                 *m_pAssociatedCluster;      ///< The address of an associated cluster
-    const MCParticle        *m_pMCParticle;             ///< The address of the associated MC particle
-    const void              *m_pParentAddress;          ///< The address of the parent track in the user framework
+    Cluster                *m_pAssociatedCluster;       ///< The address of an associated cluster
+    MCParticleWeightMap     m_mcParticleWeightMap;      ///< The mc particle weight map
+    const void             *m_pParentAddress;           ///< The address of the parent track in the user framework
 
     TrackList               m_parentTrackList;          ///< The list of parent track addresses
     TrackList               m_siblingTrackList;         ///< The list of sibling track addresses
@@ -459,26 +466,19 @@ inline bool Track::HasAssociatedCluster() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline StatusCode Track::GetAssociatedCluster(Cluster *&pCluster) const
+inline Cluster *Track::GetAssociatedCluster() const
 {
     if (NULL == m_pAssociatedCluster)
-        return STATUS_CODE_NOT_INITIALIZED;
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
-    pCluster = m_pAssociatedCluster;
-
-    return STATUS_CODE_SUCCESS;
+    return m_pAssociatedCluster;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline StatusCode Track::GetMCParticle(const MCParticle *&pMCParticle) const
+inline const MCParticleWeightMap &Track::GetMCParticleWeightMap() const
 {
-    if (NULL == m_pMCParticle)
-        return STATUS_CODE_NOT_INITIALIZED;
-
-    pMCParticle = m_pMCParticle;
-
-    return STATUS_CODE_SUCCESS;
+    return m_mcParticleWeightMap;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -121,8 +121,15 @@ StatusCode ReclusterHelper::InitializeReclusterMonitoring(const TrackList &track
 
         if (m_reclusterMonitoringMap.end() == mapIter)
         {
-            Cluster *pCluster = NULL;
-            const float clusterEnergy((STATUS_CODE_SUCCESS != pTrack->GetAssociatedCluster(pCluster)) ? 0.f : pCluster->GetTrackComparisonEnergy());
+            float clusterEnergy(0.f);
+
+            try
+            {
+                clusterEnergy = pTrack->GetAssociatedCluster()->GetTrackComparisonEnergy();
+            }
+            catch (StatusCodeException &)
+            {
+            }
 
             if (!m_reclusterMonitoringMap.insert(ReclusterMonitoringMap::value_type(pTrackParentAddress, ReclusterChangeLog(clusterEnergy))).second)
                 return STATUS_CODE_FAILURE;
@@ -156,8 +163,15 @@ StatusCode ReclusterHelper::EndReclusterMonitoring()
             if (m_reclusterMonitoringMap.end() == mapIter)
                 return STATUS_CODE_FAILURE;
 
-            Cluster *pCluster = NULL;
-            const float clusterEnergy((STATUS_CODE_SUCCESS != pTrack->GetAssociatedCluster(pCluster)) ? 0.f : pCluster->GetTrackComparisonEnergy());
+            float clusterEnergy(0.f);
+
+            try
+            {
+                clusterEnergy = pTrack->GetAssociatedCluster()->GetTrackComparisonEnergy();
+            }
+            catch (StatusCodeException &)
+            {
+            }
 
             mapIter->second.SetNewEnergyValue(clusterEnergy);
         }

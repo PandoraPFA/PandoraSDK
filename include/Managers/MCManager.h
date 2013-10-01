@@ -95,14 +95,14 @@ private:
      * 
      *  @param  caloHitToPfoTargetMap to receive the calo hit uid to mc pfo target map
      */
-    StatusCode CreateCaloHitToPfoTargetMap(UidToMCParticleMap &caloHitToPfoTargetMap) const;
+    StatusCode CreateCaloHitToPfoTargetsMap(UidToMCParticleWeightMap &caloHitToPfoTargetsMap) const;
 
    /**
      *  @brief  Create a map relating track uid to mc pfo target
      * 
      *  @param  trackToPfoTargetMap to receive the track uid to mc pfo target map
      */
-    StatusCode CreateTrackToPfoTargetMap(UidToMCParticleMap &trackToPfoTargetMap) const;
+    StatusCode CreateTrackToPfoTargetsMap(UidToMCParticleWeightMap &trackToPfoTargetsMap) const;
 
     /**
      *  @brief  Apply mc particle associations (parent-daughter) that have been registered with the mc manager
@@ -121,8 +121,8 @@ private:
      */
     StatusCode RemoveMCParticleRelationships(MCParticle *const pMCParticle) const;
 
-    typedef std::pair<Uid, float> UidAndWeight;
-    typedef std::map<Uid, UidAndWeight> ObjectRelationMap;
+    typedef std::map<Uid, float> UidToWeightMap;
+    typedef std::map<Uid, UidToWeightMap> ObjectRelationMap;
     typedef std::multimap<Uid, Uid> MCParticleRelationMap;
 
     /**
@@ -137,12 +137,12 @@ private:
         ObjectRelationMap &objectRelationMap) const;
 
    /**
-     *  @brief  Create a map relating an object (calo hit or track) uid to mc pfo target
+     *  @brief  Create a map relating an object (calo hit or track) uid to mc pfo targets
      * 
-     *  @param  caloHitToPfoTargetMap to receive the calo hit uid to mc pfo target map
+     *  @param  uidToMCParticleWeightMap to receive the calo hit uid to mc pfo target map
      *  @param  objectRelationMap the object relation map containing the information
      */
-    StatusCode CreateUidToPfoTargetMap(UidToMCParticleMap &uidToPfoTargetMap, const ObjectRelationMap &objectRelationMap) const;
+    StatusCode CreateUidToPfoTargetsMap(UidToMCParticleWeightMap &uidToMCParticleWeightMap, const ObjectRelationMap &objectRelationMap) const;
 
     UidToMCParticleMap              m_uidToMCParticleMap;               ///< The uid to mc particle map
     MCParticleRelationMap           m_parentDaughterRelationMap;        ///< The mc particle parent-daughter relation map
@@ -172,16 +172,16 @@ inline StatusCode MCManager::SetTrackToMCParticleRelationship(const Uid trackUid
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline StatusCode MCManager::CreateCaloHitToPfoTargetMap(UidToMCParticleMap &caloHitToPfoTargetMap) const
+inline StatusCode MCManager::CreateCaloHitToPfoTargetsMap(UidToMCParticleWeightMap &caloHitToPfoTargetsMap) const
 {
-    return this->CreateUidToPfoTargetMap(caloHitToPfoTargetMap, m_caloHitToMCParticleMap);
+    return this->CreateUidToPfoTargetsMap(caloHitToPfoTargetsMap, m_caloHitToMCParticleMap);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline StatusCode MCManager::CreateTrackToPfoTargetMap(UidToMCParticleMap &trackToPfoTargetMap) const
+inline StatusCode MCManager::CreateTrackToPfoTargetsMap(UidToMCParticleWeightMap &trackToPfoTargetsMap) const
 {
-    return this->CreateUidToPfoTargetMap(trackToPfoTargetMap, m_trackToMCParticleMap);
+    return this->CreateUidToPfoTargetsMap(trackToPfoTargetsMap, m_trackToMCParticleMap);
 }
 
 } // namespace pandora

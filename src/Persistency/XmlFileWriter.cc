@@ -356,7 +356,7 @@ StatusCode XmlFileWriter::WriteMCParticle(const MCParticle *const pMCParticle)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode XmlFileWriter::WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2)
+StatusCode XmlFileWriter::WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight)
 {
     m_pCurrentXmlElement = new TiXmlElement("Relationship");
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
@@ -364,6 +364,7 @@ StatusCode XmlFileWriter::WriteRelationship(const RelationshipId relationshipId,
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("RelationshipId", relationshipId));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Address1", address1));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Address2", address2));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Weight", weight));
 
     return STATUS_CODE_SUCCESS;
 }

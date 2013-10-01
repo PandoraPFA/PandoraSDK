@@ -255,12 +255,17 @@ StatusCode MCManager::SetUidToMCParticleRelationship(const Uid objectUid, const 
 
     if (objectRelationMap.end() != iter)
     {
-        if (mcParticleWeight > iter->second.second)
-            iter->second = UidAndWeight(mcParticleUid, mcParticleWeight);
+        UidToWeightMap &uidToWeightMap(iter->second);
+        uidToWeightMap[mcParticleUid] += mcParticleWeight;
     }
     else
     {
-        if (!objectRelationMap.insert(ObjectRelationMap::value_type(objectUid, UidAndWeight(mcParticleUid, mcParticleWeight))).second)
+        UidToWeightMap uidToWeightMap;
+
+        if (!uidToWeightMap.insert(UidToWeightMap::value_type(mcParticleUid, mcParticleWeight)).second)
+            return STATUS_CODE_FAILURE;
+
+        if (!objectRelationMap.insert(ObjectRelationMap::value_type(objectUid, uidToWeightMap)).second)
             return STATUS_CODE_FAILURE;
     }
 
@@ -269,7 +274,7 @@ StatusCode MCManager::SetUidToMCParticleRelationship(const Uid objectUid, const 
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MCManager::CreateUidToPfoTargetMap(UidToMCParticleMap &uidToPfoTargetMap, const ObjectRelationMap &objectRelationMap) const
+StatusCode MCManager::CreateUidToPfoTargetsMap(UidToMCParticleWeightMap &uidToMCParticleWeightMap, const ObjectRelationMap &objectRelationMap) const
 {
     if (m_uidToMCParticleMap.empty())
         return STATUS_CODE_SUCCESS;
@@ -279,27 +284,35 @@ StatusCode MCManager::CreateUidToPfoTargetMap(UidToMCParticleMap &uidToPfoTarget
     for (ObjectRelationMap::const_iterator relationIter = objectRelationMap.begin(), relationIterEnd = objectRelationMap.end();
         relationIter != relationIterEnd; ++relationIter)
     {
-        UidToMCParticleMap::const_iterator mcParticleIter = m_uidToMCParticleMap.find(relationIter->second.first);
+        const Uid objectUid(relationIter->first);
+        const UidToWeightMap &uidToWeightMap(relationIter->second);
 
-        if (m_uidToMCParticleMap.end() == mcParticleIter)
-            continue;
-
-        MCParticle *pMCParticle = NULL;
-
-        if (!shouldCollapseMCParticlesToPfoTarget)
+        for (UidToWeightMap::const_iterator weightIter = uidToWeightMap.begin(), weightIterEnd = uidToWeightMap.end();
+            weightIter != weightIterEnd; ++weightIter)
         {
-            pMCParticle = mcParticleIter->second;
-        }
-        else
-        {
-            pMCParticle = mcParticleIter->second->m_pPfoTarget;
-        }
+            const Uid mcParticleUid(weightIter->first);
+            const float mcParticleWeight(weightIter->second);
+            UidToMCParticleMap::const_iterator mcParticleIter = m_uidToMCParticleMap.find(mcParticleUid);
 
-        if (pMCParticle == NULL)
-            continue;
+            if (m_uidToMCParticleMap.end() == mcParticleIter)
+                continue;
 
-        if (!uidToPfoTargetMap.insert(UidToMCParticleMap::value_type(relationIter->first, pMCParticle)).second)
-            return STATUS_CODE_ALREADY_PRESENT;
+            MCParticle *pMCParticle = NULL;
+
+            if (!shouldCollapseMCParticlesToPfoTarget)
+            {
+                pMCParticle = mcParticleIter->second;
+            }
+            else
+            {
+                pMCParticle = mcParticleIter->second->m_pPfoTarget;
+            }
+
+            if (pMCParticle == NULL)
+                continue;
+
+            uidToMCParticleWeightMap[objectUid][pMCParticle] += mcParticleWeight;
+        }
     }
 
     return STATUS_CODE_SUCCESS;
