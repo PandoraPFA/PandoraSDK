@@ -251,11 +251,19 @@ StatusCode MCManager::RemoveMCParticleRelationships(MCParticle *const pMCParticl
 StatusCode MCManager::SetUidToMCParticleRelationship(const Uid objectUid, const Uid mcParticleUid, const float mcParticleWeight,
     ObjectRelationMap &objectRelationMap) const
 {
+    static const bool useSingleMCParticleAssociation(PandoraSettings::UseSingleMCParticleAssociation());
     ObjectRelationMap::iterator iter = objectRelationMap.find(objectUid);
 
     if (objectRelationMap.end() != iter)
     {
         UidToWeightMap &uidToWeightMap(iter->second);
+
+        if (useSingleMCParticleAssociation && (mcParticleWeight < uidToWeightMap.begin()->second))
+            return STATUS_CODE_SUCCESS;
+
+        if (useSingleMCParticleAssociation)
+            uidToWeightMap.clear();
+
         uidToWeightMap[mcParticleUid] += mcParticleWeight;
     }
     else
