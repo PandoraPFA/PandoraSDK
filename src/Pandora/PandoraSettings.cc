@@ -87,6 +87,7 @@ StatusCode PandoraSettings::RunRegisteredSettingsFunctions(const TiXmlHandle *co
 bool PandoraSettings::m_isMonitoringEnabled = false;
 bool PandoraSettings::m_shouldDisplayAlgorithmInfo = false;
 bool PandoraSettings::m_shouldCollapseMCParticlesToPfoTarget = true;
+bool PandoraSettings::m_useSingleMCParticleAssociation = false;
 float PandoraSettings::m_electromagneticEnergyResolution = 0.2f;
 float PandoraSettings::m_hadronicEnergyResolution = 0.6f;
 float PandoraSettings::m_mcPfoSelectionRadius = 500.f;
@@ -105,6 +106,9 @@ StatusCode PandoraSettings::ReadGlobalSettings(const TiXmlHandle *const pXmlHand
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(*pXmlHandle,
         "ShouldCollapseMCParticlesToPfoTarget", m_shouldCollapseMCParticlesToPfoTarget));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(*pXmlHandle,
+        "UseSingleMCParticleAssociation", m_useSingleMCParticleAssociation));
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(*pXmlHandle,
         "ElectromagneticEnergyResolution", m_electromagneticEnergyResolution));

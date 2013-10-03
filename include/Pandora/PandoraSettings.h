@@ -79,6 +79,13 @@ public:
      */
     static bool ShouldCollapseMCParticlesToPfoTarget();
 
+    /**
+     *  @brief  Whether to allow only single mc particle association to objects (largest weight)
+     * 
+     *  @return boolean
+     */
+    static bool UseSingleMCParticleAssociation();
+
 private:
     /**
      *  @brief  Register a pandora settings function to e.g. read settings for a registered particle id or energy correction function
@@ -116,6 +123,7 @@ private:
     static bool     m_isMonitoringEnabled;                  ///< Whether monitoring is enabled
     static bool     m_shouldDisplayAlgorithmInfo;           ///< Whether to display algorithm information during processing
     static bool     m_shouldCollapseMCParticlesToPfoTarget; ///< Whether to collapse mc particle decay chains down to just the pfo target
+    static bool     m_useSingleMCParticleAssociation;       ///< Whether to allow only single mc particle association to objects (largest weight)
 
     static float    m_electromagneticEnergyResolution;      ///< Electromagnetic energy resolution, X, such that sigmaE = ( X * E / sqrt(E) )
     static float    m_hadronicEnergyResolution;             ///< Hadronic energy resolution, X, such that sigmaE = ( X * E / sqrt(E) )
@@ -148,6 +156,13 @@ inline bool PandoraSettings::ShouldDisplayAlgorithmInfo()
 inline bool PandoraSettings::ShouldCollapseMCParticlesToPfoTarget()
 {
     return m_shouldCollapseMCParticlesToPfoTarget;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline bool PandoraSettings::UseSingleMCParticleAssociation()
+{
+    return m_useSingleMCParticleAssociation;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
