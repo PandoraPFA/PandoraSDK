@@ -1,4 +1,12 @@
 ************************************************************************
+TAG V00-13
+************************************************************************
+Upgrade handling of relationships between mc particles and calohits/tracks.
+Instead of associating the single mc particle representing the largest energy contribution, client applications can now provide the relationships as a series of weighted contributions.
+Calohits and tracks now hold a map of mc particles to weights (typically energy contribution). Previous functionality is restored if an algorithm uses the GetMainMCParticle methods.
+Add UseSingleMCParticleAssociation configuration option, so that, for every calohit/track, MCManager only keeps track of the mc particle association with the largest weight.
+
+************************************************************************
 TAG V00-12 FOR ILCSOFT USAGE
 ************************************************************************
 Updated Pandora persistency, with separate binary and xml file writers and readers.
