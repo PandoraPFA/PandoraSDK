@@ -68,9 +68,17 @@ StatusCode AlgorithmManager::InitializeAlgorithms(const TiXmlHandle *const pXmlH
 
 StatusCode AlgorithmManager::CreateAlgorithm(TiXmlElement *const pXmlElement, std::string &algorithmName)
 {
+    const char *pAttribute(pXmlElement->Attribute("type"));
+    
+    if (NULL == pAttribute)
+    {
+        std::cout << "Algorithm encountered in xml without defined type." << std::endl;
+        return STATUS_CODE_NOT_FOUND;
+    }
+
     std::string instanceLabel;
     const StatusCode statusCode = FindSpecificAlgorithmInstance(pXmlElement, algorithmName, instanceLabel);
-
+    
     if (STATUS_CODE_NOT_FOUND != statusCode)
         return statusCode;
 
@@ -109,9 +117,14 @@ StatusCode AlgorithmManager::CreateAlgorithm(TiXmlElement *const pXmlElement, st
 
 StatusCode AlgorithmManager::FindSpecificAlgorithmInstance(TiXmlElement *const pXmlElement, std::string &algorithmName, std::string &instanceLabel) const
 {
-    try 
+    try
     {
-        instanceLabel = std::string(pXmlElement->Attribute("instance"));
+        const char *pAttribute(pXmlElement->Attribute("instance"));
+        
+        if (NULL == pAttribute)
+            return STATUS_CODE_NOT_FOUND;
+
+        instanceLabel = std::string(pAttribute);
         SpecificAlgorithmInstanceMap::const_iterator iter = m_specificAlgorithmInstanceMap.find(instanceLabel);
 
         if (m_specificAlgorithmInstanceMap.end() == iter)

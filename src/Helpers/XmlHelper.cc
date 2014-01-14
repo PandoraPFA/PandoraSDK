@@ -63,7 +63,12 @@ StatusCode XmlHelper::ProcessAlgorithm(const Algorithm &algorithm, const TiXmlHa
     {
         try
         {
-            if (description == std::string(pXmlElement->Attribute("description")))
+            const char *pAttribute(pXmlElement->Attribute("description"));
+            
+            if (NULL == pAttribute)
+                return STATUS_CODE_NOT_FOUND;
+
+            if (description == std::string(pAttribute))
                 return PandoraContentApi::CreateDaughterAlgorithm(algorithm, pXmlElement, algorithmName);
         }
         catch (...)
