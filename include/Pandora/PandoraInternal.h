@@ -14,6 +14,8 @@
 #include <sstream>
 #include <vector>
 
+#include <stdint.h>
+
 namespace pandora
 {
 
