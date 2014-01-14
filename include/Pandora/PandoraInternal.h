@@ -84,6 +84,16 @@ inline bool StringToType(const std::string &s, T &t)
     return !(iss >> t).fail();
 }
 
+template <>
+inline bool StringToType(const std::string &s, void *&t)
+{
+    uintptr_t address;
+    std::istringstream iss(s);
+    iss >> std::hex >> address;
+    t = reinterpret_cast<void*>(address);
+    return true;
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -96,6 +106,13 @@ inline std::string TypeToString(const T &t)
         throw;
 
     return oss.str();
+}
+
+template <>
+inline std::string TypeToString(void *const &t)
+{
+    const uintptr_t address(reinterpret_cast<uintptr_t>(t));
+    return TypeToString(address);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
