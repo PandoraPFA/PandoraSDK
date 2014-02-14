@@ -12,7 +12,7 @@
 #include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraInternal.h"
 
-namespace pandora { class Algorithm; class TiXmlElement; class TiXmlHandle;}
+namespace pandora { class Algorithm; class AlgorithmTool; class TiXmlElement; class TiXmlHandle;}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -113,9 +113,20 @@ public:
         std::string &daughterAlgorithmName);
 
     /**
+     *  @brief  Create an algorithm tool instance, via one of the algorithm tool factories registered with pandora.
+     *          This function is expected to be called whilst reading the settings for a parent algorithm.
+     * 
+     *  @param  parentAlgorithm the parent algorithm, which will later run this algorithm tool
+     *  @param  pXmlElement address of the xml element describing the algorithm tool type and settings
+     *  @param  pAlgorithmTool to receive the address of the algorithm tool instance
+     */
+    static pandora::StatusCode CreateAlgorithmTool(pandora::Algorithm &parentAlgorithm, pandora::TiXmlElement *const pXmlElement,
+        pandora::AlgorithmTool *&pAlgorithmTool);
+
+    /**
      *  @brief  Run an algorithm registered with pandora, from within a parent algorithm
      * 
-     *  @param  parentAlgorithm address of the parent algorithm, now attempting to run a daughter algorithm
+     *  @param  parentAlgorithm the parent algorithm, now attempting to run a daughter algorithm
      *  @param  daughterAlgorithmName the name of the daughter algorithm instance to run
      */
     static pandora::StatusCode RunDaughterAlgorithm(const pandora::Algorithm &parentAlgorithm, const std::string &daughterAlgorithmName);

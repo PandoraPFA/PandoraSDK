@@ -7,6 +7,7 @@
  */
 
 #include "Pandora/Algorithm.h"
+#include "Pandora/AlgorithmTool.h"
 
 #include "Api/PandoraContentApiImpl.h"
 
@@ -108,6 +109,13 @@ StatusCode PandoraContentApiImpl::RepeatEventPreparation() const
 StatusCode PandoraContentApiImpl::CreateDaughterAlgorithm(TiXmlElement *const pXmlElement, std::string &daughterAlgorithmName) const
 {
     return m_pPandora->m_pAlgorithmManager->CreateAlgorithm(pXmlElement, daughterAlgorithmName);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PandoraContentApiImpl::CreateAlgorithmTool(TiXmlElement *const pXmlElement, AlgorithmTool *&pAlgorithmTool) const
+{
+    return m_pPandora->m_pAlgorithmManager->CreateAlgorithmTool(pXmlElement, pAlgorithmTool);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

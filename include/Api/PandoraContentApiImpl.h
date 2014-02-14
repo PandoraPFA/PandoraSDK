@@ -63,6 +63,15 @@ public:
     StatusCode CreateDaughterAlgorithm(TiXmlElement *const pXmlElement, std::string &daughterAlgorithmName) const;
 
     /**
+     *  @brief  Create an algorithm tool instance, via one of the algorithm tool factories registered with pandora.
+     *          This function is expected to be called whilst reading the settings for a parent algorithm.
+     * 
+     *  @param  pXmlElement address of the xml element describing the algorithm tool type and settings
+     *  @param  pAlgorithmTool to receive the address of the algorithm tool instance
+     */
+    StatusCode CreateAlgorithmTool(TiXmlElement *const pXmlElement, AlgorithmTool *&pAlgorithmTool) const;
+
+    /**
      *  @brief  Run an algorithm registered with pandora
      * 
      *  @param  algorithmName the algorithm name

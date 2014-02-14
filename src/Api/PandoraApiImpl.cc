@@ -6,8 +6,6 @@
  *  $Log: $
  */
 
-#include "Pandora/Algorithm.h"
-
 #include "Api/PandoraApi.h"
 #include "Api/PandoraApiImpl.h"
 
@@ -95,6 +93,13 @@ StatusCode PandoraApiImpl::ReadSettings(const std::string &xmlFileName) const
 StatusCode PandoraApiImpl::RegisterAlgorithmFactory(const std::string &algorithmType, AlgorithmFactory *const pAlgorithmFactory) const
 {
     return m_pPandora->m_pAlgorithmManager->RegisterAlgorithmFactory(algorithmType, pAlgorithmFactory);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PandoraApiImpl::RegisterAlgorithmToolFactory(const std::string &algorithmToolType, AlgorithmToolFactory *const pAlgorithmToolFactory) const
+{
+    return m_pPandora->m_pAlgorithmManager->RegisterAlgorithmToolFactory(algorithmToolType, pAlgorithmToolFactory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
