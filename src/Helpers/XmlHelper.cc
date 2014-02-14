@@ -13,9 +13,43 @@
 namespace pandora
 {
 
+StatusCode XmlHelper::ProcessAlgorithm(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &description,
+    std::string &algorithmName)
+{
+    if ("algorithm" != xmlHandle.ToNode()->ValueStr())
+        return STATUS_CODE_NOT_ALLOWED;
+
+    for (TiXmlElement *pXmlElement = xmlHandle.FirstChild("algorithm").Element(); NULL != pXmlElement;
+        pXmlElement = pXmlElement->NextSiblingElement("algorithm"))
+    {
+        try
+        {
+            const char *pAttribute(pXmlElement->Attribute("description"));
+
+            if (NULL == pAttribute)
+                return STATUS_CODE_NOT_FOUND;
+
+            if (description == std::string(pAttribute))
+                return PandoraContentApi::CreateDaughterAlgorithm(algorithm, pXmlElement, algorithmName);
+        }
+        catch (...)
+        {
+            if (description.empty())
+                return PandoraContentApi::CreateDaughterAlgorithm(algorithm, pXmlElement, algorithmName);
+        }
+    }
+
+    return STATUS_CODE_NOT_FOUND;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode XmlHelper::ProcessAlgorithmList(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
     StringVector &algorithmNames)
 {
+    if ("algorithm" != xmlHandle.ToNode()->ValueStr())
+        return STATUS_CODE_NOT_ALLOWED;
+
     const TiXmlHandle algorithmListHandle = TiXmlHandle(xmlHandle.FirstChild(listName).Element());
 
     for (TiXmlElement *pXmlElement = algorithmListHandle.FirstChild("algorithm").Element(); NULL != pXmlElement;
@@ -31,52 +65,54 @@ StatusCode XmlHelper::ProcessAlgorithmList(const Algorithm &algorithm, const TiX
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode XmlHelper::ProcessFirstAlgorithm(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, std::string &algorithmName)
+StatusCode XmlHelper::ProcessAlgorithmTool(Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &description,
+    AlgorithmTool *&pAlgorithmTool)
 {
-    TiXmlElement *const pXmlElement = xmlHandle.FirstChild("algorithm").Element();
+    if ("algorithm" != xmlHandle.ToNode()->ValueStr())
+        return STATUS_CODE_NOT_ALLOWED;
 
-    if (NULL == pXmlElement)
-        return STATUS_CODE_NOT_FOUND;
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::CreateDaughterAlgorithm(algorithm, pXmlElement, algorithmName));
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode XmlHelper::ProcessFirstAlgorithmInList(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
-    std::string &algorithmName)
-{
-    const TiXmlHandle listXmlHandle = TiXmlHandle(xmlHandle.FirstChild(listName).Element());
-
-    return ProcessFirstAlgorithm(algorithm, listXmlHandle, algorithmName);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode XmlHelper::ProcessAlgorithm(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &description,
-    std::string &algorithmName)
-{
-    for (TiXmlElement *pXmlElement = xmlHandle.FirstChild("algorithm").Element(); NULL != pXmlElement;
-        pXmlElement = pXmlElement->NextSiblingElement("algorithm"))
+    for (TiXmlElement *pXmlElement = xmlHandle.FirstChild("tool").Element(); NULL != pXmlElement;
+        pXmlElement = pXmlElement->NextSiblingElement("tool"))
     {
         try
         {
             const char *pAttribute(pXmlElement->Attribute("description"));
-            
+
             if (NULL == pAttribute)
                 return STATUS_CODE_NOT_FOUND;
 
             if (description == std::string(pAttribute))
-                return PandoraContentApi::CreateDaughterAlgorithm(algorithm, pXmlElement, algorithmName);
+                return PandoraContentApi::CreateAlgorithmTool(algorithm, pXmlElement, pAlgorithmTool);
         }
         catch (...)
         {
+            if (description.empty())
+                return PandoraContentApi::CreateAlgorithmTool(algorithm, pXmlElement, pAlgorithmTool);
         }
     }
 
     return STATUS_CODE_NOT_FOUND;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode XmlHelper::ProcessAlgorithmToolList(Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
+    AlgorithmToolList &algorithmToolList)
+{
+    if ("algorithm" != xmlHandle.ToNode()->ValueStr())
+        return STATUS_CODE_NOT_ALLOWED;
+
+    const TiXmlHandle algorithmListHandle = TiXmlHandle(xmlHandle.FirstChild(listName).Element());
+
+    for (TiXmlElement *pXmlElement = algorithmListHandle.FirstChild("tool").Element(); NULL != pXmlElement;
+        pXmlElement = pXmlElement->NextSiblingElement("tool"))
+    {
+        AlgorithmTool *pAlgorithmTool = NULL;
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::CreateAlgorithmTool(algorithm, pXmlElement, pAlgorithmTool));
+        algorithmToolList.push_back(pAlgorithmTool);
+    }
+
+    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -40,6 +40,14 @@ pandora::StatusCode PandoraApi::RegisterAlgorithmFactory(const pandora::Pandora 
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+pandora::StatusCode PandoraApi::RegisterAlgorithmToolFactory(const pandora::Pandora &pandora, const std::string &algorithmToolType,
+    pandora::AlgorithmToolFactory *const pAlgorithmToolFactory)
+{
+    return pandora.GetPandoraApiImpl()->RegisterAlgorithmToolFactory(algorithmToolType, pAlgorithmToolFactory);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 pandora::StatusCode PandoraApi::SetMCParentDaughterRelationship(const pandora::Pandora &pandora, const void *pParentAddress,
     const void *pDaughterAddress)
 {

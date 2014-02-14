@@ -62,6 +62,14 @@ pandora::StatusCode PandoraContentApi::CreateDaughterAlgorithm(const pandora::Al
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+pandora::StatusCode PandoraContentApi::CreateAlgorithmTool(pandora::Algorithm &parentAlgorithm, pandora::TiXmlElement *const pXmlElement,
+    pandora::AlgorithmTool *&pAlgorithmTool)
+{
+    return parentAlgorithm.GetPandoraContentApiImpl()->CreateAlgorithmTool(pXmlElement, pAlgorithmTool);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 pandora::StatusCode PandoraContentApi::RunDaughterAlgorithm(const pandora::Algorithm &parentAlgorithm, const std::string &daughterAlgorithmName)
 {
     return parentAlgorithm.GetPandoraContentApiImpl()->RunAlgorithm(daughterAlgorithmName);

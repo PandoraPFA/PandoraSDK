@@ -11,7 +11,7 @@
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraInputTypes.h"
 
-namespace pandora { class AlgorithmFactory; }
+namespace pandora { class AlgorithmFactory; class AlgorithmToolFactory; }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -243,6 +243,16 @@ public:
      */
     static pandora::StatusCode RegisterAlgorithmFactory(const pandora::Pandora &pandora, const std::string &algorithmType,
         pandora::AlgorithmFactory *const pAlgorithmFactory);
+
+    /**
+     *  @brief  Register an algorithm tool factory with pandora
+     * 
+     *  @param  pandora the pandora instance to register the algorithm tool factory with
+     *  @param  algorithmTool Type the type of algorithm tool that the factory will create
+     *  @param  pAlgorithmToolFactory the address of an algorithm tool factory instance
+     */
+    static pandora::StatusCode RegisterAlgorithmToolFactory(const pandora::Pandora &pandora, const std::string &algorithmToolType,
+        pandora::AlgorithmToolFactory *const pAlgorithmToolFactory);
 
     /**
      *  @brief  Set parent-daughter mc particle relationship

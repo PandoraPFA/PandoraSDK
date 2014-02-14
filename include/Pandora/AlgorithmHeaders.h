@@ -31,6 +31,7 @@
 #include "Objects/Track.h"
 #include "Objects/TrackState.h"
 
+#include "Pandora/AlgorithmTool.h"
 #include "Pandora/PandoraInternal.h"
 #include "Pandora/PandoraSettings.h"
 

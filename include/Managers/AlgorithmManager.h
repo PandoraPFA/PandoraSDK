@@ -18,7 +18,9 @@ namespace pandora
 {
 
 class Algorithm;
+class AlgorithmTool;
 class AlgorithmFactory;
+class AlgorithmToolFactory;
 class Pandora;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -58,6 +60,14 @@ private:
     StatusCode RegisterAlgorithmFactory(const std::string &algorithmType, AlgorithmFactory *const pAlgorithmFactory);
 
     /**
+     *  @brief  Register an algorithm tool factory
+     * 
+     *  @param  algorithmToolType the type of algorithm tool that the factory will create
+     *  @param  pAlgorithmToolFactory the address of an algorithm tool factory instance
+     */
+    StatusCode RegisterAlgorithmToolFactory(const std::string &algorithmToolType, AlgorithmToolFactory *const pAlgorithmToolFactory);
+
+    /**
      *  @brief  Initialize algorithms
      * 
      *  @param  pXmlHandle address of the relevant xml handle
@@ -71,6 +81,14 @@ private:
      *  @param  algorithmName to receive the name of the algorithm instance
      */
     StatusCode CreateAlgorithm(TiXmlElement *const pXmlElement, std::string &algorithmName);
+
+    /**
+     *  @brief  Create an algorithm tool, via one of the algorithm tool factories registered with pandora
+     * 
+     *  @param  pXmlElement address of the xml element describing the algorithm tool type and settings
+     *  @param  pAlgorithmTool to receive the address of the algorithm tool instance
+     */
+    StatusCode CreateAlgorithmTool(TiXmlElement *const pXmlElement, AlgorithmTool *&pAlgorithmTool);
 
     /**
      *  @brief  Find the name of a specific algorithm instance, so that it can be re-used
@@ -88,8 +106,13 @@ private:
     AlgorithmMap                    m_algorithmMap;                     ///< The algorithm map
     AlgorithmFactoryMap             m_algorithmFactoryMap;              ///< The algorithm factory map
     SpecificAlgorithmInstanceMap    m_specificAlgorithmInstanceMap;     ///< The specific algorithm instance map
-
     StringVector                    m_pandoraAlgorithms;                ///< The ordered list of names of top-level algorithms, to be run by pandora
+
+    typedef std::vector<AlgorithmTool*> AlgorithmToolList;
+    typedef std::map<const std::string, AlgorithmToolFactory *const> AlgorithmToolFactoryMap;
+
+    AlgorithmToolList               m_algorithmToolList;                ///< The algorithm tool list
+    AlgorithmToolFactoryMap         m_algorithmToolFactoryMap;          ///< The algorithm tool factory map
 
     Pandora                         *m_pPandora;                        ///< The pandora object that will run the algorithms
 

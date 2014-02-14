@@ -44,7 +44,7 @@ StatusCode EventWritingAlgorithm::Initialize()
         }
         else if (XML == m_geometryFileType)
         {
-            XmlFileWriter geometryFileWriter(*(this->GetPandora()), m_geometryFileName, fileMode); // TODO append/overwrite for xml
+            XmlFileWriter geometryFileWriter(*(this->GetPandora()), m_geometryFileName, fileMode);
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, geometryFileWriter.WriteGeometry());
         }
         else

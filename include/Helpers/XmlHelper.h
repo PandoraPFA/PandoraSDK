@@ -9,6 +9,7 @@
 #define XML_HELPER_H 1
 
 #include "Pandora/Algorithm.h"
+#include "Pandora/AlgorithmTool.h"
 
 #include "Pandora/PandoraInternal.h"
 #include "Pandora/StatusCodes.h"
@@ -58,15 +59,15 @@ public:
         std::vector< std::vector<T> > &vector);
 
     /**
-     *  @brief  Process a list of daughter algorithms in an xml file
+     *  @brief  Process an algorithm described in an xml element with a matching "description = ..." attribute
      * 
      *  @param  algorithm the parent algorithm calling this function
      *  @param  xmlHandle the relevant xml handle
-     *  @param  listName the name of the algorithm list
-     *  @param  algorithmNames to receive the names of the algorithm instances
+     *  @param  description the description attribute of the algorithm xml element
+     *  @param  algorithmName to receive the name of the algorithm instance
      */
-    static StatusCode ProcessAlgorithmList(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
-        StringVector &algorithmNames);
+    static StatusCode ProcessAlgorithm(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &description,
+        std::string &algorithmName);
 
     /**
      *  @brief  Process a single algorithm described in an xml file (the first found by the xml handle)
@@ -78,26 +79,46 @@ public:
     static StatusCode ProcessFirstAlgorithm(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, std::string &algorithmName);
 
     /**
-     *  @brief  Process a single algorithm from a list of daughter algorithms (the first found by the xml handle)
+     *  @brief  Process a list of daughter algorithms in an xml file
      * 
      *  @param  algorithm the parent algorithm calling this function
      *  @param  xmlHandle the relevant xml handle
      *  @param  listName the name of the algorithm list
-     *  @param  algorithmName to receive the name of the algorithm instance
+     *  @param  algorithmNames to receive the names of the algorithm instances
      */
-    static StatusCode ProcessFirstAlgorithmInList(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
-        std::string &algorithmName);
+    static StatusCode ProcessAlgorithmList(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
+        StringVector &algorithmNames);
 
     /**
-     *  @brief  Process an algorithm described in an xml element with a matching "description = ..." attribute
+     *  @brief  Process an algorithm tool described in an xml element with a matching "description = ..." attribute
      * 
      *  @param  algorithm the parent algorithm calling this function
      *  @param  xmlHandle the relevant xml handle
-     *  @param  description the description attribute of the algorithm xml element
-     *  @param  algorithmName to receive the name of the algorithm instance
+     *  @param  description the description attribute of the algorithm tool xml element
+     *  @param  pAlgorithmTool to receive the address of the algorithm tool instance
      */
-    static StatusCode ProcessAlgorithm(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &description,
-        std::string &algorithmName);
+    static StatusCode ProcessAlgorithmTool(Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &description,
+        AlgorithmTool *&pAlgorithmTool);
+
+    /**
+     *  @brief  Process a single algorithm tool described in an xml file (the first found by the xml handle)
+     * 
+     *  @param  algorithm the parent algorithm calling this function
+     *  @param  xmlHandle the relevant xml handle
+     *  @param  pAlgorithmTool to receive the address of the algorithm tool instance
+     */
+    static StatusCode ProcessFirstAlgorithmTool(Algorithm &algorithm, const TiXmlHandle &xmlHandle, AlgorithmTool *&pAlgorithmTool);
+
+    /**
+     *  @brief  Process a list of algorithms tools in an xml file
+     * 
+     *  @param  algorithm the parent algorithm calling this function
+     *  @param  xmlHandle the relevant xml handle
+     *  @param  listName the name of the algorithm tool list
+     *  @param  algorithmToolList to receive the list of addresses of the algorithm tool instances
+     */
+    static StatusCode ProcessAlgorithmToolList(Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
+        AlgorithmToolList &algorithmToolList);
 
     /**
      *  @brief  Tokenize a string
@@ -265,6 +286,22 @@ inline StatusCode XmlHelper::Read2DVectorOfValues(const TiXmlHandle &xmlHandle, 
     }
 
     return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline StatusCode XmlHelper::ProcessFirstAlgorithm(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, std::string &algorithmName)
+{
+    const std::string emptyDescription;
+    return XmlHelper::ProcessAlgorithm(algorithm, xmlHandle, emptyDescription, algorithmName);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline StatusCode XmlHelper::ProcessFirstAlgorithmTool(Algorithm &algorithm, const TiXmlHandle &xmlHandle, AlgorithmTool *&pAlgorithmTool)
+{
+    const std::string emptyDescription;
+    return XmlHelper::ProcessAlgorithmTool(algorithm, xmlHandle, emptyDescription, pAlgorithmTool);
 }
 
 } // namespace pandora

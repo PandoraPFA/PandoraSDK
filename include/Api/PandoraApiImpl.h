@@ -52,6 +52,14 @@ public:
     StatusCode RegisterAlgorithmFactory(const std::string &algorithmType, AlgorithmFactory *const pAlgorithmFactory) const;
 
     /**
+     *  @brief  Register an algorithm tool factory with pandora
+     * 
+     *  @param  algorithmToolType the type of algorithm tool that the factory will create
+     *  @param  pAlgorithmToolFactory the address of an algorithm tool factory instance
+     */
+    StatusCode RegisterAlgorithmToolFactory(const std::string &algorithmToolType, AlgorithmToolFactory *const pAlgorithmToolFactory) const;
+
+    /**
      *  @brief  Set parent-daughter mc particle relationship
      * 
      *  @param  pParentAddress address of parent mc particle in the user framework

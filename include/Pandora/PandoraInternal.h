@@ -12,6 +12,7 @@
 #include <map>
 #include <set>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #include <stdint.h>
@@ -52,6 +53,13 @@ class TwoDHistogram;
 #define PANDORA_REGISTER_ALGORITHM(a, b)                                                                    \
 {                                                                                                           \
     const pandora::StatusCode statusCode(PandoraApi::RegisterAlgorithmFactory(pandora, a, new b));          \
+    if (pandora::STATUS_CODE_SUCCESS != statusCode)                                                         \
+        return statusCode;                                                                                  \
+}
+
+#define PANDORA_REGISTER_ALGORITHM_TOOL(a, b)                                                               \
+{                                                                                                           \
+    const pandora::StatusCode statusCode(PandoraApi::RegisterAlgorithmToolFactory(pandora, a, new b));      \
     if (pandora::STATUS_CODE_SUCCESS != statusCode)                                                         \
         return statusCode;                                                                                  \
 }
