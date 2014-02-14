@@ -26,16 +26,17 @@ StatusCode XmlHelper::ProcessAlgorithm(const Algorithm &algorithm, const TiXmlHa
         {
             const char *pAttribute(pXmlElement->Attribute("description"));
 
-            if (NULL == pAttribute)
+            if ((NULL == pAttribute) && !description.empty())
                 return STATUS_CODE_NOT_FOUND;
+
+            if (NULL == pAttribute)
+                return PandoraContentApi::CreateDaughterAlgorithm(algorithm, pXmlElement, algorithmName);
 
             if (description == std::string(pAttribute))
                 return PandoraContentApi::CreateDaughterAlgorithm(algorithm, pXmlElement, algorithmName);
         }
         catch (...)
         {
-            if (description.empty())
-                return PandoraContentApi::CreateDaughterAlgorithm(algorithm, pXmlElement, algorithmName);
         }
     }
 
@@ -78,16 +79,17 @@ StatusCode XmlHelper::ProcessAlgorithmTool(Algorithm &algorithm, const TiXmlHand
         {
             const char *pAttribute(pXmlElement->Attribute("description"));
 
-            if (NULL == pAttribute)
+            if ((NULL == pAttribute) && !description.empty())
                 return STATUS_CODE_NOT_FOUND;
+
+            if (NULL == pAttribute)
+                return PandoraContentApi::CreateAlgorithmTool(algorithm, pXmlElement, pAlgorithmTool);
 
             if (description == std::string(pAttribute))
                 return PandoraContentApi::CreateAlgorithmTool(algorithm, pXmlElement, pAlgorithmTool);
         }
         catch (...)
         {
-            if (description.empty())
-                return PandoraContentApi::CreateAlgorithmTool(algorithm, pXmlElement, pAlgorithmTool);
         }
     }
 
