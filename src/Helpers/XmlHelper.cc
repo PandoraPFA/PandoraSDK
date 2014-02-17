@@ -22,15 +22,15 @@ StatusCode XmlHelper::ProcessAlgorithm(const Algorithm &algorithm, const TiXmlHa
     for (TiXmlElement *pXmlElement = xmlHandle.FirstChild("algorithm").Element(); NULL != pXmlElement;
         pXmlElement = pXmlElement->NextSiblingElement("algorithm"))
     {
+        if (description.empty())
+            return PandoraContentApi::CreateDaughterAlgorithm(algorithm, pXmlElement, algorithmName);
+
         try
         {
             const char *pAttribute(pXmlElement->Attribute("description"));
 
-            if ((NULL == pAttribute) && !description.empty())
-                return STATUS_CODE_NOT_FOUND;
-
             if (NULL == pAttribute)
-                return PandoraContentApi::CreateDaughterAlgorithm(algorithm, pXmlElement, algorithmName);
+                return STATUS_CODE_NOT_FOUND;
 
             if (description == std::string(pAttribute))
                 return PandoraContentApi::CreateDaughterAlgorithm(algorithm, pXmlElement, algorithmName);
@@ -75,15 +75,15 @@ StatusCode XmlHelper::ProcessAlgorithmTool(Algorithm &algorithm, const TiXmlHand
     for (TiXmlElement *pXmlElement = xmlHandle.FirstChild("tool").Element(); NULL != pXmlElement;
         pXmlElement = pXmlElement->NextSiblingElement("tool"))
     {
+        if (description.empty())
+            return PandoraContentApi::CreateAlgorithmTool(algorithm, pXmlElement, pAlgorithmTool);
+
         try
         {
             const char *pAttribute(pXmlElement->Attribute("description"));
 
-            if ((NULL == pAttribute) && !description.empty())
-                return STATUS_CODE_NOT_FOUND;
-
             if (NULL == pAttribute)
-                return PandoraContentApi::CreateAlgorithmTool(algorithm, pXmlElement, pAlgorithmTool);
+                return STATUS_CODE_NOT_FOUND;
 
             if (description == std::string(pAttribute))
                 return PandoraContentApi::CreateAlgorithmTool(algorithm, pXmlElement, pAlgorithmTool);
