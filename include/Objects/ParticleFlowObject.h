@@ -67,6 +67,13 @@ public:
     const CartesianVector &GetMomentum() const;
 
     /**
+     *  @brief  Get particle flow object vertex
+     * 
+     *  @return The particle flow object vertex
+     */
+    const CartesianVector &GetVertex() const;
+
+    /**
      *  @brief  Get the track list
      * 
      *  @return The track list
@@ -171,6 +178,13 @@ public:
      */
     void SetMomentum(const CartesianVector &momentum);
 
+    /**
+     *  @brief  Set particle flow object vertex
+     * 
+     *  @param  momentum the particle flow object vertex
+     */
+    void SetVertex(const CartesianVector &vertex);
+
 private:
     /**
      *  @brief  Constructor
@@ -215,6 +229,7 @@ private:
     float                   m_mass;                     ///< The particle flow object mass
     float                   m_energy;                   ///< The particle flow object energy
     CartesianVector         m_momentum;                 ///< The particle flow object momentum
+    CartesianVector         m_vertex;                   ///< The particle flow object vertex
 
     TrackList               m_trackList;                ///< The track list
     ClusterList             m_clusterList;              ///< The cluster list
@@ -266,6 +281,13 @@ inline float ParticleFlowObject::GetEnergy() const
 inline const CartesianVector &ParticleFlowObject::GetMomentum() const
 {
     return m_momentum;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const CartesianVector &ParticleFlowObject::GetVertex() const
+{
+    return m_vertex;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -357,6 +379,13 @@ inline void ParticleFlowObject::SetEnergy(const float energy)
 inline void ParticleFlowObject::SetMomentum(const CartesianVector &momentum)
 {
     m_momentum = momentum;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline void ParticleFlowObject::SetVertex(const CartesianVector &vertex)
+{
+    m_vertex = vertex;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

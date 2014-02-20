@@ -20,6 +20,7 @@ ParticleFlowObject::ParticleFlowObject(const PandoraContentApi::ParticleFlowObje
     m_mass(particleFlowObjectParameters.m_mass.Get()),
     m_energy(particleFlowObjectParameters.m_energy.Get()),
     m_momentum(particleFlowObjectParameters.m_momentum.Get()),
+    m_vertex(particleFlowObjectParameters.m_vertex.Get()),
     m_trackList(particleFlowObjectParameters.m_trackList),
     m_clusterList(particleFlowObjectParameters.m_clusterList)
 {
