@@ -60,6 +60,14 @@ private:
     StatusCode AddTrackToPfo(ParticleFlowObject *pPfo, Track *pTrack) const;
 
     /**
+     *  @brief  Add a parent-daughter particle flow object relationship
+     *
+     *  @param  pParentPfo address of parent particle flow object
+     *  @param  pDaughterPfo address of daughter particle flow object
+     */
+    StatusCode SetParentDaughterAssociation(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const;
+
+    /**
      *  @brief  Remove a cluster from a particle flow object. Note this function will not remove the final object (track or cluster)
      *          from a particle flow object, and will instead return status code "not allowed" as a prompt to delete the cluster
      *
@@ -77,6 +85,14 @@ private:
      *  @param  pTrack address of the track to remove
      */
     StatusCode RemoveTrackFromPfo(ParticleFlowObject *pPfo, Track *pTrack);
+
+    /**
+     *  @brief  Remove a parent-daughter particle flow object relationship
+     *
+     *  @param  pParentPfo address of parent particle flow object
+     *  @param  pDaughterPfo address of daughter particle flow object
+     */
+    StatusCode RemoveParentDaughterAssociation(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const;
 
     friend class PandoraApiImpl;
     friend class PandoraContentApiImpl;

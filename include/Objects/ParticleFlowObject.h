@@ -109,6 +109,34 @@ public:
     unsigned int GetNClusters() const;
 
     /**
+     *  @brief  Get the parent pfo list
+     * 
+     *  @return The parent pfo list
+     */
+    const PfoList &GetParentPfoList() const;
+
+    /**
+     *  @brief  Get the daughter pfo list
+     * 
+     *  @return The daughter pfo list
+     */
+    const PfoList &GetDaughterPfoList() const;
+
+    /**
+     *  @brief  Get the number of parent pfos
+     * 
+     *  @return The number of parent pfos
+     */
+    unsigned int GetNParentPfos() const;
+
+    /**
+     *  @brief  Get the number of daughter pfos
+     * 
+     *  @return The number of daughter pfos
+     */
+    unsigned int GetNDaughterPfos() const;
+
+    /**
      *  @brief  Set the particle flow object id (PDG code)
      * 
      *  @param  particleId the particle flow object id
@@ -154,6 +182,34 @@ private:
      */
     ~ParticleFlowObject();
 
+    /**
+     *  @brief  Add a parent pfo to the parent pfo list
+     * 
+     *  @param  pPfo the address of the parent pfo
+     */
+    StatusCode AddParent(ParticleFlowObject *const pPfo);
+
+    /**
+     *  @brief  Add a daughter pfo to the daughter pfo list
+     * 
+     *  @param  pPfo the address of the daughter pfo
+     */
+    StatusCode AddDaughter(ParticleFlowObject *const pPfo);
+
+    /**
+     *  @brief  Remove a parent pfo from the parent pfo list
+     * 
+     *  @param  pPfo the address of the parent pfo
+     */
+    StatusCode RemoveParent(ParticleFlowObject *const pPfo);
+
+    /**
+     *  @brief  Remove a daughter pfo from the daughter pfo list
+     * 
+     *  @param  pPfo the address of the daughter pfo
+     */
+    StatusCode RemoveDaughter(ParticleFlowObject *const pPfo);
+
     int                     m_particleId;               ///< The particle flow object id (PDG code)
     int                     m_charge;                   ///< The particle flow object charge
     float                   m_mass;                     ///< The particle flow object mass
@@ -162,6 +218,9 @@ private:
 
     TrackList               m_trackList;                ///< The track list
     ClusterList             m_clusterList;              ///< The cluster list
+
+    PfoList                 m_parentPfoList;            ///< The list of parent pfos
+    PfoList                 m_daughterPfoList;          ///< The list of daughter pfos
 
     friend class ParticleFlowObjectManager;
     friend class AlgorithmObjectManager<ParticleFlowObject>;
@@ -235,6 +294,34 @@ inline unsigned int ParticleFlowObject::GetNTracks() const
 inline unsigned int ParticleFlowObject::GetNClusters() const
 {
     return m_clusterList.size();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const PfoList &ParticleFlowObject::GetParentPfoList() const
+{
+    return m_parentPfoList;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const PfoList &ParticleFlowObject::GetDaughterPfoList() const
+{
+    return m_daughterPfoList;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline unsigned int ParticleFlowObject::GetNParentPfos() const
+{
+    return m_parentPfoList.size();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline unsigned int ParticleFlowObject::GetNDaughterPfos() const
+{
+    return m_daughterPfoList.size();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

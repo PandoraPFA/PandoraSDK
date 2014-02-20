@@ -581,6 +581,22 @@ pandora::StatusCode PandoraContentApi::RemoveTrackFromPfo(const pandora::Algorit
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+pandora::StatusCode PandoraContentApi::SetPfoParentDaughterRelationship(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *pParentPfo,
+    pandora::ParticleFlowObject *pDaughterPfo)
+{
+    return algorithm.GetPandoraContentApiImpl()->SetPfoParentDaughterRelationship(pParentPfo, pDaughterPfo);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+pandora::StatusCode PandoraContentApi::RemovePfoParentDaughterRelationship(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *pParentPfo,
+    pandora::ParticleFlowObject *pDaughterPfo)
+{
+    return algorithm.GetPandoraContentApiImpl()->RemovePfoParentDaughterRelationship(pParentPfo, pDaughterPfo);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 pandora::StatusCode PandoraContentApi::GetCurrentMCParticleList(const pandora::Algorithm &algorithm, const pandora::MCParticleList *&pMCParticleList)
 {
     std::string mcParticleListName;
