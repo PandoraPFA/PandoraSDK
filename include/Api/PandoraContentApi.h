@@ -773,6 +773,26 @@ public:
     static pandora::StatusCode RemoveTrackFromPfo(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *pPfo,
         pandora::Track *pTrack);
 
+    /**
+     *  @brief  Set parent-daughter particle flow object relationship
+     * 
+     *  @param  algorithm the algorithm calling this function
+     *  @param  pParentPfo address of parent particle flow object
+     *  @param  pDaughterPfo address of daughter particle flow object
+     */
+    static pandora::StatusCode SetPfoParentDaughterRelationship(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *pParentPfo,
+        pandora::ParticleFlowObject *pDaughterPfo);
+
+    /**
+     *  @brief  Remove parent-daughter particle flow object relationship
+     * 
+     *  @param  algorithm the algorithm calling this function
+     *  @param  pParentPfo address of parent particle flow object
+     *  @param  pDaughterPfo address of daughter particle flow object
+     */
+    static pandora::StatusCode RemovePfoParentDaughterRelationship(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *pParentPfo,
+        pandora::ParticleFlowObject *pDaughterPfo);
+
 
     /* MCParticle-related functions */
 

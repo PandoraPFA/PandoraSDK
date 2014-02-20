@@ -584,6 +584,22 @@ public:
      */
     StatusCode RemoveTrackFromPfo(ParticleFlowObject *pPfo, Track *pTrack) const;
 
+    /**
+     *  @brief  Set parent-daughter particle flow object relationship
+     * 
+     *  @param  pParentPfo address of parent particle flow object
+     *  @param  pDaughterPfo address of daughter particle flow object
+     */
+    StatusCode SetPfoParentDaughterRelationship(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const;
+
+    /**
+     *  @brief  Remove parent-daughter particle flow object relationship
+     * 
+     *  @param  pParentPfo address of parent particle flow object
+     *  @param  pDaughterPfo address of daughter particle flow object
+     */
+    StatusCode RemovePfoParentDaughterRelationship(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const;
+
 
     /* MCParticle-related functions */
 
@@ -714,7 +730,7 @@ private:
      * 
      *  @param  pPfo address of the pfo to prepare for deletion
      */
-    StatusCode PrepareForDeletion(const ParticleFlowObject *const pPfo) const;
+    StatusCode PrepareForDeletion(ParticleFlowObject *const pPfo) const;
 
     /**
      *  @brief  Prepare a list of pfos for deletion, flagging constituents as available

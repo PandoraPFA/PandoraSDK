@@ -23,8 +23,6 @@ ParticleFlowObject::ParticleFlowObject(const PandoraContentApi::ParticleFlowObje
     m_trackList(particleFlowObjectParameters.m_trackList),
     m_clusterList(particleFlowObjectParameters.m_clusterList)
 {
-    if (particleFlowObjectParameters.m_clusterList.empty() && particleFlowObjectParameters.m_trackList.empty())
-        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -68,6 +66,59 @@ ClusterAddressList ParticleFlowObject::GetClusterAddressList() const
     }
 
     return clusterAddressList;
+}
+
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ParticleFlowObject::AddParent(ParticleFlowObject *const pPfo)
+{
+    if (NULL == pPfo)
+        return STATUS_CODE_INVALID_PARAMETER;
+
+    if (!m_parentPfoList.insert(pPfo).second)
+        return STATUS_CODE_ALREADY_PRESENT;
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ParticleFlowObject::AddDaughter(ParticleFlowObject *const pPfo)
+{
+    if (NULL == pPfo)
+        return STATUS_CODE_INVALID_PARAMETER;
+
+    if (!m_daughterPfoList.insert(pPfo).second)
+        return STATUS_CODE_ALREADY_PRESENT;
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ParticleFlowObject::RemoveParent(ParticleFlowObject *const pPfo)
+{
+    PfoList::const_iterator iter = m_parentPfoList.find(pPfo);
+
+    if (m_parentPfoList.end() == iter)
+        return STATUS_CODE_NOT_FOUND;
+
+    m_parentPfoList.erase(iter);
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ParticleFlowObject::RemoveDaughter(ParticleFlowObject *const pPfo)
+{
+    PfoList::const_iterator iter = m_daughterPfoList.find(pPfo);
+
+    if (m_daughterPfoList.end() == iter)
+        return STATUS_CODE_NOT_FOUND;
+
+    m_daughterPfoList.erase(iter);
+    return STATUS_CODE_SUCCESS;
 }
 
 } // namespace pandora

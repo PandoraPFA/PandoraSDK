@@ -82,6 +82,16 @@ StatusCode ParticleFlowObjectManager::AddTrackToPfo(ParticleFlowObject *pPfo, Tr
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode ParticleFlowObjectManager::SetParentDaughterAssociation(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const
+{
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pParentPfo->AddDaughter(pDaughterPfo));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pDaughterPfo->AddParent(pParentPfo));
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode ParticleFlowObjectManager::RemoveClusterFromPfo(ParticleFlowObject *pPfo, Cluster *pCluster)
 {
     ClusterList &clusterList = pPfo->m_clusterList;
@@ -106,6 +116,16 @@ StatusCode ParticleFlowObjectManager::RemoveTrackFromPfo(ParticleFlowObject *pPf
         return STATUS_CODE_NOT_FOUND;
 
     trackList.erase(trackIter);
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ParticleFlowObjectManager::RemoveParentDaughterAssociation(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const
+{
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pParentPfo->RemoveDaughter(pDaughterPfo));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pDaughterPfo->RemoveParent(pParentPfo));
 
     return STATUS_CODE_SUCCESS;
 }

@@ -716,9 +716,6 @@ StatusCode PandoraContentApiImpl::AddTrackToPfo(ParticleFlowObject *pPfo, Track 
 
 StatusCode PandoraContentApiImpl::RemoveClusterFromPfo(ParticleFlowObject *pPfo, Cluster *pCluster) const
 {
-    if ((pPfo->GetNClusters() <= 1) && (pPfo->GetNTracks() == 0))
-        return STATUS_CODE_NOT_ALLOWED;
-
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->RemoveClusterFromPfo(pPfo, pCluster));
     pCluster->SetAvailability(true);
 
@@ -729,13 +726,24 @@ StatusCode PandoraContentApiImpl::RemoveClusterFromPfo(ParticleFlowObject *pPfo,
 
 StatusCode PandoraContentApiImpl::RemoveTrackFromPfo(ParticleFlowObject *pPfo, Track *pTrack) const
 {
-    if ((pPfo->GetNTracks() <= 1) && (pPfo->GetNClusters() == 0))
-        return STATUS_CODE_NOT_ALLOWED;
-
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->RemoveTrackFromPfo(pPfo, pTrack));
     pTrack->SetAvailability(true);
 
     return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PandoraContentApiImpl::SetPfoParentDaughterRelationship(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const
+{
+    return m_pPandora->m_pPfoManager->SetParentDaughterAssociation(pParentPfo, pDaughterPfo);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PandoraContentApiImpl::RemovePfoParentDaughterRelationship(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const
+{
+    return m_pPandora->m_pPfoManager->RemoveParentDaughterAssociation(pParentPfo, pDaughterPfo);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -939,7 +947,7 @@ StatusCode PandoraContentApiImpl::PrepareForDeletion(const PfoList &pfoList) con
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraContentApiImpl::PrepareForDeletion(const ParticleFlowObject *const pPfo) const
+StatusCode PandoraContentApiImpl::PrepareForDeletion(ParticleFlowObject *const pPfo) const
 {
     const TrackList trackList(pPfo->GetTrackList());
     const ClusterList pfoList(pPfo->GetClusterList());
@@ -949,6 +957,15 @@ StatusCode PandoraContentApiImpl::PrepareForDeletion(const ParticleFlowObject *c
 
     for (ClusterList::const_iterator iter = pfoList.begin(), iterEnd = pfoList.end(); iter != iterEnd; ++iter)
         (*iter)->SetAvailability(true);
+
+    const PfoList parentList(pPfo->GetParentPfoList());
+    const PfoList daughterList(pPfo->GetDaughterPfoList());
+
+    for (PfoList::const_iterator iter = parentList.begin(), iterEnd = parentList.end(); iter != iterEnd; ++iter)
+        this->RemovePfoParentDaughterRelationship(*iter, pPfo);
+
+    for (PfoList::const_iterator iter = daughterList.begin(), iterEnd = daughterList.end(); iter != iterEnd; ++iter)
+        this->RemovePfoParentDaughterRelationship(pPfo, *iter);
 
     return STATUS_CODE_SUCCESS;
 }
