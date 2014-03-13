@@ -116,8 +116,9 @@ public:
     StatusCode GetCaloHitList(const std::string &caloHitListName, const CaloHitList *&pCaloHitList) const;
 
     /**
-     *  @brief  Save the current calo hit list under a new name
+     *  @brief  Save a provided calo hit list under a new name
      * 
+     *  @param  caloHitList the provided calo hit list
      *  @param  newListName the new calo hit list name
      */
     StatusCode SaveCaloHitList(const CaloHitList &caloHitList, const std::string &newListName) const;
