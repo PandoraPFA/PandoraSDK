@@ -193,9 +193,10 @@ public:
         const pandora::CaloHitList *&pCaloHitList);
 
     /**
-     *  @brief  Save the current calo hit list under a new name
+     *  @brief  Save a provided calo hit list under a new name
      * 
      *  @param  algorithm the algorithm calling this function
+     *  @param  caloHitList the provided calo hit list
      *  @param  newListName the new calo hit list name
      */
     static pandora::StatusCode SaveCaloHitList(const pandora::Algorithm &algorithm, const pandora::CaloHitList &caloHitList,
