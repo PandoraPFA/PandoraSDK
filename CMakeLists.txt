@@ -11,7 +11,7 @@ PROJECT( PandoraSDK )
 
 # project version
 SET( PandoraSDK_VERSION_MAJOR 0 )
-SET( PandoraSDK_VERSION_MINOR 13 )
+SET( PandoraSDK_VERSION_MINOR 14 )
 SET( PandoraSDK_VERSION_PATCH 0 )
 
 
