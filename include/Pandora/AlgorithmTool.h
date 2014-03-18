@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef ALGORITHM_TOOL_H
-#define ALGORITHM_TOOL_H 1
+#ifndef PANDORA_ALGORITHM_TOOL_H
+#define PANDORA_ALGORITHM_TOOL_H 1
 
 namespace pandora
 {
@@ -137,4 +137,4 @@ inline StatusCode AlgorithmTool::RegisterDetails(const std::string &algorithmToo
 
 } // namespace pandora
 
-#endif // #ifndef ALGORITHM_TOOL_H
+#endif // #ifndef PANDORA_ALGORITHM_TOOL_H
