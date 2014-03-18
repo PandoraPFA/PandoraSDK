@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef FILE_READER_H
-#define FILE_READER_H 1
+#ifndef PANDORA_FILE_READER_H
+#define PANDORA_FILE_READER_H 1
 
 #include "Api/PandoraApi.h"
 
@@ -137,4 +137,4 @@ protected:
 
 } // namespace pandora
 
-#endif // #ifndef FILE_READER_H
+#endif // #ifndef PANDORA_FILE_READER_H

@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef XML_HELPER_H
-#define XML_HELPER_H 1
+#ifndef PANDORA_XML_HELPER_H
+#define PANDORA_XML_HELPER_H 1
 
 #include "Pandora/Algorithm.h"
 #include "Pandora/AlgorithmTool.h"
@@ -306,4 +306,4 @@ inline StatusCode XmlHelper::ProcessFirstAlgorithmTool(Algorithm &algorithm, con
 
 } // namespace pandora
 
-#endif // #ifndef XML_HELPER_H
+#endif // #ifndef PANDORA_XML_HELPER_H

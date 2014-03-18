@@ -106,8 +106,9 @@ StatusCode Cluster::AddCaloHit(CaloHit *const pCaloHit)
     m_hadronicEnergy += pCaloHit->GetHadronicEnergy();
 
     const PseudoLayer pseudoLayer(pCaloHit->GetPseudoLayer());
+    OrderedCaloHitList::const_iterator iter = m_orderedCaloHitList.find(pseudoLayer);
 
-    if (m_orderedCaloHitList[pseudoLayer]->size() > 1)
+    if ((m_orderedCaloHitList.end() != iter) && (iter->second->size() > 1))
     {
         m_sumXByPseudoLayer[pseudoLayer] += x;
         m_sumYByPseudoLayer[pseudoLayer] += y;
@@ -461,8 +462,9 @@ StatusCode Cluster::AddHitsFromSecondCluster(Cluster *const pCluster)
     for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
     {
         const PseudoLayer pseudoLayer(iter->first);
+        OrderedCaloHitList::const_iterator currentIter = m_orderedCaloHitList.find(pseudoLayer);
 
-        if (m_orderedCaloHitList[pseudoLayer]->size() > 1)
+        if ((m_orderedCaloHitList.end() != currentIter) && (currentIter->second->size() > 1))
         {
             m_sumXByPseudoLayer[pseudoLayer] += pCluster->m_sumXByPseudoLayer[pseudoLayer];
             m_sumYByPseudoLayer[pseudoLayer] += pCluster->m_sumYByPseudoLayer[pseudoLayer];

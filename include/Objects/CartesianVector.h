@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef CARTESIAN_VECTOR_H
-#define CARTESIAN_VECTOR_H 1
+#ifndef PANDORA_CARTESIAN_VECTOR_H
+#define PANDORA_CARTESIAN_VECTOR_H 1
 
 #include "Pandora/StatusCodes.h"
 
@@ -367,4 +367,4 @@ inline CartesianVector operator*(const CartesianVector &lhs, const double scalar
 
 } // namespace pandora
 
-#endif // #ifndef CARTESIAN_VECTOR_H
+#endif // #ifndef PANDORA_CARTESIAN_VECTOR_H

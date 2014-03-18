@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef DETECTOR_GAP_H
-#define DETECTOR_GAP_H 1
+#ifndef PANDORA_DETECTOR_GAP_H
+#define PANDORA_DETECTOR_GAP_H 1
 
 #include "Api/PandoraApi.h"
 
@@ -124,4 +124,4 @@ inline DetectorGap::~DetectorGap()
 
 } // namespace pandora
 
-#endif // #ifndef DETECTOR_GAP_H
+#endif // #ifndef PANDORA_DETECTOR_GAP_H

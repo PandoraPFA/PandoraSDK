@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef ORDERED_CALO_HIT_LIST_H
-#define ORDERED_CALO_HIT_LIST_H 1
+#ifndef PANDORA_ORDERED_CALO_HIT_LIST_H
+#define PANDORA_ORDERED_CALO_HIT_LIST_H 1
 
 #include "Objects/CaloHit.h"
 
@@ -21,9 +21,13 @@ namespace pandora
 /**
  *  @brief  Calo hit lists arranged by pseudo layer
  */
-class OrderedCaloHitList : public std::map<PseudoLayer, CaloHitList *>
+class OrderedCaloHitList
 {
 public:
+    typedef std::map<unsigned int, CaloHitList *> TheList;
+    typedef TheList::const_iterator const_iterator;
+    typedef TheList::const_reverse_iterator const_reverse_iterator;
+
     /**
      *  @brief  Default constructor
      */
@@ -113,6 +117,42 @@ public:
     void GetCaloHitList(CaloHitList &caloHitList) const;
 
     /**
+     *  @brief  Returns a const iterator referring to the first element in the ordered calo hit list
+     */
+    const_iterator begin() const;
+
+    /**
+     *  @brief  Returns a const iterator referring to the past-the-end element in the ordered calo hit list
+     */
+    const_iterator end() const;
+
+    /**
+     *  @brief  Returns a const reverse iterator referring to the first element in the ordered calo hit list
+     */
+    const_reverse_iterator rbegin() const;
+
+    /**
+     *  @brief  Returns a const reverse iterator referring to the past-the-end element in the ordered calo hit list
+     */
+    const_reverse_iterator rend() const;
+
+    /**
+     *  @brief  Searches the container for an element with specified layer and returns an iterator to it if found,
+     *          otherwise it returns an iterator to the past-the-end element.
+     */
+    const_iterator find(const unsigned int index) const;
+
+    /**
+     *  @brief  Returns the number of elements in the container.
+     */
+    unsigned int size() const;
+
+    /**
+     *  @brief  Returns whether the map container is empty (i.e. whether its size is 0)
+     */
+    bool empty() const;
+
+    /**
      *  @brief  Assignment operator
      * 
      *  @param  rhs the ordered calo hit list to assign
@@ -140,7 +180,57 @@ private:
      *  @param  pseudoLayer the pesudo layer
      */
     StatusCode Remove(CaloHit *const pCaloHit, const PseudoLayer pseudoLayer);
+
+    TheList     m_theList;      ///< The ordered calo hit list
 };
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline OrderedCaloHitList::const_iterator OrderedCaloHitList::begin() const
+{
+    return m_theList.begin();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline OrderedCaloHitList::const_iterator OrderedCaloHitList::end() const
+{
+    return m_theList.end();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline OrderedCaloHitList::const_iterator OrderedCaloHitList::find(const unsigned int index) const
+{
+    return m_theList.find(index);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline OrderedCaloHitList::const_reverse_iterator OrderedCaloHitList::rbegin() const
+{
+    return m_theList.rbegin();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline OrderedCaloHitList::const_reverse_iterator OrderedCaloHitList::rend() const
+{
+    return m_theList.rend();
+}
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline unsigned int OrderedCaloHitList::size() const
+{
+    return m_theList.size();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline bool OrderedCaloHitList::empty() const
+{
+    return m_theList.empty();
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -160,9 +250,9 @@ inline StatusCode OrderedCaloHitList::Remove(CaloHit *const pCaloHit)
 
 inline void OrderedCaloHitList::clear()
 {
-    std::map<PseudoLayer, CaloHitList *>::clear();
+    m_theList.clear();
 }
 
 } // namespace pandora
 
-#endif // #ifndef ORDERED_CALO_HIT_LIST_H
+#endif // #ifndef PANDORA_ORDERED_CALO_HIT_LIST_H

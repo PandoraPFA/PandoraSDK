@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef PLUGIN_MANAGER_H
-#define PLUGIN_MANAGER_H 1
+#ifndef PANDORA_PLUGIN_MANAGER_H
+#define PANDORA_PLUGIN_MANAGER_H 1
 
 #include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraInternal.h"
@@ -120,4 +120,4 @@ private:
 
 } // namespace pandora
 
-#endif // #ifndef PLUGIN_MANAGER_H
+#endif // #ifndef PANDORA_PLUGIN_MANAGER_H

@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef TRACK_H
-#define TRACK_H 1
+#ifndef PANDORA_TRACK_H
+#define PANDORA_TRACK_H 1
 
 #include "Api/PandoraApi.h"
 
@@ -525,4 +525,4 @@ inline void Track::SetAvailability(bool isAvailable)
 
 } // namespace pandora
 
-#endif // #ifndef TRACK_H
+#endif // #ifndef PANDORA_TRACK_H

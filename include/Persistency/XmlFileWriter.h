@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef XML_FILE_WRITER_H
-#define XML_FILE_WRITER_H 1
+#ifndef PANDORA_XML_FILE_WRITER_H
+#define PANDORA_XML_FILE_WRITER_H 1
 
 #include "Pandora/Pandora.h"
 
@@ -91,4 +91,4 @@ inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const 
 
 } // namespace pandora
 
-#endif // #ifndef XML_FILE_WRITER_H
+#endif // #ifndef PANDORA_XML_FILE_WRITER_H

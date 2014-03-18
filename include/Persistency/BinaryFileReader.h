@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef BINARY_FILE_READER_H
-#define BINARY_FILE_READER_H 1
+#ifndef PANDORA_BINARY_FILE_READER_H
+#define PANDORA_BINARY_FILE_READER_H 1
 
 #include "Pandora/Pandora.h"
 
@@ -165,4 +165,4 @@ inline StatusCode BinaryFileReader::ReadVariable(TrackState &t)
 
 } // namespace pandora
 
-#endif // #ifndef BINARY_FILE_READER_H
+#endif // #ifndef PANDORA_BINARY_FILE_READER_H

@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef XML_FILE_READER_H
-#define XML_FILE_READER_H 1
+#ifndef PANDORA_XML_FILE_READER_H
+#define PANDORA_XML_FILE_READER_H 1
 
 #include "Objects/CartesianVector.h"
 #include "Objects/TrackState.h"
@@ -88,4 +88,4 @@ private:
 
 } // namespace pandora
 
-#endif // #ifndef XML_FILE_READER_H
+#endif // #ifndef PANDORA_XML_FILE_READER_H

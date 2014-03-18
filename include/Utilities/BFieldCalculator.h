@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef BFIELD_CALCULATOR_H
-#define BFIELD_CALCULATOR_H 1
+#ifndef PANDORA_BFIELD_CALCULATOR_H
+#define PANDORA_BFIELD_CALCULATOR_H 1
 
 #include "Helpers/GeometryHelper.h"
 #include "Helpers/XmlHelper.h"
@@ -71,4 +71,4 @@ inline void BFieldCalculator::ReadSettings(const TiXmlHandle *const /*pXmlHandle
 
 } // namespace pandora
 
-#endif // #ifndef BFIELD_CALCULATOR_H
+#endif // #ifndef PANDORA_BFIELD_CALCULATOR_H

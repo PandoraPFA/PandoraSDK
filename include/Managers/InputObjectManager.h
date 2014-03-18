@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef INPUT_OBJECT_MANAGER
-#define INPUT_OBJECT_MANAGER 1
+#ifndef PANDORA_INPUT_OBJECT_MANAGER
+#define PANDORA_INPUT_OBJECT_MANAGER 1
 
 #include "Managers/Manager.h"
 
@@ -87,4 +87,4 @@ protected:
 
 } // namespace pandora
 
-#endif // #ifndef INPUT_OBJECT_MANAGER
+#endif // #ifndef PANDORA_INPUT_OBJECT_MANAGER

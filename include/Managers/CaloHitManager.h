@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef CALO_HIT_MANAGER_H
-#define CALO_HIT_MANAGER_H 1
+#ifndef PANDORA_CALO_HIT_MANAGER_H
+#define PANDORA_CALO_HIT_MANAGER_H 1
 
 #include "Api/PandoraApi.h"
 
@@ -241,4 +241,4 @@ inline StatusCode CaloHitManager::SetCaloHitAvailability(CaloHit *const pCaloHit
 
 } // namespace pandora
 
-#endif // #ifndef CALO_HIT_MANAGER_H
+#endif // #ifndef PANDORA_CALO_HIT_MANAGER_H

@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef CALO_HIT_HELPER_H
-#define CALO_HIT_HELPER_H 1
+#ifndef PANDORA_CALO_HIT_HELPER_H
+#define PANDORA_CALO_HIT_HELPER_H 1
 
 #include "Pandora/PandoraInternal.h"
 #include "Pandora/StatusCodes.h"
@@ -108,4 +108,4 @@ private:
 
 } // namespace pandora
 
-#endif // #ifndef CALO_HIT_HELPER_H
+#endif // #ifndef PANDORA_CALO_HIT_HELPER_H

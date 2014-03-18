@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef ALGORITHM_H
-#define ALGORITHM_H 1
+#ifndef PANDORA_ALGORITHM_H
+#define PANDORA_ALGORITHM_H 1
 
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraInternal.h"
@@ -182,4 +182,4 @@ inline StatusCode Algorithm::RegisterDetails(Pandora *pPandora, const std::strin
 
 } // namespace pandora
 
-#endif // #ifndef ALGORITHM_H
+#endif // #ifndef PANDORA_ALGORITHM_H

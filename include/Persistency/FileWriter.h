@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef FILE_WRITER_H
-#define FILE_WRITER_H 1
+#ifndef PANDORA_FILE_WRITER_H
+#define PANDORA_FILE_WRITER_H 1
 
 #include "Helpers/GeometryHelper.h"
 
@@ -226,4 +226,4 @@ private:
 
 } // namespace pandora
 
-#endif // #ifndef FILE_WRITER_H
+#endif // #ifndef PANDORA_FILE_WRITER_H

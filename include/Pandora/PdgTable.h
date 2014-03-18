@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef PDG_TABLE_H
-#define PDG_TABLE_H 1
+#ifndef PANDORA_PDG_TABLE_H
+#define PANDORA_PDG_TABLE_H 1
 
 namespace pandora
 {
@@ -231,4 +231,4 @@ inline int PdgTable::GetParticleCharge(const int pdgCode)
 
 } // namespace pandora
 
-#endif // #ifndef PDG_TABLE_H
+#endif // #ifndef PANDORA_PDG_TABLE_H

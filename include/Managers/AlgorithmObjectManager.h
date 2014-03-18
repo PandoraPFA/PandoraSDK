@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef ALGORITHM_OBJECT_MANAGER
-#define ALGORITHM_OBJECT_MANAGER 1
+#ifndef PANDORA_ALGORITHM_OBJECT_MANAGER
+#define PANDORA_ALGORITHM_OBJECT_MANAGER 1
 
 #include "Managers/Manager.h"
 
@@ -192,4 +192,4 @@ inline StatusCode AlgorithmObjectManager<T>::DeleteObjects(const ObjectList &obj
 
 } // namespace pandora
 
-#endif // #ifndef ALGORITHM_OBJECT_MANAGER
+#endif // #ifndef PANDORA_ALGORITHM_OBJECT_MANAGER

@@ -22,12 +22,12 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
+#ifndef PANDORA_TINYXML_INCLUDED
+#define PANDORA_TINYXML_INCLUDED
+
 #ifndef TIXML_USE_STL // Allowed use of the stl
 #define TIXML_USE_STL
 #endif
-
-#ifndef TINYXML_INCLUDED
-#define TINYXML_INCLUDED
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -1803,4 +1803,4 @@ private:
 
 } // Added namespace pandora
 
-#endif
+#endif // PANDORA_TINYXML_INCLUDED

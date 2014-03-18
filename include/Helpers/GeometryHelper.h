@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef GEOMETRY_HELPER_H
-#define GEOMETRY_HELPER_H 1
+#ifndef PANDORA_GEOMETRY_HELPER_H
+#define PANDORA_GEOMETRY_HELPER_H 1
 
 #include "Api/PandoraApi.h"
 
@@ -703,4 +703,4 @@ inline const GeometryHelper::LayerParametersList &GeometryHelper::SubDetectorPar
 
 } // namespace pandora
 
-#endif // #ifndef GEOMETRY_HELPER_H
+#endif // #ifndef PANDORA_GEOMETRY_HELPER_H

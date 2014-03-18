@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef STATUS_CODES_H
-#define STATUS_CODES_H 1
+#ifndef PANDORA_STATUS_CODES_H
+#define PANDORA_STATUS_CODES_H 1
 
 #include <exception>
 #include <string>
@@ -221,4 +221,4 @@ inline std::string StatusCodeToString(const StatusCode statusCode)
 
 } // namespace pandora
 
-#endif // #ifndef STATUS_CODES_H
+#endif // #ifndef PANDORA_STATUS_CODES_H

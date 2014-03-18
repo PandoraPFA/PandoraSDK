@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef RECLUSTER_HELPER_H
-#define RECLUSTER_HELPER_H 1
+#ifndef PANDORA_RECLUSTER_HELPER_H
+#define PANDORA_RECLUSTER_HELPER_H 1
 
 #include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraInternal.h"
@@ -410,4 +410,4 @@ inline unsigned int ReclusterHelper::ReclusterChangeLog::GetNEnergyChanges() con
 
 } // namespace pandora
 
-#endif // #ifndef RECLUSTER_HELPER_H
+#endif // #ifndef PANDORA_RECLUSTER_HELPER_H
