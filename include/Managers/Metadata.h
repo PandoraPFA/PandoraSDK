@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef METADATA_MANAGER_H
-#define METADATA_MANAGER_H 1
+#ifndef PANDORA_METADATA_MANAGER_H
+#define PANDORA_METADATA_MANAGER_H 1
 
 #include "Objects/CaloHit.h"
 
@@ -248,4 +248,4 @@ inline CaloHitMetadata *ReclusterMetadata::GetCurrentCaloHitMetadata()
 
 } // namespace pandora
 
-#endif // #ifndef METADATA_MANAGER_H
+#endif // #ifndef PANDORA_METADATA_MANAGER_H

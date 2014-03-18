@@ -36,8 +36,8 @@ distribution.
 
 #ifndef TIXML_USE_STL
 
-#ifndef TIXML_STRING_INCLUDED
-#define TIXML_STRING_INCLUDED
+#ifndef PANDORA_TIXML_STRING_INCLUDED
+#define PANDORA_TIXML_STRING_INCLUDED
 
 #include <assert.h>
 #include <string.h>
@@ -319,5 +319,5 @@ public :
 
 } // Added namespace pandora
 
-#endif	// TIXML_STRING_INCLUDED
+#endif	// PANDORA_TIXML_STRING_INCLUDED
 #endif	// TIXML_USE_STL

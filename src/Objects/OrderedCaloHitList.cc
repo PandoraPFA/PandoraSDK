@@ -12,15 +12,13 @@
 namespace pandora
 {
 
-OrderedCaloHitList::OrderedCaloHitList() :
-    std::map<PseudoLayer, CaloHitList *>()
+OrderedCaloHitList::OrderedCaloHitList()
 {
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-OrderedCaloHitList::OrderedCaloHitList(const OrderedCaloHitList &rhs) :
-    std::map<PseudoLayer, CaloHitList *>()
+OrderedCaloHitList::OrderedCaloHitList(const OrderedCaloHitList &rhs)
 {
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Add(rhs));
 }
@@ -29,7 +27,7 @@ OrderedCaloHitList::OrderedCaloHitList(const OrderedCaloHitList &rhs) :
 
 OrderedCaloHitList::~OrderedCaloHitList()
 {
-    for (OrderedCaloHitList::iterator iter = this->begin(), iterEnd = this->end(); iter != iterEnd; ++iter)
+    for (TheList::iterator iter = m_theList.begin(), iterEnd = m_theList.end(); iter != iterEnd; ++iter)
     {
         delete iter->second;
     }
@@ -121,7 +119,7 @@ unsigned int OrderedCaloHitList::GetNCaloHitsInPseudoLayer(const PseudoLayer pse
 
 void OrderedCaloHitList::Reset()
 {
-    for (OrderedCaloHitList::iterator iter = this->begin(), iterEnd = this->end(); iter != iterEnd; ++iter)
+    for (TheList::iterator iter = m_theList.begin(), iterEnd = m_theList.end(); iter != iterEnd; ++iter)
         delete iter->second;
 
     this->clear();
@@ -157,9 +155,9 @@ bool OrderedCaloHitList::operator= (const OrderedCaloHitList &rhs)
 
 StatusCode OrderedCaloHitList::Add(CaloHit *const pCaloHit, const PseudoLayer pseudoLayer)
 {
-    OrderedCaloHitList::iterator iter = this->find(pseudoLayer);
+    TheList::iterator iter = m_theList.find(pseudoLayer);
 
-    if (this->end() == iter)
+    if (m_theList.end() == iter)
     {
         CaloHitList *pCaloHitList = new CaloHitList;
 
@@ -169,7 +167,7 @@ StatusCode OrderedCaloHitList::Add(CaloHit *const pCaloHit, const PseudoLayer ps
             return STATUS_CODE_FAILURE;
         }
 
-        if (!(this->insert(OrderedCaloHitList::value_type(pseudoLayer, pCaloHitList)).second))
+        if (!(m_theList.insert(TheList::value_type(pseudoLayer, pCaloHitList)).second))
         {
             delete pCaloHitList;
             return STATUS_CODE_FAILURE;
@@ -188,9 +186,9 @@ StatusCode OrderedCaloHitList::Add(CaloHit *const pCaloHit, const PseudoLayer ps
 
 StatusCode OrderedCaloHitList::Remove(CaloHit *const pCaloHit, const PseudoLayer pseudoLayer)
 {
-    OrderedCaloHitList::iterator listIter = this->find(pseudoLayer);
+    TheList::iterator listIter = m_theList.find(pseudoLayer);
 
-    if (this->end() == listIter)
+    if (m_theList.end() == listIter)
         return STATUS_CODE_NOT_FOUND;
 
     CaloHitList::iterator caloHitIter = listIter->second->find(pCaloHit);
@@ -203,7 +201,7 @@ StatusCode OrderedCaloHitList::Remove(CaloHit *const pCaloHit, const PseudoLayer
     if (listIter->second->empty())
     {
         delete listIter->second;
-        this->erase(listIter);
+        m_theList.erase(listIter);
     }
 
     return STATUS_CODE_SUCCESS;

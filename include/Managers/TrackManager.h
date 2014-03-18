@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef TRACK_MANAGER_H
-#define TRACK_MANAGER_H 1
+#ifndef PANDORA_TRACK_MANAGER_H
+#define PANDORA_TRACK_MANAGER_H 1
 
 #include "Api/PandoraApi.h"
 
@@ -131,4 +131,4 @@ private:
 
 } // namespace pandora
 
-#endif // #ifndef TRACK_MANAGER_H
+#endif // #ifndef PANDORA_TRACK_MANAGER_H

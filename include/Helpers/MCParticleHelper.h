@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef MC_PARTICLE_HELPER_H
-#define MC_PARTICLE_HELPER_H 1
+#ifndef PANDORA_MC_PARTICLE_HELPER_H
+#define PANDORA_MC_PARTICLE_HELPER_H 1
 
 #include "Pandora/PandoraInternal.h"
 #include "Pandora/StatusCodes.h"
@@ -46,4 +46,4 @@ private:
 
 } // namespace pandora
 
-#endif // #ifndef MC_PARTICLE_HELPER_H
+#endif // #ifndef PANDORA_MC_PARTICLE_HELPER_H

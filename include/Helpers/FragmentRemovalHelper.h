@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef FRAGMENT_REMOVAL_HELPER_H
-#define FRAGMENT_REMOVAL_HELPER_H 1
+#ifndef PANDORA_FRAGMENT_REMOVAL_HELPER_H
+#define PANDORA_FRAGMENT_REMOVAL_HELPER_H 1
 
 #include "Objects/CartesianVector.h"
 
@@ -293,4 +293,4 @@ inline float ClusterContact::GetConeFraction1() const
 
 } // namespace pandora
 
-#endif // #ifndef FRAGMENT_REMOVAL_HELPER_H
+#endif // #ifndef PANDORA_FRAGMENT_REMOVAL_HELPER_H

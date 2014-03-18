@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef TRACK_STATE_H
-#define TRACK_STATE_H 1
+#ifndef PANDORA_TRACK_STATE_H
+#define PANDORA_TRACK_STATE_H 1
 
 #include "Objects/CartesianVector.h"
 
@@ -82,4 +82,4 @@ inline const CartesianVector &TrackState::GetMomentum() const
 
 } // namespace pandora
 
-#endif // #ifndef TRACK_STATE_H
+#endif // #ifndef PANDORA_TRACK_STATE_H

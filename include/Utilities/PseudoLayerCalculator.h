@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef PSEUDO_LAYER_CALCULATOR_H
-#define PSEUDO_LAYER_CALCULATOR_H 1
+#ifndef PANDORA_PSEUDO_LAYER_CALCULATOR_H
+#define PANDORA_PSEUDO_LAYER_CALCULATOR_H 1
 
 #include "Helpers/GeometryHelper.h"
 #include "Helpers/XmlHelper.h"
@@ -79,4 +79,4 @@ inline void PseudoLayerCalculator::ReadSettings(const TiXmlHandle *const /*pXmlH
 
 } // namespace pandora
 
-#endif // #ifndef PSEUDO_LAYER_CALCULATOR_H
+#endif // #ifndef PANDORA_PSEUDO_LAYER_CALCULATOR_H

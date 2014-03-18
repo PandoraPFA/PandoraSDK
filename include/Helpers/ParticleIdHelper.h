@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef PARTICLE_ID_HELPER_H
-#define PARTICLE_ID_HELPER_H 1
+#ifndef PANDORA_PARTICLE_ID_HELPER_H
+#define PANDORA_PARTICLE_ID_HELPER_H 1
 
 #include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraInternal.h"
@@ -223,4 +223,4 @@ inline const CaloHitList &ParticleIdHelper::ShowerPeak::GetPeakCaloHitList() con
 
 } // namespace pandora
 
-#endif // #ifndef PARTICLE_ID_HELPER_H
+#endif // #ifndef PANDORA_PARTICLE_ID_HELPER_H

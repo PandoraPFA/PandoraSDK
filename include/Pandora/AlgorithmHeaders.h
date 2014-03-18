@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef ALGORITHM_HEADERS_H
-#define ALGORITHM_HEADERS_H 1
+#ifndef PANDORA_ALGORITHM_HEADERS_H
+#define PANDORA_ALGORITHM_HEADERS_H 1
 
 #include "Api/PandoraContentApi.h"
 
@@ -43,4 +43,4 @@
 #include <cmath>
 #include <limits>
 
-#endif // #ifndef ALGORITHM_HEADERS_H
+#endif // #ifndef PANDORA_ALGORITHM_HEADERS_H

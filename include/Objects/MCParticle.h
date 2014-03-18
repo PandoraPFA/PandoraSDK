@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef MC_PARTICLE_H
-#define MC_PARTICLE_H 1
+#ifndef PANDORA_MC_PARTICLE_H
+#define PANDORA_MC_PARTICLE_H 1
 
 #include "Api/PandoraApi.h"
 
@@ -407,4 +407,4 @@ inline const MCParticleList &MCParticle::GetDaughterList() const
 
 } // namespace pandora
 
-#endif // #ifndef MC_PARTICLE_H
+#endif // #ifndef PANDORA_MC_PARTICLE_H

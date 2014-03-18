@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef PARTICLE_FLOW_OBJECT_MANAGER_H
-#define PARTICLE_FLOW_OBJECT_MANAGER_H 1
+#ifndef PANDORA_PARTICLE_FLOW_OBJECT_MANAGER_H
+#define PANDORA_PARTICLE_FLOW_OBJECT_MANAGER_H 1
 
 #include "Api/PandoraContentApi.h"
 
@@ -101,4 +101,4 @@ private:
 
 } // namespace pandora
 
-#endif // #ifndef PARTICLE_FLOW_OBJECT_MANAGER_H
+#endif // #ifndef PANDORA_PARTICLE_FLOW_OBJECT_MANAGER_H

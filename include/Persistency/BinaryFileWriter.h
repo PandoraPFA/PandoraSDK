@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef BINARY_FILE_WRITER_H
-#define BINARY_FILE_WRITER_H 1
+#ifndef PANDORA_BINARY_FILE_WRITER_H
+#define PANDORA_BINARY_FILE_WRITER_H 1
 
 #include "Pandora/Pandora.h"
 
@@ -108,4 +108,4 @@ inline StatusCode BinaryFileWriter::WriteVariable(const TrackState &t)
 
 } // namespace pandora
 
-#endif // #ifndef BINARY_FILE_WRITER_H
+#endif // #ifndef PANDORA_BINARY_FILE_WRITER_H

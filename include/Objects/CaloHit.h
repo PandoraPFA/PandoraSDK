@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef CALO_HIT_H
-#define CALO_HIT_H 1
+#ifndef PANDORA_CALO_HIT_H
+#define PANDORA_CALO_HIT_H 1
 
 #include "Api/PandoraApi.h"
 
@@ -689,4 +689,4 @@ inline float PointingCaloHit::GetCellLengthScale() const
 
 } // namespace pandora
 
-#endif // #ifndef CALO_HIT_H
+#endif // #ifndef PANDORA_CALO_HIT_H

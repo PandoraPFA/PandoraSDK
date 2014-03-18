@@ -21,6 +21,9 @@ namespace pandora
 
 float GeometryHelper::GetBField(const CartesianVector &positionVector)
 {
+    if (NULL == m_pBFieldCalculator)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
     return m_pBFieldCalculator->GetBField(positionVector);
 }
 
@@ -28,6 +31,9 @@ float GeometryHelper::GetBField(const CartesianVector &positionVector)
 
 PseudoLayer GeometryHelper::GetPseudoLayer(const CartesianVector &positionVector)
 {
+    if (NULL == m_pPseudoLayerCalculator)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
     return m_pPseudoLayerCalculator->GetPseudoLayer(positionVector);
 }
 
@@ -35,6 +41,9 @@ PseudoLayer GeometryHelper::GetPseudoLayer(const CartesianVector &positionVector
 
 PseudoLayer GeometryHelper::GetPseudoLayerAtIp()
 {
+    if (NULL == m_pPseudoLayerCalculator)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
     return m_pPseudoLayerCalculator->GetPseudoLayerAtIp();
 }
 

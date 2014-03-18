@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef CLUSTER_HELPER_H
-#define CLUSTER_HELPER_H 1
+#ifndef PANDORA_CLUSTER_HELPER_H
+#define PANDORA_CLUSTER_HELPER_H 1
 
 #include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraInternal.h"
@@ -597,4 +597,4 @@ inline void ClusterHelper::ClusterFitResult::Reset()
 
 } // namespace pandora
 
-#endif // #ifndef CLUSTER_HELPER_H
+#endif // #ifndef PANDORA_CLUSTER_HELPER_H

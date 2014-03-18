@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef CLUSTER_H
-#define CLUSTER_H 1
+#ifndef PANDORA_CLUSTER_H
+#define PANDORA_CLUSTER_H 1
 
 #include "Api/PandoraContentApi.h"
 
@@ -908,4 +908,4 @@ inline void Cluster::SetAvailability(bool isAvailable)
 
 } // namespace pandora
 
-#endif // #ifndef CLUSTER_H
+#endif // #ifndef PANDORA_CLUSTER_H

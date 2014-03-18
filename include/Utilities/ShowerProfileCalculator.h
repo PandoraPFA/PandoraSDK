@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef SHOWER_PROFILE_CALCULATOR_H
-#define SHOWER_PROFILE_CALCULATOR_H 1
+#ifndef PANDORA_SHOWER_PROFILE_CALCULATOR_H
+#define PANDORA_SHOWER_PROFILE_CALCULATOR_H 1
 
 #include "Helpers/ParticleIdHelper.h"
 #include "Helpers/XmlHelper.h"
@@ -68,4 +68,4 @@ inline void ShowerProfileCalculator::ReadSettings(const TiXmlHandle *const /*pXm
 
 } // namespace pandora
 
-#endif // #ifndef SHOWER_PROFILE_CALCULATOR_H
+#endif // #ifndef PANDORA_SHOWER_PROFILE_CALCULATOR_H

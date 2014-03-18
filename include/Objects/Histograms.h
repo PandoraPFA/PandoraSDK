@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef HISTOGRAMS_H
-#define HISTOGRAMS_H 1
+#ifndef PANDORA_HISTOGRAMS_H
+#define PANDORA_HISTOGRAMS_H 1
 
 #include <map>
 
@@ -628,4 +628,4 @@ inline float TwoDHistogram::GetStandardDeviationY() const
 
 } // namespace pandora
 
-#endif // #ifndef HISTOGRAMS_H
+#endif // #ifndef PANDORA_HISTOGRAMS_H

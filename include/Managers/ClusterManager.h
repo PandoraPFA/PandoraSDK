@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef CLUSTER_MANAGER_H
-#define CLUSTER_MANAGER_H 1
+#ifndef PANDORA_CLUSTER_MANAGER_H
+#define PANDORA_CLUSTER_MANAGER_H 1
 
 #include "Api/PandoraContentApi.h"
 
@@ -150,4 +150,4 @@ inline StatusCode ClusterManager::RemoveIsolatedCaloHitFromCluster(Cluster *pClu
 
 } // namespace pandora
 
-#endif // #ifndef CLUSTER_MANAGER_H
+#endif // #ifndef PANDORA_CLUSTER_MANAGER_H

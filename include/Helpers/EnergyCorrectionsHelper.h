@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef ENERGY_CORRECTIONS_HELPER_H
-#define ENERGY_CORRECTIONS_HELPER_H 1
+#ifndef PANDORA_ENERGY_CORRECTIONS_HELPER_H
+#define PANDORA_ENERGY_CORRECTIONS_HELPER_H 1
 
 #include "Pandora/PandoraInternal.h"
 #include "Pandora/PandoraInputTypes.h"
@@ -53,4 +53,4 @@ private:
 
 } // namespace pandora
 
-#endif // #ifndef ENERGY_CORRECTIONS_HELPER_H
+#endif // #ifndef PANDORA_ENERGY_CORRECTIONS_HELPER_H

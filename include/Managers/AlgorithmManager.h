@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef ALGORITHM_MANAGER_H
-#define ALGORITHM_MANAGER_H 1
+#ifndef PANDORA_ALGORITHM_MANAGER_H
+#define PANDORA_ALGORITHM_MANAGER_H 1
 
 #include "Pandora/PandoraInternal.h"
 #include "Pandora/StatusCodes.h"
@@ -130,4 +130,4 @@ inline const StringVector *AlgorithmManager::GetPandoraAlgorithms() const
 
 } // namespace pandora
 
-#endif // #ifndef ALGORITHM_MANAGER_H
+#endif // #ifndef PANDORA_ALGORITHM_MANAGER_H

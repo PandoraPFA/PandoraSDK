@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef HELIX_H
-#define HELIX_H 1
+#ifndef PANDORA_HELIX_H
+#define PANDORA_HELIX_H 1
 
 #include "Objects/CartesianVector.h"
 
@@ -390,4 +390,4 @@ inline float Helix::GetRadius() const
 
 } // namespace pandora
 
-#endif // #ifndef HELIX_H
+#endif // #ifndef PANDORA_HELIX_H

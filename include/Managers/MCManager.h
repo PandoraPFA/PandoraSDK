@@ -5,8 +5,8 @@
  * 
  *  $Log: $
  */
-#ifndef MC_MANAGER_H
-#define MC_MANAGER_H 1
+#ifndef PANDORA_MC_MANAGER_H
+#define PANDORA_MC_MANAGER_H 1
 
 #include "Api/PandoraApi.h"
 
@@ -186,4 +186,4 @@ inline StatusCode MCManager::CreateTrackToPfoTargetsMap(UidToMCParticleWeightMap
 
 } // namespace pandora
 
-#endif // #ifndef MC_MANAGER_H
+#endif // #ifndef PANDORA_MC_MANAGER_H
