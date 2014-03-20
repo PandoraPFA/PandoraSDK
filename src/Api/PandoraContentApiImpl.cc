@@ -155,8 +155,11 @@ StatusCode PandoraContentApiImpl::RunAlgorithm(const std::string &algorithmName)
         std::cout << "Failure in algorithm " << iter->first << ", " << iter->second->GetAlgorithmType() << ", unrecognized exception" << std::endl;
     }
 
+    PfoList pfosToBeDeleted;
     ClusterList clustersToBeDeleted;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->GetResetDeletionObjects(iter->second, pfosToBeDeleted));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->GetResetDeletionObjects(iter->second, clustersToBeDeleted));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareForDeletion(pfosToBeDeleted));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareForDeletion(clustersToBeDeleted));
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->ResetAlgorithmInfo(iter->second, true));
