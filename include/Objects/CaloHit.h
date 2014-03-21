@@ -157,20 +157,6 @@ public:
     float GetHadronicEnergy() const;
 
     /**
-     *  @brief  Get the surrounding energy
-     * 
-     *  @return the surrounding energy
-     */
-    float GetSurroundingEnergy() const;
-
-    /**
-     *  @brief  Get the density weight
-     * 
-     *  @return the density weight
-     */
-    float GetDensityWeight() const;
-
-    /**
      *  @brief  Whether the calo hit is flagged as a possible mip hit
      * 
      *  @return boolean
@@ -260,20 +246,6 @@ protected:
     StatusCode SetPseudoLayer(PseudoLayer pseudoLayer);
 
     /**
-     *  @brief  Set the density weight
-     * 
-     *  @param  densityWeight the density weight
-     */
-    StatusCode SetDensityWeight(float densityWeight);
-
-    /**
-     *  @brief  Set the surrounding energy value
-     * 
-     *  @param  surroundingEnergy the surrounding energy value
-     */
-    StatusCode SetSurroundingEnergy(float surroundingEnergy);
-
-    /**
      *  @brief  Set the isolated hit flag
      * 
      *  @param  isolatedFlag the isolated hit flag
@@ -320,8 +292,6 @@ protected:
     InputPseudoLayer        m_pseudoLayer;              ///< The pseudo layer to which the calo hit has been assigned
     const bool              m_isInOuterSamplingLayer;   ///< Whether cell is in one of the outermost detector sampling layers
 
-    InputFloat              m_densityWeight;            ///< The density weight
-    InputFloat              m_surroundingEnergy;        ///< The surrounding energy, units GeV
     bool                    m_isPossibleMip;            ///< Whether the calo hit is a possible mip hit
     bool                    m_isIsolated;               ///< Whether the calo hit is isolated
     bool                    m_isAvailable;              ///< Whether the calo hit is available to be added to a cluster
@@ -569,36 +539,6 @@ inline float CaloHit::GetElectromagneticEnergy() const
 inline float CaloHit::GetHadronicEnergy() const
 {
     return m_hadronicEnergy;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float CaloHit::GetSurroundingEnergy() const
-{
-    try
-    {
-        return m_surroundingEnergy.Get();
-    }
-    catch (StatusCodeException &statusCodeException)
-    {
-        std::cout << "CaloHit::GetSurroundingEnergy " << statusCodeException.ToString() << std::endl;
-        throw statusCodeException;
-    }
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float CaloHit::GetDensityWeight() const
-{
-    try
-    {
-        return m_densityWeight.Get();
-    }
-    catch (StatusCodeException &statusCodeException)
-    {
-        std::cout << "CaloHit::GetDensityWeight " << statusCodeException.ToString() << std::endl;
-        throw statusCodeException;
-    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

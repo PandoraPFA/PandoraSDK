@@ -82,8 +82,6 @@ CaloHit::CaloHit(CaloHit *pCaloHit, const float weight) :
     m_layer(pCaloHit->m_layer),
     m_pseudoLayer(pCaloHit->m_pseudoLayer),
     m_isInOuterSamplingLayer(pCaloHit->m_isInOuterSamplingLayer),
-    m_densityWeight(pCaloHit->m_densityWeight),
-    m_surroundingEnergy(pCaloHit->m_surroundingEnergy),
     m_isPossibleMip(pCaloHit->m_isPossibleMip),
     m_isIsolated(pCaloHit->m_isIsolated),
     m_isAvailable(pCaloHit->m_isAvailable),
@@ -107,26 +105,6 @@ CaloHit::~CaloHit()
 StatusCode CaloHit::SetPseudoLayer(PseudoLayer pseudoLayer)
 {
     if (!(m_pseudoLayer = pseudoLayer))
-        return STATUS_CODE_NOT_INITIALIZED;
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode CaloHit::SetDensityWeight(float densityWeight)
-{
-    if (!(m_densityWeight = densityWeight))
-        return STATUS_CODE_NOT_INITIALIZED;
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode CaloHit::SetSurroundingEnergy(float surroundingEnergy)
-{
-    if (!(m_surroundingEnergy = surroundingEnergy))
         return STATUS_CODE_NOT_INITIALIZED;
 
     return STATUS_CODE_SUCCESS;
