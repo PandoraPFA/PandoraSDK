@@ -14,15 +14,15 @@
 namespace pandora
 {
 
-ParticleFlowObject::ParticleFlowObject(const PandoraContentApi::ParticleFlowObjectParameters &particleFlowObjectParameters) :
-    m_particleId(particleFlowObjectParameters.m_particleId.Get()),
-    m_charge(particleFlowObjectParameters.m_charge.Get()),
-    m_mass(particleFlowObjectParameters.m_mass.Get()),
-    m_energy(particleFlowObjectParameters.m_energy.Get()),
-    m_momentum(particleFlowObjectParameters.m_momentum.Get()),
-    m_vertex(particleFlowObjectParameters.m_vertex.Get()),
-    m_trackList(particleFlowObjectParameters.m_trackList),
-    m_clusterList(particleFlowObjectParameters.m_clusterList)
+ParticleFlowObject::ParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &parameters) :
+    m_particleId(parameters.m_particleId.Get()),
+    m_charge(parameters.m_charge.Get()),
+    m_mass(parameters.m_mass.Get()),
+    m_energy(parameters.m_energy.Get()),
+    m_momentum(parameters.m_momentum.Get()),
+    m_vertex(parameters.m_vertex.Get()),
+    m_trackList(parameters.m_trackList),
+    m_clusterList(parameters.m_clusterList)
 {
 }
 

@@ -188,8 +188,10 @@ public:
 private:
     /**
      *  @brief  Constructor
+     * 
+     *  @param  parameters the particle flow object parameters
      */
-    ParticleFlowObject(const PandoraContentApi::ParticleFlowObjectParameters &particleFlowObjectParameters);
+    ParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &parameters);
 
     /**
      *  @brief  Destructor
@@ -240,6 +242,8 @@ private:
     friend class ParticleFlowObjectManager;
     friend class AlgorithmObjectManager<ParticleFlowObject>;
 };
+
+typedef ParticleFlowObject Pfo;                         ///< The ParticleFlowObject to Pfo typedef
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
