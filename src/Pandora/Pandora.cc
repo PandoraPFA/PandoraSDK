@@ -18,6 +18,7 @@
 #include "Managers/ParticleFlowObjectManager.h"
 #include "Managers/PluginManager.h"
 #include "Managers/TrackManager.h"
+#include "Managers/VertexManager.h"
 
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraImpl.h"
@@ -36,6 +37,7 @@ Pandora::Pandora() :
     m_pPfoManager(NULL),
     m_pPluginManager(NULL),
     m_pTrackManager(NULL),
+    m_pVertexManager(NULL),
     m_pPandoraApiImpl(NULL),
     m_pPandoraContentApiImpl(NULL),
     m_pPandoraImpl(NULL)
@@ -49,6 +51,7 @@ Pandora::Pandora() :
         m_pPfoManager = new ParticleFlowObjectManager;
         m_pPluginManager = new PluginManager;
         m_pTrackManager = new TrackManager;
+        m_pVertexManager = new VertexManager;
         m_pPandoraApiImpl = new PandoraApiImpl(this);
         m_pPandoraContentApiImpl = new PandoraContentApiImpl(this);
         m_pPandoraImpl = new PandoraImpl(this);
@@ -78,6 +81,7 @@ Pandora::~Pandora()
     delete m_pPfoManager;
     delete m_pPluginManager;
     delete m_pTrackManager;
+    delete m_pVertexManager;
     delete m_pPandoraApiImpl;
     delete m_pPandoraContentApiImpl;
     delete m_pPandoraImpl;

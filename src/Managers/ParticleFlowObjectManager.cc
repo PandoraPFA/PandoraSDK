@@ -62,22 +62,18 @@ StatusCode ParticleFlowObjectManager::CreateParticleFlowObject(const PandoraCont
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObjectManager::AddClusterToPfo(ParticleFlowObject *pPfo, Cluster *pCluster) const
+template <typename T>
+StatusCode ParticleFlowObjectManager::AddToPfo(ParticleFlowObject *pPfo, T *pT) const
 {
-    if (!pPfo->m_clusterList.insert(pCluster).second)
-        return STATUS_CODE_ALREADY_PRESENT;
-
-    return STATUS_CODE_SUCCESS;
+    return pPfo->AddToPfo(pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObjectManager::AddTrackToPfo(ParticleFlowObject *pPfo, Track *pTrack) const
+template <typename T>
+StatusCode ParticleFlowObjectManager::RemoveFromPfo(ParticleFlowObject *pPfo, T *pT) const
 {
-    if (!pPfo->m_trackList.insert(pTrack).second)
-        return STATUS_CODE_ALREADY_PRESENT;
-
-    return STATUS_CODE_SUCCESS;
+    return pPfo->RemoveFromPfo(pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -92,36 +88,6 @@ StatusCode ParticleFlowObjectManager::SetParentDaughterAssociation(ParticleFlowO
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObjectManager::RemoveClusterFromPfo(ParticleFlowObject *pPfo, Cluster *pCluster)
-{
-    ClusterList &clusterList = pPfo->m_clusterList;
-    ClusterList::iterator clusterIter = clusterList.find(pCluster);
-
-    if (clusterList.end() == clusterIter)
-        return STATUS_CODE_NOT_FOUND;
-
-    clusterList.erase(clusterIter);
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode ParticleFlowObjectManager::RemoveTrackFromPfo(ParticleFlowObject *pPfo, Track *pTrack)
-{
-    TrackList &trackList = pPfo->m_trackList;
-    TrackList::iterator trackIter = trackList.find(pTrack);
-
-    if (trackList.end() == trackIter)
-        return STATUS_CODE_NOT_FOUND;
-
-    trackList.erase(trackIter);
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 StatusCode ParticleFlowObjectManager::RemoveParentDaughterAssociation(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pParentPfo->RemoveDaughter(pDaughterPfo));
@@ -129,5 +95,16 @@ StatusCode ParticleFlowObjectManager::RemoveParentDaughterAssociation(ParticleFl
 
     return STATUS_CODE_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template StatusCode ParticleFlowObjectManager::AddToPfo<Cluster>(ParticleFlowObject *, Cluster *) const;
+template StatusCode ParticleFlowObjectManager::AddToPfo<Track>(ParticleFlowObject *, Track *) const;
+template StatusCode ParticleFlowObjectManager::AddToPfo<Vertex>(ParticleFlowObject *, Vertex *) const;
+
+template StatusCode ParticleFlowObjectManager::RemoveFromPfo<Cluster>(ParticleFlowObject *, Cluster *) const;
+template StatusCode ParticleFlowObjectManager::RemoveFromPfo<Track>(ParticleFlowObject *, Track *) const;
+template StatusCode ParticleFlowObjectManager::RemoveFromPfo<Vertex>(ParticleFlowObject *, Vertex *) const;
 
 } //  namespace pandora

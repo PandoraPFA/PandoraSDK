@@ -44,20 +44,22 @@ private:
         ParticleFlowObject *&pPfo);
 
     /**
-     *  @brief  Add a cluster to a particle flow object
+     *  @brief  Add an object to a particle flow object
      *
      *  @param  pPfo address of the particle flow object to modify
-     *  @param  pCluster address of the cluster to add
+     *  @param  pT address of the object to add
      */
-    StatusCode AddClusterToPfo(ParticleFlowObject *pPfo, Cluster *pCluster) const;
+    template <typename T>
+    StatusCode AddToPfo(ParticleFlowObject *pPfo, T *pT) const;
 
     /**
-     *  @brief  Add a track to a particle flow object
+     *  @brief  Remove an object from a particle flow object
      *
      *  @param  pPfo address of the particle flow object to modify
-     *  @param  pTrack address of the track to add
+     *  @param  pT address of the object to remove
      */
-    StatusCode AddTrackToPfo(ParticleFlowObject *pPfo, Track *pTrack) const;
+    template <typename T>
+    StatusCode RemoveFromPfo(ParticleFlowObject *pPfo, T *pT) const;
 
     /**
      *  @brief  Add a parent-daughter particle flow object relationship
@@ -66,25 +68,6 @@ private:
      *  @param  pDaughterPfo address of daughter particle flow object
      */
     StatusCode SetParentDaughterAssociation(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const;
-
-    /**
-     *  @brief  Remove a cluster from a particle flow object. Note this function will not remove the final object (track or cluster)
-     *          from a particle flow object, and will instead return status code "not allowed" as a prompt to delete the cluster
-     *
-     *  @param  algorithm the algorithm calling this function
-     *  @param  pPfo address of the particle flow object to modify
-     *  @param  pCluster address of the cluster to remove
-     */
-    StatusCode RemoveClusterFromPfo(ParticleFlowObject *pPfo, Cluster *pCluster);
-
-    /**
-     *  @brief  Remove a track from a particle flow object. Note this function will not remove the final object (track or cluster)
-     *          from a particle flow object, and will instead return status code "not allowed" as a prompt to delete the cluster
-     *
-     *  @param  pPfo address of the particle flow object to modify
-     *  @param  pTrack address of the track to remove
-     */
-    StatusCode RemoveTrackFromPfo(ParticleFlowObject *pPfo, Track *pTrack);
 
     /**
      *  @brief  Remove a parent-daughter particle flow object relationship

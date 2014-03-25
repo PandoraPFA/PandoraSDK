@@ -35,6 +35,7 @@ class ShowerProfileCalculator;
 class Track;
 class TrackState;
 class TwoDHistogram;
+class Vertex;
 
 // Macro allowing use of pandora monitoring to be quickly included/excluded via pre-processor flag
 #ifdef MONITORING
@@ -152,13 +153,15 @@ typedef std::set<CaloHit *> CaloHitList;
 typedef std::set<Track *> TrackList;
 typedef std::set<Cluster *> ClusterList;
 typedef std::set<MCParticle *> MCParticleList;
-typedef std::vector<TrackState *> TrackStateList;
+typedef std::set<ParticleFlowObject *> PfoList;
+typedef std::set<Vertex *> VertexList;
+
 typedef std::vector<CaloHit *> CaloHitVector;
 typedef std::vector<Track *> TrackVector;
 typedef std::vector<Cluster *> ClusterVector;
 typedef std::vector<MCParticle *> MCParticleVector;
 typedef std::vector<ParticleFlowObject *> PfoVector;
-typedef std::set<ParticleFlowObject *> PfoList;
+typedef std::vector<Vertex *> VertexVector;
 
 typedef unsigned int PseudoLayer;
 typedef std::set<std::string> StringSet;

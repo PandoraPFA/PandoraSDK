@@ -30,6 +30,7 @@
 #include "Objects/ParticleFlowObject.h"
 #include "Objects/Track.h"
 #include "Objects/TrackState.h"
+#include "Objects/Vertex.h"
 
 #include "Pandora/AlgorithmTool.h"
 #include "Pandora/PandoraInternal.h"

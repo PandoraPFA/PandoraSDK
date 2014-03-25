@@ -19,10 +19,12 @@
 #include "Managers/MCManager.h"
 #include "Managers/TrackManager.h"
 #include "Managers/ParticleFlowObjectManager.h"
+#include "Managers/VertexManager.h"
 
 #include "Objects/Cluster.h"
 #include "Objects/ParticleFlowObject.h"
 #include "Objects/Track.h"
+#include "Objects/Vertex.h"
 
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraSettings.h"
@@ -60,33 +62,49 @@ StatusCode PandoraContentApiImpl::CreateCluster(Track *pTrack, Cluster *&pCluste
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraContentApiImpl::CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &particleFlowObjectParameters,
+StatusCode PandoraContentApiImpl::CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &pfoParameters,
     ParticleFlowObject *&pPfo) const
 {
-    const TrackList &trackList(particleFlowObjectParameters.m_trackList);
-    const ClusterList &clusterList(particleFlowObjectParameters.m_clusterList);
-
+    const TrackList &trackList(pfoParameters.m_trackList);
     for (TrackList::const_iterator iter = trackList.begin(), iterEnd = trackList.end(); iter != iterEnd; ++iter)
     {
         if (!(*iter)->IsAvailable())
             return STATUS_CODE_NOT_ALLOWED;
     }
 
+    const ClusterList &clusterList(pfoParameters.m_clusterList);
     for (ClusterList::const_iterator iter = clusterList.begin(), iterEnd = clusterList.end(); iter != iterEnd; ++iter)
     {
         if (!(*iter)->IsAvailable())
             return STATUS_CODE_NOT_ALLOWED;
     }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->CreateParticleFlowObject(particleFlowObjectParameters, pPfo));
+    const VertexList &vertexList(pfoParameters.m_vertexList);
+    for (VertexList::const_iterator iter = vertexList.begin(), iterEnd = vertexList.end(); iter != iterEnd; ++iter)
+    {
+        if (!(*iter)->IsAvailable())
+            return STATUS_CODE_NOT_ALLOWED;
+    }
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->CreateParticleFlowObject(pfoParameters, pPfo));
 
     for (TrackList::const_iterator iter = trackList.begin(), iterEnd = trackList.end(); iter != iterEnd; ++iter)
         (*iter)->SetAvailability(false);
 
     for (ClusterList::const_iterator iter = clusterList.begin(), iterEnd = clusterList.end(); iter != iterEnd; ++iter)
+        (*iter)->SetAvailability(false);
+
+    for (VertexList::const_iterator iter = vertexList.begin(), iterEnd = vertexList.end(); iter != iterEnd; ++iter)
         (*iter)->SetAvailability(false);
 
     return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PandoraContentApiImpl::CreateVertex(const CartesianVector &vertexPosition, Vertex *&pVertex) const
+{
+    return m_pPandora->m_pVertexManager->CreateVertex(vertexPosition, pVertex);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -154,6 +172,12 @@ StatusCode PandoraContentApiImpl::GetCurrentList(const MCParticleList *&pMCParti
     return m_pPandora->m_pMCManager->GetCurrentList(pMCParticleList, listName);
 }
 
+template <>
+StatusCode PandoraContentApiImpl::GetCurrentList(const VertexList *&pVertexList, std::string &listName) const
+{
+    return m_pPandora->m_pVertexManager->GetCurrentList(pVertexList, listName);
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <>
@@ -184,6 +208,12 @@ template <>
 StatusCode PandoraContentApiImpl::GetCurrentListName<Pfo>(std::string &listName) const
 {
     return m_pPandora->m_pPfoManager->GetCurrentListName(listName);
+}
+
+template <>
+StatusCode PandoraContentApiImpl::GetCurrentListName<Vertex>(std::string &listName) const
+{
+    return m_pPandora->m_pVertexManager->GetCurrentListName(listName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -218,6 +248,12 @@ StatusCode PandoraContentApiImpl::ReplaceCurrentList<Pfo>(const Algorithm &algor
     return m_pPandora->m_pPfoManager->ReplaceCurrentAndAlgorithmInputLists(&algorithm, newListName);
 }
 
+template <>
+StatusCode PandoraContentApiImpl::ReplaceCurrentList<Vertex>(const Algorithm &algorithm, const std::string &newListName) const
+{
+    return m_pPandora->m_pVertexManager->ReplaceCurrentAndAlgorithmInputLists(&algorithm, newListName);
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <>
@@ -248,6 +284,12 @@ template <>
 StatusCode PandoraContentApiImpl::DropCurrentList<Pfo>() const
 {
     return m_pPandora->m_pPfoManager->DropCurrentList();
+}
+
+template <>
+StatusCode PandoraContentApiImpl::DropCurrentList<Vertex>() const
+{
+    return m_pPandora->m_pVertexManager->DropCurrentList();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -282,6 +324,12 @@ StatusCode PandoraContentApiImpl::GetList(const std::string &listName, const Pfo
     return m_pPandora->m_pPfoManager->GetList(listName, pList);
 }
 
+template <>
+StatusCode PandoraContentApiImpl::GetList(const std::string &listName, const VertexList *&pList) const
+{
+    return m_pPandora->m_pVertexManager->GetList(listName, pList);
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <>
@@ -309,10 +357,7 @@ StatusCode PandoraContentApiImpl::SaveList<Cluster>(const std::string &newListNa
 {
     std::string currentListName;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->GetCurrentListName(currentListName));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->SaveObjects(newListName, currentListName));
-
-    const ClusterList *pNewList = NULL;
-    return m_pPandora->m_pClusterManager->GetList(newListName, pNewList);
+    return m_pPandora->m_pClusterManager->SaveObjects(newListName, currentListName);
 }
 
 template <>
@@ -320,10 +365,15 @@ StatusCode PandoraContentApiImpl::SaveList<Pfo>(const std::string &newListName) 
 {
     std::string currentListName;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->GetCurrentListName(currentListName));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->SaveObjects(newListName, currentListName));
+    return m_pPandora->m_pPfoManager->SaveObjects(newListName, currentListName);
+}
 
-    const PfoList *pNewList = NULL;
-    return m_pPandora->m_pPfoManager->GetList(newListName, pNewList);
+template <>
+StatusCode PandoraContentApiImpl::SaveList<Vertex>(const std::string &newListName) const
+{
+    std::string currentListName;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pVertexManager->GetCurrentListName(currentListName));
+    return m_pPandora->m_pVertexManager->SaveObjects(newListName, currentListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -338,6 +388,12 @@ template <>
 StatusCode PandoraContentApiImpl::SaveList<Pfo>(const std::string &oldListName, const std::string &newListName) const
 {
     return m_pPandora->m_pPfoManager->SaveObjects(newListName, oldListName);
+}
+
+template <>
+StatusCode PandoraContentApiImpl::SaveList<Vertex>(const std::string &oldListName, const std::string &newListName) const
+{
+    return m_pPandora->m_pVertexManager->SaveObjects(newListName, oldListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -358,6 +414,14 @@ StatusCode PandoraContentApiImpl::SaveList(const std::string &newListName, const
     return m_pPandora->m_pPfoManager->SaveObjects(newListName, currentListName, pfosToSave);
 }
 
+template <>
+StatusCode PandoraContentApiImpl::SaveList(const std::string &newListName, const VertexList &verticesToSave) const
+{
+    std::string currentListName;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pVertexManager->GetCurrentListName(currentListName));
+    return m_pPandora->m_pVertexManager->SaveObjects(newListName, currentListName, verticesToSave);
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <>
@@ -372,6 +436,12 @@ StatusCode PandoraContentApiImpl::SaveList(const std::string &oldListName, const
     return m_pPandora->m_pPfoManager->SaveObjects(newListName, oldListName, pfosToSave);
 }
 
+template <>
+StatusCode PandoraContentApiImpl::SaveList(const std::string &oldListName, const std::string &newListName, const VertexList &verticesToSave) const
+{
+    return m_pPandora->m_pVertexManager->SaveObjects(newListName, oldListName, verticesToSave);
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <>
@@ -384,6 +454,12 @@ template <>
 StatusCode PandoraContentApiImpl::TemporarilyReplaceCurrentList<Pfo>(const std::string &newListName) const
 {
     return m_pPandora->m_pPfoManager->TemporarilyReplaceCurrentList(newListName);
+}
+
+template <>
+StatusCode PandoraContentApiImpl::TemporarilyReplaceCurrentList<Vertex>(const std::string &newListName) const
+{
+    return m_pPandora->m_pVertexManager->TemporarilyReplaceCurrentList(newListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -402,6 +478,13 @@ StatusCode PandoraContentApiImpl::CreateTemporaryListAndSetCurrent(const Algorit
     return m_pPandora->m_pPfoManager->GetCurrentList(pPfoList, temporaryListName);
 }
 
+template <>
+StatusCode PandoraContentApiImpl::CreateTemporaryListAndSetCurrent(const Algorithm &algorithm, const VertexList *&pVertexList, std::string &temporaryListName) const
+{
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pVertexManager->CreateTemporaryListAndSetCurrent(&algorithm, temporaryListName));
+    return m_pPandora->m_pVertexManager->GetCurrentList(pVertexList, temporaryListName);
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <>
@@ -414,6 +497,24 @@ template <>
 bool PandoraContentApiImpl::IsAvailable(pandora::CaloHitList *pCaloHitList) const
 {
     return m_pPandora->m_pCaloHitManager->AreCaloHitsAvailable(*pCaloHitList);
+}
+
+template <>
+bool PandoraContentApiImpl::IsAvailable(pandora::Track *pTrack) const
+{
+    return pTrack->IsAvailable();
+}
+
+template <>
+bool PandoraContentApiImpl::IsAvailable(pandora::Cluster *pCluster) const
+{
+    return pCluster->IsAvailable();
+}
+
+template <>
+bool PandoraContentApiImpl::IsAvailable(pandora::Vertex *pVertex) const
+{
+    return pVertex->IsAvailable();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -571,46 +672,25 @@ StatusCode PandoraContentApiImpl::MergeAndDeleteClusters(Cluster *pClusterToEnla
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template <>
-StatusCode PandoraContentApiImpl::AddToPfo(ParticleFlowObject *pPfo, Cluster *pCluster) const
+template <typename T>
+StatusCode PandoraContentApiImpl::AddToPfo(ParticleFlowObject *pPfo, T *pT) const
 {
-    if (!pCluster->IsAvailable())
+    if (!pT->IsAvailable())
         return STATUS_CODE_NOT_ALLOWED;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->AddClusterToPfo(pPfo, pCluster));
-    pCluster->SetAvailability(false);
-
-    return STATUS_CODE_SUCCESS;
-}
-
-template <>
-StatusCode PandoraContentApiImpl::AddToPfo(ParticleFlowObject *pPfo, Track *pTrack) const
-{
-    if (!pTrack->IsAvailable())
-        return STATUS_CODE_NOT_ALLOWED;
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->AddTrackToPfo(pPfo, pTrack));
-    pTrack->SetAvailability(false);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->AddToPfo(pPfo, pT));
+    pT->SetAvailability(false);
 
     return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template <>
-StatusCode PandoraContentApiImpl::RemoveFromPfo(ParticleFlowObject *pPfo, Cluster *pCluster) const
+template <typename T>
+StatusCode PandoraContentApiImpl::RemoveFromPfo(ParticleFlowObject *pPfo, T *pT) const
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->RemoveClusterFromPfo(pPfo, pCluster));
-    pCluster->SetAvailability(true);
-
-    return STATUS_CODE_SUCCESS;
-}
-
-template <>
-StatusCode PandoraContentApiImpl::RemoveFromPfo(ParticleFlowObject *pPfo, Track *pTrack) const
-{
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->RemoveTrackFromPfo(pPfo, pTrack));
-    pTrack->SetAvailability(true);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->RemoveFromPfo(pPfo, pT));
+    pT->SetAvailability(true);
 
     return STATUS_CODE_SUCCESS;
 }
@@ -714,6 +794,24 @@ StatusCode PandoraContentApiImpl::PrepareForDeletion(PfoList *const pPfoList) co
     return STATUS_CODE_SUCCESS;
 }
 
+template <>
+StatusCode PandoraContentApiImpl::PrepareForDeletion(Vertex *const pVertex) const
+{
+    if (!pVertex->IsAvailable())
+        return STATUS_CODE_NOT_ALLOWED;
+
+    return STATUS_CODE_SUCCESS;
+}
+
+template <>
+StatusCode PandoraContentApiImpl::PrepareForDeletion(VertexList *const pVertexList) const
+{
+    for (VertexList::const_iterator iter = pVertexList->begin(), iterEnd = pVertexList->end(); iter != iterEnd; ++iter)
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareForDeletion(*iter));
+
+    return STATUS_CODE_SUCCESS;
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <>
@@ -763,6 +861,20 @@ StatusCode PandoraContentApiImpl::Delete(PfoList *pPfoList) const
     return m_pPandora->m_pPfoManager->DeleteObjects(*pPfoList);
 }
 
+template <>
+StatusCode PandoraContentApiImpl::Delete(Vertex *pVertex) const
+{
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareForDeletion(pVertex));
+    return m_pPandora->m_pVertexManager->DeleteObject(pVertex);
+}
+
+template <>
+StatusCode PandoraContentApiImpl::Delete(VertexList *pVertexList) const
+{
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareForDeletion(pVertexList));
+    return m_pPandora->m_pVertexManager->DeleteObjects(*pVertexList);
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <>
@@ -791,6 +903,20 @@ StatusCode PandoraContentApiImpl::Delete(PfoList *pPfoList, const std::string &l
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareForDeletion(pPfoList));
     return m_pPandora->m_pPfoManager->DeleteObjects(*pPfoList, listName);
+}
+
+template <>
+StatusCode PandoraContentApiImpl::Delete(Vertex *pVertex, const std::string &listName) const
+{
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareForDeletion(pVertex));
+    return m_pPandora->m_pVertexManager->DeleteObject(pVertex, listName);
+}
+
+template <>
+StatusCode PandoraContentApiImpl::Delete(VertexList *pVertexList, const std::string &listName) const
+{
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareForDeletion(pVertexList));
+    return m_pPandora->m_pVertexManager->DeleteObjects(*pVertexList, listName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -874,11 +1000,7 @@ StatusCode PandoraContentApiImpl::RunAlgorithm(const std::string &algorithmName)
     if (m_pPandora->m_pAlgorithmManager->m_algorithmMap.end() == iter)
         return STATUS_CODE_NOT_FOUND;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->RegisterAlgorithm(iter->second));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->RegisterAlgorithm(iter->second));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pMCManager->RegisterAlgorithm(iter->second));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->RegisterAlgorithm(iter->second));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pTrackManager->RegisterAlgorithm(iter->second));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PreRunAlgorithm(iter->second));
 
     try
     {
@@ -902,20 +1024,60 @@ StatusCode PandoraContentApiImpl::RunAlgorithm(const std::string &algorithmName)
         std::cout << "Failure in algorithm " << iter->first << ", " << iter->second->GetAlgorithmType() << ", unrecognized exception" << std::endl;
     }
 
-    PfoList pfosToBeDeleted;
-    ClusterList clustersToBeDeleted;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->GetResetDeletionObjects(iter->second, pfosToBeDeleted));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->GetResetDeletionObjects(iter->second, clustersToBeDeleted));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareForDeletion(&pfosToBeDeleted));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareForDeletion(&clustersToBeDeleted));
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->ResetAlgorithmInfo(iter->second, true));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->ResetAlgorithmInfo(iter->second, true));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pMCManager->ResetAlgorithmInfo(iter->second, true));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->ResetAlgorithmInfo(iter->second, true));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pTrackManager->ResetAlgorithmInfo(iter->second, true));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PostRunAlgorithm(iter->second));
 
     return STATUS_CODE_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PandoraContentApiImpl::PreRunAlgorithm(Algorithm *const pAlgorithm) const
+{
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->RegisterAlgorithm(pAlgorithm));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->RegisterAlgorithm(pAlgorithm));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pMCManager->RegisterAlgorithm(pAlgorithm));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->RegisterAlgorithm(pAlgorithm));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pTrackManager->RegisterAlgorithm(pAlgorithm));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pVertexManager->RegisterAlgorithm(pAlgorithm));
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PandoraContentApiImpl::PostRunAlgorithm(Algorithm *const pAlgorithm) const
+{
+    PfoList pfosToBeDeleted;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->GetResetDeletionObjects(pAlgorithm, pfosToBeDeleted));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareForDeletion(&pfosToBeDeleted));
+
+    ClusterList clustersToBeDeleted;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->GetResetDeletionObjects(pAlgorithm, clustersToBeDeleted));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareForDeletion(&clustersToBeDeleted));
+
+    VertexList verticesToBeDeleted;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pVertexManager->GetResetDeletionObjects(pAlgorithm, verticesToBeDeleted));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareForDeletion(&verticesToBeDeleted));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->ResetAlgorithmInfo(pAlgorithm, true));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->ResetAlgorithmInfo(pAlgorithm, true));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pMCManager->ResetAlgorithmInfo(pAlgorithm, true));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->ResetAlgorithmInfo(pAlgorithm, true));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pTrackManager->ResetAlgorithmInfo(pAlgorithm, true));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pVertexManager->ResetAlgorithmInfo(pAlgorithm, true));
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template StatusCode PandoraContentApiImpl::AddToPfo<Cluster>(ParticleFlowObject *, Cluster *) const;
+template StatusCode PandoraContentApiImpl::AddToPfo<Track>(ParticleFlowObject *, Track *) const;
+template StatusCode PandoraContentApiImpl::AddToPfo<Vertex>(ParticleFlowObject *, Vertex *) const;
+
+template StatusCode PandoraContentApiImpl::RemoveFromPfo<Cluster>(ParticleFlowObject *, Cluster *) const;
+template StatusCode PandoraContentApiImpl::RemoveFromPfo<Track>(ParticleFlowObject *, Track *) const;
+template StatusCode PandoraContentApiImpl::RemoveFromPfo<Vertex>(ParticleFlowObject *, Vertex *) const;
 
 } // namespace pandora

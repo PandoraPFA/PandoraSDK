@@ -10,6 +10,7 @@
 
 #include "Objects/Cluster.h"
 #include "Objects/ParticleFlowObject.h"
+#include "Objects/Vertex.h"
 
 namespace pandora
 {
@@ -316,5 +317,6 @@ StatusCode AlgorithmObjectManager<T>::DropCurrentList()
 
 template class AlgorithmObjectManager<Cluster>;
 template class AlgorithmObjectManager<ParticleFlowObject>;
+template class AlgorithmObjectManager<Vertex>;
 
 } // namespace pandora

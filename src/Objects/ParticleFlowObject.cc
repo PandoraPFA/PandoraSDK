@@ -20,9 +20,9 @@ ParticleFlowObject::ParticleFlowObject(const PandoraContentApi::ParticleFlowObje
     m_mass(parameters.m_mass.Get()),
     m_energy(parameters.m_energy.Get()),
     m_momentum(parameters.m_momentum.Get()),
-    m_vertex(parameters.m_vertex.Get()),
     m_trackList(parameters.m_trackList),
-    m_clusterList(parameters.m_clusterList)
+    m_clusterList(parameters.m_clusterList),
+    m_vertexList(parameters.m_vertexList)
 {
 }
 
@@ -69,6 +69,72 @@ ClusterAddressList ParticleFlowObject::GetClusterAddressList() const
     return clusterAddressList;
 }
 
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <>
+StatusCode ParticleFlowObject::AddToPfo(Cluster *pCluster)
+{
+    if (m_clusterList.insert(pCluster).second)
+        return STATUS_CODE_ALREADY_PRESENT;
+
+    return STATUS_CODE_SUCCESS;
+}
+
+template <>
+StatusCode ParticleFlowObject::AddToPfo(Track *pTrack)
+{
+    if (m_trackList.insert(pTrack).second)
+        return STATUS_CODE_ALREADY_PRESENT;
+
+    return STATUS_CODE_SUCCESS;
+}
+
+template <>
+StatusCode ParticleFlowObject::AddToPfo(Vertex *pVertex)
+{
+    if (m_vertexList.insert(pVertex).second)
+        return STATUS_CODE_ALREADY_PRESENT;
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <>
+StatusCode ParticleFlowObject::RemoveFromPfo(Cluster *pCluster)
+{
+    ClusterList::iterator iter = m_clusterList.find(pCluster);
+
+    if (m_clusterList.end() == iter)
+        return STATUS_CODE_NOT_FOUND;
+
+    m_clusterList.erase(iter);
+    return STATUS_CODE_SUCCESS;
+}
+
+template <>
+StatusCode ParticleFlowObject::RemoveFromPfo(Track *pTrack)
+{
+    TrackList::iterator iter = m_trackList.find(pTrack);
+
+    if (m_trackList.end() == iter)
+        return STATUS_CODE_NOT_FOUND;
+
+    m_trackList.erase(iter);
+    return STATUS_CODE_SUCCESS;
+}
+
+template <>
+StatusCode ParticleFlowObject::RemoveFromPfo(Vertex *pVertex)
+{
+    VertexList::iterator iter = m_vertexList.find(pVertex);
+
+    if (m_vertexList.end() == iter)
+        return STATUS_CODE_NOT_FOUND;
+
+    m_vertexList.erase(iter);
+    return STATUS_CODE_SUCCESS;
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -121,5 +187,16 @@ StatusCode ParticleFlowObject::RemoveDaughter(ParticleFlowObject *const pPfo)
     m_daughterPfoList.erase(iter);
     return STATUS_CODE_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template StatusCode ParticleFlowObject::AddToPfo<Cluster>(Cluster *);
+template StatusCode ParticleFlowObject::AddToPfo<Track>(Track *);
+template StatusCode ParticleFlowObject::AddToPfo<Vertex>(Vertex *);
+
+template StatusCode ParticleFlowObject::RemoveFromPfo<Cluster>(Cluster *);
+template StatusCode ParticleFlowObject::RemoveFromPfo<Track>(Track *);
+template StatusCode ParticleFlowObject::RemoveFromPfo<Vertex>(Vertex *);
 
 } // namespace pandora

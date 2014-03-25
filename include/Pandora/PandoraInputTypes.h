@@ -183,14 +183,13 @@ typedef PandoraInputType<int> InputInt;
 typedef PandoraInputType<float> InputFloat;
 typedef PandoraInputType<void *> InputAddress;
 typedef PandoraInputType<bool> InputBool;
+
 typedef PandoraInputType<HitType> InputHitType;
 typedef PandoraInputType<MCParticleType> InputMCParticleType;
 typedef PandoraInputType<DetectorRegion> InputDetectorRegion;
 typedef PandoraInputType<unsigned int> InputPseudoLayer;
-
 typedef PandoraInputType<CartesianVector> InputCartesianVector;
 typedef PandoraInputType<TrackState> InputTrackState;
-typedef std::vector<TrackState> InputTrackStateList;
 
 typedef std::vector<const void *> CaloHitAddressList, TrackAddressList;
 typedef std::vector<CaloHitAddressList> ClusterAddressList;
