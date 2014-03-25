@@ -17,6 +17,7 @@
 #include "Managers/ParticleFlowObjectManager.h"
 #include "Managers/PluginManager.h"
 #include "Managers/TrackManager.h"
+#include "Managers/VertexManager.h"
 
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraImpl.h"
@@ -101,6 +102,7 @@ StatusCode PandoraImpl::ResetEvent() const
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pMCManager->ResetForNextEvent());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->ResetForNextEvent());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pTrackManager->ResetForNextEvent());
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pVertexManager->ResetForNextEvent());
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, ReclusterHelper::ResetReclusterMonitoring());
 

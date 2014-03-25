@@ -58,9 +58,9 @@ public:
             pandora::InputFloat             m_mass;             ///< The particle flow object mass
             pandora::InputFloat             m_energy;           ///< The particle flow object energy
             pandora::InputCartesianVector   m_momentum;         ///< The particle flow object momentum
-            pandora::InputCartesianVector   m_vertex;           ///< The particle flow object vertex
             pandora::ClusterList            m_clusterList;      ///< The clusters in the particle flow object
             pandora::TrackList              m_trackList;        ///< The tracks in the particle flow object
+            pandora::VertexList             m_vertexList;       ///< The vertices in the particle flow object
         };
 
         /**
@@ -71,6 +71,22 @@ public:
          *  @param  pPfo to receive the address of the particle flow object created
          */
         static pandora::StatusCode Create(const pandora::Algorithm &algorithm, const Parameters &parameters, pandora::ParticleFlowObject *&pPfo);
+    };
+
+    /**
+     *  @brief  Vertex creation class
+     */
+    class Vertex
+    {
+    public:
+        /**
+         *  @brief  Create a vertex
+         *
+         *  @param  algorithm the algorithm creating the vertex
+         *  @param  vertexPosition the vertex position
+         *  @param  pVertex to receive the address of the vertex created
+         */
+        static pandora::StatusCode Create(const pandora::Algorithm &algorithm, const pandora::CartesianVector &vertexPosition, pandora::Vertex *&pVertex);
     };
 
 
@@ -197,7 +213,7 @@ public:
     static pandora::StatusCode SaveList(const pandora::Algorithm &algorithm, const T &t, const std::string &newListName);
 
 
-    /* List-manipulation functions: algorithm objects only (Clusters, Pfos) */
+    /* List-manipulation functions: algorithm objects only (Clusters, Pfos, Vertices) */
 
     /**
      *  @brief  Save the current list in a list with the specified new name. Note that this will empty the list; the objects
@@ -279,7 +295,7 @@ public:
     static bool IsAvailable(const pandora::Algorithm &algorithm, T *pT);
 
 
-    /* Object-related functions: algorithm objects only (Clusters, Pfos) */
+    /* Object-related functions: algorithm objects only (Clusters, Pfos, Vertices) */
 
     /**
      *  @brief  Delete an object from the current list

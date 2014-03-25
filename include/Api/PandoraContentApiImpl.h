@@ -44,6 +44,14 @@ public:
      */
     StatusCode CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &pfoParameters, ParticleFlowObject *&pPfo) const;
 
+    /**
+     *  @brief  Create a vertex
+     * 
+     *  @param  vertexPosition the vertex position
+     *  @param  pVertex to receive the address of the vertex created
+     */
+    StatusCode CreateVertex(const CartesianVector &vertexPosition, Vertex *&pVertex) const;
+
 
     /* High-level steering functions */
 
@@ -146,7 +154,7 @@ public:
     StatusCode SaveList(const T &t, const std::string &newListName) const;
 
 
-    /* List-manipulation functions: algorithm objects only (Clusters, Pfos) */
+    /* List-manipulation functions: algorithm objects only (Clusters, Pfos, Vertices) */
 
     /**
      *  @brief  Save the current list in a list with the specified new name. Note that this will empty the list; the objects
@@ -222,7 +230,7 @@ public:
     bool IsAvailable(T *pT) const;
 
 
-    /* Object-related functions: algorithm objects only (Clusters, Pfos) */
+    /* Object-related functions: algorithm objects only (Clusters, Pfos, Vertices) */
 
     /**
      *  @brief  Delete an object from the current list
@@ -466,6 +474,20 @@ private:
      */
     template <typename T>
     StatusCode PrepareForReclusteringDeletion(const T *const pT) const;
+
+    /**
+     *  @brief  Perform necessary operations prior to algorithm execution, e.g. algorithm to manager handshakes
+     * 
+     *  @param  pAlgorithm address of the algorithm
+     */
+    StatusCode PreRunAlgorithm(Algorithm *const pAlgorithm) const;
+
+    /**
+     *  @brief  Perform necessary operations after algorithm execution, e.g. preparing temporaries for deletion
+     * 
+     *  @param  pAlgorithm address of the algorithm
+     */
+    StatusCode PostRunAlgorithm(Algorithm *const pAlgorithm) const;
 
     Pandora    *m_pPandora;    ///< The pandora object to provide an interface to
 

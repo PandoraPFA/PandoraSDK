@@ -135,7 +135,7 @@ StatusCode InputObjectManager<T>::EraseAllContent()
 
     if (Manager<T>::m_nameToListMap.end() == inputIter)
     {
-        std::cout << "InputObjectManager::EraseAllContent cannot retrieve track list " << std::endl;
+        std::cout << "InputObjectManager::EraseAllContent cannot retrieve object list " << std::endl;
     }
     else
     {

@@ -67,13 +67,6 @@ public:
     const CartesianVector &GetMomentum() const;
 
     /**
-     *  @brief  Get particle flow object vertex
-     * 
-     *  @return The particle flow object vertex
-     */
-    const CartesianVector &GetVertex() const;
-
-    /**
      *  @brief  Get the track list
      * 
      *  @return The track list
@@ -86,6 +79,13 @@ public:
      *  @return The cluster list
      */
     const ClusterList &GetClusterList() const;
+
+    /**
+     *  @brief  Get the vertex list
+     * 
+     *  @return The vertex list
+     */
+    const VertexList &GetVertexList() const;
 
     /**
      *  @brief  Get track address list
@@ -178,13 +178,6 @@ public:
      */
     void SetMomentum(const CartesianVector &momentum);
 
-    /**
-     *  @brief  Set particle flow object vertex
-     * 
-     *  @param  momentum the particle flow object vertex
-     */
-    void SetVertex(const CartesianVector &vertex);
-
 private:
     /**
      *  @brief  Constructor
@@ -197,6 +190,22 @@ private:
      *  @brief  Destructor
      */
     ~ParticleFlowObject();
+
+    /**
+     *  @brief  Add an object to the particle flow object
+     *
+     *  @param  pT address of the object to add
+     */
+    template <typename T>
+    StatusCode AddToPfo(T *pT);
+
+    /**
+     *  @brief  Remove an object from the particle flow object
+     *
+     *  @param  pT address of the object to remove
+     */
+    template <typename T>
+    StatusCode RemoveFromPfo(T *pT);
 
     /**
      *  @brief  Add a parent pfo to the parent pfo list
@@ -231,10 +240,10 @@ private:
     float                   m_mass;                     ///< The particle flow object mass
     float                   m_energy;                   ///< The particle flow object energy
     CartesianVector         m_momentum;                 ///< The particle flow object momentum
-    CartesianVector         m_vertex;                   ///< The particle flow object vertex
 
     TrackList               m_trackList;                ///< The track list
     ClusterList             m_clusterList;              ///< The cluster list
+    VertexList              m_vertexList;               ///< The vertex list
 
     PfoList                 m_parentPfoList;            ///< The list of parent pfos
     PfoList                 m_daughterPfoList;          ///< The list of daughter pfos
@@ -289,13 +298,6 @@ inline const CartesianVector &ParticleFlowObject::GetMomentum() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const CartesianVector &ParticleFlowObject::GetVertex() const
-{
-    return m_vertex;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 inline const TrackList &ParticleFlowObject::GetTrackList() const
 {
     return m_trackList;
@@ -306,6 +308,13 @@ inline const TrackList &ParticleFlowObject::GetTrackList() const
 inline const ClusterList &ParticleFlowObject::GetClusterList() const
 {
     return m_clusterList;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const VertexList &ParticleFlowObject::GetVertexList() const
+{
+    return m_vertexList;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -383,13 +392,6 @@ inline void ParticleFlowObject::SetEnergy(const float energy)
 inline void ParticleFlowObject::SetMomentum(const CartesianVector &momentum)
 {
     m_momentum = momentum;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline void ParticleFlowObject::SetVertex(const CartesianVector &vertex)
-{
-    m_vertex = vertex;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

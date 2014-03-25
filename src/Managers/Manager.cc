@@ -259,5 +259,6 @@ template class Manager<Cluster>;
 template class Manager<MCParticle>;
 template class Manager<ParticleFlowObject>;
 template class Manager<Track>;
+template class Manager<Vertex>;
 
 } // namespace pandora

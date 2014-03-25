@@ -30,6 +30,15 @@ pandora::StatusCode PandoraContentApi::ParticleFlowObject::Create(const pandora:
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+pandora::StatusCode PandoraContentApi::Vertex::Create(const pandora::Algorithm &algorithm, const pandora::CartesianVector &vertexPosition,
+    pandora::Vertex *&pVertex)
+{
+    return algorithm.GetPandoraContentApiImpl()->CreateVertex(vertexPosition, pVertex);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 pandora::StatusCode PandoraContentApi::RepeatEventPreparation(const pandora::Algorithm &algorithm)
 {
     return algorithm.GetPandoraContentApiImpl()->RepeatEventPreparation();
@@ -376,36 +385,42 @@ template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::TrackLis
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::MCParticleList>(const pandora::Algorithm &, const pandora::MCParticleList *&);
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::ClusterList>(const pandora::Algorithm &, const pandora::ClusterList *&);
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::PfoList>(const pandora::Algorithm &, const pandora::PfoList *&);
+template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::VertexList>(const pandora::Algorithm &, const pandora::VertexList *&);
 
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::CaloHitList>(const pandora::Algorithm &, const pandora::CaloHitList *&, std::string &);
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::TrackList>(const pandora::Algorithm &, const pandora::TrackList *&, std::string &);
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::MCParticleList>(const pandora::Algorithm &, const pandora::MCParticleList *&, std::string &);
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::ClusterList>(const pandora::Algorithm &, const pandora::ClusterList *&, std::string &);
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::PfoList>(const pandora::Algorithm &, const pandora::PfoList *&, std::string &);
+template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::VertexList>(const pandora::Algorithm &, const pandora::VertexList *&, std::string &);
 
 template pandora::StatusCode PandoraContentApi::GetCurrentListName<pandora::CaloHit>(const pandora::Algorithm &, std::string &);
 template pandora::StatusCode PandoraContentApi::GetCurrentListName<pandora::Track>(const pandora::Algorithm &, std::string &);
 template pandora::StatusCode PandoraContentApi::GetCurrentListName<pandora::MCParticle>(const pandora::Algorithm &, std::string &);
 template pandora::StatusCode PandoraContentApi::GetCurrentListName<pandora::Cluster>(const pandora::Algorithm &, std::string &);
 template pandora::StatusCode PandoraContentApi::GetCurrentListName<pandora::ParticleFlowObject>(const pandora::Algorithm &, std::string &);
+template pandora::StatusCode PandoraContentApi::GetCurrentListName<pandora::Vertex>(const pandora::Algorithm &, std::string &);
 
 template pandora::StatusCode PandoraContentApi::ReplaceCurrentList<pandora::CaloHit>(const pandora::Algorithm &, const std::string &);
 template pandora::StatusCode PandoraContentApi::ReplaceCurrentList<pandora::Track>(const pandora::Algorithm &, const std::string &);
 template pandora::StatusCode PandoraContentApi::ReplaceCurrentList<pandora::MCParticle>(const pandora::Algorithm &, const std::string &);
 template pandora::StatusCode PandoraContentApi::ReplaceCurrentList<pandora::Cluster>(const pandora::Algorithm &, const std::string &);
 template pandora::StatusCode PandoraContentApi::ReplaceCurrentList<pandora::ParticleFlowObject>(const pandora::Algorithm &, const std::string &);
+template pandora::StatusCode PandoraContentApi::ReplaceCurrentList<pandora::Vertex>(const pandora::Algorithm &, const std::string &);
 
 template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::CaloHit>(const pandora::Algorithm &);
 template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::Track>(const pandora::Algorithm &);
 template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::MCParticle>(const pandora::Algorithm &);
 template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::Cluster>(const pandora::Algorithm &);
 template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::ParticleFlowObject>(const pandora::Algorithm &);
+template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::Vertex>(const pandora::Algorithm &);
 
 template pandora::StatusCode PandoraContentApi::GetList<pandora::CaloHitList>(const pandora::Algorithm &, const std::string &, const pandora::CaloHitList *&);
 template pandora::StatusCode PandoraContentApi::GetList<pandora::TrackList>(const pandora::Algorithm &, const std::string &, const pandora::TrackList *&);
 template pandora::StatusCode PandoraContentApi::GetList<pandora::MCParticleList>(const pandora::Algorithm &, const std::string &, const pandora::MCParticleList *&);
 template pandora::StatusCode PandoraContentApi::GetList<pandora::ClusterList>(const pandora::Algorithm &, const std::string &, const pandora::ClusterList *&);
 template pandora::StatusCode PandoraContentApi::GetList<pandora::PfoList>(const pandora::Algorithm &, const std::string &, const pandora::PfoList *&);
+template pandora::StatusCode PandoraContentApi::GetList<pandora::VertexList>(const pandora::Algorithm &, const std::string &, const pandora::VertexList *&);
 
 template pandora::StatusCode PandoraContentApi::SaveList<pandora::CaloHitList>(const pandora::Algorithm &, const pandora::CaloHitList &, const std::string &);
 template pandora::StatusCode PandoraContentApi::SaveList<pandora::TrackList>(const pandora::Algorithm &, const pandora::TrackList &, const std::string &);
@@ -413,37 +428,52 @@ template pandora::StatusCode PandoraContentApi::SaveList<pandora::MCParticleList
 
 template pandora::StatusCode PandoraContentApi::SaveList<pandora::Cluster>(const pandora::Algorithm &, const std::string &);
 template pandora::StatusCode PandoraContentApi::SaveList<pandora::ParticleFlowObject>(const pandora::Algorithm &, const std::string &);
+template pandora::StatusCode PandoraContentApi::SaveList<pandora::Vertex>(const pandora::Algorithm &, const std::string &);
 
 template pandora::StatusCode PandoraContentApi::SaveList<pandora::Cluster>(const pandora::Algorithm &, const std::string &, const std::string &);
 template pandora::StatusCode PandoraContentApi::SaveList<pandora::ParticleFlowObject>(const pandora::Algorithm &, const std::string &, const std::string &);
+template pandora::StatusCode PandoraContentApi::SaveList<pandora::Vertex>(const pandora::Algorithm &, const std::string &, const std::string &);
 
 template pandora::StatusCode PandoraContentApi::SaveList<pandora::ClusterList>(const pandora::Algorithm &, const std::string &, const pandora::ClusterList &);
 template pandora::StatusCode PandoraContentApi::SaveList<pandora::PfoList>(const pandora::Algorithm &, const std::string &, const pandora::PfoList &);
+template pandora::StatusCode PandoraContentApi::SaveList<pandora::VertexList>(const pandora::Algorithm &, const std::string &, const pandora::VertexList &);
 
 template pandora::StatusCode PandoraContentApi::SaveList<pandora::ClusterList>(const pandora::Algorithm &, const std::string &, const std::string &, const pandora::ClusterList &);
 template pandora::StatusCode PandoraContentApi::SaveList<pandora::PfoList>(const pandora::Algorithm &, const std::string &, const std::string &, const pandora::PfoList &);
+template pandora::StatusCode PandoraContentApi::SaveList<pandora::VertexList>(const pandora::Algorithm &, const std::string &, const std::string &, const pandora::VertexList &);
 
 template pandora::StatusCode PandoraContentApi::TemporarilyReplaceCurrentList<pandora::Cluster>(const pandora::Algorithm &, const std::string &);
 template pandora::StatusCode PandoraContentApi::TemporarilyReplaceCurrentList<pandora::ParticleFlowObject>(const pandora::Algorithm &, const std::string &);
+template pandora::StatusCode PandoraContentApi::TemporarilyReplaceCurrentList<pandora::Vertex>(const pandora::Algorithm &, const std::string &);
 
 template pandora::StatusCode PandoraContentApi::CreateTemporaryListAndSetCurrent<pandora::ClusterList>(const pandora::Algorithm &, const pandora::ClusterList *&, std::string &);
 template pandora::StatusCode PandoraContentApi::CreateTemporaryListAndSetCurrent<pandora::PfoList>(const pandora::Algorithm &, const pandora::PfoList *&, std::string &);
+template pandora::StatusCode PandoraContentApi::CreateTemporaryListAndSetCurrent<pandora::VertexList>(const pandora::Algorithm &, const pandora::VertexList *&, std::string &);
 
 template bool PandoraContentApi::IsAvailable<pandora::CaloHit>(const pandora::Algorithm &algorithm, pandora::CaloHit *);
 template bool PandoraContentApi::IsAvailable<pandora::CaloHitList>(const pandora::Algorithm &algorithm, pandora::CaloHitList *);
+template bool PandoraContentApi::IsAvailable<pandora::Track>(const pandora::Algorithm &algorithm, pandora::Track *);
+template bool PandoraContentApi::IsAvailable<pandora::Cluster>(const pandora::Algorithm &algorithm, pandora::Cluster *);
+template bool PandoraContentApi::IsAvailable<pandora::Vertex>(const pandora::Algorithm &algorithm, pandora::Vertex *);
 
 template pandora::StatusCode PandoraContentApi::Delete<pandora::Cluster>(const pandora::Algorithm &, pandora::Cluster *);
 template pandora::StatusCode PandoraContentApi::Delete<pandora::ClusterList>(const pandora::Algorithm &, pandora::ClusterList *);
 template pandora::StatusCode PandoraContentApi::Delete<pandora::ParticleFlowObject>(const pandora::Algorithm &, pandora::ParticleFlowObject *);
 template pandora::StatusCode PandoraContentApi::Delete<pandora::PfoList>(const pandora::Algorithm &, pandora::PfoList *);
+template pandora::StatusCode PandoraContentApi::Delete<pandora::Vertex>(const pandora::Algorithm &, pandora::Vertex *);
+template pandora::StatusCode PandoraContentApi::Delete<pandora::VertexList>(const pandora::Algorithm &, pandora::VertexList *);
 
 template pandora::StatusCode PandoraContentApi::Delete<pandora::Cluster>(const pandora::Algorithm &, pandora::Cluster *, const std::string &);
 template pandora::StatusCode PandoraContentApi::Delete<pandora::ClusterList>(const pandora::Algorithm &, pandora::ClusterList *, const std::string &);
 template pandora::StatusCode PandoraContentApi::Delete<pandora::ParticleFlowObject>(const pandora::Algorithm &, pandora::ParticleFlowObject *, const std::string &);
 template pandora::StatusCode PandoraContentApi::Delete<pandora::PfoList>(const pandora::Algorithm &, pandora::PfoList *, const std::string &);
+template pandora::StatusCode PandoraContentApi::Delete<pandora::Vertex>(const pandora::Algorithm &, pandora::Vertex *, const std::string &);
+template pandora::StatusCode PandoraContentApi::Delete<pandora::VertexList>(const pandora::Algorithm &, pandora::VertexList *, const std::string &);
 
 template pandora::StatusCode PandoraContentApi::AddToPfo<pandora::Cluster>(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *, pandora::Cluster *);
 template pandora::StatusCode PandoraContentApi::AddToPfo<pandora::Track>(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *, pandora::Track *);
+template pandora::StatusCode PandoraContentApi::AddToPfo<pandora::Vertex>(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *, pandora::Vertex *);
 
 template pandora::StatusCode PandoraContentApi::RemoveFromPfo<pandora::Cluster>(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *, pandora::Cluster *);
 template pandora::StatusCode PandoraContentApi::RemoveFromPfo<pandora::Track>(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *, pandora::Track *);
+template pandora::StatusCode PandoraContentApi::RemoveFromPfo<pandora::Vertex>(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *, pandora::Vertex *);
