@@ -74,7 +74,7 @@ ClusterAddressList ParticleFlowObject::GetClusterAddressList() const
 template <>
 StatusCode ParticleFlowObject::AddToPfo(Cluster *pCluster)
 {
-    if (m_clusterList.insert(pCluster).second)
+    if (!m_clusterList.insert(pCluster).second)
         return STATUS_CODE_ALREADY_PRESENT;
 
     return STATUS_CODE_SUCCESS;
@@ -83,7 +83,7 @@ StatusCode ParticleFlowObject::AddToPfo(Cluster *pCluster)
 template <>
 StatusCode ParticleFlowObject::AddToPfo(Track *pTrack)
 {
-    if (m_trackList.insert(pTrack).second)
+    if (!m_trackList.insert(pTrack).second)
         return STATUS_CODE_ALREADY_PRESENT;
 
     return STATUS_CODE_SUCCESS;
@@ -92,7 +92,7 @@ StatusCode ParticleFlowObject::AddToPfo(Track *pTrack)
 template <>
 StatusCode ParticleFlowObject::AddToPfo(Vertex *pVertex)
 {
-    if (m_vertexList.insert(pVertex).second)
+    if (!m_vertexList.insert(pVertex).second)
         return STATUS_CODE_ALREADY_PRESENT;
 
     return STATUS_CODE_SUCCESS;
