@@ -38,6 +38,13 @@ public:
     static bool ShouldDisplayAlgorithmInfo();
 
     /**
+     *  @brief  Whether to allow only single hit types in individual clusters
+     * 
+     *  @return boolean
+     */
+    static bool SingleHitTypeClusteringMode();
+
+    /**
      *  @brief  Get the electromagnetic energy resolution as a fraction, X, such that sigmaE = ( X * E / sqrt(E) )
      * 
      *  @return The electromagnetic energy resolution
@@ -122,6 +129,7 @@ private:
 
     static bool     m_isMonitoringEnabled;                  ///< Whether monitoring is enabled
     static bool     m_shouldDisplayAlgorithmInfo;           ///< Whether to display algorithm information during processing
+    static bool     m_singleHitTypeClusteringMode;          ///< Whether to allow only single hit types in individual clusters
     static bool     m_shouldCollapseMCParticlesToPfoTarget; ///< Whether to collapse mc particle decay chains down to just the pfo target
     static bool     m_useSingleMCParticleAssociation;       ///< Whether to allow only single mc particle association to objects (largest weight)
 
@@ -149,6 +157,13 @@ inline bool PandoraSettings::IsMonitoringEnabled()
 inline bool PandoraSettings::ShouldDisplayAlgorithmInfo()
 {
     return m_shouldDisplayAlgorithmInfo;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline bool PandoraSettings::SingleHitTypeClusteringMode()
+{
+    return m_singleHitTypeClusteringMode;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

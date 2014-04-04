@@ -460,6 +460,16 @@ private:
     PandoraContentApiImpl(Pandora *pPandora);
 
     /**
+     *  @brief  Whether a proposed addition to a cluster is allowed
+     *
+     *  @param  pCluster address of the cluster to modify
+     *  @param  pCaloHit address of the hit to add
+     * 
+     *  @return boolean
+     */
+    bool IsAddToClusterAllowed(Cluster *pCluster, CaloHit *pCaloHit) const;
+
+    /**
      *  @brief  Prepare an object, or a list of objects, for deletion
      * 
      *  @param  pT address of the object, or list of objects, to prepare for deletion
