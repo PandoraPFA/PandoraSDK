@@ -521,7 +521,7 @@ bool PandoraContentApiImpl::IsAvailable(pandora::Vertex *pVertex) const
 
 StatusCode PandoraContentApiImpl::AddToCluster(Cluster *pCluster, CaloHit *pCaloHit) const
 {
-    if (!m_pPandora->m_pCaloHitManager->IsCaloHitAvailable(pCaloHit))
+    if (!this->IsAddToClusterAllowed(pCluster, pCaloHit))
         return STATUS_CODE_NOT_ALLOWED;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->AddCaloHitToCluster(pCluster, pCaloHit));
@@ -547,7 +547,7 @@ StatusCode PandoraContentApiImpl::RemoveFromCluster(Cluster *pCluster, CaloHit *
 
 StatusCode PandoraContentApiImpl::AddIsolatedToCluster(Cluster *pCluster, CaloHit *pCaloHit) const
 {
-    if (!m_pPandora->m_pCaloHitManager->IsCaloHitAvailable(pCaloHit))
+    if (!this->IsAddToClusterAllowed(pCluster, pCaloHit))
         return STATUS_CODE_NOT_ALLOWED;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->AddIsolatedCaloHitToCluster(pCluster, pCaloHit));
@@ -714,6 +714,36 @@ StatusCode PandoraContentApiImpl::RemovePfoParentDaughterRelationship(ParticleFl
 PandoraContentApiImpl::PandoraContentApiImpl(Pandora *pPandora) :
     m_pPandora(pPandora)
 {
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PandoraContentApiImpl::IsAddToClusterAllowed(Cluster *pCluster, CaloHit *pCaloHit) const
+{
+    if (!m_pPandora->m_pCaloHitManager->IsCaloHitAvailable(pCaloHit))
+        return false;
+
+    if (!PandoraSettings::SingleHitTypeClusteringMode())
+        return true;
+
+    CaloHit *pFirstCaloHit(NULL);
+
+    if (!pCluster->GetOrderedCaloHitList().empty())
+    {
+        if (pCluster->GetOrderedCaloHitList().begin()->second->empty())
+            throw StatusCodeException(STATUS_CODE_FAILURE);
+
+        pFirstCaloHit = *(pCluster->GetOrderedCaloHitList().begin()->second->begin());
+    }
+    else if (!pCluster->GetIsolatedCaloHitList().empty())
+    {
+        pFirstCaloHit = *(pCluster->GetIsolatedCaloHitList().begin());
+    }
+
+    if ((NULL == pFirstCaloHit) || (pFirstCaloHit->GetHitType() == pCaloHit->GetHitType()))
+        return true;
+
+    return false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -1004,7 +1034,7 @@ StatusCode PandoraContentApiImpl::RunAlgorithm(const std::string &algorithmName)
 
     try
     {
-        static const bool shouldDisplayAlgorithmInfo(PandoraSettings::ShouldDisplayAlgorithmInfo());
+        const bool shouldDisplayAlgorithmInfo(PandoraSettings::ShouldDisplayAlgorithmInfo());
 
         if (shouldDisplayAlgorithmInfo)
         {

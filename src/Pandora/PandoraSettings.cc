@@ -86,6 +86,7 @@ StatusCode PandoraSettings::RunRegisteredSettingsFunctions(const TiXmlHandle *co
 
 bool PandoraSettings::m_isMonitoringEnabled = false;
 bool PandoraSettings::m_shouldDisplayAlgorithmInfo = false;
+bool PandoraSettings::m_singleHitTypeClusteringMode = false;
 bool PandoraSettings::m_shouldCollapseMCParticlesToPfoTarget = true;
 bool PandoraSettings::m_useSingleMCParticleAssociation = false;
 float PandoraSettings::m_electromagneticEnergyResolution = 0.2f;
@@ -103,6 +104,9 @@ StatusCode PandoraSettings::ReadGlobalSettings(const TiXmlHandle *const pXmlHand
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(*pXmlHandle,
         "ShouldDisplayAlgorithmInfo", m_shouldDisplayAlgorithmInfo));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(*pXmlHandle,
+        "SingleHitTypeClusteringMode", m_singleHitTypeClusteringMode));
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(*pXmlHandle,
         "ShouldCollapseMCParticlesToPfoTarget", m_shouldCollapseMCParticlesToPfoTarget));
