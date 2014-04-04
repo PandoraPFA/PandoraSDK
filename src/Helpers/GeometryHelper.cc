@@ -294,9 +294,10 @@ GeometryHelper::HitTypeToGranularityMap GeometryHelper::GetDefaultHitTypeToGranu
         !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(ECAL, FINE)).second ||
         !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(HCAL, COARSE)).second ||
         !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(MUON, VERY_COARSE)).second ||
-        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(VIEW_U, FINE)).second ||
-        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(VIEW_V, FINE)).second ||
-        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(VIEW_W, FINE)).second )
+        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(TPC_VIEW_U, FINE)).second ||
+        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(TPC_VIEW_V, FINE)).second ||
+        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(TPC_VIEW_W, FINE)).second ||
+        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(TPC_3D, FINE)).second)
     {
         throw StatusCodeException(STATUS_CODE_FAILURE);
     }
