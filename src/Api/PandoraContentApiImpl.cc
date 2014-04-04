@@ -534,7 +534,7 @@ StatusCode PandoraContentApiImpl::AddToCluster(Cluster *pCluster, CaloHit *pCalo
 
 StatusCode PandoraContentApiImpl::RemoveFromCluster(Cluster *pCluster, CaloHit *pCaloHit) const
 {
-    if (pCluster->GetNCaloHits() <= 1)
+    if ((pCluster->GetNCaloHits() <= 1) && (pCluster->GetNIsolatedCaloHits() == 0))
         return STATUS_CODE_NOT_ALLOWED;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->RemoveCaloHitFromCluster(pCluster, pCaloHit));
@@ -559,6 +559,9 @@ StatusCode PandoraContentApiImpl::AddIsolatedToCluster(Cluster *pCluster, CaloHi
 
 StatusCode PandoraContentApiImpl::RemoveIsolatedFromCluster(Cluster *pCluster, CaloHit *pCaloHit) const
 {
+    if ((pCluster->GetNCaloHits() == 0) && (pCluster->GetNIsolatedCaloHits() <= 1))
+        return STATUS_CODE_NOT_ALLOWED;
+
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->RemoveIsolatedCaloHitFromCluster(pCluster, pCaloHit));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->SetCaloHitAvailability(pCaloHit, true));
     return STATUS_CODE_SUCCESS;
