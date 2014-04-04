@@ -348,7 +348,8 @@ public:
     static pandora::StatusCode AddIsolatedToCluster(const pandora::Algorithm &algorithm, pandora::Cluster *pCluster, pandora::CaloHit *pCaloHit);
 
     /**
-     *  @brief  Remove an isolated calo hit from a cluster.
+     *  @brief  Remove an isolated calo hit from a cluster. Note this function will not remove the final calo hit from a cluster, and
+     *          will instead return status code "not allowed" as a prompt to delete the cluster
      *
      *  @param  algorithm the algorithm calling this function
      *  @param  pCluster address of the cluster to modify
