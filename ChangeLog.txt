@@ -1,4 +1,18 @@
 ************************************************************************
+TAG V00-15
+************************************************************************
+Major upgrade of PandoraContentApi, with templates removing need for separate accessors for each object type.
+Add Pandora Vertex class and its AlgorithmObject Manager and associated APIs.
+The ifndef statements in header files are now fully qualified.
+Add single hit type clustering mode functionality.
+Modify rules for removing last calo hit from a cluster.
+Modify error-checking upon addition of reconstruction objects to a pfo.
+Remove unused CaloHit variables and associated Helper functions.
+Rename HitType entries VIEW_U->TPC_VIEW_U, etc. and add new HitType TPC_3D.
+Improve inner workings of OrderedCaloHitList.
+Allow Client Apps to avoid registering GeometryParameters.
+
+************************************************************************
 TAG V00-14
 ************************************************************************
 Add algorithm tool functionality.
