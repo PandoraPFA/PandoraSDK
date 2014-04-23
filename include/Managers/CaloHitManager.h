@@ -41,9 +41,10 @@ private:
      *  @brief  Create calo hit
      * 
      *  @param  parameters the calo hit parameters
+     *  @param  pCaloHit to receive the address of the calo hit
      */
     template <typename PARAMETERS>
-    StatusCode CreateCaloHit(const PARAMETERS &parameters);
+    StatusCode CreateCaloHit(const PARAMETERS &parameters, CaloHit *&pCaloHit);
 
     /**
      *  @brief  Perform the actual calo hit instantiation
@@ -119,7 +120,7 @@ private:
      *  @param  caloHitList the list of calo hits
      *  @param  isAvailable the calo hit availability
      */
-    StatusCode SetCaloHitAvailability(CaloHitList &caloHitList, bool isAvailable);
+    StatusCode SetCaloHitAvailability(const CaloHitList &caloHitList, bool isAvailable);
 
     /**
      *  @brief  Fragment a calo hit into two daughter calo hits, with a specified energy division

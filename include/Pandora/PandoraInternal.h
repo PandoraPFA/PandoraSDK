@@ -153,6 +153,7 @@ typedef std::set<CaloHit *> CaloHitList;
 typedef std::set<Track *> TrackList;
 typedef std::set<Cluster *> ClusterList;
 typedef std::set<MCParticle *> MCParticleList;
+typedef std::set<ParticleFlowObject *> ParticleFlowObjectList;
 typedef std::set<ParticleFlowObject *> PfoList;
 typedef std::set<Vertex *> VertexList;
 
@@ -160,6 +161,7 @@ typedef std::vector<CaloHit *> CaloHitVector;
 typedef std::vector<Track *> TrackVector;
 typedef std::vector<Cluster *> ClusterVector;
 typedef std::vector<MCParticle *> MCParticleVector;
+typedef std::vector<ParticleFlowObject *> ParticleFlowObjectVector;
 typedef std::vector<ParticleFlowObject *> PfoVector;
 typedef std::vector<Vertex *> VertexVector;
 

@@ -37,9 +37,10 @@ private:
     /**
      *  @brief  Create track
      * 
-     *  @param  trackParameters the track parameters
+     *  @param  parameters the track parameters
+     *  @param  pTrack to receive the address of the track
      */
-    StatusCode CreateTrack(const PandoraApi::TrackParameters &trackParameters);
+    StatusCode CreateTrack(const PandoraApi::Track::Parameters &parameters, Track *&pTrack);
 
     /**
      *  @brief  Erase all track manager content

@@ -28,13 +28,13 @@ TrackManager::~TrackManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode TrackManager::CreateTrack(const PandoraApi::TrackParameters &trackParameters)
+StatusCode TrackManager::CreateTrack(const PandoraApi::Track::Parameters &parameters, Track *&pTrack)
 {
-    Track *pTrack = NULL;
+    pTrack = NULL;
 
     try
     {
-        pTrack = new Track(trackParameters);
+        pTrack = new Track(parameters);
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
 
@@ -53,6 +53,7 @@ StatusCode TrackManager::CreateTrack(const PandoraApi::TrackParameters &trackPar
     {
         std::cout << "Failed to create track: " << statusCodeException.ToString() << std::endl;
         delete pTrack;
+        pTrack = NULL;
         return statusCodeException.GetStatusCode();
     }
 }

@@ -28,7 +28,7 @@ VertexManager::~VertexManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode VertexManager::CreateVertex(const CartesianVector &vertexPosition, Vertex *&pVertex)
+StatusCode VertexManager::CreateVertex(const PandoraContentApi::Vertex::Parameters &parameters, Vertex *&pVertex)
 {
     pVertex = NULL;
 
@@ -42,7 +42,7 @@ StatusCode VertexManager::CreateVertex(const CartesianVector &vertexPosition, Ve
         if (m_nameToListMap.end() == iter)
              throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
-        pVertex = new Vertex(vertexPosition);
+        pVertex = new Vertex(parameters);
 
         if (NULL == pVertex)
              throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -56,6 +56,7 @@ StatusCode VertexManager::CreateVertex(const CartesianVector &vertexPosition, Ve
     {
         std::cout << "Failed to create vertex: " << statusCodeException.ToString() << std::endl;
         delete pVertex;
+        pVertex = NULL;
         return statusCodeException.GetStatusCode();
     }
 }

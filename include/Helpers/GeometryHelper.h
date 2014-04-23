@@ -56,7 +56,7 @@ public:
          *  @param  subDetectorName the sub detector name
          *  @param  inputParameters the input sub detector parameters
          */
-        void Initialize(const std::string &subDetectorName, const PandoraApi::GeometryParameters::SubDetectorParameters &inputParameters);
+        void Initialize(const std::string &subDetectorName, const PandoraApi::Geometry::Parameters::SubDetectorParameters &inputParameters);
 
         /**
          *  @brief  Whether the sub detector parameters have been initialized

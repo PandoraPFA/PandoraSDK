@@ -37,9 +37,10 @@ private:
     /**
      *  @brief  Create a mc particle
      * 
-     *  @param  mcParticleParameters the mc particle parameters
+     *  @param  parameters the mc particle parameters
+     *  @param  pMCParticle address of the mc particle
      */
-    StatusCode CreateMCParticle(const PandoraApi::MCParticleParameters &mcParticleParameters);
+    StatusCode CreateMCParticle(const PandoraApi::MCParticle::Parameters &parameters, MCParticle *&pMCParticle);
 
     /**
      *  @brief  Erase all mc manager content

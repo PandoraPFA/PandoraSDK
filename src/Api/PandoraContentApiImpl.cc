@@ -33,36 +33,18 @@ namespace pandora
 {
 
 template <>
-StatusCode PandoraContentApiImpl::CreateCluster(CaloHit *pCaloHit, Cluster *&pCluster) const
+StatusCode PandoraContentApiImpl::CreateObject(const PandoraContentApi::Cluster::Parameters &parameters, Cluster *&pCluster) const
 {
-    if (!m_pPandora->m_pCaloHitManager->IsCaloHitAvailable(pCaloHit))
+    if (!m_pPandora->m_pCaloHitManager->AreCaloHitsAvailable(parameters.m_caloHitList))
         return STATUS_CODE_NOT_ALLOWED;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->CreateCluster(pCaloHit, pCluster));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->SetCaloHitAvailability(pCaloHit, false));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->CreateCluster(parameters, pCluster));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->SetCaloHitAvailability(parameters.m_caloHitList, false));
     return STATUS_CODE_SUCCESS;
 }
 
 template <>
-StatusCode PandoraContentApiImpl::CreateCluster(CaloHitList *pCaloHitList, Cluster *&pCluster) const
-{
-    if (!m_pPandora->m_pCaloHitManager->AreCaloHitsAvailable(*pCaloHitList))
-        return STATUS_CODE_NOT_ALLOWED;
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->CreateCluster(pCaloHitList, pCluster));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->SetCaloHitAvailability(*pCaloHitList, false));
-    return STATUS_CODE_SUCCESS;
-}
-
-template <>
-StatusCode PandoraContentApiImpl::CreateCluster(Track *pTrack, Cluster *&pCluster) const
-{
-    return m_pPandora->m_pClusterManager->CreateCluster(pTrack, pCluster);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode PandoraContentApiImpl::CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &pfoParameters,
+StatusCode PandoraContentApiImpl::CreateObject(const PandoraContentApi::ParticleFlowObject::Parameters &pfoParameters,
     ParticleFlowObject *&pPfo) const
 {
     const TrackList &trackList(pfoParameters.m_trackList);
@@ -100,11 +82,34 @@ StatusCode PandoraContentApiImpl::CreateParticleFlowObject(const PandoraContentA
     return STATUS_CODE_SUCCESS;
 }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode PandoraContentApiImpl::CreateVertex(const CartesianVector &vertexPosition, Vertex *&pVertex) const
+template <>
+StatusCode PandoraContentApiImpl::CreateObject(const PandoraContentApi::Vertex::Parameters &parameters, Vertex *&pVertex) const
 {
-    return m_pPandora->m_pVertexManager->CreateVertex(vertexPosition, pVertex);
+    return m_pPandora->m_pVertexManager->CreateVertex(parameters, pVertex);
+}
+
+template <>
+StatusCode PandoraContentApiImpl::CreateObject(const PandoraApi::MCParticle::Parameters &parameters, MCParticle *&pMCParticle) const
+{
+    return m_pPandora->m_pMCManager->CreateMCParticle(parameters, pMCParticle);
+}
+
+template <>
+StatusCode PandoraContentApiImpl::CreateObject(const PandoraApi::Track::Parameters &parameters, Track *&pTrack) const
+{
+    return m_pPandora->m_pTrackManager->CreateTrack(parameters, pTrack);
+}
+
+template <>
+StatusCode PandoraContentApiImpl::CreateObject(const PandoraApi::RectangularCaloHit::Parameters &parameters, CaloHit *&pCaloHit) const
+{
+    return m_pPandora->m_pCaloHitManager->CreateCaloHit(parameters, pCaloHit);
+}
+
+template <>
+StatusCode PandoraContentApiImpl::CreateObject(const PandoraApi::PointingCaloHit::Parameters &parameters, CaloHit *&pCaloHit) const
+{
+    return m_pPandora->m_pCaloHitManager->CreateCaloHit(parameters, pCaloHit);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

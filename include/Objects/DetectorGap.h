@@ -49,9 +49,9 @@ public:
     /**
      *  @brief  Constructor
      * 
-     *  @param  gapParameters the gap parameters
+     *  @param  parameters the gap parameters
      */
-    BoxGap(const PandoraApi::BoxGap::Parameters &gapParameters);
+    BoxGap(const PandoraApi::BoxGap::Parameters &parameters);
 
     bool IsInGap(const CartesianVector &positionVector) const;
 
@@ -72,9 +72,9 @@ public:
     /**
      *  @brief  Constructor
      * 
-     *  @param  gapParameters the gap parameters
+     *  @param  parameters the gap parameters
      */
-    ConcentricGap(const PandoraApi::ConcentricGap::Parameters &gapParameters);
+    ConcentricGap(const PandoraApi::ConcentricGap::Parameters &parameters);
 
     bool IsInGap(const CartesianVector &positionVector) const;
 

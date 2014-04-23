@@ -38,9 +38,9 @@ CaloHitManager::~CaloHitManager()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename PARAMETERS>
-StatusCode CaloHitManager::CreateCaloHit(const PARAMETERS &parameters)
+StatusCode CaloHitManager::CreateCaloHit(const PARAMETERS &parameters, CaloHit *&pCaloHit)
 {
-    CaloHit *pCaloHit = NULL;
+    pCaloHit = NULL;
 
     try
     {
@@ -63,26 +63,21 @@ StatusCode CaloHitManager::CreateCaloHit(const PARAMETERS &parameters)
     {
         std::cout << "Failed to create calo hit: " << statusCodeException.ToString() << std::endl;
         delete pCaloHit;
+        pCaloHit = NULL;
         return statusCodeException.GetStatusCode();
     }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template <typename PARAMETERS>
-CaloHit *CaloHitManager::HitInstantiation(const PARAMETERS &parameters)
-{
-    return NULL;
-}
-
 template <>
-CaloHit *CaloHitManager::HitInstantiation(const PandoraApi::RectangularCaloHitParameters &parameters)
+CaloHit *CaloHitManager::HitInstantiation(const PandoraApi::RectangularCaloHit::Parameters &parameters)
 {
     return new RectangularCaloHit(parameters);
 }
 
 template <>
-CaloHit *CaloHitManager::HitInstantiation(const PandoraApi::PointingCaloHitParameters &parameters)
+CaloHit *CaloHitManager::HitInstantiation(const PandoraApi::PointingCaloHit::Parameters &parameters)
 {
     return new PointingCaloHit(parameters);
 }
@@ -211,7 +206,7 @@ bool CaloHitManager::AreCaloHitsAvailable(const CaloHitList &caloHitList) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHitManager::SetCaloHitAvailability(CaloHitList &caloHitList, bool isAvailable)
+StatusCode CaloHitManager::SetCaloHitAvailability(const CaloHitList &caloHitList, bool isAvailable)
 {
     if (0 == m_nReclusteringProcesses)
     {
@@ -506,7 +501,7 @@ StatusCode CaloHitManager::Update(CaloHitList *pCaloHitList, const CaloHitReplac
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template StatusCode CaloHitManager::CreateCaloHit<PandoraApi::RectangularCaloHitParameters>(const PandoraApi::RectangularCaloHitParameters &parameters);
-template StatusCode CaloHitManager::CreateCaloHit<PandoraApi::PointingCaloHitParameters>(const PandoraApi::PointingCaloHitParameters &parameters);
+template StatusCode CaloHitManager::CreateCaloHit<PandoraApi::RectangularCaloHit::Parameters>(const PandoraApi::RectangularCaloHit::Parameters &, CaloHit *&);
+template StatusCode CaloHitManager::CreateCaloHit<PandoraApi::PointingCaloHit::Parameters>(const PandoraApi::PointingCaloHit::Parameters &, CaloHit *&);
 
 } // namespace pandora

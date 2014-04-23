@@ -8,11 +8,14 @@
 #ifndef PANDORA_CONTENT_API_H
 #define PANDORA_CONTENT_API_H 1
 
+#include "Api/PandoraApi.h"
+
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraInternal.h"
 
-namespace pandora { class Algorithm; class AlgorithmTool; class TiXmlElement; class TiXmlHandle;}
+namespace pandora { class Algorithm; class AlgorithmTool; class TiXmlElement; class TiXmlHandle; }
+namespace pandora { class CaloHit; class Cluster; class MCParticle; class ParticleFlowObject; class Track; class Vertex; }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -25,69 +28,71 @@ public:
     /* Object-creation functions */
 
     /**
-     *  @brief  Cluster creation class
+     *  @brief  Object creation helper class
+     * 
+     *  @param  PARAMETERS the type of object parameters
      */
-    class Cluster
+    template <typename PARAMETERS, typename OBJECT>
+    class ObjectCreationHelper
     {
     public:
+        typedef PARAMETERS Parameters;
+        typedef OBJECT Object;
+
         /**
-         *  @brief  Create a cluster
-         *
-         *  @param  algorithm the algorithm creating the cluster
-         *  @param  pClusterParameters address of either 1) a single calo hit, 2) a calo hit list, or 3) a track
-         *  @param  pCluster to receive the address of the cluster created
+         *  @brief  Create a new object
+         * 
+         *  @param  algorithm the algorithm calling this function
+         *  @param  parameters the object parameters
+         *  @param  pObject to receive the address of the object created
          */
-        template <typename PARAMETERS>
-        static pandora::StatusCode Create(const pandora::Algorithm &algorithm, PARAMETERS *pClusterParameters, pandora::Cluster *&pCluster);
+        static pandora::StatusCode Create(const pandora::Algorithm &algorithm, const Parameters &parameters, Object *&pObject);
     };
 
     /**
-     *  @brief  Particle flow object creation class
+     *  @brief  ClusterParameters class. To build a cluster must provide at least one hit (which may be isolated) or a track address.
      */
-    class ParticleFlowObject
+    class ClusterParameters
     {
     public:
-        /**
-         *  @brief  Parameters class
-         */
-        class Parameters
-        {
-        public:
-            pandora::InputInt               m_particleId;       ///< The particle flow object id (PDG code)
-            pandora::InputInt               m_charge;           ///< The particle flow object charge
-            pandora::InputFloat             m_mass;             ///< The particle flow object mass
-            pandora::InputFloat             m_energy;           ///< The particle flow object energy
-            pandora::InputCartesianVector   m_momentum;         ///< The particle flow object momentum
-            pandora::ClusterList            m_clusterList;      ///< The clusters in the particle flow object
-            pandora::TrackList              m_trackList;        ///< The tracks in the particle flow object
-            pandora::VertexList             m_vertexList;       ///< The vertices in the particle flow object
-        };
+        pandora::CaloHitList            m_caloHitList;          ///< The calo hit(s) to include
+        pandora::CaloHitList            m_isolatedCaloHitList;  ///< The isolated calo hit(s) to include
+        pandora::InputTrackAddress      m_pTrack;               ///< The address of the track seeding the cluster
+    };
 
-        /**
-         *  @brief  Create a particle flow object
-         * 
-         *  @param  algorithm the algorithm creating the particle flow object
-         *  @param  particleFlowObjectParameters the particle flow object parameters
-         *  @param  pPfo to receive the address of the particle flow object created
-         */
-        static pandora::StatusCode Create(const pandora::Algorithm &algorithm, const Parameters &parameters, pandora::ParticleFlowObject *&pPfo);
+    /**
+     *  @brief  ParticleFlowObjectParameters class
+     */
+    class ParticleFlowObjectParameters
+    {
+    public:
+        pandora::InputInt               m_particleId;           ///< The particle flow object id (PDG code)
+        pandora::InputInt               m_charge;               ///< The particle flow object charge
+        pandora::InputFloat             m_mass;                 ///< The particle flow object mass
+        pandora::InputFloat             m_energy;               ///< The particle flow object energy
+        pandora::InputCartesianVector   m_momentum;             ///< The particle flow object momentum
+        pandora::ClusterList            m_clusterList;          ///< The clusters in the particle flow object
+        pandora::TrackList              m_trackList;            ///< The tracks in the particle flow object
+        pandora::VertexList             m_vertexList;           ///< The vertices in the particle flow object
     };
 
     /**
      *  @brief  Vertex creation class
      */
-    class Vertex
+    class VertexParameters
     {
     public:
-        /**
-         *  @brief  Create a vertex
-         *
-         *  @param  algorithm the algorithm creating the vertex
-         *  @param  vertexPosition the vertex position
-         *  @param  pVertex to receive the address of the vertex created
-         */
-        static pandora::StatusCode Create(const pandora::Algorithm &algorithm, const pandora::CartesianVector &vertexPosition, pandora::Vertex *&pVertex);
+        pandora::InputCartesianVector   m_position;             ///< The vertex position
     };
+
+    typedef ObjectCreationHelper<ClusterParameters, pandora::Cluster> Cluster;
+    typedef ObjectCreationHelper<ParticleFlowObjectParameters, pandora::ParticleFlowObject> ParticleFlowObject;
+    typedef ObjectCreationHelper<VertexParameters, pandora::Vertex> Vertex;
+    typedef ObjectCreationHelper<PandoraApi::MCParticle::Parameters, pandora::MCParticle> MCParticle;
+    typedef ObjectCreationHelper<PandoraApi::Track::Parameters, pandora::Track> Track;
+    typedef ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters, pandora::CaloHit> CaloHit;
+    typedef ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters, pandora::CaloHit> RectangularCaloHit;
+    typedef ObjectCreationHelper<PandoraApi::PointingCaloHit::Parameters, pandora::CaloHit> PointingCaloHit;
 
 
     /* High-level steering functions */

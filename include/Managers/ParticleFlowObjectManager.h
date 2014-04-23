@@ -37,11 +37,10 @@ private:
     /**
      *  @brief  Create a particle flow object
      * 
-     *  @param  particleFlowObjectParameters the particle flow object parameters
+     *  @param  parameters the particle flow object parameters
      *  @param  pPfo to receive the address of the particle flow object created
      */
-    StatusCode CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &particleFlowObjectParameters,
-        ParticleFlowObject *&pPfo);
+    StatusCode CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &parameters, ParticleFlowObject *&pPfo);
 
     /**
      *  @brief  Add an object to a particle flow object

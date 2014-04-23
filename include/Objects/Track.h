@@ -222,7 +222,7 @@ private:
      * 
      *  @param  parameters the calo hit parameters
      */
-    Track(const PandoraApi::TrackParameters &trackParameters);
+    Track(const PandoraApi::Track::Parameters &parameters);
 
     /**
      *  @brief  Destructor

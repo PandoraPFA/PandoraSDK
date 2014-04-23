@@ -344,23 +344,9 @@ private:
     /**
      *  @brief  Constructor
      * 
-     *  @param  pCaloHit address of calo hit with which initialize cluster
+     *  @param  parameters the cluster parameters
      */
-    Cluster(CaloHit *pCaloHit);
-
-    /**
-     *  @brief  Constructor
-     * 
-     *  @param  pCaloHitList calo hits with which to create cluster
-     */
-    Cluster(CaloHitList *pCaloHitList);
-
-    /**
-     *  @brief  Constructor
-     * 
-     *  @param  pTrack address of track with which to seed cluster
-     */
-    Cluster(Track *pTrack);
+    Cluster(const PandoraContentApi::Cluster::Parameters &parameters);
 
     /**
      *  @brief  Destructor

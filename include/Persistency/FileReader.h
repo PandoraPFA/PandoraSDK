@@ -105,21 +105,21 @@ protected:
      * 
      *  @param  pGeometryParameters address of the geometry parameters
      */
-    virtual StatusCode ReadTracker(PandoraApi::GeometryParameters *pGeometryParameters) = 0;
+    virtual StatusCode ReadTracker(PandoraApi::Geometry::Parameters *pGeometryParameters) = 0;
 
     /**
      *  @brief  Read the coil parameters from the current position in the file
      * 
      *  @param  pGeometryParameters address of the geometry parameters
      */
-    virtual StatusCode ReadCoil(PandoraApi::GeometryParameters *pGeometryParameters) = 0;
+    virtual StatusCode ReadCoil(PandoraApi::Geometry::Parameters *pGeometryParameters) = 0;
 
     /**
      *  @brief  Read the additional sub detector parameters from the current position in the file
      * 
      *  @param  pGeometryParameters address of the geometry parameters
      */
-    virtual StatusCode ReadAdditionalSubDetectors(PandoraApi::GeometryParameters *pGeometryParameters) = 0;
+    virtual StatusCode ReadAdditionalSubDetectors(PandoraApi::Geometry::Parameters *pGeometryParameters) = 0;
 
     /**
      *  @brief  Read a sub detector from the current position in the file
@@ -128,7 +128,7 @@ protected:
      *  @param  pSubDetectorParameters address of the sub detector parameters to populate
      *  @param  checkComponentId whether to check the component id before deserializing
      */
-    virtual StatusCode ReadSubDetector(std::string &subDetectorName, PandoraApi::GeometryParameters::SubDetectorParameters *pSubDetectorParameters) = 0;
+    virtual StatusCode ReadSubDetector(std::string &subDetectorName, PandoraApi::Geometry::Parameters::SubDetectorParameters *pSubDetectorParameters) = 0;
 
     const pandora::Pandora *const   m_pPandora;             ///< Address of pandora instance to be used alongside the file reader
     ContainerId                     m_containerId;          ///< The type of container currently being read from file

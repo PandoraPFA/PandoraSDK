@@ -28,13 +28,13 @@ public:
     /* Object-creation functions */
 
     /**
-     *  @brief  Create a cluster
-     *
-     *  @param  pClusterParameters address of either 1) a calo hit, 2) a calo hit list or 3) a track
-     *  @param  pCluster to receive the address of the cluster created
+     *  @brief  Create an object for pandora
+     * 
+     *  @param  parameters the object parameters
+     *  @param  pObject to receive the address of the object created
      */
-    template <typename PARAMETERS>
-    StatusCode CreateCluster(PARAMETERS *pClusterParameters, Cluster *&pCluster) const;
+    template <typename PARAMETERS, typename OBJECT>
+    StatusCode CreateObject(const PARAMETERS &parameters, OBJECT *&pObject) const;
 
     /**
      *  @brief  Create a particle flow object

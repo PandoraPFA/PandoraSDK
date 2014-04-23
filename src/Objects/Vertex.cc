@@ -13,8 +13,8 @@
 namespace pandora
 {
 
-Vertex::Vertex(const CartesianVector &vertexPosition) :
-    m_position(vertexPosition),
+Vertex::Vertex(const PandoraContentApi::Vertex::Parameters &parameters) :
+    m_position(parameters.m_position.Get()),
     m_isAvailable(true)
 {
 }

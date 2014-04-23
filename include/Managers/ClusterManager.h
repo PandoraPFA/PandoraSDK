@@ -39,11 +39,10 @@ private:
     /**
      *  @brief  Create cluster
      * 
-     *  @param  clusterParameters the cluster parameters
+     *  @param  parameters the cluster parameters
      *  @param  pCluster to receive the address of the cluster created
      */
-    template <typename CLUSTER_PARAMETERS>
-    StatusCode CreateCluster(CLUSTER_PARAMETERS *pClusterParameters, Cluster *&pCluster);
+    StatusCode CreateCluster(const PandoraContentApi::Cluster::Parameters &parameters, Cluster *&pCluster);
 
     /**
      *  @brief  Add a calo hit to a cluster

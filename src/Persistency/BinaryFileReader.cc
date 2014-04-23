@@ -200,7 +200,7 @@ StatusCode BinaryFileReader::ReadNextEventComponent()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadTracker(PandoraApi::GeometryParameters *pGeometryParameters)
+StatusCode BinaryFileReader::ReadTracker(PandoraApi::Geometry::Parameters *pGeometryParameters)
 {
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
@@ -226,7 +226,7 @@ StatusCode BinaryFileReader::ReadTracker(PandoraApi::GeometryParameters *pGeomet
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadCoil(PandoraApi::GeometryParameters *pGeometryParameters)
+StatusCode BinaryFileReader::ReadCoil(PandoraApi::Geometry::Parameters *pGeometryParameters)
 {
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
@@ -252,7 +252,7 @@ StatusCode BinaryFileReader::ReadCoil(PandoraApi::GeometryParameters *pGeometryP
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadAdditionalSubDetectors(PandoraApi::GeometryParameters *pGeometryParameters)
+StatusCode BinaryFileReader::ReadAdditionalSubDetectors(PandoraApi::Geometry::Parameters *pGeometryParameters)
 {
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
@@ -273,7 +273,7 @@ StatusCode BinaryFileReader::ReadAdditionalSubDetectors(PandoraApi::GeometryPara
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadSubDetector(std::string &subDetectorName, PandoraApi::GeometryParameters::SubDetectorParameters *pSubDetectorParameters)
+StatusCode BinaryFileReader::ReadSubDetector(std::string &subDetectorName, PandoraApi::Geometry::Parameters::SubDetectorParameters *pSubDetectorParameters)
 {
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;

@@ -36,29 +36,29 @@ const MCParticle *CaloHit::GetMainMCParticle() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-CaloHit::CaloHit(const PandoraApi::CaloHitBaseParameters &caloHitParameters) :
-    m_positionVector(caloHitParameters.m_positionVector.Get()),
-    m_expectedDirection(caloHitParameters.m_expectedDirection.Get().GetUnitVector()),
-    m_cellNormalVector(caloHitParameters.m_cellNormalVector.Get().GetUnitVector()),
-    m_cellThickness(caloHitParameters.m_cellThickness.Get()),
-    m_nCellRadiationLengths(caloHitParameters.m_nCellRadiationLengths.Get()),
-    m_nCellInteractionLengths(caloHitParameters.m_nCellInteractionLengths.Get()),
-    m_time(caloHitParameters.m_time.Get()),
-    m_inputEnergy(caloHitParameters.m_inputEnergy.Get()),
-    m_mipEquivalentEnergy(caloHitParameters.m_mipEquivalentEnergy.Get()),
-    m_electromagneticEnergy(caloHitParameters.m_electromagneticEnergy.Get()),
-    m_hadronicEnergy(caloHitParameters.m_hadronicEnergy.Get()),
-    m_isDigital(caloHitParameters.m_isDigital.Get()),
-    m_hitType(caloHitParameters.m_hitType.Get()),
-    m_detectorRegion(caloHitParameters.m_detectorRegion.Get()),
-    m_layer(caloHitParameters.m_layer.Get()),
-    m_isInOuterSamplingLayer(caloHitParameters.m_isInOuterSamplingLayer.Get()),
+CaloHit::CaloHit(const PandoraApi::CaloHitBaseParameters &parameters) :
+    m_positionVector(parameters.m_positionVector.Get()),
+    m_expectedDirection(parameters.m_expectedDirection.Get().GetUnitVector()),
+    m_cellNormalVector(parameters.m_cellNormalVector.Get().GetUnitVector()),
+    m_cellThickness(parameters.m_cellThickness.Get()),
+    m_nCellRadiationLengths(parameters.m_nCellRadiationLengths.Get()),
+    m_nCellInteractionLengths(parameters.m_nCellInteractionLengths.Get()),
+    m_time(parameters.m_time.Get()),
+    m_inputEnergy(parameters.m_inputEnergy.Get()),
+    m_mipEquivalentEnergy(parameters.m_mipEquivalentEnergy.Get()),
+    m_electromagneticEnergy(parameters.m_electromagneticEnergy.Get()),
+    m_hadronicEnergy(parameters.m_hadronicEnergy.Get()),
+    m_isDigital(parameters.m_isDigital.Get()),
+    m_hitType(parameters.m_hitType.Get()),
+    m_detectorRegion(parameters.m_detectorRegion.Get()),
+    m_layer(parameters.m_layer.Get()),
+    m_isInOuterSamplingLayer(parameters.m_isInOuterSamplingLayer.Get()),
     m_isPossibleMip(false),
     m_isIsolated(false),
     m_isAvailable(true),
     m_weight(1.f),
     m_cellGeometry(UNKNOWN_CELL_GEOMETRY),
-    m_pParentAddress(caloHitParameters.m_pParentAddress.Get())
+    m_pParentAddress(parameters.m_pParentAddress.Get())
 {
 }
 
@@ -141,7 +141,7 @@ void CaloHit::RemoveMCParticles()
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-RectangularCaloHit::RectangularCaloHit(const PandoraApi::RectangularCaloHitParameters &parameters) :
+RectangularCaloHit::RectangularCaloHit(const PandoraApi::RectangularCaloHit::Parameters &parameters) :
     CaloHit(parameters),
     m_cellSizeU(parameters.m_cellSizeU.Get()),
     m_cellSizeV(parameters.m_cellSizeV.Get()),
@@ -188,7 +188,7 @@ void RectangularCaloHit::GetCellCorners(CartesianPointList &cartesianPointList) 
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-PointingCaloHit::PointingCaloHit(const PandoraApi::PointingCaloHitParameters &parameters) :
+PointingCaloHit::PointingCaloHit(const PandoraApi::PointingCaloHit::Parameters &parameters) :
     CaloHit(parameters),
     m_cellSizeEta(parameters.m_cellSizeEta.Get()),
     m_cellSizePhi(parameters.m_cellSizePhi.Get()),

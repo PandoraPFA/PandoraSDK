@@ -179,10 +179,10 @@ pandora::StatusCode PandoraApi::Reset(const pandora::Pandora &pandora)
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template class PandoraApi::ObjectCreationHelper<PandoraApi::MCParticleParameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::TrackParameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::RectangularCaloHitParameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::PointingCaloHitParameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::GeometryParameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::BoxGapParameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::ConcentricGapParameters>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::MCParticle::Parameters>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::Track::Parameters>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::PointingCaloHit::Parameters>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::Parameters>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::BoxGap::Parameters>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::ConcentricGap::Parameters>;

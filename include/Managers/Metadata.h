@@ -117,7 +117,7 @@ public:
      *  @param  caloHitList the list of calo hits
      *  @param  isAvailable the calo hit availability
      */
-    StatusCode SetCaloHitAvailability(CaloHitList &caloHitList, bool isAvailable);
+    StatusCode SetCaloHitAvailability(const CaloHitList &caloHitList, bool isAvailable);
 
 private:
     CaloHitList                *m_pCaloHitList;                     ///< Address of the associated calo hit list

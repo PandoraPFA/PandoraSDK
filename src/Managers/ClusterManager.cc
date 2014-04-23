@@ -26,8 +26,7 @@ ClusterManager::~ClusterManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template <typename CLUSTER_PARAMETERS>
-StatusCode ClusterManager::CreateCluster(CLUSTER_PARAMETERS *pClusterParameters, Cluster *&pCluster)
+StatusCode ClusterManager::CreateCluster(const PandoraContentApi::Cluster::Parameters &parameters, Cluster *&pCluster)
 {
     pCluster = NULL;
 
@@ -41,7 +40,7 @@ StatusCode ClusterManager::CreateCluster(CLUSTER_PARAMETERS *pClusterParameters,
         if (m_nameToListMap.end() == iter)
              throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
-        pCluster = new Cluster(pClusterParameters);
+        pCluster = new Cluster(parameters);
 
         if (NULL == pCluster)
              throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -55,6 +54,7 @@ StatusCode ClusterManager::CreateCluster(CLUSTER_PARAMETERS *pClusterParameters,
     {
         std::cout << "Failed to create cluster: " << statusCodeException.ToString() << std::endl;
         delete pCluster;
+        pCluster = NULL;
         return statusCodeException.GetStatusCode();
     }
 }
@@ -164,12 +164,5 @@ StatusCode ClusterManager::RemoveTrackAssociations(const TrackToClusterMap &trac
 
     return STATUS_CODE_SUCCESS;
 }
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template StatusCode ClusterManager::CreateCluster<CaloHit>(CaloHit *pCaloHit, Cluster *&pCluster);
-template StatusCode ClusterManager::CreateCluster<CaloHitList>(CaloHitList *pCaloHitList, Cluster *&pCluster);
-template StatusCode ClusterManager::CreateCluster<Track>(Track *pTrack, Cluster *&pCluster);
 
 } // namespace pandora
