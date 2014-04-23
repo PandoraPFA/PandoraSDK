@@ -384,6 +384,36 @@ inline bool PandoraInputType<TrackState>::IsValid(const TrackState &t) const
         IS_INF(m.GetX()) || IS_INF(m.GetY()) || IS_INF(m.GetZ()));
 }
 
+template <>
+inline bool PandoraInputType<Track *>::IsValid(Track *const &) const
+{
+    return true;
+}
+
+template <>
+inline bool PandoraInputType<CaloHit *>::IsValid(CaloHit *const &) const
+{
+    return true;
+}
+
+template <>
+inline bool PandoraInputType<Cluster *>::IsValid(Cluster *const &) const
+{
+    return true;
+}
+
+template <>
+inline bool PandoraInputType<ParticleFlowObject *>::IsValid(ParticleFlowObject *const &) const
+{
+    return true;
+}
+
+template <>
+inline bool PandoraInputType<Vertex *>::IsValid(Vertex *const &) const
+{
+    return true;
+}
+
 } // namespace pandora
 
 #endif // #ifndef PANDORA_INPUT_TYPES_H
