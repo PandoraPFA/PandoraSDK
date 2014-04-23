@@ -27,7 +27,7 @@ ParticleFlowObjectManager::~ParticleFlowObjectManager()
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObjectManager::CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &particleFlowObjectParameters,
+StatusCode ParticleFlowObjectManager::CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &parameters,
     ParticleFlowObject *&pPfo)
 {
     pPfo = NULL;
@@ -42,7 +42,7 @@ StatusCode ParticleFlowObjectManager::CreateParticleFlowObject(const PandoraCont
         if (m_nameToListMap.end() == iter)
              throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
-        pPfo = new ParticleFlowObject(particleFlowObjectParameters);
+        pPfo = new ParticleFlowObject(parameters);
 
         if (NULL == pPfo)
              throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -56,6 +56,7 @@ StatusCode ParticleFlowObjectManager::CreateParticleFlowObject(const PandoraCont
     {
         std::cout << "Failed to create particle flow object: " << statusCodeException.ToString() << std::endl;
         delete pPfo;
+        pPfo = NULL;
         return statusCodeException.GetStatusCode();
     }
 }

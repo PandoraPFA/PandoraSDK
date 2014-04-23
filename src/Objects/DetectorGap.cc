@@ -13,11 +13,11 @@
 namespace pandora
 {
 
-BoxGap::BoxGap(const PandoraApi::BoxGap::Parameters &gapParameters) :
-    m_vertex(gapParameters.m_vertex.Get()),
-    m_side1(gapParameters.m_side1.Get()),
-    m_side2(gapParameters.m_side2.Get()),
-    m_side3(gapParameters.m_side3.Get())
+BoxGap::BoxGap(const PandoraApi::BoxGap::Parameters &parameters) :
+    m_vertex(parameters.m_vertex.Get()),
+    m_side1(parameters.m_side1.Get()),
+    m_side2(parameters.m_side2.Get()),
+    m_side3(parameters.m_side3.Get())
 {
 }
 
@@ -49,15 +49,15 @@ bool BoxGap::IsInGap(const CartesianVector &positionVector) const
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-ConcentricGap::ConcentricGap(const PandoraApi::ConcentricGap::Parameters &gapParameters) :
-    m_minZCoordinate(gapParameters.m_minZCoordinate.Get()),
-    m_maxZCoordinate(gapParameters.m_maxZCoordinate.Get()),
-    m_innerRCoordinate(gapParameters.m_innerRCoordinate.Get()),
-    m_innerPhiCoordinate(gapParameters.m_innerPhiCoordinate.Get()),
-    m_innerSymmetryOrder(gapParameters.m_innerSymmetryOrder.Get()),
-    m_outerRCoordinate(gapParameters.m_outerRCoordinate.Get()),
-    m_outerPhiCoordinate(gapParameters.m_outerPhiCoordinate.Get()),
-    m_outerSymmetryOrder(gapParameters.m_outerSymmetryOrder.Get())
+ConcentricGap::ConcentricGap(const PandoraApi::ConcentricGap::Parameters &parameters) :
+    m_minZCoordinate(parameters.m_minZCoordinate.Get()),
+    m_maxZCoordinate(parameters.m_maxZCoordinate.Get()),
+    m_innerRCoordinate(parameters.m_innerRCoordinate.Get()),
+    m_innerPhiCoordinate(parameters.m_innerPhiCoordinate.Get()),
+    m_innerSymmetryOrder(parameters.m_innerSymmetryOrder.Get()),
+    m_outerRCoordinate(parameters.m_outerRCoordinate.Get()),
+    m_outerPhiCoordinate(parameters.m_outerPhiCoordinate.Get()),
+    m_outerSymmetryOrder(parameters.m_outerSymmetryOrder.Get())
 {
     if ((0 == m_innerSymmetryOrder) || (0 == m_outerSymmetryOrder))
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);

@@ -130,7 +130,7 @@ void GeometryHelper::FillAngleVector(const unsigned int symmetryOrder, const flo
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode GeometryHelper::Initialize(const PandoraApi::GeometryParameters &geometryParameters)
+StatusCode GeometryHelper::Initialize(const PandoraApi::Geometry::Parameters &geometryParameters)
 {
     try
     {

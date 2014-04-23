@@ -11,16 +11,16 @@
 namespace pandora
 {
 
-MCParticle::MCParticle(const PandoraApi::MCParticleParameters &mcParticleParameters) :
-    m_uid(mcParticleParameters.m_pParentAddress.Get()),
-    m_energy(mcParticleParameters.m_energy.Get()),
-    m_momentum(mcParticleParameters.m_momentum.Get()),
-    m_vertex(mcParticleParameters.m_vertex.Get()),
-    m_endpoint(mcParticleParameters.m_endpoint.Get()),
-    m_innerRadius(mcParticleParameters.m_vertex.Get().GetMagnitude()),
-    m_outerRadius(mcParticleParameters.m_endpoint.Get().GetMagnitude()),
-    m_particleId(mcParticleParameters.m_particleId.Get()),
-    m_mcParticleType(mcParticleParameters.m_mcParticleType.Get()),
+MCParticle::MCParticle(const PandoraApi::MCParticle::Parameters &parameters) :
+    m_uid(parameters.m_pParentAddress.Get()),
+    m_energy(parameters.m_energy.Get()),
+    m_momentum(parameters.m_momentum.Get()),
+    m_vertex(parameters.m_vertex.Get()),
+    m_endpoint(parameters.m_endpoint.Get()),
+    m_innerRadius(parameters.m_vertex.Get().GetMagnitude()),
+    m_outerRadius(parameters.m_endpoint.Get().GetMagnitude()),
+    m_particleId(parameters.m_particleId.Get()),
+    m_mcParticleType(parameters.m_mcParticleType.Get()),
     m_pPfoTarget(NULL)
 {
 }

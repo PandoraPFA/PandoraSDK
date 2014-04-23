@@ -39,25 +39,25 @@ const MCParticle *Track::GetMainMCParticle() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-Track::Track(const PandoraApi::TrackParameters &trackParameters) :
-    m_d0(trackParameters.m_d0.Get()),
-    m_z0(trackParameters.m_z0.Get()),
-    m_particleId(trackParameters.m_particleId.Get()),
-    m_charge(trackParameters.m_charge.Get()),
-    m_mass(trackParameters.m_mass.Get()),
-    m_momentumAtDca(trackParameters.m_momentumAtDca.Get()),
+Track::Track(const PandoraApi::Track::Parameters &parameters) :
+    m_d0(parameters.m_d0.Get()),
+    m_z0(parameters.m_z0.Get()),
+    m_particleId(parameters.m_particleId.Get()),
+    m_charge(parameters.m_charge.Get()),
+    m_mass(parameters.m_mass.Get()),
+    m_momentumAtDca(parameters.m_momentumAtDca.Get()),
     m_momentumMagnitudeAtDca(m_momentumAtDca.GetMagnitude()),
     m_energyAtDca(std::sqrt(m_mass * m_mass + m_momentumMagnitudeAtDca * m_momentumMagnitudeAtDca)),
-    m_trackStateAtStart(trackParameters.m_trackStateAtStart.Get()),
-    m_trackStateAtEnd(trackParameters.m_trackStateAtEnd.Get()),
-    m_trackStateAtCalorimeter(trackParameters.m_trackStateAtCalorimeter.Get()),
-    m_timeAtCalorimeter(trackParameters.m_timeAtCalorimeter.Get()),
-    m_reachesCalorimeter(trackParameters.m_reachesCalorimeter.Get()),
-    m_isProjectedToEndCap(trackParameters.m_isProjectedToEndCap.Get()),
-    m_canFormPfo(trackParameters.m_canFormPfo.Get()),
-    m_canFormClusterlessPfo(trackParameters.m_canFormClusterlessPfo.Get()),
+    m_trackStateAtStart(parameters.m_trackStateAtStart.Get()),
+    m_trackStateAtEnd(parameters.m_trackStateAtEnd.Get()),
+    m_trackStateAtCalorimeter(parameters.m_trackStateAtCalorimeter.Get()),
+    m_timeAtCalorimeter(parameters.m_timeAtCalorimeter.Get()),
+    m_reachesCalorimeter(parameters.m_reachesCalorimeter.Get()),
+    m_isProjectedToEndCap(parameters.m_isProjectedToEndCap.Get()),
+    m_canFormPfo(parameters.m_canFormPfo.Get()),
+    m_canFormClusterlessPfo(parameters.m_canFormClusterlessPfo.Get()),
     m_pAssociatedCluster(NULL),
-    m_pParentAddress(trackParameters.m_pParentAddress.Get()),
+    m_pParentAddress(parameters.m_pParentAddress.Get()),
     m_isAvailable(true)
 {
     // Consistency checks

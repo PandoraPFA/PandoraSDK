@@ -16,7 +16,7 @@
 namespace pandora
 {
 
-Cluster::Cluster(CaloHit *pCaloHit) :
+Cluster::Cluster(const PandoraContentApi::Cluster::Parameters &parameters) :
     m_nCaloHits(0),
     m_nPossibleMipHits(0),
     m_electromagneticEnergy(0),
@@ -26,63 +26,31 @@ Cluster::Cluster(CaloHit *pCaloHit) :
     m_isFixedPhoton(false),
     m_isFixedElectron(false),
     m_isFixedMuon(false),
-    m_isMipTrack(false),
-    m_pTrackSeed(NULL),
-    m_initialDirection(pCaloHit->GetExpectedDirection()),
-    m_isDirectionUpToDate(true),
-    m_isFitUpToDate(false),
-    m_isAvailable(true)
-{
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddCaloHit(pCaloHit));
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-Cluster::Cluster(CaloHitList *pCaloHitList) :
-    m_nCaloHits(0),
-    m_nPossibleMipHits(0),
-    m_electromagneticEnergy(0),
-    m_hadronicEnergy(0),
-    m_isolatedElectromagneticEnergy(0),
-    m_isolatedHadronicEnergy(0),
-    m_isFixedPhoton(false),
-    m_isFixedElectron(false),
-    m_isFixedMuon(false),
-    m_isMipTrack(false),
-    m_pTrackSeed(NULL),
+    m_isMipTrack(parameters.m_pTrack.IsInitialized()),
+    m_pTrackSeed(parameters.m_pTrack.IsInitialized() ? parameters.m_pTrack.Get() : NULL),
     m_initialDirection(0.f, 0.f, 0.f),
     m_isDirectionUpToDate(false),
     m_isFitUpToDate(false),
     m_isAvailable(true)
 {
-    if (pCaloHitList->empty())
+    if (parameters.m_caloHitList.empty() && parameters.m_isolatedCaloHitList.empty() && !parameters.m_pTrack.IsInitialized())
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
-    for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
+    if (parameters.m_pTrack.IsInitialized())
+    {
+        m_initialDirection = parameters.m_pTrack.Get()->GetTrackStateAtCalorimeter().GetMomentum().GetUnitVector();
+        m_isDirectionUpToDate = true;
+    }
+
+    for (CaloHitList::const_iterator iter = parameters.m_caloHitList.begin(), iterEnd = parameters.m_caloHitList.end(); iter != iterEnd; ++iter)
+    {
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddCaloHit(*iter));
+    }
 
-    this->CalculateInitialDirection();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-Cluster::Cluster(Track *pTrack) :
-    m_nCaloHits(0),
-    m_nPossibleMipHits(0),
-    m_electromagneticEnergy(0),
-    m_hadronicEnergy(0),
-    m_isolatedElectromagneticEnergy(0),
-    m_isolatedHadronicEnergy(0),
-    m_isFixedPhoton(false),
-    m_isFixedElectron(false),
-    m_isFixedMuon(false),
-    m_isMipTrack(true),
-    m_pTrackSeed(pTrack),
-    m_initialDirection(pTrack->GetTrackStateAtCalorimeter().GetMomentum().GetUnitVector()),
-    m_isDirectionUpToDate(true),
-    m_isFitUpToDate(false),
-    m_isAvailable(true)
-{
+    for (CaloHitList::const_iterator iter = parameters.m_isolatedCaloHitList.begin(), iterEnd = parameters.m_isolatedCaloHitList.end(); iter != iterEnd; ++iter)
+    {
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddIsolatedCaloHit(*iter));
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

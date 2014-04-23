@@ -34,13 +34,13 @@ MCManager::~MCManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MCManager::CreateMCParticle(const PandoraApi::MCParticleParameters &mcParticleParameters)
+StatusCode MCManager::CreateMCParticle(const PandoraApi::MCParticle::Parameters &parameters, MCParticle *&pMCParticle)
 {
-    MCParticle *pMCParticle = NULL;
+    pMCParticle = NULL;
 
     try
     {
-        pMCParticle = new MCParticle(mcParticleParameters);
+        pMCParticle = new MCParticle(parameters);
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
 
@@ -59,6 +59,7 @@ StatusCode MCManager::CreateMCParticle(const PandoraApi::MCParticleParameters &m
     {
         std::cout << "Failed to create mc particle: " << statusCodeException.ToString() << std::endl;
         delete pMCParticle;
+        pMCParticle = NULL;
         return statusCodeException.GetStatusCode();
     }
 }

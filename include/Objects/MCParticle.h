@@ -143,9 +143,9 @@ private:
     /**
      *  @brief  Constructor
      * 
-     *  @param  mcParticleParameters the mc particle parameters
+     *  @param  parameters the mc particle parameters
      */
-    MCParticle(const PandoraApi::MCParticleParameters &mcParticleParameters);
+    MCParticle(const PandoraApi::MCParticle::Parameters &parameters);
 
     /**
      *  @brief  Destructor

@@ -128,7 +128,7 @@ bool CaloHitMetadata::AreCaloHitsAvailable(const CaloHitList &caloHitList) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHitMetadata::SetCaloHitAvailability(CaloHitList &caloHitList, bool isAvailable)
+StatusCode CaloHitMetadata::SetCaloHitAvailability(const CaloHitList &caloHitList, bool isAvailable)
 {
     for (CaloHitList::iterator iter = caloHitList.begin(), iterEnd = caloHitList.end(); iter != iterEnd; ++iter)
     {

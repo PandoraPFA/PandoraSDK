@@ -8,7 +8,7 @@
 #ifndef PANDORA_VERTEX_H
 #define PANDORA_VERTEX_H 1
 
-#include "Api/PandoraApi.h"
+#include "Api/PandoraContentApi.h"
 
 #include "Pandora/PandoraInternal.h"
 
@@ -41,9 +41,9 @@ private:
     /**
      *  @brief  Constructor
      * 
-     *  @param  vertexPosition the vertex position
+     *  @param  parameters the vertex parameters
      */
-    Vertex(const CartesianVector &vertexPosition);
+    Vertex(const PandoraContentApi::Vertex::Parameters &parameters);
 
     /**
      *  @brief  Destructor

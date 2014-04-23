@@ -8,6 +8,8 @@
 #ifndef PANDORA_VERTEX_MANAGER_H
 #define PANDORA_VERTEX_MANAGER_H 1
 
+#include "Api/PandoraContentApi.h"
+
 #include "Managers/AlgorithmObjectManager.h"
 
 #include "Pandora/PandoraInternal.h"
@@ -35,10 +37,10 @@ private:
     /**
      *  @brief  Create a vertex
      * 
-     *  @param  vertexPosition the vertex position
+     *  @param  parameters the vertex parameters
      *  @param  pVertex to receive the address of the vertex created
      */
-    StatusCode CreateVertex(const CartesianVector &vertexPosition, Vertex *&pVertex);
+    StatusCode CreateVertex(const PandoraContentApi::Vertex::Parameters &parameters, Vertex *&pVertex);
 
     friend class PandoraContentApiImpl;
     friend class PandoraImpl;

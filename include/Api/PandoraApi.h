@@ -38,7 +38,7 @@ public:
          *  @param  pandora the pandora instance to create the new object
          *  @param  parameters the object parameters
          */
-         static pandora::StatusCode Create(const pandora::Pandora &pandora, const Parameters &parameters);
+        static pandora::StatusCode Create(const pandora::Pandora &pandora, const Parameters &parameters);
     };
 
     /**

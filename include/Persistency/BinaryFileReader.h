@@ -47,10 +47,10 @@ private:
     StatusCode GoToEvent(const unsigned int eventNumber);
     StatusCode ReadNextGeometryComponent();
     StatusCode ReadNextEventComponent();
-    StatusCode ReadTracker(PandoraApi::GeometryParameters *pGeometryParameters);
-    StatusCode ReadCoil(PandoraApi::GeometryParameters *pGeometryParameters);
-    StatusCode ReadAdditionalSubDetectors(PandoraApi::GeometryParameters *pGeometryParameters);
-    StatusCode ReadSubDetector(std::string &subDetectorName, PandoraApi::GeometryParameters::SubDetectorParameters *pSubDetectorParameters);
+    StatusCode ReadTracker(PandoraApi::Geometry::Parameters *pGeometryParameters);
+    StatusCode ReadCoil(PandoraApi::Geometry::Parameters *pGeometryParameters);
+    StatusCode ReadAdditionalSubDetectors(PandoraApi::Geometry::Parameters *pGeometryParameters);
+    StatusCode ReadSubDetector(std::string &subDetectorName, PandoraApi::Geometry::Parameters::SubDetectorParameters *pSubDetectorParameters);
 
     /**
      *  @brief  Read a box gap from the current position in the file

@@ -340,7 +340,7 @@ private:
      * 
      *  @param  parameters the calo hit parameters
      */
-    RectangularCaloHit(const PandoraApi::RectangularCaloHitParameters &parameters);
+    RectangularCaloHit(const PandoraApi::RectangularCaloHit::Parameters &parameters);
 
     /**
      *  @brief  Weighted copy constructor
@@ -389,7 +389,7 @@ private:
      * 
      *  @param  parameters the calo hit parameters
      */
-    PointingCaloHit(const PandoraApi::PointingCaloHitParameters &parameters);
+    PointingCaloHit(const PandoraApi::PointingCaloHit::Parameters &parameters);
 
     /**
      *  @brief  Weighted copy constructor
