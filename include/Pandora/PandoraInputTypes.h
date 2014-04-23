@@ -192,10 +192,6 @@ typedef PandoraInputType<unsigned int> InputPseudoLayer;
 typedef PandoraInputType<CartesianVector> InputCartesianVector;
 typedef PandoraInputType<TrackState> InputTrackState;
 typedef PandoraInputType<Track *> InputTrackAddress;
-typedef PandoraInputType<CaloHit *> InputCaloHitAddress;
-typedef PandoraInputType<Cluster *> InputClusterAddress;
-typedef PandoraInputType<ParticleFlowObject *> InputPfoAddress;
-typedef PandoraInputType<Vertex *> InputVertexAddress;
 
 typedef std::vector<const void *> CaloHitAddressList, TrackAddressList;
 typedef std::vector<CaloHitAddressList> ClusterAddressList;
@@ -386,30 +382,6 @@ inline bool PandoraInputType<TrackState>::IsValid(const TrackState &t) const
 
 template <>
 inline bool PandoraInputType<Track *>::IsValid(Track *const &) const
-{
-    return true;
-}
-
-template <>
-inline bool PandoraInputType<CaloHit *>::IsValid(CaloHit *const &) const
-{
-    return true;
-}
-
-template <>
-inline bool PandoraInputType<Cluster *>::IsValid(Cluster *const &) const
-{
-    return true;
-}
-
-template <>
-inline bool PandoraInputType<ParticleFlowObject *>::IsValid(ParticleFlowObject *const &) const
-{
-    return true;
-}
-
-template <>
-inline bool PandoraInputType<Vertex *>::IsValid(Vertex *const &) const
 {
     return true;
 }
