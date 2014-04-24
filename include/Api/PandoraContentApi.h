@@ -316,7 +316,8 @@ public:
      * 
      *  @param  algorithm the algorithm calling this function
      *  @param  pT address of the object, or a list of objects, to delete
-     *  @param  listName name of the list containing the object     */
+     *  @param  listName name of the list containing the object
+     */
     template <typename T>
     static pandora::StatusCode Delete(const pandora::Algorithm &algorithm, T *pT, const std::string &listName);
 
@@ -324,13 +325,14 @@ public:
     /* CaloHit-related functions */
 
     /**
-     *  @brief  Add a calo hit to a cluster
+     *  @brief  Add a calo hit, or a list of calo hits, to a cluster
      *
      *  @param  algorithm the algorithm calling this function
      *  @param  pCluster address of the cluster to modify
-     *  @param  pCaloHit address of the hit to add
+     *  @param  pT address of the calo hit, or list of calo hits, to add
      */
-    static pandora::StatusCode AddToCluster(const pandora::Algorithm &algorithm, pandora::Cluster *pCluster, pandora::CaloHit *pCaloHit);
+    template <typename T>
+    static pandora::StatusCode AddToCluster(const pandora::Algorithm &algorithm, pandora::Cluster *pCluster, T *pT);
 
     /**
      *  @brief  Remove a calo hit from a cluster. Note this function will not remove the final calo hit from a cluster, and
@@ -343,14 +345,15 @@ public:
     static pandora::StatusCode RemoveFromCluster(const pandora::Algorithm &algorithm, pandora::Cluster *pCluster, pandora::CaloHit *pCaloHit);
 
     /**
-     *  @brief  Add an isolated calo hit to a cluster. This is not counted as a regular calo hit: it contributes only
-     *          towards the cluster energy and does not affect any other cluster properties.
+     *  @brief  Add an isolated calo hit, or a list of isolated calo hits, to a cluster. An isolated calo hit is not counted as a
+     *          regular calo hit: it contributes only towards the cluster energy and does not affect any other cluster properties.
      *
      *  @param  algorithm the algorithm calling this function
      *  @param  pCluster address of the cluster to modify
-     *  @param  pCaloHit address of the isolated hit to add
+     *  @param  pT address of the isolated calo hit, or list of isolated calo hits, to add
      */
-    static pandora::StatusCode AddIsolatedToCluster(const pandora::Algorithm &algorithm, pandora::Cluster *pCluster, pandora::CaloHit *pCaloHit);
+    template <typename T>
+    static pandora::StatusCode AddIsolatedToCluster(const pandora::Algorithm &algorithm, pandora::Cluster *pCluster, T *pT);
 
     /**
      *  @brief  Remove an isolated calo hit from a cluster. Note this function will not remove the final calo hit from a cluster, and

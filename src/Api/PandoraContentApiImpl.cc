@@ -524,6 +524,7 @@ bool PandoraContentApiImpl::IsAvailable(pandora::Vertex *pVertex) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+template <>
 StatusCode PandoraContentApiImpl::AddToCluster(Cluster *pCluster, CaloHit *pCaloHit) const
 {
     if (!this->IsAddToClusterAllowed(pCluster, pCaloHit))
@@ -531,6 +532,24 @@ StatusCode PandoraContentApiImpl::AddToCluster(Cluster *pCluster, CaloHit *pCalo
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->AddCaloHitToCluster(pCluster, pCaloHit));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->SetCaloHitAvailability(pCaloHit, false));
+
+    return STATUS_CODE_SUCCESS;
+}
+
+template <>
+StatusCode PandoraContentApiImpl::AddToCluster(Cluster *pCluster, CaloHitList *pCaloHitList) const
+{
+    for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
+    {
+        if (!this->IsAddToClusterAllowed(pCluster, *iter))
+            return STATUS_CODE_NOT_ALLOWED;
+    }
+
+    for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->AddCaloHitToCluster(pCluster, *iter));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->SetCaloHitAvailability(*iter, false));
+    }
 
     return STATUS_CODE_SUCCESS;
 }
@@ -550,6 +569,7 @@ StatusCode PandoraContentApiImpl::RemoveFromCluster(Cluster *pCluster, CaloHit *
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+template <>
 StatusCode PandoraContentApiImpl::AddIsolatedToCluster(Cluster *pCluster, CaloHit *pCaloHit) const
 {
     if (!this->IsAddToClusterAllowed(pCluster, pCaloHit))
@@ -557,6 +577,24 @@ StatusCode PandoraContentApiImpl::AddIsolatedToCluster(Cluster *pCluster, CaloHi
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->AddIsolatedCaloHitToCluster(pCluster, pCaloHit));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->SetCaloHitAvailability(pCaloHit, false));
+    return STATUS_CODE_SUCCESS;
+}
+
+template <>
+StatusCode PandoraContentApiImpl::AddIsolatedToCluster(Cluster *pCluster, CaloHitList *pCaloHitList) const
+{
+    for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
+    {
+        if (!this->IsAddToClusterAllowed(pCluster, *iter))
+            return STATUS_CODE_NOT_ALLOWED;
+    }
+
+    for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->AddIsolatedCaloHitToCluster(pCluster, *iter));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->SetCaloHitAvailability(*iter, false));
+    }
+
     return STATUS_CODE_SUCCESS;
 }
 

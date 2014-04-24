@@ -252,12 +252,13 @@ public:
     /* CaloHit-related functions */
 
     /**
-     *  @brief  Add a calo hit to a cluster
+     *  @brief  Add a calo hit, or a list of calo hits, to a cluster
      *
      *  @param  pCluster address of the cluster to modify
-     *  @param  pCaloHit address of the hit to add
+     *  @param  pT address of the calo hit, or list of calo hits, to add
      */
-    StatusCode AddToCluster(Cluster *pCluster, CaloHit *pCaloHit) const;
+    template <typename T>
+    StatusCode AddToCluster(Cluster *pCluster, T *pT) const;
 
     /**
      *  @brief  Remove a calo hit from a cluster. Note this function will not remove the final calo hit from a cluster, and
@@ -269,13 +270,14 @@ public:
     StatusCode RemoveFromCluster(Cluster *pCluster, CaloHit *pCaloHit) const;
 
     /**
-     *  @brief  Add an isolated calo hit to a cluster. This is not counted as a regular calo hit: it contributes only
-     *          towards the cluster energy and does not affect any other cluster properties.
+     *  @brief  Add an isolated calo hit, or a list of isolated calo hits, to a cluster. An isolated calo hit is not counted as a
+     *          regular calo hit: it contributes only towards the cluster energy and does not affect any other cluster properties.
      *
      *  @param  pCluster address of the cluster to modify
-     *  @param  pCaloHit address of the isolated hit to add
+     *  @param  pT address of the isolated calo hit, or list of isolated calo hits, to add
      */
-    StatusCode AddIsolatedToCluster(Cluster *pCluster, CaloHit *pCaloHit) const;
+    template <typename T>
+    StatusCode AddIsolatedToCluster(Cluster *pCluster, T *pT) const;
 
     /**
      *  @brief  Remove an isolated calo hit from a cluster. Note this function will not remove the final calo hit from a cluster, and
