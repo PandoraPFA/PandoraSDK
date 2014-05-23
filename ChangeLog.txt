@@ -1,4 +1,10 @@
 ************************************************************************
+TAG V00-16
+************************************************************************
+Overhaul object creation from within Pandora algorithms.
+Algorithms are now able to add lists of calo hits to a cluster with a single API call.
+
+************************************************************************
 TAG V00-15
 ************************************************************************
 Major upgrade of PandoraContentApi, with templates removing need for separate accessors for each object type.
