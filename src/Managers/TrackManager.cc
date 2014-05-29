@@ -245,7 +245,7 @@ StatusCode TrackManager::RemoveClusterAssociations(const TrackList &trackList) c
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode TrackManager::InitializeReclustering(const Algorithm *const pAlgorithm, const TrackList &trackList, const std::string &originalReclusterListName)
+StatusCode TrackManager::InitializeReclustering(const Algorithm *const pAlgorithm, const TrackList &trackList, const std::string &/*originalReclusterListName*/)
 {
     std::string temporaryListName;
     return this->CreateTemporaryListAndSetCurrent(pAlgorithm, trackList, temporaryListName);

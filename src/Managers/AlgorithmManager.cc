@@ -96,10 +96,10 @@ StatusCode AlgorithmManager::CreateAlgorithm(TiXmlElement *const pXmlElement, st
     }
 
     std::string instanceLabel;
-    const StatusCode statusCode = FindSpecificAlgorithmInstance(pXmlElement, algorithmName, instanceLabel);
+    const StatusCode instanceStatusCode = FindSpecificAlgorithmInstance(pXmlElement, algorithmName, instanceLabel);
 
-    if (STATUS_CODE_NOT_FOUND != statusCode)
-        return statusCode;
+    if (STATUS_CODE_NOT_FOUND != instanceStatusCode)
+        return instanceStatusCode;
 
     AlgorithmFactoryMap::const_iterator iter = m_algorithmFactoryMap.find(pXmlElement->Attribute("type"));
 

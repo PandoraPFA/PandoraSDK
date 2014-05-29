@@ -389,7 +389,7 @@ StatusCode CaloHitManager::PrepareForClustering(const Algorithm *const pAlgorith
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHitManager::EndReclustering(const Algorithm *const pAlgorithm, const std::string &selectedReclusterListName)
+StatusCode CaloHitManager::EndReclustering(const Algorithm *const /*pAlgorithm*/, const std::string &selectedReclusterListName)
 {
     if (0 == m_nReclusteringProcesses)
         return STATUS_CODE_SUCCESS;

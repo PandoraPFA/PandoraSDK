@@ -1,7 +1,7 @@
 INCLUDES = -I$(PANDORA_DIR)/PandoraSDK/include
 
 CC = g++
-CFLAGS = -c -Wall -g -w -fPIC -O2
+CFLAGS = -c -g -fPIC -O2 -Wall -Wextra -pedantic -Wshadow -Werror -ansi
 ifdef BUILD_32BIT_COMPATIBLE
     CFLAGS += -m32
 endif

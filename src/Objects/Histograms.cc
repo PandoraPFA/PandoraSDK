@@ -56,7 +56,7 @@ Histogram::Histogram(const TiXmlHandle *const pXmlHandle, const std::string &xml
     FloatVector orderedBinContents;
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, "BinContents", orderedBinContents));
 
-    if (orderedBinContents.size() != m_nBinsX + 2)
+    if (orderedBinContents.size() != static_cast<unsigned int>(m_nBinsX) + 2)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
     for (int binX = -1; binX <= m_nBinsX; ++binX)
@@ -316,14 +316,14 @@ TwoDHistogram::TwoDHistogram(const TiXmlHandle *const pXmlHandle, const std::str
     HistogramEntryList histogramEntryList;
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::Read2DVectorOfValues(xmlHandle, "BinContents", "Row", histogramEntryList));
 
-    if (histogramEntryList.size() != m_nBinsY + 2)
+    if (histogramEntryList.size() != static_cast<unsigned int>(m_nBinsY) + 2)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
     for (int binY = -1; binY <= m_nBinsY; ++binY)
     {
         const FloatVector &orderedBinContents(histogramEntryList[binY + 1]);
 
-        if (orderedBinContents.size() != m_nBinsX + 2)
+        if (orderedBinContents.size() != static_cast<unsigned int>(m_nBinsX) + 2)
             throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
         for (int binX = -1; binX <= m_nBinsX; ++binX)
