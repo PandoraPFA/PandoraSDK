@@ -38,6 +38,8 @@ protected:
      */
     virtual StatusCode CreateInputList();
 
+    using Manager<T>::CreateTemporaryListAndSetCurrent;
+
     /**
      *  @brief  Change the current list to a specified temporary list
      *

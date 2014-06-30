@@ -62,6 +62,8 @@ private:
      */
     StatusCode CalculateCaloHitProperties() const;
 
+    using InputObjectManager<CaloHit>::CreateTemporaryListAndSetCurrent;
+
     /**
      *  @brief  Change the current calo hit list to the constituent hits of a cluster list
      * 

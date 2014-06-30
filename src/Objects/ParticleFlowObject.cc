@@ -188,15 +188,4 @@ StatusCode ParticleFlowObject::RemoveDaughter(ParticleFlowObject *const pPfo)
     return STATUS_CODE_SUCCESS;
 }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template StatusCode ParticleFlowObject::AddToPfo<Cluster>(Cluster *);
-template StatusCode ParticleFlowObject::AddToPfo<Track>(Track *);
-template StatusCode ParticleFlowObject::AddToPfo<Vertex>(Vertex *);
-
-template StatusCode ParticleFlowObject::RemoveFromPfo<Cluster>(Cluster *);
-template StatusCode ParticleFlowObject::RemoveFromPfo<Track>(Track *);
-template StatusCode ParticleFlowObject::RemoveFromPfo<Vertex>(Vertex *);
-
 } // namespace pandora
