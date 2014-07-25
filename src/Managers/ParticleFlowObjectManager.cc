@@ -81,6 +81,9 @@ StatusCode ParticleFlowObjectManager::RemoveFromPfo(ParticleFlowObject *pPfo, T 
 
 StatusCode ParticleFlowObjectManager::SetParentDaughterAssociation(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const
 {
+    if (pParentPfo == pDaughterPfo)
+        return STATUS_CODE_INVALID_PARAMETER;
+
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pParentPfo->AddDaughter(pDaughterPfo));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pDaughterPfo->AddParent(pParentPfo));
 
