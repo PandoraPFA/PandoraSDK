@@ -414,6 +414,13 @@ template pandora::StatusCode PandoraContentApi::ReplaceCurrentList<pandora::Clus
 template pandora::StatusCode PandoraContentApi::ReplaceCurrentList<pandora::ParticleFlowObject>(const pandora::Algorithm &, const std::string &);
 template pandora::StatusCode PandoraContentApi::ReplaceCurrentList<pandora::Vertex>(const pandora::Algorithm &, const std::string &);
 
+template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::CaloHit>(const pandora::Algorithm &);
+template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::Track>(const pandora::Algorithm &);
+template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::MCParticle>(const pandora::Algorithm &);
+template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::Cluster>(const pandora::Algorithm &);
+template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::ParticleFlowObject>(const pandora::Algorithm &);
+template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::Vertex>(const pandora::Algorithm &);
+
 template pandora::StatusCode PandoraContentApi::GetList<pandora::CaloHitList>(const pandora::Algorithm &, const std::string &, const pandora::CaloHitList *&);
 template pandora::StatusCode PandoraContentApi::GetList<pandora::TrackList>(const pandora::Algorithm &, const std::string &, const pandora::TrackList *&);
 template pandora::StatusCode PandoraContentApi::GetList<pandora::MCParticleList>(const pandora::Algorithm &, const std::string &, const pandora::MCParticleList *&);
