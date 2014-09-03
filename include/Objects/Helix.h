@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Objects/Helix.h
+ *  @file   PandoraSDK/include/Objects/Helix.h
  * 
  *  @brief  Header file for the helix class, based on marlin util helix class.
  * 
@@ -11,8 +11,6 @@
 #include "Objects/CartesianVector.h"
 
 #include "Pandora/StatusCodes.h"
-
-#include <cmath>
 
 namespace pandora
 {

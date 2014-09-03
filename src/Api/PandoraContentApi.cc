@@ -1,51 +1,73 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Api/PandoraContentApi.cc
+ *  @file   PandoraSDK/src/Api/PandoraContentApi.cc
  * 
  *  @brief  Implementation of the pandora content api class.
  * 
  *  $Log: $
  */
 
-#include "Pandora/Algorithm.h"
-
 #include "Api/PandoraContentApi.h"
 #include "Api/PandoraContentApiImpl.h"
 
+#include "Pandora/Algorithm.h"
+#include "Pandora/Pandora.h"
+
 template <typename PARAMETERS, typename OBJECT>
-pandora::StatusCode PandoraContentApi::ObjectCreationHelper<PARAMETERS, OBJECT>::Create(const pandora::Algorithm &algorithm, const Parameters &parameters,
-    Object *&pObject)
+pandora::StatusCode PandoraContentApi::ObjectCreationHelper<PARAMETERS, OBJECT>::Create(const pandora::Algorithm &algorithm,
+    const Parameters &parameters, Object *&pObject)
 {
-    return algorithm.GetPandoraContentApiImpl()->CreateObject(parameters, pObject);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->CreateObject(parameters, pObject);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const pandora::PandoraSettings *PandoraContentApi::GetSettings(const pandora::Algorithm &algorithm)
+{
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->GetSettings();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const pandora::GeometryManager *PandoraContentApi::GetGeometry(const pandora::Algorithm &algorithm)
+{
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->GetGeometry();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const pandora::PluginManager *PandoraContentApi::GetPlugins(const pandora::Algorithm &algorithm)
+{
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->GetPlugins();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 pandora::StatusCode PandoraContentApi::RepeatEventPreparation(const pandora::Algorithm &algorithm)
 {
-    return algorithm.GetPandoraContentApiImpl()->RepeatEventPreparation();
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->RepeatEventPreparation();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraContentApi::CreateAlgorithmTool(const pandora::Algorithm &parentAlgorithm, pandora::TiXmlElement *const pXmlElement,
+pandora::StatusCode PandoraContentApi::CreateAlgorithmTool(const pandora::Algorithm &algorithm, pandora::TiXmlElement *const pXmlElement,
     pandora::AlgorithmTool *&pAlgorithmTool)
 {
-    return parentAlgorithm.GetPandoraContentApiImpl()->CreateAlgorithmTool(pXmlElement, pAlgorithmTool);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->CreateAlgorithmTool(pXmlElement, pAlgorithmTool);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraContentApi::CreateDaughterAlgorithm(const pandora::Algorithm &parentAlgorithm, pandora::TiXmlElement *const pXmlElement,
+pandora::StatusCode PandoraContentApi::CreateDaughterAlgorithm(const pandora::Algorithm &algorithm, pandora::TiXmlElement *const pXmlElement,
     std::string &daughterAlgorithmName)
 {
-    return parentAlgorithm.GetPandoraContentApiImpl()->CreateDaughterAlgorithm(pXmlElement, daughterAlgorithmName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->CreateDaughterAlgorithm(pXmlElement, daughterAlgorithmName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraContentApi::RunDaughterAlgorithm(const pandora::Algorithm &parentAlgorithm, const std::string &daughterAlgorithmName)
+pandora::StatusCode PandoraContentApi::RunDaughterAlgorithm(const pandora::Algorithm &algorithm, const std::string &daughterAlgorithmName)
 {
-    return parentAlgorithm.GetPandoraContentApiImpl()->RunAlgorithm(daughterAlgorithmName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->RunAlgorithm(daughterAlgorithmName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -53,7 +75,7 @@ pandora::StatusCode PandoraContentApi::RunDaughterAlgorithm(const pandora::Algor
 pandora::StatusCode PandoraContentApi::RunClusteringAlgorithm(const pandora::Algorithm &algorithm, const std::string &clusteringAlgorithmName,
     const pandora::ClusterList *&pNewClusterList, std::string &newClusterListName)
 {
-    return algorithm.GetPandoraContentApiImpl()->RunClusteringAlgorithm(algorithm, clusteringAlgorithmName, pNewClusterList, newClusterListName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->RunClusteringAlgorithm(algorithm, clusteringAlgorithmName, pNewClusterList, newClusterListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -62,7 +84,7 @@ template <typename T>
 pandora::StatusCode PandoraContentApi::GetCurrentList(const pandora::Algorithm &algorithm, const T *&pT)
 {
     std::string listName;
-    return algorithm.GetPandoraContentApiImpl()->GetCurrentList(pT, listName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->GetCurrentList(pT, listName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -70,7 +92,7 @@ pandora::StatusCode PandoraContentApi::GetCurrentList(const pandora::Algorithm &
 template <typename T>
 pandora::StatusCode PandoraContentApi::GetCurrentList(const pandora::Algorithm &algorithm, const T *&pT, std::string &listName)
 {
-    return algorithm.GetPandoraContentApiImpl()->GetCurrentList(pT, listName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->GetCurrentList(pT, listName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -78,7 +100,7 @@ pandora::StatusCode PandoraContentApi::GetCurrentList(const pandora::Algorithm &
 template <typename T>
 pandora::StatusCode PandoraContentApi::GetCurrentListName(const pandora::Algorithm &algorithm, std::string &listName)
 {
-    return algorithm.GetPandoraContentApiImpl()->GetCurrentListName<T>(listName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->GetCurrentListName<T>(listName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -86,7 +108,7 @@ pandora::StatusCode PandoraContentApi::GetCurrentListName(const pandora::Algorit
 template <typename T>
 pandora::StatusCode PandoraContentApi::ReplaceCurrentList(const pandora::Algorithm &algorithm, const std::string &newListName)
 {
-    return algorithm.GetPandoraContentApiImpl()->ReplaceCurrentList<T>(algorithm, newListName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->ReplaceCurrentList<T>(algorithm, newListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -94,7 +116,7 @@ pandora::StatusCode PandoraContentApi::ReplaceCurrentList(const pandora::Algorit
 template <typename T>
 pandora::StatusCode PandoraContentApi::DropCurrentList(const pandora::Algorithm &algorithm)
 {
-    return algorithm.GetPandoraContentApiImpl()->DropCurrentList<T>();
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->DropCurrentList<T>();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -102,7 +124,7 @@ pandora::StatusCode PandoraContentApi::DropCurrentList(const pandora::Algorithm 
 template <typename T>
 pandora::StatusCode PandoraContentApi::GetList(const pandora::Algorithm &algorithm, const std::string &listName, const T *&pT)
 {
-    return algorithm.GetPandoraContentApiImpl()->GetList(listName, pT);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->GetList(listName, pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -110,7 +132,7 @@ pandora::StatusCode PandoraContentApi::GetList(const pandora::Algorithm &algorit
 template <typename T>
 pandora::StatusCode PandoraContentApi::SaveList(const pandora::Algorithm &algorithm, const T &t, const std::string &newListName)
 {
-    return algorithm.GetPandoraContentApiImpl()->SaveList(t, newListName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->SaveList(t, newListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -118,15 +140,16 @@ pandora::StatusCode PandoraContentApi::SaveList(const pandora::Algorithm &algori
 template <typename T>
 pandora::StatusCode PandoraContentApi::SaveList(const pandora::Algorithm &algorithm, const std::string &newListName)
 {
-    return algorithm.GetPandoraContentApiImpl()->SaveList<T>(newListName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->SaveList<T>(newListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-pandora::StatusCode PandoraContentApi::SaveList(const pandora::Algorithm &algorithm, const std::string &oldListName, const std::string &newListName)
+pandora::StatusCode PandoraContentApi::SaveList(const pandora::Algorithm &algorithm, const std::string &oldListName,
+    const std::string &newListName)
 {
-    return algorithm.GetPandoraContentApiImpl()->SaveList<T>(oldListName, newListName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->SaveList<T>(oldListName, newListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -134,16 +157,16 @@ pandora::StatusCode PandoraContentApi::SaveList(const pandora::Algorithm &algori
 template <typename T>
 pandora::StatusCode PandoraContentApi::SaveList(const pandora::Algorithm &algorithm, const std::string &newListName, const T &t)
 {
-    return algorithm.GetPandoraContentApiImpl()->SaveList(newListName, t);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->SaveList(newListName, t);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-pandora::StatusCode PandoraContentApi::SaveList(const pandora::Algorithm &algorithm, const std::string &oldListName, const std::string &newListName,
-    const T &t)
+pandora::StatusCode PandoraContentApi::SaveList(const pandora::Algorithm &algorithm, const std::string &oldListName,
+    const std::string &newListName, const T &t)
 {
-    return algorithm.GetPandoraContentApiImpl()->SaveList(oldListName, newListName, t);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->SaveList(oldListName, newListName, t);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -151,15 +174,16 @@ pandora::StatusCode PandoraContentApi::SaveList(const pandora::Algorithm &algori
 template <typename T>
 pandora::StatusCode PandoraContentApi::TemporarilyReplaceCurrentList(const pandora::Algorithm &algorithm, const std::string &newListName)
 {
-    return algorithm.GetPandoraContentApiImpl()->TemporarilyReplaceCurrentList<T>(newListName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->TemporarilyReplaceCurrentList<T>(newListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-pandora::StatusCode PandoraContentApi::CreateTemporaryListAndSetCurrent(const pandora::Algorithm &algorithm, const T *&pT, std::string &temporaryListName)
+pandora::StatusCode PandoraContentApi::CreateTemporaryListAndSetCurrent(const pandora::Algorithm &algorithm, const T *&pT,
+    std::string &temporaryListName)
 {
-    return algorithm.GetPandoraContentApiImpl()->CreateTemporaryListAndSetCurrent(algorithm, pT, temporaryListName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->CreateTemporaryListAndSetCurrent(algorithm, pT, temporaryListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -167,7 +191,7 @@ pandora::StatusCode PandoraContentApi::CreateTemporaryListAndSetCurrent(const pa
 template <typename T>
 bool PandoraContentApi::IsAvailable(const pandora::Algorithm &algorithm, T *pT)
 {
-    return algorithm.GetPandoraContentApiImpl()->IsAvailable(pT);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->IsAvailable(pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -175,7 +199,7 @@ bool PandoraContentApi::IsAvailable(const pandora::Algorithm &algorithm, T *pT)
 template <typename T>
 pandora::StatusCode PandoraContentApi::Delete(const pandora::Algorithm &algorithm, T *pT)
 {
-    return algorithm.GetPandoraContentApiImpl()->Delete(pT);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->Delete(pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -183,7 +207,7 @@ pandora::StatusCode PandoraContentApi::Delete(const pandora::Algorithm &algorith
 template <typename T>
 pandora::StatusCode PandoraContentApi::Delete(const pandora::Algorithm &algorithm, T *pT, const std::string &listName)
 {
-    return algorithm.GetPandoraContentApiImpl()->Delete(pT, listName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->Delete(pT, listName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -191,14 +215,15 @@ pandora::StatusCode PandoraContentApi::Delete(const pandora::Algorithm &algorith
 template <typename T>
 pandora::StatusCode PandoraContentApi::AddToCluster(const pandora::Algorithm &algorithm, pandora::Cluster *pCluster, T *pT)
 {
-    return algorithm.GetPandoraContentApiImpl()->AddToCluster(pCluster, pT);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->AddToCluster(pCluster, pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraContentApi::RemoveFromCluster(const pandora::Algorithm &algorithm, pandora::Cluster *pCluster, pandora::CaloHit *pCaloHit)
+pandora::StatusCode PandoraContentApi::RemoveFromCluster(const pandora::Algorithm &algorithm, pandora::Cluster *pCluster,
+    pandora::CaloHit *pCaloHit)
 {
-    return algorithm.GetPandoraContentApiImpl()->RemoveFromCluster(pCluster, pCaloHit);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->RemoveFromCluster(pCluster, pCaloHit);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -206,22 +231,23 @@ pandora::StatusCode PandoraContentApi::RemoveFromCluster(const pandora::Algorith
 template <typename T>
 pandora::StatusCode PandoraContentApi::AddIsolatedToCluster(const pandora::Algorithm &algorithm, pandora::Cluster *pCluster, T *pT)
 {
-    return algorithm.GetPandoraContentApiImpl()->AddIsolatedToCluster(pCluster, pT);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->AddIsolatedToCluster(pCluster, pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraContentApi::RemoveIsolatedFromCluster(const pandora::Algorithm &algorithm, pandora::Cluster *pCluster, pandora::CaloHit *pCaloHit)
+pandora::StatusCode PandoraContentApi::RemoveIsolatedFromCluster(const pandora::Algorithm &algorithm, pandora::Cluster *pCluster,
+    pandora::CaloHit *pCaloHit)
 {
-    return algorithm.GetPandoraContentApiImpl()->RemoveIsolatedFromCluster(pCluster, pCaloHit);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->RemoveIsolatedFromCluster(pCluster, pCaloHit);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraContentApi::Fragment(const pandora::Algorithm &algorithm, pandora::CaloHit *pOriginalCaloHit, const float fraction1,
-    pandora::CaloHit *&pDaughterCaloHit1, pandora::CaloHit *&pDaughterCaloHit2)
+pandora::StatusCode PandoraContentApi::Fragment(const pandora::Algorithm &algorithm, pandora::CaloHit *pOriginalCaloHit,
+    const float fraction1, pandora::CaloHit *&pDaughterCaloHit1, pandora::CaloHit *&pDaughterCaloHit2)
 {
-    return algorithm.GetPandoraContentApiImpl()->Fragment(pOriginalCaloHit, fraction1, pDaughterCaloHit1, pDaughterCaloHit2);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->Fragment(pOriginalCaloHit, fraction1, pDaughterCaloHit1, pDaughterCaloHit2);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -229,7 +255,7 @@ pandora::StatusCode PandoraContentApi::Fragment(const pandora::Algorithm &algori
 pandora::StatusCode PandoraContentApi::MergeFragments(const pandora::Algorithm &algorithm, pandora::CaloHit *pFragmentCaloHit1,
     pandora::CaloHit *pFragmentCaloHit2, pandora::CaloHit *&pMergedCaloHit)
 {
-    return algorithm.GetPandoraContentApiImpl()->MergeFragments(pFragmentCaloHit1, pFragmentCaloHit2, pMergedCaloHit);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->MergeFragments(pFragmentCaloHit1, pFragmentCaloHit2, pMergedCaloHit);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -237,7 +263,7 @@ pandora::StatusCode PandoraContentApi::MergeFragments(const pandora::Algorithm &
 pandora::StatusCode PandoraContentApi::AddTrackClusterAssociation(const pandora::Algorithm &algorithm, pandora::Track *const pTrack,
     pandora::Cluster *const pCluster)
 {
-    return algorithm.GetPandoraContentApiImpl()->AddTrackClusterAssociation(pTrack, pCluster);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->AddTrackClusterAssociation(pTrack, pCluster);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -245,35 +271,28 @@ pandora::StatusCode PandoraContentApi::AddTrackClusterAssociation(const pandora:
 pandora::StatusCode PandoraContentApi::RemoveTrackClusterAssociation(const pandora::Algorithm &algorithm, pandora::Track *const pTrack,
     pandora::Cluster *const pCluster)
 {
-    return algorithm.GetPandoraContentApiImpl()->RemoveTrackClusterAssociation(pTrack, pCluster);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->RemoveTrackClusterAssociation(pTrack, pCluster);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 pandora::StatusCode PandoraContentApi::RemoveCurrentTrackClusterAssociations(const pandora::Algorithm &algorithm)
 {
-    return algorithm.GetPandoraContentApiImpl()->RemoveCurrentTrackClusterAssociations();
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->RemoveCurrentTrackClusterAssociations();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 pandora::StatusCode PandoraContentApi::RemoveAllTrackClusterAssociations(const pandora::Algorithm &algorithm)
 {
-    return algorithm.GetPandoraContentApiImpl()->RemoveAllTrackClusterAssociations();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-pandora::StatusCode PandoraContentApi::RepeatMCParticlePreparation(const pandora::Algorithm &algorithm)
-{
-    return algorithm.GetPandoraContentApiImpl()->RepeatMCParticlePreparation();
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->RemoveAllTrackClusterAssociations();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 pandora::StatusCode PandoraContentApi::RemoveAllMCParticleRelationships(const pandora::Algorithm &algorithm)
 {
-    return algorithm.GetPandoraContentApiImpl()->RemoveAllMCParticleRelationships();
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->RemoveAllMCParticleRelationships();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -281,7 +300,7 @@ pandora::StatusCode PandoraContentApi::RemoveAllMCParticleRelationships(const pa
 pandora::StatusCode PandoraContentApi::MergeAndDeleteClusters(const pandora::Algorithm &algorithm, pandora::Cluster *pClusterToEnlarge,
     pandora::Cluster *pClusterToDelete)
 {
-    return algorithm.GetPandoraContentApiImpl()->MergeAndDeleteClusters(pClusterToEnlarge, pClusterToDelete);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->MergeAndDeleteClusters(pClusterToEnlarge, pClusterToDelete);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -289,7 +308,7 @@ pandora::StatusCode PandoraContentApi::MergeAndDeleteClusters(const pandora::Alg
 pandora::StatusCode PandoraContentApi::MergeAndDeleteClusters(const pandora::Algorithm &algorithm, pandora::Cluster *pClusterToEnlarge,
     pandora::Cluster *pClusterToDelete, const std::string &enlargeListName, const std::string &deleteListName)
 {
-    return algorithm.GetPandoraContentApiImpl()->MergeAndDeleteClusters(pClusterToEnlarge, pClusterToDelete, enlargeListName, deleteListName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->MergeAndDeleteClusters(pClusterToEnlarge, pClusterToDelete, enlargeListName, deleteListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -297,7 +316,7 @@ pandora::StatusCode PandoraContentApi::MergeAndDeleteClusters(const pandora::Alg
 template <typename T>
 pandora::StatusCode PandoraContentApi::AddToPfo(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *pPfo, T *pT)
 {
-    return algorithm.GetPandoraContentApiImpl()->AddToPfo(pPfo, pT);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->AddToPfo(pPfo, pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -305,7 +324,7 @@ pandora::StatusCode PandoraContentApi::AddToPfo(const pandora::Algorithm &algori
 template <typename T>
 pandora::StatusCode PandoraContentApi::RemoveFromPfo(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *pPfo, T *pT)
 {
-    return algorithm.GetPandoraContentApiImpl()->RemoveFromPfo(pPfo, pT);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->RemoveFromPfo(pPfo, pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -313,7 +332,7 @@ pandora::StatusCode PandoraContentApi::RemoveFromPfo(const pandora::Algorithm &a
 pandora::StatusCode PandoraContentApi::SetPfoParentDaughterRelationship(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *pParentPfo,
     pandora::ParticleFlowObject *pDaughterPfo)
 {
-    return algorithm.GetPandoraContentApiImpl()->SetPfoParentDaughterRelationship(pParentPfo, pDaughterPfo);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->SetPfoParentDaughterRelationship(pParentPfo, pDaughterPfo);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -321,7 +340,7 @@ pandora::StatusCode PandoraContentApi::SetPfoParentDaughterRelationship(const pa
 pandora::StatusCode PandoraContentApi::RemovePfoParentDaughterRelationship(const pandora::Algorithm &algorithm, pandora::ParticleFlowObject *pParentPfo,
     pandora::ParticleFlowObject *pDaughterPfo)
 {
-    return algorithm.GetPandoraContentApiImpl()->RemovePfoParentDaughterRelationship(pParentPfo, pDaughterPfo);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->RemovePfoParentDaughterRelationship(pParentPfo, pDaughterPfo);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -329,7 +348,7 @@ pandora::StatusCode PandoraContentApi::RemovePfoParentDaughterRelationship(const
 pandora::StatusCode PandoraContentApi::InitializeFragmentation(const pandora::Algorithm &algorithm, const pandora::ClusterList &inputClusterList,
     std::string &originalClustersListName, std::string &fragmentClustersListName)
 {
-    return algorithm.GetPandoraContentApiImpl()->InitializeFragmentation(algorithm, inputClusterList, originalClustersListName,
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->InitializeFragmentation(algorithm, inputClusterList, originalClustersListName,
         fragmentClustersListName);
 }
 
@@ -338,7 +357,7 @@ pandora::StatusCode PandoraContentApi::InitializeFragmentation(const pandora::Al
 pandora::StatusCode PandoraContentApi::EndFragmentation(const pandora::Algorithm &algorithm, const std::string &clusterListToSaveName,
     const std::string &clusterListToDeleteName)
 {
-    return algorithm.GetPandoraContentApiImpl()->EndFragmentation(algorithm, clusterListToSaveName, clusterListToDeleteName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->EndFragmentation(algorithm, clusterListToSaveName, clusterListToDeleteName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -346,14 +365,14 @@ pandora::StatusCode PandoraContentApi::EndFragmentation(const pandora::Algorithm
 pandora::StatusCode PandoraContentApi::InitializeReclustering(const pandora::Algorithm &algorithm, const pandora::TrackList &inputTrackList,
     const pandora::ClusterList &inputClusterList, std::string &originalClustersListName)
 {
-    return algorithm.GetPandoraContentApiImpl()->InitializeReclustering(algorithm, inputTrackList, inputClusterList, originalClustersListName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->InitializeReclustering(algorithm, inputTrackList, inputClusterList, originalClustersListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 pandora::StatusCode PandoraContentApi::EndReclustering(const pandora::Algorithm &algorithm, const std::string &selectedClusterListName)
 {
-    return algorithm.GetPandoraContentApiImpl()->EndReclustering(algorithm, selectedClusterListName);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->EndReclustering(algorithm, selectedClusterListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -394,13 +413,6 @@ template pandora::StatusCode PandoraContentApi::ReplaceCurrentList<pandora::MCPa
 template pandora::StatusCode PandoraContentApi::ReplaceCurrentList<pandora::Cluster>(const pandora::Algorithm &, const std::string &);
 template pandora::StatusCode PandoraContentApi::ReplaceCurrentList<pandora::ParticleFlowObject>(const pandora::Algorithm &, const std::string &);
 template pandora::StatusCode PandoraContentApi::ReplaceCurrentList<pandora::Vertex>(const pandora::Algorithm &, const std::string &);
-
-template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::CaloHit>(const pandora::Algorithm &);
-template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::Track>(const pandora::Algorithm &);
-template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::MCParticle>(const pandora::Algorithm &);
-template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::Cluster>(const pandora::Algorithm &);
-template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::ParticleFlowObject>(const pandora::Algorithm &);
-template pandora::StatusCode PandoraContentApi::DropCurrentList<pandora::Vertex>(const pandora::Algorithm &);
 
 template pandora::StatusCode PandoraContentApi::GetList<pandora::CaloHitList>(const pandora::Algorithm &, const std::string &, const pandora::CaloHitList *&);
 template pandora::StatusCode PandoraContentApi::GetList<pandora::TrackList>(const pandora::Algorithm &, const std::string &, const pandora::TrackList *&);

@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Persistency/FileWriter.h
+ *  @file   PandoraSDK/include/Persistency/FileWriter.h
  * 
  *  @brief  Header file for the file writer class.
  * 
@@ -8,16 +8,18 @@
 #ifndef PANDORA_FILE_WRITER_H
 #define PANDORA_FILE_WRITER_H 1
 
-#include "Helpers/GeometryHelper.h"
-
-#include "Pandora/Pandora.h"
-#include "Pandora/PandoraIO.h"
 #include "Pandora/StatusCodes.h"
+
+#include "Persistency/PandoraIO.h"
 
 #include <string>
 
 namespace pandora
 {
+
+class Pandora;
+
+//------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
  *  @brief  FileWriter class
@@ -45,23 +47,16 @@ public:
     StatusCode WriteGeometry();
 
     /**
-     *  @brief  Write the current event to the file
-     * 
-     *  @param  writeMCRelationships whether to write mc relationship information to the file
-     *  @param  writeTrackRelationships whether to write track relationship information to the file
-     */
-    StatusCode WriteEvent(const bool writeMCRelationships = true, const bool writeTrackRelationships = true);
-
-    /**
      *  @brief  Write the specified event components to the file
      * 
      *  @param  caloHitList the list of calo hits to write to the file
      *  @param  trackList the list of tracks to write to the file
+     *  @param  mcParticleList the list of mc particles to write to the file
      *  @param  writeMCRelationships whether to write mc relationship information to the file
      *  @param  writeTrackRelationships whether to write track relationship information to the file
      */
-    StatusCode WriteEvent(const CaloHitList &caloHitList, const TrackList &trackList, const bool writeMCRelationships = true,
-        const bool writeTrackRelationships = true);
+    StatusCode WriteEvent(const CaloHitList &caloHitList, const TrackList &trackList, const MCParticleList &mcParticleList,
+        const bool writeMCRelationships = true, const bool writeTrackRelationships = true);
 
 protected:
    /**
@@ -77,27 +72,12 @@ protected:
     virtual StatusCode WriteFooter() = 0;
 
     /**
-     *  @brief  Write the tracker parameters to the file
-     */
-    virtual StatusCode WriteTracker() = 0;
-
-    /**
-     *  @brief  Write the coil parameters to the file
-     */
-    virtual StatusCode WriteCoil() = 0;
-
-    /**
-     *  @brief  Write the additional sub detector parameters to the file
-     */
-    virtual StatusCode WriteAdditionalSubDetectors() = 0;
-
-    /**
      *  @brief  Write a sub detector to the current position in the file
      * 
      *  @param  subDetectorName the sub detector name
-     *  @param  pSubDetectorParameters address of the sub detector parameters
+     *  @param  pSubDetector address of the sub detector
      */
-    virtual StatusCode WriteSubDetector(const std::string &subDetectorName, const GeometryHelper::SubDetectorParameters *const pSubDetectorParameters) = 0;
+    virtual StatusCode WriteSubDetector(const SubDetector *const pSubDetector) = 0;
 
     /**
      *  @brief  Write the detector gap parameters to the file
@@ -136,11 +116,16 @@ protected:
      */
     virtual StatusCode WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight = 1.f) = 0;
 
-    const pandora::Pandora *const   m_pPandora;             ///< Address of pandora instance to be used alongside the file writer
+    const Pandora *const            m_pPandora;             ///< Address of pandora instance to be used alongside the file writer
     ContainerId                     m_containerId;          ///< The type of container currently being written to file
     std::string                     m_fileName;             ///< The file name
 
 private:
+    /**
+     *  @brief  Write the sub detector parameters to the file
+     */
+    StatusCode WriteSubDetectorList();
+
     /**
      *  @brief  Write the detector gap parameters to the file
      */

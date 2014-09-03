@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Api/PandoraApi.h
+ *  @file   PandoraSDK/include/Api/PandoraApi.h
  *
  *  @brief  Header file for the pandora api class.
  *
@@ -125,9 +125,9 @@ public:
     };
 
     /**
-     *  @brief  GeometryParameters class
+     *  @brief  Geometry class
      */
-    class GeometryParameters
+    class Geometry
     {
     public:
         /**
@@ -149,6 +149,7 @@ public:
         class SubDetectorParameters
         {
         public:
+            pandora::InputString        m_subDetectorName;          ///< The sub detector name, must uniquely specify a single sub detector
             pandora::InputFloat         m_innerRCoordinate;         ///< Inner cylindrical polar r coordinate, origin interaction point, units mm
             pandora::InputFloat         m_innerZCoordinate;         ///< Inner cylindrical polar z coordinate, origin interaction point, units mm
             pandora::InputFloat         m_innerPhiCoordinate;       ///< Inner cylindrical polar phi coordinate (angle wrt cartesian x axis)
@@ -162,62 +163,44 @@ public:
             LayerParametersList         m_layerParametersList;      ///< The list of layer parameters for the detector section
         };
 
-        typedef std::map<std::string, SubDetectorParameters> SubDetectorParametersMap;
+        /**
+         *  @brief  BoxGapParameters class
+         */
+        class BoxGapParameters
+        {
+        public:
+            pandora::InputCartesianVector   m_vertex;                   ///< Cartesian coordinates of a gap vertex, units mm
+            pandora::InputCartesianVector   m_side1;                    ///< Cartesian vector describing first side meeting vertex, units mm
+            pandora::InputCartesianVector   m_side2;                    ///< Cartesian vector describing second side meeting vertex, units mm
+            pandora::InputCartesianVector   m_side3;                    ///< Cartesian vector describing third side meeting vertex, units mm
+        };
 
-        SubDetectorParameters           m_inDetBarrelParameters;    ///< The inner detector barrel parameters
-        SubDetectorParameters           m_inDetEndCapParameters;    ///< The inner detector end cap parameters
-        SubDetectorParameters           m_eCalBarrelParameters;     ///< The ecal barrel parameters
-        SubDetectorParameters           m_eCalEndCapParameters;     ///< The ecal end cap parameters
-        SubDetectorParameters           m_hCalBarrelParameters;     ///< The hcal barrel parameters
-        SubDetectorParameters           m_hCalEndCapParameters;     ///< The hcal end cap parameters
-        SubDetectorParameters           m_muonBarrelParameters;     ///< The muon detector barrel parameters
-        SubDetectorParameters           m_muonEndCapParameters;     ///< The muon detector end cap parameters
-        pandora::InputFloat             m_mainTrackerInnerRadius;   ///< The main tracker inner radius, units mm
-        pandora::InputFloat             m_mainTrackerOuterRadius;   ///< The main tracker outer radius, units mm
-        pandora::InputFloat             m_mainTrackerZExtent;       ///< The main tracker z extent, units mm
-        pandora::InputFloat             m_coilInnerRadius;          ///< The coil inner radius, units mm
-        pandora::InputFloat             m_coilOuterRadius;          ///< The coil outer radius, units mm
-        pandora::InputFloat             m_coilZExtent;              ///< The coil z extent, units mm
-        SubDetectorParametersMap        m_additionalSubDetectors;   ///< Map from name to parameters for any additional subdetectors
+        /**
+         *  @brief  ConcentricGapParameters class
+         */
+        class ConcentricGapParameters
+        {
+        public:
+            pandora::InputFloat             m_minZCoordinate;           ///< Min cylindrical polar z coordinate, origin interaction point, units mm
+            pandora::InputFloat             m_maxZCoordinate;           ///< Max cylindrical polar z coordinate, origin interaction point, units mm
+            pandora::InputFloat             m_innerRCoordinate;         ///< Inner cylindrical polar r coordinate, origin interaction point, units mm
+            pandora::InputFloat             m_innerPhiCoordinate;       ///< Inner cylindrical polar phi coordinate (angle wrt cartesian x axis)
+            pandora::InputUInt              m_innerSymmetryOrder;       ///< Order of symmetry of the innermost edge of gap
+            pandora::InputFloat             m_outerRCoordinate;         ///< Outer cylindrical polar r coordinate, origin interaction point, units mm
+            pandora::InputFloat             m_outerPhiCoordinate;       ///< Outer cylindrical polar phi coordinate (angle wrt cartesian x axis)
+            pandora::InputUInt              m_outerSymmetryOrder;       ///< Order of symmetry of the outermost edge of gap
+        };
+
+        typedef ObjectCreationHelper<SubDetectorParameters> SubDetector;
+        typedef ObjectCreationHelper<BoxGapParameters> BoxGap;
+        typedef ObjectCreationHelper<ConcentricGapParameters> ConcentricGap;
     };
 
-    /**
-     *  @brief  BoxGapParameters class
-     */
-    class BoxGapParameters
-    {
-    public:
-        pandora::InputCartesianVector   m_vertex;                   ///< Cartesian coordinates of a gap vertex, units mm
-        pandora::InputCartesianVector   m_side1;                    ///< Cartesian vector describing first side meeting vertex, units mm
-        pandora::InputCartesianVector   m_side2;                    ///< Cartesian vector describing second side meeting vertex, units mm
-        pandora::InputCartesianVector   m_side3;                    ///< Cartesian vector describing third side meeting vertex, units mm
-    };
-
-    /**
-     *  @brief  ConcentricGapParameters class
-     */
-    class ConcentricGapParameters
-    {
-    public:
-        pandora::InputFloat             m_minZCoordinate;           ///< Min cylindrical polar z coordinate, origin interaction point, units mm
-        pandora::InputFloat             m_maxZCoordinate;           ///< Max cylindrical polar z coordinate, origin interaction point, units mm
-        pandora::InputFloat             m_innerRCoordinate;         ///< Inner cylindrical polar r coordinate, origin interaction point, units mm
-        pandora::InputFloat             m_innerPhiCoordinate;       ///< Inner cylindrical polar phi coordinate (angle wrt cartesian x axis)
-        pandora::InputUInt              m_innerSymmetryOrder;       ///< Order of symmetry of the innermost edge of gap
-        pandora::InputFloat             m_outerRCoordinate;         ///< Outer cylindrical polar r coordinate, origin interaction point, units mm
-        pandora::InputFloat             m_outerPhiCoordinate;       ///< Outer cylindrical polar phi coordinate (angle wrt cartesian x axis)
-        pandora::InputUInt              m_outerSymmetryOrder;       ///< Order of symmetry of the outermost edge of gap
-    };
-
-    // Objects available for construction by pandora
     typedef ObjectCreationHelper<MCParticleParameters> MCParticle;
     typedef ObjectCreationHelper<TrackParameters> Track;
     typedef ObjectCreationHelper<RectangularCaloHitParameters> CaloHit;
     typedef ObjectCreationHelper<RectangularCaloHitParameters> RectangularCaloHit;
     typedef ObjectCreationHelper<PointingCaloHitParameters> PointingCaloHit;
-    typedef ObjectCreationHelper<GeometryParameters> Geometry;
-    typedef ObjectCreationHelper<BoxGapParameters> BoxGap;
-    typedef ObjectCreationHelper<ConcentricGapParameters> ConcentricGap;
 
     /**
      *  @brief  Process an event
@@ -324,30 +307,6 @@ public:
     static pandora::StatusCode GetPfoList(const pandora::Pandora &pandora, const std::string &pfoListName, const pandora::PfoList *&pPfoList);
 
     /**
-     *  @brief  Set the bfield calculator used by pandora
-     * 
-     *  @param  pandora the pandora instance to register the bfield calculator with
-     *  @param  pBFieldCalculator address of the bfield calculator
-     */
-    static pandora::StatusCode SetBFieldCalculator(const pandora::Pandora &pandora, pandora::BFieldCalculator *pBFieldCalculator);
-
-    /**
-     *  @brief  Set the pseudo layer calculator used by pandora
-     * 
-     *  @param  pandora the pandora instance to register the pseudo layer calculator with
-     *  @param  pPseudoLayerCalculator address of the pseudo layer calculator
-     */
-    static pandora::StatusCode SetPseudoLayerCalculator(const pandora::Pandora &pandora, pandora::PseudoLayerCalculator *pPseudoLayerCalculator);
-
-    /**
-     *  @brief  Set the shower profile calculator used by pandora
-     * 
-     *  @param  pandora the pandora instance to register the shower profile calculator with
-     *  @param  pPseudoLayerCalculator address of the pseudo layer calculator
-     */
-    static pandora::StatusCode SetShowerProfileCalculator(const pandora::Pandora &pandora, pandora::ShowerProfileCalculator *pShowerProfileCalculator);
-
-    /**
      *  @brief  Set the granularity level to be associated with a specified hit type
      * 
      *  @param  pandora the pandora instance to register the hit type to granularity relationship
@@ -358,56 +317,49 @@ public:
         const pandora::Granularity granularity);
 
     /**
-     *  @brief  Register an energy correction function
+     *  @brief  Set the bfield plugin used by pandora
      * 
-     *  @param  pandora the pandora instance with which to register the energy correction function
-     *  @param  functionName the name/label associated with the energy correction function
+     *  @param  pandora the pandora instance to register the bfield calculator with
+     *  @param  pBFieldPlugin address of the bfield plugin (will pass ownership to pandora)
+     */
+    static pandora::StatusCode SetBFieldPlugin(const pandora::Pandora &pandora, pandora::BFieldPlugin *pBFieldPlugin);
+
+    /**
+     *  @brief  Set the pseudo layer plugin used by pandora
+     * 
+     *  @param  pandora the pandora instance to register the pseudo layer calculator with
+     *  @param  pPseudoLayerPlugin address of the pseudo layer plugin (will pass ownership to pandora)
+     */
+    static pandora::StatusCode SetPseudoLayerPlugin(const pandora::Pandora &pandora, pandora::PseudoLayerPlugin *pPseudoLayerPlugin);
+
+    /**
+     *  @brief  Set the shower profile plugin used by pandora
+     * 
+     *  @param  pandora the pandora instance to register the shower profile calculator with
+     *  @param  pPseudoLayerPlugin address of the pseudo layer plugin (will pass ownership to pandora)
+     */
+    static pandora::StatusCode SetShowerProfilePlugin(const pandora::Pandora &pandora, pandora::ShowerProfilePlugin *pShowerProfilePlugin);
+
+    /**
+     *  @brief  Register an energy correction plugin
+     * 
+     *  @param  pandora the pandora instance with which to register the energy correction plugin
+     *  @param  name the name/label associated with the energy correction plugin
      *  @param  energyCorrectionType the energy correction type
-     *  @param  pEnergyCorrectionFunction pointer to an energy correction function
+     *  @param  pEnergyCorrectionPlugin address of the energy correction plugin (will pass ownership to pandora)
      */
-    static pandora::StatusCode RegisterEnergyCorrectionFunction(const pandora::Pandora &pandora, const std::string &functionName,
-        const pandora::EnergyCorrectionType energyCorrectionType, pandora::EnergyCorrectionFunction *pEnergyCorrectionFunction);
+    static pandora::StatusCode RegisterEnergyCorrectionPlugin(const pandora::Pandora &pandora, const std::string &name,
+        const pandora::EnergyCorrectionType energyCorrectionType, pandora::EnergyCorrectionPlugin *pEnergyCorrectionPlugin);
 
     /**
-     *  @brief  Register a particle id function
+     *  @brief  Register a particle id plugin
      * 
-     *  @param  pandora the pandora instance with which to register the particle id function
-     *  @param  functionName the name/label associated with the particle id function
-     *  @param  pParticleIdFunction pointer to a particle id function
+     *  @param  pandora the pandora instance with which to register the particle id plugin
+     *  @param  functionName the name/label associated with the particle id plugin
+     *  @param  pParticleIdPlugin address of the particle id plugin (will pass ownership to pandora)
      */
-    static pandora::StatusCode RegisterParticleIdFunction(const pandora::Pandora &pandora, const std::string &functionName,
-        pandora::ParticleIdFunction *pParticleIdFunction);
-
-    /**
-     *  @brief  Register a pandora settings function to e.g. read settings for a registered particle id or energy correction function
-     * 
-     *  @param  pandora the pandora instance with which to register the pandora settings function
-     *  @param  xmlTagName the name of the xml tag (within the <pandora></pandora> tags) containing the settings
-     *  @param  pSettingsFunction pointer to the pandora settings function
-     */
-    static pandora::StatusCode RegisterSettingsFunction(const pandora::Pandora &pandora, const std::string &xmlTagName,
-        pandora::SettingsFunction *pSettingsFunction);
-
-    /**
-     *  @brief  Register a reset function which will be called whenever the client application resets pandora to process another event
-     * 
-     *  @param  pandora the pandora instance with which to register the reset function
-     *  @param  pResetFunction pointer to the reset function
-     */
-    static pandora::StatusCode RegisterResetFunction(const pandora::Pandora &pandora, pandora::ResetFunction *pResetFunction);
-
-    /**
-     *  @brief  Get the recluster monitoring results, recording the changes in the energy associated with a specific track during
-     *          the pandora reclustering phase
-     * 
-     *  @param  pandora the pandora instance to query
-     *  @param  pTrackParentAddress address of track in the user framework
-     *  @param  netEnergyChange to receive the net change in energy associated with the track during reclustering
-     *  @param  sumModulusEnergyChanges to receive the sum of the moduli of energy changes during reclustering
-     *  @param  sumSquaredEnergyChanges to receive the sum of the squared energy changes during reclustering
-     */
-    static pandora::StatusCode GetReclusterMonitoringResults(const pandora::Pandora &pandora, const void *pTrackParentAddress,
-        float &netEnergyChange, float &sumModulusEnergyChanges, float &sumSquaredEnergyChanges);
+    static pandora::StatusCode RegisterParticleIdPlugin(const pandora::Pandora &pandora, const std::string &name,
+        pandora::ParticleIdPlugin *pParticleIdPlugin);
 
     /**
      *  @brief  Reset pandora to process another event

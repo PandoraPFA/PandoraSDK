@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Pandora/PandoraImpl.h
+ *  @file   PandoraSDK/include/Pandora/PandoraImpl.h
  * 
  *  @brief  Header file for the pandora impl class.
  * 
@@ -35,6 +35,27 @@ private:
     StatusCode PrepareCaloHits() const;
 
     /**
+     *  @brief  Get the list of algorithms to be run by pandora
+     *
+     *  @return address of the list pandora algorithms
+     */
+    const StringVector &GetPandoraAlgorithms() const;
+
+    /**
+     *  @brief  Run an algorithm registered with pandora
+     * 
+     *  @param  algorithmName the name of the algorithm instance to run
+     */
+    StatusCode RunAlgorithm(const std::string &algorithmName) const;
+
+    /**
+     *  @brief  Initialize pandora settings
+     * 
+     *  @param  pXmlHandle address of the relevant xml handle
+     */
+    StatusCode InitializeSettings(const TiXmlHandle *const pXmlHandle) const;
+
+    /**
      *  @brief  Initialize pandora algorithms
      * 
      *  @param  pXmlHandle address of the relevant xml handle
@@ -49,21 +70,7 @@ private:
     StatusCode InitializePlugins(const TiXmlHandle *const pXmlHandle) const;
 
     /**
-     *  @brief  Run an algorithm registered with pandora
-     * 
-     *  @param  algorithmName the name of the algorithm instance to run
-     */
-    StatusCode RunAlgorithm(const std::string &algorithmName) const;
-
-    /**
-     *  @brief  Register a reset function, called whenever client application resets pandora to process another event
-     * 
-     *  @param  pResetFunction pointer to the reset function
-     */
-    StatusCode RegisterResetFunction(ResetFunction *pResetFunction);
-
-    /**
-     *  @brief  Reset event, calling manager reset functions and any registered reset functions
+     *  @brief  Ï event, calling manager reset functions and any registered reset functions
      */
     StatusCode ResetEvent() const;
 
@@ -75,7 +82,6 @@ private:
     PandoraImpl(Pandora *pPandora);
 
     Pandora                *m_pPandora;             ///< The pandora object to provide an interface to
-    ResetFunctionVector     m_resetFunctionVector;  ///< The reset function vector
 
     friend class Pandora;
 };

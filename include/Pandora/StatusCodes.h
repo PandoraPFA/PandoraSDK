@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Pandora/StatusCodes.h
+ *  @file   PandoraSDK/include/Pandora/StatusCodes.h
  * 
  *  @brief  Header file defining status codes and relevant preprocessor macros
  * 

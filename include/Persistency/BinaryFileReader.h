@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Persistency/BinaryFileReader.h
+ *  @file   PandoraSDK/include/Persistency/BinaryFileReader.h
  * 
  *  @brief  Header file for the binary file reader class.
  * 
@@ -47,10 +47,13 @@ private:
     StatusCode GoToEvent(const unsigned int eventNumber);
     StatusCode ReadNextGeometryComponent();
     StatusCode ReadNextEventComponent();
-    StatusCode ReadTracker(PandoraApi::Geometry::Parameters *pGeometryParameters);
-    StatusCode ReadCoil(PandoraApi::Geometry::Parameters *pGeometryParameters);
-    StatusCode ReadAdditionalSubDetectors(PandoraApi::Geometry::Parameters *pGeometryParameters);
-    StatusCode ReadSubDetector(std::string &subDetectorName, PandoraApi::Geometry::Parameters::SubDetectorParameters *pSubDetectorParameters);
+
+    /**
+     *  @brief  Read a sub detector from the current position in the file
+     * 
+     *  @param  checkComponentId whether to check the component id before deserializing
+     */
+    StatusCode ReadSubDetector(bool checkComponentId = true);
 
     /**
      *  @brief  Read a box gap from the current position in the file

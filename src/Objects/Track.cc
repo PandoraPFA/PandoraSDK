@@ -1,12 +1,10 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Objects/Track.cc
+ *  @file   PandoraSDK/src/Objects/Track.cc
  * 
  *  @brief  Implementation of the track class.
  * 
  *  $Log: $
  */
-
-#include "Helpers/GeometryHelper.h"
 
 #include "Objects/Helix.h"
 #include "Objects/Track.h"
@@ -39,15 +37,14 @@ const MCParticle *Track::GetMainMCParticle() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-Track::Track(const PandoraApi::Track::Parameters &parameters) :
+Track::Track(const PandoraApi::Track::Parameters &parameters, const float bField) :
     m_d0(parameters.m_d0.Get()),
     m_z0(parameters.m_z0.Get()),
     m_particleId(parameters.m_particleId.Get()),
     m_charge(parameters.m_charge.Get()),
     m_mass(parameters.m_mass.Get()),
     m_momentumAtDca(parameters.m_momentumAtDca.Get()),
-    m_momentumMagnitudeAtDca(m_momentumAtDca.GetMagnitude()),
-    m_energyAtDca(std::sqrt(m_mass * m_mass + m_momentumMagnitudeAtDca * m_momentumMagnitudeAtDca)),
+    m_energyAtDca(std::sqrt(m_mass * m_mass + m_momentumAtDca.GetMagnitudeSquared())),
     m_trackStateAtStart(parameters.m_trackStateAtStart.Get()),
     m_trackStateAtEnd(parameters.m_trackStateAtEnd.Get()),
     m_trackStateAtCalorimeter(parameters.m_trackStateAtCalorimeter.Get()),
@@ -61,14 +58,13 @@ Track::Track(const PandoraApi::Track::Parameters &parameters) :
     m_isAvailable(true)
 {
     // Consistency checks
-    if (0.f == m_energyAtDca)
+    if (m_energyAtDca < std::numeric_limits<float>::epsilon())
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
     if (0 == m_charge)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
     // Obtain helix fit to track state at calorimeter
-    static const float bField(GeometryHelper::GetBField(CartesianVector(0.f, 0.f, 0.f)));
     m_pHelixFitAtCalorimeter = new Helix(m_trackStateAtCalorimeter.GetPosition(), m_trackStateAtCalorimeter.GetMomentum(), static_cast<float>(m_charge), bField);
 }
 

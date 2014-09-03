@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Managers/Metadata.cc
+ *  @file   PandoraSDK/src/Managers/Metadata.cc
  * 
  *  @brief  Implementation of metadata classes.
  * 

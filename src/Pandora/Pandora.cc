@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Pandora/Pandora.cc
+ *  @file   PandoraSDK/src/Pandora/Pandora.cc
  * 
  *  @brief  Implementation of the pandora class.
  * 
@@ -14,6 +14,7 @@
 #include "Managers/AlgorithmManager.h"
 #include "Managers/CaloHitManager.h"
 #include "Managers/ClusterManager.h"
+#include "Managers/GeometryManager.h"
 #include "Managers/MCManager.h"
 #include "Managers/ParticleFlowObjectManager.h"
 #include "Managers/PluginManager.h"
@@ -33,11 +34,13 @@ Pandora::Pandora() :
     m_pAlgorithmManager(NULL),
     m_pCaloHitManager(NULL),
     m_pClusterManager(NULL),
+    m_pGeometryManager(NULL),
     m_pMCManager(NULL),
     m_pPfoManager(NULL),
     m_pPluginManager(NULL),
     m_pTrackManager(NULL),
     m_pVertexManager(NULL),
+    m_pPandoraSettings(NULL),
     m_pPandoraApiImpl(NULL),
     m_pPandoraContentApiImpl(NULL),
     m_pPandoraImpl(NULL)
@@ -45,13 +48,15 @@ Pandora::Pandora() :
     try
     {
         m_pAlgorithmManager = new AlgorithmManager(this);
-        m_pCaloHitManager = new CaloHitManager;
-        m_pClusterManager = new ClusterManager;
-        m_pMCManager = new MCManager;
-        m_pPfoManager = new ParticleFlowObjectManager;
-        m_pPluginManager = new PluginManager;
-        m_pTrackManager = new TrackManager;
-        m_pVertexManager = new VertexManager;
+        m_pCaloHitManager = new CaloHitManager(this);
+        m_pClusterManager = new ClusterManager(this);
+        m_pGeometryManager = new GeometryManager(this);
+        m_pMCManager = new MCManager(this);
+        m_pPfoManager = new ParticleFlowObjectManager(this);
+        m_pPluginManager = new PluginManager(this);
+        m_pTrackManager = new TrackManager(this);
+        m_pVertexManager = new VertexManager(this);
+        m_pPandoraSettings = new PandoraSettings(this);
         m_pPandoraApiImpl = new PandoraApiImpl(this);
         m_pPandoraContentApiImpl = new PandoraContentApiImpl(this);
         m_pPandoraImpl = new PandoraImpl(this);
@@ -77,11 +82,13 @@ Pandora::~Pandora()
     delete m_pAlgorithmManager;
     delete m_pCaloHitManager;
     delete m_pClusterManager;
+    delete m_pGeometryManager;
     delete m_pMCManager;
     delete m_pPfoManager;
     delete m_pPluginManager;
     delete m_pTrackManager;
     delete m_pVertexManager;
+    delete m_pPandoraSettings;
     delete m_pPandoraApiImpl;
     delete m_pPandoraContentApiImpl;
     delete m_pPandoraImpl;
@@ -100,21 +107,14 @@ StatusCode Pandora::PrepareEvent()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Pandora::PrepareMCParticles()
-{
-    return m_pPandoraImpl->PrepareMCParticles();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 StatusCode Pandora::ProcessEvent()
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareEvent());
 
     // Loop over algorithms
-    const StringVector *const pPandoraAlgorithms = m_pAlgorithmManager->GetPandoraAlgorithms();
+    const StringVector &pandoraAlgorithms(m_pPandoraImpl->GetPandoraAlgorithms());
 
-    for (StringVector::const_iterator iter = pPandoraAlgorithms->begin(), iterEnd = pPandoraAlgorithms->end(); iter != iterEnd; ++iter)
+    for (StringVector::const_iterator iter = pandoraAlgorithms.begin(), iterEnd = pandoraAlgorithms.end(); iter != iterEnd; ++iter)
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandoraImpl->RunAlgorithm(*iter));
 
     return STATUS_CODE_SUCCESS;
@@ -125,13 +125,6 @@ StatusCode Pandora::ProcessEvent()
 StatusCode Pandora::ResetEvent()
 {
     return m_pPandoraImpl->ResetEvent();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode Pandora::RegisterResetFunction(ResetFunction *pResetFunction)
-{
-    return m_pPandoraImpl->RegisterResetFunction(pResetFunction);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -149,9 +142,9 @@ StatusCode Pandora::ReadSettings(const std::string &xmlFileName)
         }
 
         const TiXmlHandle xmlDocumentHandle(&xmlDocument);
-        const TiXmlHandle xmlHandle = TiXmlHandle(xmlDocumentHandle.FirstChildElement().Element());
+        const TiXmlHandle xmlHandle(TiXmlHandle(xmlDocumentHandle.FirstChildElement().Element()));
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraSettings::Initialize(&xmlHandle));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandoraImpl->InitializeSettings(&xmlHandle));
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandoraImpl->InitializeAlgorithms(&xmlHandle));
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandoraImpl->InitializePlugins(&xmlHandle));
     }
@@ -181,6 +174,27 @@ const PandoraApiImpl *Pandora::GetPandoraApiImpl() const
 const PandoraContentApiImpl *Pandora::GetPandoraContentApiImpl() const
 {
     return m_pPandoraContentApiImpl;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const PandoraSettings *Pandora::GetSettings() const
+{
+    return m_pPandoraSettings;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const GeometryManager *Pandora::GetGeometry() const
+{
+    return m_pGeometryManager;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const PluginManager *Pandora::GetPlugins() const
+{
+    return m_pPluginManager;
 }
 
 } // namespace pandora

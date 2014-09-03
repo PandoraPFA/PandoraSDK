@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Objects/OrderedCaloHitList.h
+ *  @file   PandoraSDK/include/Objects/OrderedCaloHitList.h
  * 
  *  @brief  Header file for the ordered calo hit list class.
  * 
@@ -93,7 +93,7 @@ public:
      *  @param  pseudoLayer the pseudo layer
      *  @param  pCaloHitList to receive the address of the relevant calo hit list
      */
-    StatusCode GetCaloHitsInPseudoLayer(const PseudoLayer pseudoLayer, CaloHitList *&pCaloHitList) const;
+    StatusCode GetCaloHitsInPseudoLayer(const unsigned int pseudoLayer, CaloHitList *&pCaloHitList) const;
 
     /**
      *  @brief  Get the number of calo hits in a specified pseudo layer
@@ -102,7 +102,7 @@ public:
      * 
      *  @return The number of calo hits in the specified pseudo layer
      */
-    unsigned int GetNCaloHitsInPseudoLayer(const PseudoLayer pseudoLayer) const;
+    unsigned int GetNCaloHitsInPseudoLayer(const unsigned int pseudoLayer) const;
 
     /**
      *  @brief  Reset the ordered calo hit list, emptying its contents
@@ -171,7 +171,7 @@ private:
      *  @param  pCaloHit the address of the calo hit
      *  @param  pseudoLayer the pesudo layer
      */
-    StatusCode Add(CaloHit *const pCaloHit, const PseudoLayer pseudoLayer);
+    StatusCode Add(CaloHit *const pCaloHit, const unsigned int pseudoLayer);
 
     /**
      *  @brief  Remove a calo hit from a specified pseudo layer
@@ -179,7 +179,7 @@ private:
      *  @param  pCaloHit the address of the calo hit
      *  @param  pseudoLayer the pesudo layer
      */
-    StatusCode Remove(CaloHit *const pCaloHit, const PseudoLayer pseudoLayer);
+    StatusCode Remove(CaloHit *const pCaloHit, const unsigned int pseudoLayer);
 
     TheList     m_theList;      ///< The ordered calo hit list
 };

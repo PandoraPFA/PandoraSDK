@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Managers/VertexManager.h
+ *  @file   PandoraSDK/include/Managers/VertexManager.h
  * 
  *  @brief  Header file for the vertex manager class.
  * 
@@ -24,9 +24,11 @@ class VertexManager : public AlgorithmObjectManager<Vertex>
 {
 public:
     /**
-     *  @brief  Default constructor
+     *  @brief  Constructor
+     * 
+     *  @param  pPandora address of the associated pandora object
      */
-    VertexManager();
+    VertexManager(const Pandora *const pPandora);
 
     /**
      *  @brief  Destructor

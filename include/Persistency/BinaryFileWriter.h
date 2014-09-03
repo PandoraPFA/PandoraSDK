@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Persistency/BinaryFileWriter.h
+ *  @file   PandoraSDK/include/Persistency/BinaryFileWriter.h
  * 
  *  @brief  Header file for the binary file writer class.
  * 
@@ -43,11 +43,8 @@ public:
 private:
     StatusCode WriteHeader(const ContainerId containerId);
     StatusCode WriteFooter();
-    StatusCode WriteTracker();
-    StatusCode WriteCoil();
+    StatusCode WriteSubDetector(const SubDetector *const pSubDetector);
     StatusCode WriteDetectorGap(const DetectorGap *const pDetectorGap);
-    StatusCode WriteAdditionalSubDetectors();
-    StatusCode WriteSubDetector(const std::string &subDetectorName, const GeometryHelper::SubDetectorParameters *const pSubDetectorParameters);
     StatusCode WriteCaloHit(const CaloHit *const pCaloHit);
     StatusCode WriteTrack(const Track *const pTrack);
     StatusCode WriteMCParticle(const MCParticle *const pMCParticle);

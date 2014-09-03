@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Managers/ClusterManager.h
+ *  @file   PandoraSDK/include/Managers/ClusterManager.h
  * 
  *  @brief  Header file for the cluster manager class.
  * 
@@ -26,9 +26,11 @@ class ClusterManager : public AlgorithmObjectManager<Cluster>
 {
 public:
     /**
-     *  @brief  Default constructor
+     *  @brief  Constructor
+     * 
+     *  @param  pPandora address of the associated pandora object
      */
-     ClusterManager();
+     ClusterManager(const Pandora *const pPandora);
 
     /**
      *  @brief  Destructor

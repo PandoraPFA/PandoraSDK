@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Pandora/PandoraInternal.h
+ *  @file   PandoraSDK/include/Pandora/PandoraInternal.h
  * 
  *  @brief  Header file defining relevant internal typedefs, sort and string conversion functions
  * 
@@ -20,27 +20,32 @@
 namespace pandora
 {
 
-class BFieldCalculator;
+class Algorithm;
+class AlgorithmTool;
+class BFieldPlugin;
 class CaloHit;
 class CartesianVector;
 class Cluster;
 class DetectorGap;
+class EnergyCorrectionPlugin;
 class Helix;
 class Histogram;
 class MCParticle;
 class OrderedCaloHitList;
 class ParticleFlowObject;
-class PseudoLayerCalculator;
-class ShowerProfileCalculator;
+class ParticleIdPlugin;
+class PseudoLayerPlugin;
+class ShowerProfilePlugin;
+class SubDetector;
 class Track;
 class TrackState;
 class TwoDHistogram;
 class Vertex;
 
-// Macro allowing use of pandora monitoring to be quickly included/excluded via pre-processor flag
+// Macro allowing use of pandora monitoring to be quickly included/excluded via pre-processor flag; only works within algorithms
 #ifdef MONITORING
     #define PANDORA_MONITORING_API(command)                                                                 \
-    if (PandoraSettings::IsMonitoringEnabled())                                                             \
+    if (this->GetPandora().GetSettings()->IsMonitoringEnabled())                                            \
     {                                                                                                       \
         PandoraMonitoringApi::command;                                                                      \
     }
@@ -67,21 +72,14 @@ class Vertex;
 
 #define PANDORA_REGISTER_ENERGY_CORRECTION(a, b, c)                                                         \
 {                                                                                                           \
-    const pandora::StatusCode statusCode(PandoraApi::RegisterEnergyCorrectionFunction(pandora, a, b, c));   \
+    const pandora::StatusCode statusCode(PandoraApi::RegisterEnergyCorrectionPlugin(pandora, a, b, new c)); \
     if (pandora::STATUS_CODE_SUCCESS != statusCode)                                                         \
         return statusCode;                                                                                  \
 }
 
 #define PANDORA_REGISTER_PARTICLE_ID(a, b)                                                                  \
 {                                                                                                           \
-    const pandora::StatusCode statusCode(PandoraApi::RegisterParticleIdFunction(pandora, a, b));            \
-    if (pandora::STATUS_CODE_SUCCESS != statusCode)                                                         \
-        return statusCode;                                                                                  \
-}
-
-#define PANDORA_REGISTER_SETTINGS(a, b)                                                                     \
-{                                                                                                           \
-    const pandora::StatusCode statusCode(PandoraApi::RegisterSettingsFunction(pandora, a, b));              \
+    const pandora::StatusCode statusCode(PandoraApi::RegisterParticleIdPlugin(pandora, a, new b));          \
     if (pandora::STATUS_CODE_SUCCESS != statusCode)                                                         \
         return statusCode;                                                                                  \
 }
@@ -150,22 +148,25 @@ inline bool PointerLessThan<T>::operator()(const T *lhs, const T *rhs) const
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 typedef std::set<CaloHit *> CaloHitList;
-typedef std::set<Track *> TrackList;
 typedef std::set<Cluster *> ClusterList;
+typedef std::set<DetectorGap *> DetectorGapList;
 typedef std::set<MCParticle *> MCParticleList;
 typedef std::set<ParticleFlowObject *> ParticleFlowObjectList;
 typedef std::set<ParticleFlowObject *> PfoList;
+typedef std::set<Track *> TrackList;
 typedef std::set<Vertex *> VertexList;
 
 typedef std::vector<CaloHit *> CaloHitVector;
-typedef std::vector<Track *> TrackVector;
 typedef std::vector<Cluster *> ClusterVector;
+typedef std::vector<DetectorGap *> DetectorGapVector;
 typedef std::vector<MCParticle *> MCParticleVector;
 typedef std::vector<ParticleFlowObject *> ParticleFlowObjectVector;
 typedef std::vector<ParticleFlowObject *> PfoVector;
+typedef std::vector<Track *> TrackVector;
 typedef std::vector<Vertex *> VertexVector;
 
-typedef unsigned int PseudoLayer;
+typedef std::vector<AlgorithmTool *> AlgorithmToolList;
+
 typedef std::set<std::string> StringSet;
 typedef std::vector<std::string> StringVector;
 typedef std::vector<int> IntVector;
@@ -179,6 +180,8 @@ typedef std::map<MCParticle *, float> MCParticleWeightMap;
 typedef std::map<Uid, MCParticleWeightMap> UidToMCParticleWeightMap;
 
 typedef std::map<Track *, Cluster *> TrackToClusterMap;
+
+typedef std::map<std::string, SubDetector*> SubDetectorMap;
 
 } // namespace pandora
 

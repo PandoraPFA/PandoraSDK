@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Managers/AlgorithmManager.cc
+ *  @file   PandoraSDK/src/Managers/AlgorithmManager.cc
  * 
  *  @brief  Implementation of the algorithm manager class.
  * 
@@ -19,7 +19,7 @@
 namespace pandora
 {
 
-AlgorithmManager::AlgorithmManager(Pandora *pPandora) :
+AlgorithmManager::AlgorithmManager(const Pandora *const pPandora) :
     m_pPandora(pPandora)
 {
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, RegisterAlgorithmFactory("EventReading", new EventReadingAlgorithm::Factory));
@@ -155,7 +155,7 @@ StatusCode AlgorithmManager::CreateAlgorithmTool(TiXmlElement *const pXmlElement
     if (NULL == pAlgorithmTool)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pAlgorithmTool->RegisterDetails(iter->first));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pAlgorithmTool->RegisterDetails(m_pPandora, iter->first));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pAlgorithmTool->ReadSettings(TiXmlHandle(pXmlElement)));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pAlgorithmTool->Initialize());
     m_algorithmToolList.push_back(pAlgorithmTool);
@@ -184,7 +184,7 @@ StatusCode AlgorithmManager::FindSpecificAlgorithmInstance(TiXmlElement *const p
 
         AlgorithmMap::const_iterator targetIter = m_algorithmMap.find(algorithmName);
 
-        if ((m_algorithmMap.end() == targetIter) || (targetIter->second->m_algorithmType != std::string(pXmlElement->Attribute("type"))))
+        if ((m_algorithmMap.end() == targetIter) || (targetIter->second->GetType() != std::string(pXmlElement->Attribute("type"))))
             return STATUS_CODE_FAILURE;
 
         return STATUS_CODE_SUCCESS;

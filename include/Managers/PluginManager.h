@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Managers/PluginManager.h
+ *  @file   PandoraSDK/include/Managers/PluginManager.h
  * 
  *  @brief  Header file for the pandora plugin manager class.
  * 
@@ -8,14 +8,22 @@
 #ifndef PANDORA_PLUGIN_MANAGER_H
 #define PANDORA_PLUGIN_MANAGER_H 1
 
-#include "Pandora/PandoraInputTypes.h"
-#include "Pandora/PandoraInternal.h"
 #include "Pandora/StatusCodes.h"
-
-class TiXmlHandle;
 
 namespace pandora
 {
+
+class BFieldPlugin;
+class PseudoLayerPlugin;
+class ShowerProfilePlugin;
+
+class EnergyCorrections;
+class ParticleId;
+
+class Pandora;
+class TiXmlHandle;
+
+//------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
  *  @brief PluginManager class
@@ -24,84 +32,73 @@ class PluginManager
 {
 public:
     /**
-     *  @brief  Default constructor
+     *  @brief  Constructor
+     * 
+     *  @param  pPandora address of the associated pandora object
      */
-    PluginManager();
+    PluginManager(const Pandora *const pPandora);
 
     /**
      *  @brief  Destructor
      */
     ~PluginManager();
 
+    /**
+     *  @brief  Get the address of the b field plugin
+     * 
+     *  @return the address of the b field plugin
+     */
+    const BFieldPlugin *GetBFieldPlugin() const;
+
+    /**
+     *  @brief  Get the address of the pseudo layer plugin
+     * 
+     *  @return the address of the pseudo layer plugin
+     */
+    const PseudoLayerPlugin *GetPseudoLayerPlugin() const;
+
+    /**
+     *  @brief  Get the shower profile plugin
+     * 
+     *  @return address of the shower profile plugin
+     */
+    const ShowerProfilePlugin *GetShowerProfilePlugin() const;
+
+    /**
+     *  @brief  Get the pandora energy corrections instance
+     * 
+     *  @return the address of the pandora energy corrections instance
+     */
+    const EnergyCorrections *GetEnergyCorrections() const;
+
+    /**
+     *  @brief  Get the address of the pandora particle id instance
+     * 
+     *  @return the address of the pandora particle id instance
+     */
+    const ParticleId *GetParticleId() const;
+
 private:
-    typedef std::map<std::string, EnergyCorrectionFunction *> EnergyCorrectionFunctionMap;
-    typedef std::map<std::string, ParticleIdFunction *> ParticleIdFunctionMap;
+    /**
+     *  @brief  Set the bfield plugin
+     * 
+     *  @param  pBFieldPlugin address of the bfield plugin
+     */
+    StatusCode SetBFieldPlugin(BFieldPlugin *pBFieldPlugin);
 
     /**
-     *  @brief  Register an energy correction function
+     *  @brief  Set the pseudo layer plugin
      * 
-     *  @param  functionName the name/label associated with the energy correction function
-     *  @param  energyCorrectionType the energy correction type
-     *  @param  energyCorrectionFunction pointer to an energy correction function
+     *  @param  pPseudoLayerPlugin address of the pseudo layer plugin
      */
-    StatusCode RegisterEnergyCorrectionFunction(const std::string &functionName, const EnergyCorrectionType energyCorrectionType,
-        EnergyCorrectionFunction *pEnergyCorrectionFunction);
+    StatusCode SetPseudoLayerPlugin(PseudoLayerPlugin *pPseudoLayerPlugin);
 
     /**
-     *  @brief  Read requested function names/labels from a specified xml tag and attempt to assign the function pointers as requested
+     *  @brief  Set the shower profile plugin
      * 
-     *  @param  pXmlHandle address of the relevant xml handle
-     *  @param  xmlTagName the xml tag name for a given energy correction type
-     *  @param  energyCorrectionType the energy correction type
-     *  @param  energyCorrectionFunctionVector to receive the addresses of the energy correction functions
+     *  @param  pPseudoLayerPlugin address of the shower profile plugin
      */
-    StatusCode InitializeEnergyCorrectionFunctions(const TiXmlHandle *const pXmlHandle, const std::string &xmlTagName,
-        const EnergyCorrectionType energyCorrectionType, EnergyCorrectionFunctionVector &energyCorrectionFunctionVector);
-
-    /**
-     *  @brief  Match a vector of names/labels to energy correction functions and store pointers to these functions in a vector
-     * 
-     *  @param  functionNames the vector of names/labels associated with energy correction functions
-     *  @param  energyCorrectionType the energy correction type
-     *  @param  energyCorrectionFunctionVector to receive the addresses of the energy correction functions
-     */
-    StatusCode AssignEnergyCorrectionFunctions(const StringVector &functionNames, const EnergyCorrectionType energyCorrectionType,
-        EnergyCorrectionFunctionVector &energyCorrectionFunctionVector);
-
-    /**
-     *  @brief  Get the energy correction function map corresponding to the specified energy correction type
-     * 
-     *  @param  energyCorrectionType the energy correction type
-     * 
-     *  @return reference to the relevant energy correction function map
-     */
-    EnergyCorrectionFunctionMap &GetEnergyCorrectionFunctionMap(const EnergyCorrectionType energyCorrectionType);
-
-    /**
-     *  @brief  Register a particle id function
-     * 
-     *  @param  functionName the name/label associated with the particle id function
-     *  @param  particleIdFunction pointer to a particle id function
-     */
-    StatusCode RegisterParticleIdFunction(const std::string &functionName, ParticleIdFunction *pParticleIdFunction);
-
-    /**
-     *  @brief  Read requested function name/label from a specified xml tag and attempt to assign the function pointer as requested
-     * 
-     *  @param  pXmlHandle address of the relevant xml handle
-     *  @param  xmlTagName the xml tag name for a given particle id "slot"
-     *  @param  pParticleIdFunction to receive the address of the particle id function
-     */
-    StatusCode InitializeParticleIdFunction(const TiXmlHandle *const pXmlHandle, const std::string &xmlTagName,
-        ParticleIdFunction *&pParticleIdFunction);
-
-    /**
-     *  @brief  Match a name/label to a particle id function and assign address of the function to a function pointer
-     * 
-     *  @param  functionName the name/label associated with the particle id function
-     *  @param  pParticleIdFunction to receive the address of the particle id function
-     */
-    StatusCode AssignParticleIdFunction(const std::string &functionName, ParticleIdFunction *&pParticleIdFunction) const;
+    StatusCode SetShowerProfilePlugin(ShowerProfilePlugin *pShowerProfilePlugin);
 
     /**
      *  @brief  Initialize plugins
@@ -110,9 +107,14 @@ private:
      */
     StatusCode InitializePlugins(const TiXmlHandle *const pXmlHandle);
 
-    EnergyCorrectionFunctionMap     m_hadEnergyCorrectionFunctionMap;   ///< The hadronic energy correction function map
-    EnergyCorrectionFunctionMap     m_emEnergyCorrectionFunctionMap;    ///< The electromagnetic energy correction function map
-    ParticleIdFunctionMap           m_particleIdFunctionMap;            ///< The particle id function map
+    BFieldPlugin                   *m_pBFieldPlugin;                    ///< Address of the bfield plugin
+    PseudoLayerPlugin              *m_pPseudoLayerPlugin;               ///< Address of the pseudolayer plugin
+    ShowerProfilePlugin            *m_pShowerProfilePlugin;             ///< The shower profile plugin
+
+    EnergyCorrections              *m_pEnergyCorrections;               ///< The energy corrections
+    ParticleId                     *m_pParticleId;                      ///< The particle id
+
+    const Pandora *const            m_pPandora;                         ///< The associated pandora object
 
     friend class PandoraApiImpl;
     friend class PandoraImpl;

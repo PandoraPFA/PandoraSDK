@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Objects/Track.h
+ *  @file   PandoraSDK/include/Objects/Track.h
  * 
  *  @brief  Header file for the track class.
  * 
@@ -25,22 +25,6 @@ template<typename T> class InputObjectManager;
 class Track 
 {
 public:
-    /**
-     *  @brief  Sort tracks by descending momentum
-     * 
-     *  @param  pLhs address of first track
-     *  @param  pRhs address of second track
-     */
-    static bool SortByMomentum(const Track *const pLhs, const Track *const pRhs);
-
-    /**
-     *  @brief  Sort tracks by descending energy at dca
-     * 
-     *  @param  pLhs address of first track
-     *  @param  pRhs address of second track
-     */
-    static bool SortByEnergy(const Track *const pLhs, const Track *const pRhs);
-
     /**
      *  @brief  Get the 2D impact parameter wrt (0,0)
      * 
@@ -221,8 +205,9 @@ private:
      *  @brief  Constructor
      * 
      *  @param  parameters the calo hit parameters
+     *  @param  the bField strength to be used in a helix fit to the track
      */
-    Track(const PandoraApi::Track::Parameters &parameters);
+    Track(const PandoraApi::Track::Parameters &parameters, const float bField);
 
     /**
      *  @brief  Destructor
@@ -291,7 +276,6 @@ private:
     const float             m_mass;                     ///< The mass of the tracked particle, units GeV
 
     const CartesianVector   m_momentumAtDca;            ///< The momentum vector at the 2D distance of closest approach, units GeV
-    const float             m_momentumMagnitudeAtDca;   ///< The magnitude of the momentum at the 2D distance of closest approach, units GeV
     const float             m_energyAtDca;              ///< The track energy at the 2D distance of closest approach, units GeV
 
     const TrackState        m_trackStateAtStart;        ///< The track state at the start of the track, units mm and GeV
@@ -329,20 +313,6 @@ private:
  *  @param  track the track
  */
 std::ostream &operator<<(std::ostream &stream, const Track &track);
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool Track::SortByMomentum(const Track *const pLhs, const Track *const pRhs)
-{
-    return (pLhs->m_momentumMagnitudeAtDca > pRhs->m_momentumMagnitudeAtDca);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool Track::SortByEnergy(const Track *const pLhs, const Track *const pRhs)
-{
-    return (pLhs->GetEnergyAtDca() > pRhs->GetEnergyAtDca());
-}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -392,7 +362,6 @@ inline float Track::GetEnergyAtDca() const
 {
     return m_energyAtDca;
 }
-
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 

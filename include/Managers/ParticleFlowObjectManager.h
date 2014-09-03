@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Managers/ParticleFlowObjectManager.h
+ *  @file   PandoraSDK/include/Managers/ParticleFlowObjectManager.h
  * 
  *  @brief  Header file for the particle flow object manager class.
  * 
@@ -24,9 +24,11 @@ class ParticleFlowObjectManager : public AlgorithmObjectManager<ParticleFlowObje
 {
     public:
     /**
-     *  @brief  Default constructor
+     *  @brief  Constructor
+     * 
+     *  @param  pPandora address of the associated pandora object
      */
-     ParticleFlowObjectManager();
+     ParticleFlowObjectManager(const Pandora *const pPandora);
 
     /**
      *  @brief  Destructor

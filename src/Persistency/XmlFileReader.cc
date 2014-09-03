@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Persistency/XmlFileReader.cc
+ *  @file   PandoraSDK/src/Persistency/XmlFileReader.cc
  * 
  *  @brief  Implementation of the xml file reader class.
  * 
@@ -160,6 +160,10 @@ StatusCode XmlFileReader::ReadNextGeometryComponent()
 
     const std::string componentName(m_pCurrentXmlElement->ValueStr());
 
+    if (std::string("SubDetector") == componentName)
+    {
+        return this->ReadSubDetector();
+    }
     if (std::string("BoxGap") == componentName)
     {
         return this->ReadBoxGap();
@@ -220,112 +224,15 @@ StatusCode XmlFileReader::ReadNextEventComponent()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode XmlFileReader::ReadTracker(PandoraApi::Geometry::Parameters *pGeometryParameters)
+StatusCode XmlFileReader::ReadSubDetector()
 {
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
-
-    const TiXmlHandle xmlHandle(m_pContainerXmlNode->FirstChild("Tracker"));
-    m_pCurrentXmlElement = xmlHandle.Element();
-
-    bool readMainTrackerDetails(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "TrackerPresent", readMainTrackerDetails));
-
-    if (readMainTrackerDetails)
-    {
-        float mainTrackerInnerRadius(0.f);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "MainTrackerInnerRadius", mainTrackerInnerRadius));
-        float mainTrackerOuterRadius(0.f);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "MainTrackerOuterRadius", mainTrackerOuterRadius));
-        float mainTrackerZExtent(0.f);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "MainTrackerZExtent", mainTrackerZExtent));
-        pGeometryParameters->m_mainTrackerInnerRadius = mainTrackerInnerRadius;
-        pGeometryParameters->m_mainTrackerOuterRadius = mainTrackerOuterRadius;
-        pGeometryParameters->m_mainTrackerZExtent = mainTrackerZExtent;
-    }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode XmlFileReader::ReadCoil(PandoraApi::Geometry::Parameters *pGeometryParameters)
-{
-    if (GEOMETRY != m_containerId)
-        return STATUS_CODE_FAILURE;
-
-    const TiXmlHandle xmlHandle(m_pContainerXmlNode->FirstChild("Coil"));
-    m_pCurrentXmlElement = xmlHandle.Element();
-
-    bool readCoilDetails(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "CoilPresent", readCoilDetails));
-
-    if (readCoilDetails)
-    {
-        float coilInnerRadius(0.f);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "CoilInnerRadius", coilInnerRadius));
-        float coilOuterRadius(0.f);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "CoilOuterRadius", coilOuterRadius));
-        float coilZExtent(0.f);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "CoilZExtent", coilZExtent));
-        pGeometryParameters->m_coilInnerRadius = coilInnerRadius;
-        pGeometryParameters->m_coilOuterRadius = coilOuterRadius;
-        pGeometryParameters->m_coilZExtent = coilZExtent;
-    }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode XmlFileReader::ReadAdditionalSubDetectors(PandoraApi::Geometry::Parameters *pGeometryParameters)
-{
-    if (GEOMETRY != m_containerId)
-        return STATUS_CODE_FAILURE;
-
-    const TiXmlHandle xmlHandle(m_pContainerXmlNode);
-    m_pCurrentXmlElement = TiXmlHandle(m_pContainerXmlNode->FirstChild("NAdditionalSubDetectors")).Element();
-
-    unsigned int nAdditionalSubDetectors(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "NAdditionalSubDetectors", nAdditionalSubDetectors));
-
-    for (unsigned int iSubDetector = 0; iSubDetector < nAdditionalSubDetectors; ++iSubDetector)
-    {
-        std::string subDetectorName;
-        PandoraApi::Geometry::Parameters::SubDetectorParameters subDetectorParameters;
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadSubDetector(subDetectorName, &subDetectorParameters));
-        pGeometryParameters->m_additionalSubDetectors.insert(std::make_pair(subDetectorName, subDetectorParameters));
-    }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode XmlFileReader::ReadSubDetector(std::string &subDetectorName, PandoraApi::Geometry::Parameters::SubDetectorParameters *pSubDetectorParameters)
-{
-    if (GEOMETRY != m_containerId)
-        return STATUS_CODE_FAILURE;
-
-    if (NULL == m_pCurrentXmlElement)
-    {
-        TiXmlHandle localHandle(m_pContainerXmlNode);
-        m_pCurrentXmlElement = localHandle.FirstChild("SubDetector").Element();
-    }
-    else
-    {
-        m_pCurrentXmlElement = m_pCurrentXmlElement->NextSiblingElement("SubDetector");
-    }
 
     const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
+
+    std::string subDetectorName;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "SubDetectorName", subDetectorName));
-
-    bool isInitialized(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "IsInitialized", isInitialized));
-
-    if (!isInitialized)
-        return STATUS_CODE_SUCCESS;
-
     float innerRCoordinate(0.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "InnerRCoordinate", innerRCoordinate));
     float innerZCoordinate(0.f);
@@ -347,16 +254,18 @@ StatusCode XmlFileReader::ReadSubDetector(std::string &subDetectorName, PandoraA
     unsigned int nLayers(0);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "NLayers", nLayers));
 
-    pSubDetectorParameters->m_innerRCoordinate = innerRCoordinate;
-    pSubDetectorParameters->m_innerZCoordinate = innerZCoordinate;
-    pSubDetectorParameters->m_innerPhiCoordinate = innerPhiCoordinate;
-    pSubDetectorParameters->m_innerSymmetryOrder = innerSymmetryOrder;
-    pSubDetectorParameters->m_outerRCoordinate = outerRCoordinate;
-    pSubDetectorParameters->m_outerZCoordinate = outerZCoordinate;
-    pSubDetectorParameters->m_outerPhiCoordinate = outerPhiCoordinate;
-    pSubDetectorParameters->m_outerSymmetryOrder = outerSymmetryOrder;
-    pSubDetectorParameters->m_isMirroredInZ = isMirroredInZ;
-    pSubDetectorParameters->m_nLayers = nLayers;
+    PandoraApi::Geometry::SubDetector::Parameters parameters;
+    parameters.m_subDetectorName = subDetectorName;
+    parameters.m_innerRCoordinate = innerRCoordinate;
+    parameters.m_innerZCoordinate = innerZCoordinate;
+    parameters.m_innerPhiCoordinate = innerPhiCoordinate;
+    parameters.m_innerSymmetryOrder = innerSymmetryOrder;
+    parameters.m_outerRCoordinate = outerRCoordinate;
+    parameters.m_outerZCoordinate = outerZCoordinate;
+    parameters.m_outerPhiCoordinate = outerPhiCoordinate;
+    parameters.m_outerSymmetryOrder = outerSymmetryOrder;
+    parameters.m_isMirroredInZ = isMirroredInZ;
+    parameters.m_nLayers = nLayers;
 
     FloatVector closestDistanceToIp, nRadiationLengths, nInteractionLengths;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, "ClosestDistanceToIp", closestDistanceToIp));
@@ -368,12 +277,14 @@ StatusCode XmlFileReader::ReadSubDetector(std::string &subDetectorName, PandoraA
 
     for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
     {
-        PandoraApi::Geometry::Parameters::LayerParameters layerParameters;
+        PandoraApi::Geometry::LayerParameters layerParameters;
         layerParameters.m_closestDistanceToIp = closestDistanceToIp[iLayer];
         layerParameters.m_nRadiationLengths = nRadiationLengths[iLayer];
         layerParameters.m_nInteractionLengths = nInteractionLengths[iLayer];
-        pSubDetectorParameters->m_layerParametersList.push_back(layerParameters);
+        parameters.m_layerParametersList.push_back(layerParameters);
     }
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::SubDetector::Create(*m_pPandora, parameters));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -382,6 +293,9 @@ StatusCode XmlFileReader::ReadSubDetector(std::string &subDetectorName, PandoraA
 
 StatusCode XmlFileReader::ReadBoxGap()
 {
+    if (GEOMETRY != m_containerId)
+        return STATUS_CODE_FAILURE;
+
     const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
 
     CartesianVector vertex(0.f, 0.f, 0.f);
@@ -393,12 +307,12 @@ StatusCode XmlFileReader::ReadBoxGap()
     CartesianVector side3(0.f, 0.f, 0.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Side3", side3));
 
-    PandoraApi::BoxGap::Parameters parameters;
+    PandoraApi::Geometry::BoxGap::Parameters parameters;
     parameters.m_vertex = vertex;
     parameters.m_side1 = side1;
     parameters.m_side2 = side2;
     parameters.m_side3 = side3;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::BoxGap::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::BoxGap::Create(*m_pPandora, parameters));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -407,6 +321,9 @@ StatusCode XmlFileReader::ReadBoxGap()
 
 StatusCode XmlFileReader::ReadConcentricGap()
 {
+    if (GEOMETRY != m_containerId)
+        return STATUS_CODE_FAILURE;
+
     const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
 
     float minZCoordinate(0.f);
@@ -426,7 +343,7 @@ StatusCode XmlFileReader::ReadConcentricGap()
     unsigned int outerSymmetryOrder(0);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "OuterSymmetryOrder", outerSymmetryOrder));
 
-    PandoraApi::ConcentricGap::Parameters parameters;
+    PandoraApi::Geometry::ConcentricGap::Parameters parameters;
     parameters.m_minZCoordinate = minZCoordinate;
     parameters.m_maxZCoordinate = maxZCoordinate;
     parameters.m_innerRCoordinate = innerRCoordinate;
@@ -435,7 +352,7 @@ StatusCode XmlFileReader::ReadConcentricGap()
     parameters.m_outerRCoordinate = outerRCoordinate;
     parameters.m_outerPhiCoordinate = outerPhiCoordinate;
     parameters.m_outerSymmetryOrder = outerSymmetryOrder;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::ConcentricGap::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::ConcentricGap::Create(*m_pPandora, parameters));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -444,6 +361,9 @@ StatusCode XmlFileReader::ReadConcentricGap()
 
 StatusCode XmlFileReader::ReadCaloHit()
 {
+    if (EVENT != m_containerId)
+        return STATUS_CODE_FAILURE;
+
     const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
 
     unsigned int cellGeometryInput(0);
@@ -552,6 +472,9 @@ StatusCode XmlFileReader::ReadCaloHit()
 
 StatusCode XmlFileReader::ReadTrack()
 {
+    if (EVENT != m_containerId)
+        return STATUS_CODE_FAILURE;
+
     const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
 
     float d0(0.f);
@@ -610,6 +533,9 @@ StatusCode XmlFileReader::ReadTrack()
 
 StatusCode XmlFileReader::ReadMCParticle()
 {
+    if (EVENT != m_containerId)
+        return STATUS_CODE_FAILURE;
+
     const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
 
     float energy(0.f);
@@ -645,6 +571,9 @@ StatusCode XmlFileReader::ReadMCParticle()
 
 StatusCode XmlFileReader::ReadRelationship()
 {
+    if (EVENT != m_containerId)
+        return STATUS_CODE_FAILURE;
+
     const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
 
     unsigned int relationshipIdInput(0);

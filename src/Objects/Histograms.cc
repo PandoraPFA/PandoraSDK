@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Objects/Histograms.cc
+ *  @file   PandoraSDK/src/Objects/Histograms.cc
  * 
  *  @brief  Implementation of histogram classes.
  * 

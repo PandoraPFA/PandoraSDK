@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Managers/AlgorithmObjectManager.cc
+ *  @file   PandoraSDK/src/Managers/AlgorithmObjectManager.cc
  * 
  *  @brief  Implementation of the algorithm object manager class.
  * 
@@ -16,8 +16,8 @@ namespace pandora
 {
 
 template<typename T>
-AlgorithmObjectManager<T>::AlgorithmObjectManager() :
-    Manager<T>(),
+AlgorithmObjectManager<T>::AlgorithmObjectManager(const Pandora *const pPandora) :
+    Manager<T>(pPandora),
     m_canMakeNewObjects(false)
 {
 }
@@ -94,6 +94,9 @@ template<typename T>
 StatusCode AlgorithmObjectManager<T>::MoveObjectsBetweenLists(const std::string &targetListName, const std::string &sourceListName,
     const ObjectList *pObjectSubset)
 {
+    if (Manager<T>::NULL_LIST_NAME == targetListName)
+        return STATUS_CODE_NOT_ALLOWED;
+
     typename Manager<T>::NameToListMap::iterator sourceListIter = Manager<T>::m_nameToListMap.find(sourceListName);
 
     if (Manager<T>::m_nameToListMap.end() == sourceListIter)

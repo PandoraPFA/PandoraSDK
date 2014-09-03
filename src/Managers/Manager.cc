@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Managers/Manager.cc
+ *  @file   PandoraSDK/src/Managers/Manager.cc
  * 
  *  @brief  Implementation of the manager class.
  * 
@@ -17,8 +17,9 @@ const std::string Manager<T>::NULL_LIST_NAME = "NullList";
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<typename T>
-Manager<T>::Manager() :
-    m_currentListName(NULL_LIST_NAME)
+Manager<T>::Manager(const Pandora *const pPandora) :
+    m_currentListName(NULL_LIST_NAME),
+    m_pPandora(pPandora)
 {
 }
 

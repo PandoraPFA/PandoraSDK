@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Api/PandoraApiImpl.cc
+ *  @file   PandoraSDK/src/Api/PandoraApiImpl.cc
  * 
  *  @brief  Implementation of the pandora api class.
  * 
@@ -9,19 +9,20 @@
 #include "Api/PandoraApi.h"
 #include "Api/PandoraApiImpl.h"
 
-#include "Helpers/GeometryHelper.h"
-#include "Helpers/ParticleIdHelper.h"
-#include "Helpers/ReclusterHelper.h"
-
 #include "Managers/AlgorithmManager.h"
 #include "Managers/CaloHitManager.h"
 #include "Managers/ClusterManager.h"
+#include "Managers/GeometryManager.h"
 #include "Managers/MCManager.h"
 #include "Managers/ParticleFlowObjectManager.h"
 #include "Managers/PluginManager.h"
 #include "Managers/TrackManager.h"
+#include "Managers/VertexManager.h"
 
 #include "Pandora/PandoraSettings.h"
+
+#include "Plugins/EnergyCorrectionsPlugin.h"
+#include "Plugins/ParticleIdPlugin.h"
 
 namespace pandora
 {
@@ -55,21 +56,21 @@ StatusCode PandoraApiImpl::CreateObject(const PandoraApi::PointingCaloHit::Param
 }
 
 template <>
-StatusCode PandoraApiImpl::CreateObject(const PandoraApi::Geometry::Parameters &parameters) const
+StatusCode PandoraApiImpl::CreateObject(const PandoraApi::Geometry::SubDetector::Parameters &parameters) const
 {
-    return GeometryHelper::Initialize(parameters);
+    return m_pPandora->m_pGeometryManager->CreateSubDetector(parameters);
 }
 
 template <>
-StatusCode PandoraApiImpl::CreateObject(const PandoraApi::BoxGap::Parameters &parameters) const
+StatusCode PandoraApiImpl::CreateObject(const PandoraApi::Geometry::BoxGap::Parameters &parameters) const
 {
-    return GeometryHelper::CreateBoxGap(parameters);
+    return m_pPandora->m_pGeometryManager->CreateBoxGap(parameters);
 }
 
 template <>
-StatusCode PandoraApiImpl::CreateObject(const PandoraApi::ConcentricGap::Parameters &parameters) const
+StatusCode PandoraApiImpl::CreateObject(const PandoraApi::Geometry::ConcentricGap::Parameters &parameters) const
 {
-    return GeometryHelper::CreateConcentricGap(parameters);
+    return m_pPandora->m_pGeometryManager->CreateConcentricGap(parameters);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -153,67 +154,45 @@ StatusCode PandoraApiImpl::GetPfoList(const std::string &pfoListName, const PfoL
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::SetBFieldCalculator(BFieldCalculator *pBFieldCalculator) const
-{
-    return GeometryHelper::SetBFieldCalculator(pBFieldCalculator);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode PandoraApiImpl::SetPseudoLayerCalculator(PseudoLayerCalculator *pPseudoLayerCalculator) const
-{
-    return GeometryHelper::SetPseudoLayerCalculator(pPseudoLayerCalculator);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode PandoraApiImpl::SetShowerProfileCalculator(ShowerProfileCalculator *pShowerProfileCalculator) const
-{
-    return ParticleIdHelper::SetShowerProfileCalculator(pShowerProfileCalculator);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 StatusCode PandoraApiImpl::SetHitTypeGranularity(const HitType hitType, const Granularity granularity) const
 {
-    return GeometryHelper::SetHitTypeGranularity(hitType, granularity);
+    return m_pPandora->m_pGeometryManager->SetHitTypeGranularity(hitType, granularity);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::RegisterEnergyCorrectionFunction(const std::string &functionName, const EnergyCorrectionType energyCorrectionType,
-    EnergyCorrectionFunction *pEnergyCorrectionFunction) const
+StatusCode PandoraApiImpl::SetBFieldPlugin(BFieldPlugin *pBFieldPlugin) const
 {
-    return m_pPandora->m_pPluginManager->RegisterEnergyCorrectionFunction(functionName, energyCorrectionType, pEnergyCorrectionFunction);
+    return m_pPandora->m_pPluginManager->SetBFieldPlugin(pBFieldPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::RegisterParticleIdFunction(const std::string &functionName, ParticleIdFunction *pParticleIdFunction) const
+StatusCode PandoraApiImpl::SetPseudoLayerPlugin(PseudoLayerPlugin *pPseudoLayerPlugin) const
 {
-    return m_pPandora->m_pPluginManager->RegisterParticleIdFunction(functionName, pParticleIdFunction);
+    return m_pPandora->m_pPluginManager->SetPseudoLayerPlugin(pPseudoLayerPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::RegisterSettingsFunction(const std::string &xmlTagName, SettingsFunction *pSettingsFunction) const
+StatusCode PandoraApiImpl::SetShowerProfilePlugin(ShowerProfilePlugin *pShowerProfilePlugin) const
 {
-    return PandoraSettings::RegisterSettingsFunction(xmlTagName, pSettingsFunction);
+    return m_pPandora->m_pPluginManager->SetShowerProfilePlugin(pShowerProfilePlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::RegisterResetFunction(ResetFunction *pResetFunction) const
+StatusCode PandoraApiImpl::RegisterEnergyCorrectionPlugin(const std::string &name, const EnergyCorrectionType energyCorrectionType,
+    EnergyCorrectionPlugin *pEnergyCorrectionPlugin) const
 {
-    return m_pPandora->RegisterResetFunction(pResetFunction);
+    return m_pPandora->m_pPluginManager->m_pEnergyCorrections->RegisterPlugin(name, energyCorrectionType, pEnergyCorrectionPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::GetReclusterMonitoringResults(const void *pTrackParentAddress, float &netEnergyChange, float &sumModulusEnergyChanges,
-    float &sumSquaredEnergyChanges) const
+StatusCode PandoraApiImpl::RegisterParticleIdPlugin(const std::string &name, ParticleIdPlugin *pParticleIdPlugin) const
 {
-    return ReclusterHelper::GetReclusterMonitoringResults(pTrackParentAddress, netEnergyChange, sumModulusEnergyChanges, sumSquaredEnergyChanges);
+    return m_pPandora->m_pPluginManager->m_pParticleId->RegisterPlugin(name, pParticleIdPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

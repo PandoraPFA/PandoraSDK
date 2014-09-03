@@ -1,5 +1,5 @@
 /**
- *    @file PandoraPFANew/Framework/src/Objects/CaloHit.cc
+ *    @file PandoraSDK/src/Objects/CaloHit.cc
  * 
  *    @brief Implementation of the calo hit class.
  * 
@@ -14,24 +14,16 @@
 namespace pandora
 {
 
-const MCParticle *CaloHit::GetMainMCParticle() const
+void CaloHit::SetIsolatedFlag(const bool isolatedFlag)
 {
-    float bestWeight(0.f);
-    const MCParticle *pBestMCParticle = NULL;
+    m_isIsolated = isolatedFlag;
+}
 
-    for (MCParticleWeightMap::const_iterator iter = m_mcParticleWeightMap.begin(), iterEnd = m_mcParticleWeightMap.end(); iter != iterEnd; ++iter)
-    {
-        if (iter->second > bestWeight)
-        {
-            bestWeight = iter->second;
-            pBestMCParticle = iter->first;
-        }
-    }
+//------------------------------------------------------------------------------------------------------------------------------------------
 
-    if (NULL == pBestMCParticle)
-        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
-
-    return pBestMCParticle;
+void CaloHit::SetPossibleMipFlag(const bool possibleMipFlag)
+{
+    m_isPossibleMip = possibleMipFlag;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -102,26 +94,12 @@ CaloHit::~CaloHit()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHit::SetPseudoLayer(PseudoLayer pseudoLayer)
+StatusCode CaloHit::SetPseudoLayer(const unsigned int pseudoLayer)
 {
     if (!(m_pseudoLayer = pseudoLayer))
         return STATUS_CODE_NOT_INITIALIZED;
 
     return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void CaloHit::SetIsolatedFlag(bool isolatedFlag)
-{
-    m_isIsolated = isolatedFlag;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void CaloHit::SetPossibleMipFlag(bool possibleMipFlag)
-{
-    m_isPossibleMip = possibleMipFlag;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

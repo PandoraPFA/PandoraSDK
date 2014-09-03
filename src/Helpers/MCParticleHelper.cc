@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Helpers/MCParticleHelper.cc
+ *  @file   PandoraSDK/src/Helpers/MCParticleHelper.cc
  * 
  *  @brief  Implementation of the mc particle helper class.
  * 
@@ -15,6 +15,31 @@
 namespace pandora
 {
 
+template <>
+const MCParticle *MCParticleHelper::GetMainMCParticle(const CaloHit *const pCaloHit)
+{
+    float bestWeight(0.f);
+    const MCParticle *pBestMCParticle = NULL;
+    const MCParticleWeightMap &hitMCParticleWeightMap(pCaloHit->GetMCParticleWeightMap());
+
+    for (MCParticleWeightMap::const_iterator iter = hitMCParticleWeightMap.begin(), iterEnd = hitMCParticleWeightMap.end(); iter != iterEnd; ++iter)
+    {
+        if (iter->second > bestWeight)
+        {
+            bestWeight = iter->second;
+            pBestMCParticle = iter->first;
+        }
+    }
+
+    if (NULL == pBestMCParticle)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
+    return pBestMCParticle;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <>
 const MCParticle *MCParticleHelper::GetMainMCParticle(const Cluster *const pCluster)
 {
     MCParticleWeightMap mcParticleWeightMap;
@@ -36,39 +61,25 @@ const MCParticle *MCParticleHelper::GetMainMCParticle(const Cluster *const pClus
         }
     }
 
-    const MCParticle *pMainMCParticle(NULL);
-    float energyOfSelectedMCParticle(0.f);
+    float bestWeight(0.f);
+    const MCParticle *pBestMCParticle(NULL);
 
     for (MCParticleWeightMap::const_iterator iter = mcParticleWeightMap.begin(), iterEnd = mcParticleWeightMap.end(); iter != iterEnd; ++iter)
     {
         const MCParticle *const pCurrentMCParticle = iter->first;
-        const float currentEnergy = iter->second;
+        const float currentWeight = iter->second;
 
-        if (currentEnergy > energyOfSelectedMCParticle)
+        if (currentWeight > bestWeight)
         {
-            pMainMCParticle = pCurrentMCParticle;
-            energyOfSelectedMCParticle = currentEnergy;
+            pBestMCParticle = pCurrentMCParticle;
+            bestWeight = currentWeight;
         }
     }
 
-    if (NULL == pMainMCParticle)
+    if (NULL == pBestMCParticle)
         throw StatusCodeException(STATUS_CODE_NOT_FOUND);
 
-    return pMainMCParticle;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode MCParticleHelper::ReadSettings(const TiXmlHandle *const /*pXmlHandle*/)
-{
-    /*TiXmlElement *pXmlElement(pXmlHandle->FirstChild("MCParticleHelper").Element());
-
-    if (NULL != pXmlElement)
-    {
-        const TiXmlHandle xmlHandle(pXmlElement);
-    }*/
-
-    return STATUS_CODE_SUCCESS;
+    return pBestMCParticle;
 }
 
 } // namespace pandora

@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Persistency/FileWriter.cc
+ *  @file   PandoraSDK/src/Persistency/FileWriter.cc
  * 
  *  @brief  Implementation of the file writer class.
  * 
@@ -9,12 +9,15 @@
 #include "Api/PandoraContentApi.h"
 #include "Api/PandoraContentApiImpl.h"
 
-#include "Helpers/GeometryHelper.h"
+#include "Managers/GeometryManager.h"
 
 #include "Objects/CaloHit.h"
 #include "Objects/DetectorGap.h"
 #include "Objects/MCParticle.h"
+#include "Objects/SubDetector.h"
 #include "Objects/Track.h"
+
+#include "Pandora/Pandora.h"
 
 #include "Persistency/FileWriter.h"
 
@@ -43,17 +46,7 @@ StatusCode FileWriter::WriteGeometry()
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSubDetector("InDetBarrel", &(GeometryHelper::GetInDetBarrelParameters())));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSubDetector("InDetEndCap", &(GeometryHelper::GetInDetEndCapParameters())));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSubDetector("ECalBarrel", &(GeometryHelper::GetECalBarrelParameters())));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSubDetector("ECalEndCap", &(GeometryHelper::GetECalEndCapParameters())));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSubDetector("HCalBarrel", &(GeometryHelper::GetHCalBarrelParameters())));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSubDetector("HCalEndCap", &(GeometryHelper::GetHCalEndCapParameters())));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSubDetector("MuonBarrel", &(GeometryHelper::GetMuonBarrelParameters())));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSubDetector("MuonEndCap", &(GeometryHelper::GetMuonEndCapParameters())));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteTracker());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteCoil())
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteAdditionalSubDetectors())
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSubDetectorList())
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteDetectorGapList());
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteFooter());
@@ -63,37 +56,19 @@ StatusCode FileWriter::WriteGeometry()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode FileWriter::WriteEvent(const bool writeMCRelationships, const bool writeTrackRelationships)
-{
-    std::string caloHitListName;
-    const CaloHitList *pCaloHitList = NULL;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->GetPandoraContentApiImpl()->GetCurrentList(pCaloHitList, caloHitListName));
-
-    std::string trackListName;
-    const TrackList *pTrackList = NULL;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->GetPandoraContentApiImpl()->GetCurrentList(pTrackList, trackListName));
-
-    return this->WriteEvent(*pCaloHitList, *pTrackList, writeMCRelationships, writeTrackRelationships);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode FileWriter::WriteEvent(const CaloHitList &caloHitList, const TrackList &trackList, const bool writeMCRelationships,
-    const bool writeTrackRelationships)
+StatusCode FileWriter::WriteEvent(const CaloHitList &caloHitList, const TrackList &trackList, const MCParticleList &mcParticleList,
+    const bool writeMCRelationships, const bool writeTrackRelationships)
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteHeader(EVENT));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteCaloHitList(caloHitList));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteTrackList(trackList));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteMCParticleList(mcParticleList));
 
     if (writeMCRelationships)
     {
-        std::string mcParticleListName;
-        const MCParticleList *pMCParticleList = NULL;
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->GetPandoraContentApiImpl()->GetCurrentList(pMCParticleList, mcParticleListName));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteMCParticleList(*pMCParticleList));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteCaloHitToMCParticleRelationships(caloHitList));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteTrackToMCParticleRelationships(trackList));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteMCParticleRelationships(*pMCParticleList));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteMCParticleRelationships(mcParticleList));
     }
 
     if (writeTrackRelationships)
@@ -108,11 +83,25 @@ StatusCode FileWriter::WriteEvent(const CaloHitList &caloHitList, const TrackLis
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode FileWriter::WriteSubDetectorList()
+{
+    const SubDetectorMap &subDetectorMap(m_pPandora->GetGeometry()->GetSubDetectorMap());
+
+    for (SubDetectorMap::const_iterator iter = subDetectorMap.begin(), iterEnd = subDetectorMap.end(); iter != iterEnd; ++iter)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSubDetector(iter->second));
+    }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode FileWriter::WriteDetectorGapList()
 {
-    const GeometryHelper::DetectorGapList &detectorGapList(GeometryHelper::GetDetectorGapList());
+    const DetectorGapList &detectorGapList(m_pPandora->GetGeometry()->GetDetectorGapList());
 
-    for (GeometryHelper::DetectorGapList::const_iterator iter = detectorGapList.begin(), iterEnd = detectorGapList.end(); iter != iterEnd; ++iter)
+    for (DetectorGapList::const_iterator iter = detectorGapList.begin(), iterEnd = detectorGapList.end(); iter != iterEnd; ++iter)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteDetectorGap(*iter));
     }

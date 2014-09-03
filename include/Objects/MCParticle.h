@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Objects/MCParticle.h
+ *  @file   PandoraSDK/include/Objects/MCParticle.h
  * 
  *  @brief  Header file for the mc particle class.
  * 
@@ -25,15 +25,6 @@ template<typename T> class InputObjectManager;
 class MCParticle 
 {
 public:
-
-    /**
-     *  @brief  Sort MCParticles by descending energy
-     * 
-     *  @param  pLhs address of first MCParticle
-     *  @param  pRhs address of second MCParticle
-     */
-    static bool SortByEnergy(const MCParticle *const pLhs, const MCParticle *const pRhs);
-
     /**
      *  @brief  Whether the mc particle is a root particle
      * 
@@ -220,13 +211,6 @@ private:
     friend class MCManager;
     friend class InputObjectManager<MCParticle>;
 };
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool MCParticle::SortByEnergy(const MCParticle *const pLhs, const MCParticle *const pRhs)
-{
-    return (pLhs->GetEnergy() > pRhs->GetEnergy());
-}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 

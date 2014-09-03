@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Helpers/XmlHelper.h
+ *  @file   PandoraSDK/include/Helpers/XmlHelper.h
  * 
  *  @brief  Header file for the xml helper class.
  * 
@@ -8,8 +8,8 @@
 #ifndef PANDORA_XML_HELPER_H
 #define PANDORA_XML_HELPER_H 1
 
-#include "Pandora/Algorithm.h"
-#include "Pandora/AlgorithmTool.h"
+#include "Objects/CartesianVector.h"
+#include "Objects/TrackState.h"
 
 #include "Pandora/PandoraInternal.h"
 #include "Pandora/StatusCodes.h"
@@ -97,7 +97,7 @@ public:
      *  @param  description the description attribute of the algorithm tool xml element
      *  @param  pAlgorithmTool to receive the address of the algorithm tool instance
      */
-    static StatusCode ProcessAlgorithmTool(Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &description,
+    static StatusCode ProcessAlgorithmTool(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &description,
         AlgorithmTool *&pAlgorithmTool);
 
     /**
@@ -107,7 +107,7 @@ public:
      *  @param  xmlHandle the relevant xml handle
      *  @param  pAlgorithmTool to receive the address of the algorithm tool instance
      */
-    static StatusCode ProcessFirstAlgorithmTool(Algorithm &algorithm, const TiXmlHandle &xmlHandle, AlgorithmTool *&pAlgorithmTool);
+    static StatusCode ProcessFirstAlgorithmTool(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, AlgorithmTool *&pAlgorithmTool);
 
     /**
      *  @brief  Process a list of algorithms tools in an xml file
@@ -117,7 +117,7 @@ public:
      *  @param  listName the name of the algorithm tool list
      *  @param  algorithmToolList to receive the list of addresses of the algorithm tool instances
      */
-    static StatusCode ProcessAlgorithmToolList(Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
+    static StatusCode ProcessAlgorithmToolList(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
         AlgorithmToolList &algorithmToolList);
 
     /**
@@ -298,7 +298,7 @@ inline StatusCode XmlHelper::ProcessFirstAlgorithm(const Algorithm &algorithm, c
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline StatusCode XmlHelper::ProcessFirstAlgorithmTool(Algorithm &algorithm, const TiXmlHandle &xmlHandle, AlgorithmTool *&pAlgorithmTool)
+inline StatusCode XmlHelper::ProcessFirstAlgorithmTool(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, AlgorithmTool *&pAlgorithmTool)
 {
     const std::string emptyDescription;
     return XmlHelper::ProcessAlgorithmTool(algorithm, xmlHandle, emptyDescription, pAlgorithmTool);

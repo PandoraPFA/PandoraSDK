@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Objects/Helix.cc
+ *  @file   PandoraSDK/src/Objects/Helix.cc
  * 
  *  @brief  Implementation of the helix class, based on marlin util helix class.
  * 
@@ -8,7 +8,9 @@
 
 #include "Objects/Helix.h"
 
+#include <cmath>
 #include <iostream>
+#include <limits>
 
 namespace pandora
 {
@@ -28,7 +30,7 @@ Helix::Helix(const float phi0, const float d0, const float z0, const float omega
     m_omega(omega),
     m_tanLambda(tanLambda)
 {
-    if ((0. >= bField) || (0. == omega))
+    if ((bField < std::numeric_limits<float>::epsilon()) || (std::fabs(omega) < std::numeric_limits<float>::epsilon()))
     {
         std::cout << "Helix, invalid parameter: bField " << bField << ", omega " << omega << std::endl;
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
@@ -60,7 +62,7 @@ Helix::Helix(const CartesianVector &position, const CartesianVector &momentum, c
     const double px(momentum.GetX()), py(momentum.GetY());
     const double pxy(std::sqrt(px * px + py * py));
 
-    if ((0. >= bField) || (0. == pxy))
+    if ((bField < std::numeric_limits<float>::epsilon()) || (std::fabs(pxy) < std::numeric_limits<float>::epsilon()))
     {
         std::cout << "Helix, invalid parameter: bField " << bField << ", pxy " << pxy << std::endl;
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
@@ -110,7 +112,7 @@ Helix::Helix(const CartesianVector &position, const CartesianVector &momentum, c
     float xCircles = (-position.GetZ() * charge) / (TWO_PI * ((m_radius * m_tanLambda) - deltaPhi));
 
     int n1, n2;
-    if (xCircles >= 0.)
+    if (xCircles >= std::numeric_limits<float>::epsilon())
     {
         n1 = static_cast<int>(xCircles);
         n2 = n1 + 1;
@@ -202,7 +204,7 @@ StatusCode Helix::GetPointInXY(const float x0, const float y0, const float ax, c
 StatusCode Helix::GetPointInZ(const float zPlane, const CartesianVector &referencePoint, CartesianVector &intersectionPoint,
     float &genericTime) const
 {
-    if (m_momentum.GetZ() == 0.)
+    if (std::fabs(m_momentum.GetZ()) < std::numeric_limits<float>::epsilon())
         return STATUS_CODE_NOT_FOUND;
 
     genericTime = (zPlane - referencePoint.GetZ()) / m_momentum.GetZ();
@@ -304,7 +306,7 @@ StatusCode Helix::GetDistanceToPoint(const CartesianVector &point, CartesianVect
         const float xCircles((phi0 - phi - m_charge * (point.GetZ() - m_referencePoint.GetZ()) / (m_tanLambda * m_radius)) / TWO_PI);
 
         int n1, n2;
-        if (xCircles >= 0.)
+        if (xCircles >= std::numeric_limits<float>::epsilon())
         {
             n1 = static_cast<int>(xCircles);
             n2 = n1 + 1;
@@ -381,7 +383,7 @@ StatusCode Helix::GetDistanceToHelix(const Helix *const pHelix, CartesianVector 
     }
     else
     {
-        if ((0. == distance) || (0. == rad2))
+        if ((std::fabs(distance) < std::numeric_limits<float>::epsilon()) || (std::fabs(rad2) < std::numeric_limits<float>::epsilon()))
             return STATUS_CODE_FAILURE;
 
         singlePoint = false;

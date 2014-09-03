@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Objects/MCParticle.cc
+ *  @file   PandoraSDK/src/Objects/MCParticle.cc
  * 
  *  @brief  Implementation of the mc particle class.
  * 

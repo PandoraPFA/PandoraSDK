@@ -1,5 +1,5 @@
 /**
- *  @file PandoraPFANew/Framework/src/Objects/CartesianVector.cc
+ *  @file PandoraSDK/src/Objects/CartesianVector.cc
  * 
  *  @brief Implementation of the cartesian vector class.
  * 

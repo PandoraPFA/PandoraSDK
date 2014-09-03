@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Pandora/PandoraImpl.cc
+ *  @file   PandoraSDK/src/Pandora/PandoraImpl.cc
  * 
  *  @brief  Implementation of the pandora impl class.
  * 
@@ -7,8 +7,6 @@
  */
 
 #include "Api/PandoraContentApiImpl.h"
-
-#include "Helpers/ReclusterHelper.h"
 
 #include "Managers/AlgorithmManager.h"
 #include "Managers/CaloHitManager.h"
@@ -57,10 +55,28 @@ StatusCode PandoraImpl::PrepareTracks() const
 
 StatusCode PandoraImpl::PrepareCaloHits() const
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->CreateInputList());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->CalculateCaloHitProperties());
+    return m_pPandora->m_pCaloHitManager->CreateInputList();
+}
 
-    return STATUS_CODE_SUCCESS;
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const StringVector &PandoraImpl::GetPandoraAlgorithms() const
+{
+    return m_pPandora->m_pAlgorithmManager->GetPandoraAlgorithms();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PandoraImpl::RunAlgorithm(const std::string &algorithmName) const
+{
+    return m_pPandora->m_pPandoraContentApiImpl->RunAlgorithm(algorithmName);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PandoraImpl::InitializeSettings(const TiXmlHandle *const pXmlHandle) const
+{
+    return m_pPandora->m_pPandoraSettings->Initialize(pXmlHandle);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -79,22 +95,6 @@ StatusCode PandoraImpl::InitializePlugins(const TiXmlHandle *const pXmlHandle) c
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraImpl::RunAlgorithm(const std::string &algorithmName) const
-{
-    return m_pPandora->m_pPandoraContentApiImpl->RunAlgorithm(algorithmName);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode PandoraImpl::RegisterResetFunction(ResetFunction *pResetFunction)
-{
-    m_resetFunctionVector.push_back(pResetFunction);
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 StatusCode PandoraImpl::ResetEvent() const
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->ResetForNextEvent());
@@ -103,13 +103,6 @@ StatusCode PandoraImpl::ResetEvent() const
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->ResetForNextEvent());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pTrackManager->ResetForNextEvent());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pVertexManager->ResetForNextEvent());
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, ReclusterHelper::ResetReclusterMonitoring());
-
-    for (ResetFunctionVector::const_iterator iter = m_resetFunctionVector.begin(), iterEnd = m_resetFunctionVector.end(); iter != iterEnd; ++iter)
-    {
-        (*iter)();
-    }
 
     return STATUS_CODE_SUCCESS;
 }

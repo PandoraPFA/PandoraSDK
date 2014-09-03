@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Objects/OrderedCaloHitList.cc
+ *  @file   PandoraSDK/src/Objects/OrderedCaloHitList.cc
  * 
  *  @brief  Implementation of the ordered calo hit list class.
  * 
@@ -91,7 +91,7 @@ StatusCode OrderedCaloHitList::Remove(const CaloHitList &caloHitList)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode OrderedCaloHitList::GetCaloHitsInPseudoLayer(const PseudoLayer pseudoLayer, CaloHitList *&pCaloHitList) const
+StatusCode OrderedCaloHitList::GetCaloHitsInPseudoLayer(const unsigned int pseudoLayer, CaloHitList *&pCaloHitList) const
 {
     OrderedCaloHitList::const_iterator iter = this->find(pseudoLayer);
 
@@ -105,7 +105,7 @@ StatusCode OrderedCaloHitList::GetCaloHitsInPseudoLayer(const PseudoLayer pseudo
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-unsigned int OrderedCaloHitList::GetNCaloHitsInPseudoLayer(const PseudoLayer pseudoLayer) const
+unsigned int OrderedCaloHitList::GetNCaloHitsInPseudoLayer(const unsigned int pseudoLayer) const
 {
     OrderedCaloHitList::const_iterator iter = this->find(pseudoLayer);
 
@@ -153,7 +153,7 @@ bool OrderedCaloHitList::operator= (const OrderedCaloHitList &rhs)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode OrderedCaloHitList::Add(CaloHit *const pCaloHit, const PseudoLayer pseudoLayer)
+StatusCode OrderedCaloHitList::Add(CaloHit *const pCaloHit, const unsigned int pseudoLayer)
 {
     TheList::iterator iter = m_theList.find(pseudoLayer);
 
@@ -184,7 +184,7 @@ StatusCode OrderedCaloHitList::Add(CaloHit *const pCaloHit, const PseudoLayer ps
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode OrderedCaloHitList::Remove(CaloHit *const pCaloHit, const PseudoLayer pseudoLayer)
+StatusCode OrderedCaloHitList::Remove(CaloHit *const pCaloHit, const unsigned int pseudoLayer)
 {
     TheList::iterator listIter = m_theList.find(pseudoLayer);
 

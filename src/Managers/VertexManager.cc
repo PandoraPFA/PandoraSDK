@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Managers/VertexManager.cc
+ *  @file   PandoraSDK/src/Managers/VertexManager.cc
  * 
  *  @brief  Implementation of the vertex manager class.
  * 
@@ -13,8 +13,8 @@
 namespace pandora
 {
 
-VertexManager::VertexManager() :
-    AlgorithmObjectManager<Vertex>()
+VertexManager::VertexManager(const Pandora *const pPandora) :
+    AlgorithmObjectManager<Vertex>(pPandora)
 {
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateInitialLists());
 }

@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Persistency/FileReader.h
+ *  @file   PandoraSDK/include/Persistency/FileReader.h
  * 
  *  @brief  Header file for the file reader class.
  * 
@@ -8,16 +8,18 @@
 #ifndef PANDORA_FILE_READER_H
 #define PANDORA_FILE_READER_H 1
 
-#include "Api/PandoraApi.h"
-
-#include "Pandora/Pandora.h"
-#include "Pandora/PandoraIO.h"
 #include "Pandora/StatusCodes.h"
+
+#include "Persistency/PandoraIO.h"
 
 #include <string>
 
 namespace pandora
 {
+
+class Pandora;
+
+//------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
  *  @brief  FileReader class
@@ -100,37 +102,7 @@ protected:
      */
     virtual StatusCode ReadNextEventComponent() = 0;
 
-    /**
-     *  @brief  Read the tracker parameters from the current position in the file
-     * 
-     *  @param  pGeometryParameters address of the geometry parameters
-     */
-    virtual StatusCode ReadTracker(PandoraApi::Geometry::Parameters *pGeometryParameters) = 0;
-
-    /**
-     *  @brief  Read the coil parameters from the current position in the file
-     * 
-     *  @param  pGeometryParameters address of the geometry parameters
-     */
-    virtual StatusCode ReadCoil(PandoraApi::Geometry::Parameters *pGeometryParameters) = 0;
-
-    /**
-     *  @brief  Read the additional sub detector parameters from the current position in the file
-     * 
-     *  @param  pGeometryParameters address of the geometry parameters
-     */
-    virtual StatusCode ReadAdditionalSubDetectors(PandoraApi::Geometry::Parameters *pGeometryParameters) = 0;
-
-    /**
-     *  @brief  Read a sub detector from the current position in the file
-     * 
-     *  @param  subDetectorName to receive the sub detector name
-     *  @param  pSubDetectorParameters address of the sub detector parameters to populate
-     *  @param  checkComponentId whether to check the component id before deserializing
-     */
-    virtual StatusCode ReadSubDetector(std::string &subDetectorName, PandoraApi::Geometry::Parameters::SubDetectorParameters *pSubDetectorParameters) = 0;
-
-    const pandora::Pandora *const   m_pPandora;             ///< Address of pandora instance to be used alongside the file reader
+    const Pandora *const            m_pPandora;             ///< Address of pandora instance to be used alongside the file reader
     ContainerId                     m_containerId;          ///< The type of container currently being read from file
     std::string                     m_fileName;             ///< The file name
 };

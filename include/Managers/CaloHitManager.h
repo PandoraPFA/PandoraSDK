@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Managers/CaloHitManager.h
+ *  @file   PandoraSDK/include/Managers/CaloHitManager.h
  * 
  *  @brief  Header file for the calo hit manager class.
  * 
@@ -27,9 +27,11 @@ class CaloHitManager : public InputObjectManager<CaloHit>
 {
 public:
     /**
-     *  @brief  Default constructor
+     *  @brief  Constructor
+     * 
+     *  @param  pPandora address of the associated pandora object
      */
-    CaloHitManager();
+    CaloHitManager(const Pandora *const pPandora);
 
      /**
      *  @brief  Destructor
@@ -55,12 +57,6 @@ private:
      */
     template <typename PARAMETERS>
     CaloHit *HitInstantiation(const PARAMETERS &parameters);
-
-    /**
-     *  @brief  Calculate calo hit properties for input calo hit list. The properties include density weights,
-     *          isolation flags, possible mip flags and surrounding energy
-     */
-    StatusCode CalculateCaloHitProperties() const;
 
     using InputObjectManager<CaloHit>::CreateTemporaryListAndSetCurrent;
 

@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Persistency/EventWritingAlgorithm.h
+ *  @file   PandoraSDK/include/Persistency/EventWritingAlgorithm.h
  * 
  *  @brief  Header file for the event writing algorithm class.
  * 
@@ -9,7 +9,8 @@
 #define EVENT_WRITING_ALGORITHM_H 1
 
 #include "Pandora/Algorithm.h"
-#include "Pandora/PandoraIO.h"
+
+#include "Persistency/PandoraIO.h"
 
 namespace pandora {class FileWriter;}
 

@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Persistency/FileReader.cc
+ *  @file   PandoraSDK/src/Persistency/FileReader.cc
  * 
  *  @brief  Implementation of the file reader class.
  * 
@@ -39,21 +39,6 @@ StatusCode FileReader::ReadGeometry()
 
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
-
-    std::string detectorName;
-    PandoraApi::Geometry::Parameters parameters;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadSubDetector(detectorName, &(parameters.m_inDetBarrelParameters)));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadSubDetector(detectorName, &(parameters.m_inDetEndCapParameters)));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadSubDetector(detectorName, &(parameters.m_eCalBarrelParameters)));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadSubDetector(detectorName, &(parameters.m_eCalEndCapParameters)));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadSubDetector(detectorName, &(parameters.m_hCalBarrelParameters)));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadSubDetector(detectorName, &(parameters.m_hCalEndCapParameters)));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadSubDetector(detectorName, &(parameters.m_muonBarrelParameters)));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadSubDetector(detectorName, &(parameters.m_muonEndCapParameters)));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadTracker(&parameters));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadCoil(&parameters));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadAdditionalSubDetectors(&parameters));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::Create(*m_pPandora, parameters));
 
     try
     {

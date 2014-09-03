@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Persistency/EventReadingAlgorithm.cc
+ *  @file   PandoraSDK/src/Persistency/EventReadingAlgorithm.cc
  * 
  *  @brief  Implementation of the event reading algorithm class.
  * 
@@ -32,17 +32,14 @@ StatusCode EventReadingAlgorithm::Initialize()
 {
     if (m_shouldReadGeometry)
     {
-        if (GeometryHelper::IsInitialized())
-            return STATUS_CODE_ALREADY_INITIALIZED;
-
         if (BINARY == m_geometryFileType)
         {
-            BinaryFileReader fileReader(*(this->GetPandora()), m_geometryFileName);
+            BinaryFileReader fileReader(this->GetPandora(), m_geometryFileName);
             PANDORA_RETURN_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, fileReader.ReadGeometry());
         }
         else if (XML == m_geometryFileType)
         {
-            XmlFileReader fileReader(*(this->GetPandora()), m_geometryFileName);
+            XmlFileReader fileReader(this->GetPandora(), m_geometryFileName);
             PANDORA_RETURN_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, fileReader.ReadGeometry());
         }
         else
@@ -55,11 +52,11 @@ StatusCode EventReadingAlgorithm::Initialize()
     {
         if (BINARY == m_eventFileType)
         {
-            m_pEventFileReader = new BinaryFileReader(*(this->GetPandora()), m_eventFileName);
+            m_pEventFileReader = new BinaryFileReader(this->GetPandora(), m_eventFileName);
         }
         else if (XML == m_eventFileType)
         {
-            m_pEventFileReader = new XmlFileReader(*(this->GetPandora()), m_eventFileName);
+            m_pEventFileReader = new XmlFileReader(this->GetPandora(), m_eventFileName);
         }
         else
         {

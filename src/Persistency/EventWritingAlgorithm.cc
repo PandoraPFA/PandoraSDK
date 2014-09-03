@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Persistency/EventWritingAlgorithm.cc
+ *  @file   PandoraSDK/src/Persistency/EventWritingAlgorithm.cc
  * 
  *  @brief  Implementation of the event writing algorithm class.
  * 
@@ -32,19 +32,16 @@ StatusCode EventWritingAlgorithm::Initialize()
 {
     if (m_shouldWriteGeometry)
     {
-        if (!GeometryHelper::IsInitialized())
-            return STATUS_CODE_NOT_INITIALIZED;
-
         const FileMode fileMode(m_shouldOverwriteGeometryFile ? OVERWRITE : APPEND);
 
         if (BINARY == m_geometryFileType)
         {
-            BinaryFileWriter geometryFileWriter(*(this->GetPandora()), m_geometryFileName, fileMode);
+            BinaryFileWriter geometryFileWriter(this->GetPandora(), m_geometryFileName, fileMode);
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, geometryFileWriter.WriteGeometry());
         }
         else if (XML == m_geometryFileType)
         {
-            XmlFileWriter geometryFileWriter(*(this->GetPandora()), m_geometryFileName, fileMode);
+            XmlFileWriter geometryFileWriter(this->GetPandora(), m_geometryFileName, fileMode);
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, geometryFileWriter.WriteGeometry());
         }
         else
@@ -59,11 +56,11 @@ StatusCode EventWritingAlgorithm::Initialize()
 
         if (BINARY == m_eventFileType)
         {
-            m_pEventFileWriter = new BinaryFileWriter(*(this->GetPandora()), m_eventFileName, fileMode);
+            m_pEventFileWriter = new BinaryFileWriter(this->GetPandora(), m_eventFileName, fileMode);
         }
         else if (XML == m_eventFileType)
         {
-            m_pEventFileWriter = new XmlFileWriter(*(this->GetPandora()), m_eventFileName, fileMode);
+            m_pEventFileWriter = new XmlFileWriter(this->GetPandora(), m_eventFileName, fileMode);
         }
         else
         {
@@ -80,8 +77,17 @@ StatusCode EventWritingAlgorithm::Run()
 {
     if ((NULL != m_pEventFileWriter) && m_shouldWriteEvents)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pEventFileWriter->WriteEvent(m_shouldWriteMCRelationships,
-            m_shouldWriteTrackRelationships));
+        const CaloHitList *pCaloHitList = NULL;
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pCaloHitList));
+
+        const TrackList *pTrackList = NULL;
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pTrackList));
+
+        const MCParticleList *pMCParticleList = NULL;
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pMCParticleList));
+
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pEventFileWriter->WriteEvent(*pCaloHitList, *pTrackList, *pMCParticleList,
+            m_shouldWriteMCRelationships, m_shouldWriteTrackRelationships));
     }
 
     return STATUS_CODE_SUCCESS;

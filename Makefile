@@ -13,6 +13,7 @@ SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Managers/*.cc)
 SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Objects/*.cc)
 SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Pandora/*.cc)
 SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Persistency/*.cc)
+SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Plugins/*.cc)
 SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Xml/*.cc)
 
 OBJECTS = $(SOURCES:.cc=.o)

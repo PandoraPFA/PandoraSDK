@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Api/PandoraApiImpl.h
+ *  @file   PandoraSDK/include/Api/PandoraApiImpl.h
  *
  *  @brief  Header file for the pandora api implementation class.
  * 
@@ -22,7 +22,7 @@ class Pandora;
  */
 class PandoraApiImpl
 {
-public:
+private:
     /**
      *  @brief  Create an object for pandora
      * 
@@ -120,27 +120,6 @@ public:
     StatusCode GetPfoList(const std::string &pfoListName, const PfoList *&pPfoList) const;
 
     /**
-     *  @brief  Set the bfield calculator used by pandora
-     * 
-     *  @param  pBFieldCalculator address of the bfield calculator
-     */
-    StatusCode SetBFieldCalculator(BFieldCalculator *pBFieldCalculator) const;
-
-    /**
-     *  @brief  Set the pseudo layer calculator used by pandora
-     * 
-     *  @param  pPseudoLayerCalculator address of the pseudo layer calculator
-     */
-    StatusCode SetPseudoLayerCalculator(PseudoLayerCalculator *pPseudoLayerCalculator) const;
-
-    /**
-     *  @brief  Set the shower profile calculator used by pandora
-     * 
-     *  @param  pPseudoLayerCalculator address of the pseudo layer calculator
-     */
-    StatusCode SetShowerProfileCalculator(ShowerProfileCalculator *pShowerProfileCalculator) const;
-
-    /**
      *  @brief  Set the granularity level to be associated with a specified hit type
      * 
      *  @param  hitType the specified hit type
@@ -149,56 +128,49 @@ public:
     StatusCode SetHitTypeGranularity(const HitType hitType, const Granularity granularity) const;
 
     /**
-     *  @brief  Register an energy correction function
+     *  @brief  Set the bfield plugin used by pandora
      * 
-     *  @param  functionName the name/label associated with the energy correction function
+     *  @param  pBFieldPlugin address of the bfield plugin (will pass ownership to pandora)
+     */
+    StatusCode SetBFieldPlugin(BFieldPlugin *pBFieldPlugin) const;
+
+    /**
+     *  @brief  Set the pseudo layer plugin used by pandora
+     * 
+     *  @param  pPseudoLayerPlugin address of the pseudo layer plugin (will pass ownership to pandora)
+     */
+    StatusCode SetPseudoLayerPlugin(PseudoLayerPlugin *pPseudoLayerPlugin) const;
+
+    /**
+     *  @brief  Set the shower profile plugin used by pandora
+     * 
+     *  @param  pPseudoLayerPlugin address of the pseudo layer plugin (will pass ownership to pandora)
+     */
+    StatusCode SetShowerProfilePlugin(ShowerProfilePlugin *pShowerProfilePlugin) const;
+
+    /**
+     *  @brief  Register an energy correction plugin
+     * 
+     *  @param  name the name/label associated with the energy correction plugin
      *  @param  energyCorrectionType the energy correction type
-     *  @param  energyCorrectionFunction pointer to an energy correction function
+     *  @param  pEnergyCorrectionPlugin address of the energy correction plugin (will pass ownership to pandora)
      */
-    StatusCode RegisterEnergyCorrectionFunction(const std::string &functionName, const EnergyCorrectionType energyCorrectionType,
-        EnergyCorrectionFunction *pEnergyCorrectionFunction) const;
+    StatusCode RegisterEnergyCorrectionPlugin(const std::string &name, const EnergyCorrectionType energyCorrectionType,
+        EnergyCorrectionPlugin *pEnergyCorrectionPlugin) const;
 
     /**
-     *  @brief  Register a particle id function
+     *  @brief  Register a particle id plugin
      * 
-     *  @param  functionName the name/label associated with the particle id function
-     *  @param  particleIdFunction pointer to a particle id function
+     *  @param  functionName the name/label associated with the particle id plugin
+     *  @param  pParticleIdPlugin address of the particle id plugin (will pass ownership to pandora)
      */
-    StatusCode RegisterParticleIdFunction(const std::string &functionName, ParticleIdFunction *pParticleIdFunction) const;
-
-    /**
-     *  @brief  Register a pandora settings function to e.g. read settings for a registered particle id or energy correction function
-     * 
-     *  @param  xmlTagName the name of the xml tag (within the <pandora></pandora> tags) containing the settings
-     *  @param  pSettingsFunction pointer to the pandora settings function
-     */
-    StatusCode RegisterSettingsFunction(const std::string &xmlTagName, SettingsFunction *pSettingsFunction) const;
-
-    /**
-     *  @brief  Register a reset function which will be called whenever the client application resets pandora to process another event
-     * 
-     *  @param  pResetFunction pointer to the reset function
-     */
-    StatusCode RegisterResetFunction(ResetFunction *pResetFunction) const;
-
-    /**
-     *  @brief  Get the recluster monitoring results, recording the changes in the energy associated with a specific track during
-     *          the pandora reclustering phase
-     * 
-     *  @param  pTrackParentAddress address of track in the user framework
-     *  @param  netEnergyChange to receive the net change in energy associated with the track during reclustering
-     *  @param  sumModulusEnergyChanges to receive the sum of the moduli of energy changes during reclustering
-     *  @param  sumSquaredEnergyChanges to receive the sum of the squared energy changes during reclustering
-     */
-    StatusCode GetReclusterMonitoringResults(const void *pTrackParentAddress, float &netEnergyChange, float &sumModulusEnergyChanges,
-        float &sumSquaredEnergyChanges) const;
+    StatusCode RegisterParticleIdPlugin(const std::string &name, ParticleIdPlugin *pParticleIdPlugin) const;
 
     /**
      *  @brief  Reset pandora to process another event
      */
     StatusCode ResetEvent() const;
 
-private:
     /**
      *  @brief  Constructor
      * 
@@ -209,6 +181,8 @@ private:
     Pandora    *m_pPandora;    ///< The pandora object to provide an interface to
 
     friend class Pandora;
+    friend class PandoraImpl;
+    friend class ::PandoraApi;
 };
 
 } // namespace pandora
