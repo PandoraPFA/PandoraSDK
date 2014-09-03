@@ -1,20 +1,23 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Managers/TrackManager.cc
+ *  @file   PandoraSDK/src/Managers/TrackManager.cc
  * 
  *  @brief  Implementation of the track manager class.
  * 
  *  $Log: $
  */
 
+#include "Managers/PluginManager.h"
 #include "Managers/TrackManager.h"
 
 #include "Objects/Track.h"
 
+#include "Plugins/BFieldPlugin.h"
+
 namespace pandora
 {
 
-TrackManager::TrackManager() :
-    InputObjectManager<Track>()
+TrackManager::TrackManager(const Pandora *const pPandora) :
+    InputObjectManager<Track>(pPandora)
 {
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateInitialLists());
 }
@@ -34,7 +37,7 @@ StatusCode TrackManager::CreateTrack(const PandoraApi::Track::Parameters &parame
 
     try
     {
-        pTrack = new Track(parameters);
+        pTrack = new Track(parameters, m_pPandora->GetPlugins()->GetBFieldPlugin()->GetBField(CartesianVector(0.f, 0.f, 0.f)));
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
 

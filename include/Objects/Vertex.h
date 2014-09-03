@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Objects/Vertex.h
+ *  @file   PandoraSDK/include/Objects/Vertex.h
  * 
  *  @brief  Header file for the vertex class.
  * 

@@ -1,17 +1,22 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Objects/Cluster.cc
+ *  @file   PandoraSDK/src/Objects/Cluster.cc
  * 
  *  @brief  Implementation of the cluster class.
  * 
  *  $Log: $
  */
 
-#include "Helpers/EnergyCorrectionsHelper.h"
-#include "Helpers/ParticleIdHelper.h"
+#include "Managers/PluginManager.h"
 
 #include "Objects/CaloHit.h"
 #include "Objects/Cluster.h"
 #include "Objects/Track.h"
+
+#include "Pandora/Pandora.h"
+
+#include "Plugins/EnergyCorrectionsPlugin.h"
+#include "Plugins/ParticleIdPlugin.h"
+#include "Plugins/ShowerProfilePlugin.h"
 
 namespace pandora
 {
@@ -73,7 +78,7 @@ StatusCode Cluster::AddCaloHit(CaloHit *const pCaloHit)
     m_electromagneticEnergy += pCaloHit->GetElectromagneticEnergy();
     m_hadronicEnergy += pCaloHit->GetHadronicEnergy();
 
-    const PseudoLayer pseudoLayer(pCaloHit->GetPseudoLayer());
+    const unsigned int pseudoLayer(pCaloHit->GetPseudoLayer());
     OrderedCaloHitList::const_iterator iter = m_orderedCaloHitList.find(pseudoLayer);
 
     if ((m_orderedCaloHitList.end() != iter) && (iter->second->size() > 1))
@@ -121,7 +126,7 @@ StatusCode Cluster::RemoveCaloHit(CaloHit *const pCaloHit)
     m_electromagneticEnergy -= pCaloHit->GetElectromagneticEnergy();
     m_hadronicEnergy -= pCaloHit->GetHadronicEnergy();
 
-    const PseudoLayer pseudoLayer(pCaloHit->GetPseudoLayer());
+    const unsigned int pseudoLayer(pCaloHit->GetPseudoLayer());
 
     if (m_orderedCaloHitList.end() != m_orderedCaloHitList.find(pseudoLayer))
     {
@@ -187,43 +192,7 @@ StatusCode Cluster::RemoveIsolatedCaloHit(CaloHit *const pCaloHit)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool Cluster::ContainsHitInOuterSamplingLayer() const
-{
-    for (OrderedCaloHitList::const_reverse_iterator iter = m_orderedCaloHitList.rbegin(), iterEnd = m_orderedCaloHitList.rend();
-        iter != iterEnd; ++iter)
-    {
-        for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd;
-            ++hitIter)
-        {
-            if ((*hitIter)->IsInOuterSamplingLayer())
-                return true;
-        }
-    }
-
-    return false;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-bool Cluster::ContainsHitType(const HitType hitType) const
-{
-    for (OrderedCaloHitList::const_reverse_iterator iter = m_orderedCaloHitList.rbegin(), iterEnd = m_orderedCaloHitList.rend();
-        iter != iterEnd; ++iter)
-    {
-        for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd;
-            ++hitIter)
-        {
-            if (hitType == (*hitIter)->GetHitType())
-                return true;
-        }
-    }
-
-    return false;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-const CartesianVector Cluster::GetCentroid(const PseudoLayer pseudoLayer) const
+const CartesianVector Cluster::GetCentroid(const unsigned int pseudoLayer) const
 {
     OrderedCaloHitList::const_iterator iter = m_orderedCaloHitList.find(pseudoLayer);
 
@@ -248,65 +217,9 @@ const CartesianVector Cluster::GetCentroid(const PseudoLayer pseudoLayer) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::PerformEnergyCorrections() const
-{
-    float correctedElectromagneticEnergy(0.f), correctedHadronicEnergy(0.f), trackComparisonEnergy(0.f);
-
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, EnergyCorrectionsHelper::EnergyCorrection(this, correctedElectromagneticEnergy,
-        correctedHadronicEnergy));
-
-    if (ParticleIdHelper::IsEmShowerFast(this))
-    {
-        trackComparisonEnergy = correctedElectromagneticEnergy;
-    }
-    else
-    {
-        trackComparisonEnergy = correctedHadronicEnergy;
-    }
-
-    if (!(m_correctedElectromagneticEnergy = correctedElectromagneticEnergy) || !(m_correctedHadronicEnergy = correctedHadronicEnergy) ||
-        !(m_trackComparisonEnergy = trackComparisonEnergy))
-    {
-        throw StatusCodeException(STATUS_CODE_FAILURE);
-    }
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void Cluster::CalculateFastPhotonFlag() const
-{
-    const bool fastPhotonFlag(ParticleIdHelper::IsPhotonFast(this));
-
-    if (!(m_isPhotonFast = fastPhotonFlag))
-        throw StatusCodeException(STATUS_CODE_FAILURE);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void Cluster::CalculateShowerStartLayer() const
-{
-    const PseudoLayer showerStartLayer(ClusterHelper::GetShowerStartLayer(this));
-
-    if (!(m_showerStartLayer = showerStartLayer))
-        throw StatusCodeException(STATUS_CODE_FAILURE);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void Cluster::CalculateShowerProfile() const
-{
-    float showerProfileStart(std::numeric_limits<float>::max()), showerProfileDiscrepancy(std::numeric_limits<float>::max());
-    ParticleIdHelper::CalculateLongitudinalProfile(this, showerProfileStart, showerProfileDiscrepancy);
-
-    if (!(m_showerProfileStart = showerProfileStart) || !(m_showerProfileDiscrepancy = showerProfileDiscrepancy))
-        throw StatusCodeException(STATUS_CODE_FAILURE);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 void Cluster::CalculateFitToAllHitsResult() const
 {
-    (void) ClusterHelper::FitFullCluster(this, m_fitToAllHitsResult);
+    (void) ClusterFitHelper::FitFullCluster(this, m_fitToAllHitsResult);
     m_isFitUpToDate = true;
 }
 
@@ -333,7 +246,7 @@ void Cluster::CalculateInitialDirection() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::CalculateLayerHitType(const PseudoLayer pseudoLayer, InputHitType &layerHitType) const
+void Cluster::CalculateLayerHitType(const unsigned int pseudoLayer, InputHitType &layerHitType) const
 {
     OrderedCaloHitList::const_iterator listIter = m_orderedCaloHitList.find(pseudoLayer);
 
@@ -370,6 +283,69 @@ void Cluster::CalculateLayerHitType(const PseudoLayer pseudoLayer, InputHitType 
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+void Cluster::PerformEnergyCorrections(const Pandora &pandora) const
+{
+    const EnergyCorrections *pEnergyCorrections(pandora.GetPlugins()->GetEnergyCorrections());
+    const ParticleId *pParticleId(pandora.GetPlugins()->GetParticleId());
+
+    float correctedElectromagneticEnergy(0.f), correctedHadronicEnergy(0.f), trackComparisonEnergy(0.f);
+    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pEnergyCorrections->MakeEnergyCorrections(this, correctedElectromagneticEnergy,
+        correctedHadronicEnergy));
+
+    if (pParticleId->IsEmShower(this))
+    {
+        trackComparisonEnergy = correctedElectromagneticEnergy;
+    }
+    else
+    {
+        trackComparisonEnergy = correctedHadronicEnergy;
+    }
+
+    if (!(m_correctedElectromagneticEnergy = correctedElectromagneticEnergy) || !(m_correctedHadronicEnergy = correctedHadronicEnergy) ||
+        !(m_trackComparisonEnergy = trackComparisonEnergy))
+    {
+        throw StatusCodeException(STATUS_CODE_FAILURE);
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void Cluster::CalculateFastPhotonFlag(const Pandora &pandora) const
+{
+    const bool fastPhotonFlag(pandora.GetPlugins()->GetParticleId()->IsPhoton(this));
+
+    if (!(m_isPhotonFast = fastPhotonFlag))
+        throw StatusCodeException(STATUS_CODE_FAILURE);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void Cluster::CalculateShowerStartLayer(const Pandora &pandora) const
+{
+    const ShowerProfilePlugin *pShowerProfilePlugin(pandora.GetPlugins()->GetShowerProfilePlugin());
+
+    unsigned int showerStartLayer(std::numeric_limits<unsigned int>::max());
+    pShowerProfilePlugin->CalculateShowerStartLayer(this, showerStartLayer);
+
+    if (!(m_showerStartLayer = showerStartLayer))
+        throw StatusCodeException(STATUS_CODE_FAILURE);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void Cluster::CalculateShowerProfile(const Pandora &pandora) const
+{
+    const ShowerProfilePlugin *pShowerProfilePlugin(pandora.GetPlugins()->GetShowerProfilePlugin());
+
+    float showerProfileStart(std::numeric_limits<float>::max()), showerProfileDiscrepancy(std::numeric_limits<float>::max());
+    pShowerProfilePlugin->CalculateLongitudinalProfile(this, showerProfileStart, showerProfileDiscrepancy);
+
+    if (!(m_showerProfileStart = showerProfileStart) || !(m_showerProfileDiscrepancy = showerProfileDiscrepancy))
+        throw StatusCodeException(STATUS_CODE_FAILURE);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode Cluster::ResetProperties()
 {
     if (!m_orderedCaloHitList.empty())
@@ -389,8 +365,6 @@ StatusCode Cluster::ResetProperties()
 
     m_innerPseudoLayer.Reset();
     m_outerPseudoLayer.Reset();
-
-    m_currentFitResult.Reset();
 
     m_isFixedPhoton = false;
     m_isFixedElectron = false;
@@ -429,7 +403,7 @@ StatusCode Cluster::AddHitsFromSecondCluster(Cluster *const pCluster)
     // Loop over pseudo layers in second cluster
     for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
     {
-        const PseudoLayer pseudoLayer(iter->first);
+        const unsigned int pseudoLayer(iter->first);
         OrderedCaloHitList::const_iterator currentIter = m_orderedCaloHitList.find(pseudoLayer);
 
         if ((m_orderedCaloHitList.end() != currentIter) && (currentIter->second->size() > 1))

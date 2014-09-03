@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Objects/TrackState.h
+ *  @file   PandoraSDK/include/Objects/TrackState.h
  * 
  *  @brief  Header file for the track state class.
  * 

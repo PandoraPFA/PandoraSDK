@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Persistency/EventReadingAlgorithm.h
+ *  @file   PandoraSDK/include/Persistency/EventReadingAlgorithm.h
  * 
  *  @brief  Header file for the event reading algorithm class.
  * 
@@ -9,7 +9,8 @@
 #define EVENT_READING_ALGORITHM_H 1
 
 #include "Pandora/Algorithm.h"
-#include "Pandora/PandoraIO.h"
+
+#include "Persistency/PandoraIO.h"
 
 namespace pandora {class FileReader;}
 

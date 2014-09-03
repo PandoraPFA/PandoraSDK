@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Objects/Cluster.h
+ *  @file   PandoraSDK/include/Objects/Cluster.h
  * 
  *  @brief  Header file for the cluster class.
  * 
@@ -10,7 +10,7 @@
 
 #include "Api/PandoraContentApi.h"
 
-#include "Helpers/ClusterHelper.h"
+#include "Helpers/ClusterFitHelper.h"
 
 #include "Objects/OrderedCaloHitList.h"
 
@@ -19,6 +19,7 @@
 namespace pandora
 {
 
+class Pandora;
 template<typename T> class AlgorithmObjectManager;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -29,30 +30,6 @@ template<typename T> class AlgorithmObjectManager;
 class Cluster
 {
 public:
-    /**
-     *  @brief  Sort clusters by descending hadronic energy
-     * 
-     *  @param  pLhs address of first cluster
-     *  @param  pRhs address of second cluster
-     */
-    static bool SortByHadronicEnergy(const Cluster *const pLhs, const Cluster *const pRhs);
-
-    /**
-     *  @brief  Sort clusters by descending electromagnetic energy
-     * 
-     *  @param  pLhs address of first cluster
-     *  @param  pRhs address of second cluster
-     */
-    static bool SortByElectromagneticEnergy(const Cluster *const pLhs, const Cluster *const pRhs);
-
-    /**
-     *  @brief  Sort clusters by ascending inner layer, and by hadronic energy within a layer
-     * 
-     *  @param  pLhs address of first cluster
-     *  @param  pRhs address of second cluster
-     */
-    static bool SortByInnerLayer(const Cluster *const pLhs, const Cluster *const pRhs);
-
     /**
      *  @brief  Get the ordered calo hit list
      * 
@@ -145,13 +122,6 @@ public:
     bool IsFixedMuon() const;
 
     /**
-     *  @brief  Whether the cluster has been flagged as a section of mip track
-     * 
-     *  @return boolean
-     */
-    bool IsMipTrack() const;
-
-    /**
      *  @brief  Whether the cluster is track seeded
      * 
      *  @return boolean 
@@ -170,30 +140,14 @@ public:
      * 
      *  @return The innermost pseudo layer in the cluster
      */
-    PseudoLayer GetInnerPseudoLayer() const;
+    unsigned int GetInnerPseudoLayer() const;
 
     /**
      *  @brief  Get the outermost pseudo layer in the cluster
      * 
      *  @return The outermost pseudo layer in the cluster
      */
-    PseudoLayer GetOuterPseudoLayer() const;
-
-    /**
-     *  @brief  Whether the cluster contains a calo hit flagged as being in an outer sampling layer
-     * 
-     *  @return boolean
-     */
-    bool ContainsHitInOuterSamplingLayer() const;
-
-    /**
-     *  @brief  Whether the cluster contains a calo hit of the specified hit type
-     * 
-     *  @param  hitType the hit type
-     * 
-     *  @return boolean
-     */
-    bool ContainsHitType(const HitType hitType) const;
+    unsigned int GetOuterPseudoLayer() const;
 
     /**
      *  @brief  Get unweighted centroid for cluster at a particular pseudo layer, calculated using cached values of hit coordinate sums
@@ -202,7 +156,7 @@ public:
      * 
      *  @return The unweighted centroid, returned by value
      */
-    const CartesianVector GetCentroid(const PseudoLayer pseudoLayer) const;
+    const CartesianVector GetCentroid(const unsigned int pseudoLayer) const;
 
     /**
      *  @brief  Get the initial direction of the cluster
@@ -212,69 +166,11 @@ public:
     const CartesianVector &GetInitialDirection() const;
 
     /**
-     *  @brief  Get the current linear fit result, usually set by a clustering algorithm, as cluster grows
-     * 
-     *  @return The cluster fit result
-     */
-    const ClusterHelper::ClusterFitResult &GetCurrentFitResult() const;
-
-    /**
      *  @brief  Get the result of a linear fit to all calo hits in the cluster
      * 
      *  @return The cluster fit result
      */
-    const ClusterHelper::ClusterFitResult &GetFitToAllHitsResult() const;
-
-    /**
-     *  @brief  Get the corrected electromagnetic estimate of the cluster energy, units GeV
-     * 
-     *  @return The corrected electromagnetic energy estimate
-     */
-    float GetCorrectedElectromagneticEnergy() const;
-
-    /**
-     *  @brief  Get the corrected hadronic estimate of the cluster energy, units GeV
-     * 
-     *  @return The corrected hadronic energy estimate
-     */
-    float GetCorrectedHadronicEnergy() const;
-
-    /**
-     *  @brief  Get the best energy estimate to use when comparing cluster energy to associated track momentum, units GeV.
-     *          For clusters identified as electromagnetic showers, the corrected electromagnetic energy will be returned.
-     *          For all other clusters, the corrected hadronic energy will be returned.
-     * 
-     *  @return The track comparison energy estimate
-     */
-    float GetTrackComparisonEnergy() const;
-
-    /**
-     *  @brief  Whether the cluster has been flagged as a photon by fast photon id function
-     * 
-     *  @return boolean
-     */
-    bool IsPhotonFast() const;
-
-    /**
-     *  @brief  Get the pseudo layer at which shower commences
-     * 
-     *  @return The pseudo layer at which shower commences
-     */
-    PseudoLayer GetShowerStartLayer() const;
-
-    /**
-     *  @brief  Get the cluster shower profile start, units radiation lengths
-     * 
-     *  @return The cluster shower profile start
-     */
-    float GetShowerProfileStart() const;
-
-    /**
-     *  @brief  Get the cluster shower profile discrepancy
-     * 
-     *  @return The cluster shower profile discrepancy
-     */
-    float GetShowerProfileDiscrepancy() const;
+    const ClusterFitResult &GetFitToAllHitsResult() const;
 
     /**
      *  @brief  Get the typical inner layer hit type
@@ -319,26 +215,76 @@ public:
     void SetIsFixedMuonFlag(bool isFixedMuonFlag);
 
     /**
-     *  @brief  Set the is mip track for the cluster
-     * 
-     *  @param  isMipTrackFlag the is mip track flag
-     */
-    void SetIsMipTrackFlag(bool isMipTrackFlag);
-
-    /**
-     *  @brief  Set the result of the current linear fit to the cluster. This function is usually called by a clustering
-     *          algorithm, as the cluster grows
-     * 
-     *  @param  currentFitResult the current fit result
-     */
-    void SetCurrentFitResult(const ClusterHelper::ClusterFitResult &currentFitResult);
-
-    /**
      *  @brief  Whether the cluster is available to be added to a particle flow object
      * 
      *  @return boolean
      */
     bool IsAvailable() const;
+
+    /**
+     *  @brief  Get the corrected electromagnetic estimate of the cluster energy, units GeV
+     * 
+     *  @param  pandora the associated pandora instance
+     * 
+     *  @return The corrected electromagnetic energy estimate
+     */
+    float GetCorrectedElectromagneticEnergy(const Pandora &pandora) const;
+
+    /**
+     *  @brief  Get the corrected hadronic estimate of the cluster energy, units GeV
+     * 
+     *  @param  pandora the associated pandora instance
+     * 
+     *  @return The corrected hadronic energy estimate
+     */
+    float GetCorrectedHadronicEnergy(const Pandora &pandora) const;
+
+    /**
+     *  @brief  Get the best energy estimate to use when comparing cluster energy to associated track momentum, units GeV.
+     *          For clusters identified as electromagnetic showers, the corrected electromagnetic energy will be returned.
+     *          For all other clusters, the corrected hadronic energy will be returned.
+     * 
+     *  @param  pandora the associated pandora instance
+     * 
+     *  @return The track comparison energy estimate
+     */
+    float GetTrackComparisonEnergy(const Pandora &pandora) const;
+
+    /**
+     *  @brief  Whether the cluster has been flagged as a photon by photon id function
+     * 
+     *  @param  pandora the associated pandora instance
+     * 
+     *  @return boolean
+     */
+    bool IsPhotonFast(const Pandora &pandora) const;
+
+    /**
+     *  @brief  Get the pseudo layer at which shower commences
+     * 
+     *  @param  pandora the associated pandora instance
+     * 
+     *  @return The pseudo layer at which shower commences
+     */
+    unsigned int GetShowerStartLayer(const Pandora &pandora) const;
+
+    /**
+     *  @brief  Get the cluster shower profile start, units radiation lengths
+     * 
+     *  @param  pandora the associated pandora instance
+     * 
+     *  @return The cluster shower profile start
+     */
+    float GetShowerProfileStart(const Pandora &pandora) const;
+
+    /**
+     *  @brief  Get the cluster shower profile discrepancy
+     * 
+     *  @param  pandora the associated pandora instance
+     * 
+     *  @return The cluster shower profile discrepancy
+     */
+    float GetShowerProfileDiscrepancy(const Pandora &pandora) const;
 
 private:
     /**
@@ -382,26 +328,6 @@ private:
     StatusCode RemoveIsolatedCaloHit(CaloHit *const pCaloHit);
 
     /**
-     *  @brief  PerformClusterEnergyCorrections
-     */
-    void PerformEnergyCorrections() const;
-
-    /**
-     *  @brief  Calculate the fast photon flag
-     */
-    void CalculateFastPhotonFlag() const;
-
-    /**
-     *  @brief  Calculate the pseudo layer at which shower commences
-     */
-    void CalculateShowerStartLayer() const;
-
-    /**
-     *  @brief  Calculate shower profile and compare it with the expected profile for a photon
-     */
-    void CalculateShowerProfile() const;
-
-    /**
      *  @brief  Calculate result of a linear fit to all calo hits in the cluster
      */
     void CalculateFitToAllHitsResult() const;
@@ -417,7 +343,35 @@ private:
      *  @param  pseudoLayer the pseudo layer
      *  @param  layerHitType to receive the typical layer hit type
      */
-    void CalculateLayerHitType(const PseudoLayer pseudoLayer, InputHitType &layerHitType) const;
+    void CalculateLayerHitType(const unsigned int pseudoLayer, InputHitType &layerHitType) const;
+
+    /**
+     *  @brief  PerformClusterEnergyCorrections
+     * 
+     *  @param  pandora the associated pandora instance
+     */
+    void PerformEnergyCorrections(const Pandora &pandora) const;
+
+    /**
+     *  @brief  Calculate the fast photon flag
+     * 
+     *  @param  pandora the associated pandora instance
+     */
+    void CalculateFastPhotonFlag(const Pandora &pandora) const;
+
+    /**
+     *  @brief  Calculate the pseudo layer at which shower commences
+     * 
+     *  @param  pandora the associated pandora instance
+     */
+    void CalculateShowerStartLayer(const Pandora &pandora) const;
+
+    /**
+     *  @brief  Calculate shower profile and compare it with the expected profile for a photon
+     * 
+     *  @param  pandora the associated pandora instance
+     */
+    void CalculateShowerProfile(const Pandora &pandora) const;
 
     /**
      *  @brief  Reset all cluster properties
@@ -462,8 +416,7 @@ private:
      */
     void SetAvailability(bool isAvailable);
 
-    typedef std::map<PseudoLayer, double> ValueByPseudoLayerMap;///< The value by pseudo layer typedef
-    typedef ClusterHelper::ClusterFitResult ClusterFitResult;   ///< The cluster fit result typedef
+    typedef std::map<unsigned int, double> ValueByPseudoLayerMap;///< The value by pseudo layer typedef
     typedef std::map<HitType, float> HitTypeToEnergyMap;        ///< The hit type to energy map typedef
 
     OrderedCaloHitList          m_orderedCaloHitList;           ///< The ordered calo hit list
@@ -488,13 +441,11 @@ private:
     ValueByPseudoLayerMap       m_sumYByPseudoLayer;            ///< The sum of the y coordinates of the calo hits, stored by pseudo layer
     ValueByPseudoLayerMap       m_sumZByPseudoLayer;            ///< The sum of the z coordinates of the calo hits, stored by pseudo layer
 
-    InputPseudoLayer            m_innerPseudoLayer;             ///< The innermost pseudo layer in the cluster
-    InputPseudoLayer            m_outerPseudoLayer;             ///< The outermost pseudo layer in the cluster
+    InputUInt                   m_innerPseudoLayer;             ///< The innermost pseudo layer in the cluster
+    InputUInt                   m_outerPseudoLayer;             ///< The outermost pseudo layer in the cluster
 
     mutable CartesianVector     m_initialDirection;             ///< The initial direction of the cluster
     mutable bool                m_isDirectionUpToDate;          ///< Whether the initial direction of the cluster is up to date
-
-    mutable ClusterFitResult    m_currentFitResult;             ///< The current fit result, usually set by clustering algorithm, as cluster grows
 
     mutable ClusterFitResult    m_fitToAllHitsResult;           ///< The result of a linear fit to all calo hits in the cluster
     mutable bool                m_isFitUpToDate;                ///< Whether the fit to all calo hits is up to date
@@ -504,7 +455,7 @@ private:
     mutable InputFloat          m_trackComparisonEnergy;        ///< The appropriate corrected energy to use in comparisons with track momentum, units GeV
 
     mutable InputBool           m_isPhotonFast;                 ///< Whether the cluster is flagged as a photon by fast photon id function
-    mutable InputPseudoLayer    m_showerStartLayer;             ///< The pseudo layer at which shower commences
+    mutable InputUInt           m_showerStartLayer;             ///< The pseudo layer at which shower commences
     mutable InputFloat          m_showerProfileStart;           ///< The cluster shower profile start, units radiation lengths
     mutable InputFloat          m_showerProfileDiscrepancy;     ///< The cluster shower profile discrepancy
 
@@ -519,37 +470,6 @@ private:
     friend class ClusterManager;
     friend class AlgorithmObjectManager<Cluster>;
 };
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool Cluster::SortByHadronicEnergy(const Cluster *const pLhs, const Cluster *const pRhs)
-{
-    return (pLhs->GetHadronicEnergy() > pRhs->GetHadronicEnergy());
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool Cluster::SortByElectromagneticEnergy(const Cluster *const pLhs, const Cluster *const pRhs)
-{
-    return (pLhs->GetElectromagneticEnergy() > pRhs->GetElectromagneticEnergy());
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool Cluster::SortByInnerLayer(const Cluster *const pLhs, const Cluster *const pRhs)
-{
-    const PseudoLayer innerLayerLhs(pLhs->GetInnerPseudoLayer()), innerLayerRhs(pRhs->GetInnerPseudoLayer());
-
-    if (innerLayerLhs != innerLayerRhs)
-        return (innerLayerLhs < innerLayerRhs);
-
-    const unsigned int nCaloHitsLhs(pLhs->GetNCaloHits()), nCaloHitsRhs(pRhs->GetNCaloHits());
-
-    if (nCaloHitsLhs != nCaloHitsRhs)
-        return (nCaloHitsLhs > nCaloHitsRhs);
-
-    return (pLhs->GetHadronicEnergy() > pRhs->GetHadronicEnergy());
-}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -649,13 +569,6 @@ inline bool Cluster::IsFixedMuon() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline bool Cluster::IsMipTrack() const
-{
-    return m_isMipTrack;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 inline bool Cluster::IsTrackSeeded() const
 {
     return (NULL != m_pTrackSeed);
@@ -673,14 +586,14 @@ inline const Track *Cluster::GetTrackSeed() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline PseudoLayer Cluster::GetInnerPseudoLayer() const
+inline unsigned int Cluster::GetInnerPseudoLayer() const
 {
     return m_innerPseudoLayer.Get();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline PseudoLayer Cluster::GetOuterPseudoLayer() const
+inline unsigned int Cluster::GetOuterPseudoLayer() const
 {
     return m_outerPseudoLayer.Get();
 }
@@ -697,89 +610,12 @@ inline const CartesianVector &Cluster::GetInitialDirection() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const ClusterHelper::ClusterFitResult &Cluster::GetCurrentFitResult() const
-{
-    return m_currentFitResult;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline const ClusterHelper::ClusterFitResult &Cluster::GetFitToAllHitsResult() const
+inline const ClusterFitResult &Cluster::GetFitToAllHitsResult() const
 {
     if (!m_isFitUpToDate)
         this->CalculateFitToAllHitsResult();
 
     return m_fitToAllHitsResult;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float Cluster::GetCorrectedElectromagneticEnergy() const
-{
-    if (!m_correctedElectromagneticEnergy.IsInitialized())
-        this->PerformEnergyCorrections();
-
-    return m_correctedElectromagneticEnergy.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float Cluster::GetCorrectedHadronicEnergy() const
-{
-    if (!m_correctedHadronicEnergy.IsInitialized())
-        this->PerformEnergyCorrections();
-
-    return m_correctedHadronicEnergy.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float Cluster::GetTrackComparisonEnergy() const
-{
-    if (!m_trackComparisonEnergy.IsInitialized())
-        this->PerformEnergyCorrections();
-
-    return m_trackComparisonEnergy.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool Cluster::IsPhotonFast() const
-{
-    if (!m_isPhotonFast.IsInitialized())
-        this->CalculateFastPhotonFlag();
-
-    return m_isPhotonFast.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline PseudoLayer Cluster::GetShowerStartLayer() const
-{
-    if (!m_showerStartLayer.IsInitialized())
-        this->CalculateShowerStartLayer();
-
-    return m_showerStartLayer.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float Cluster::GetShowerProfileStart() const
-{
-    if (!m_showerProfileStart.IsInitialized())
-        this->CalculateShowerProfile();
-
-    return m_showerProfileStart.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float Cluster::GetShowerProfileDiscrepancy() const
-{
-    if (!m_showerProfileDiscrepancy.IsInitialized())
-        this->CalculateShowerProfile();
-
-    return m_showerProfileDiscrepancy.Get();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -833,16 +669,72 @@ inline void Cluster::SetIsFixedMuonFlag(bool isFixedMuonFlag)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline void Cluster::SetIsMipTrackFlag(bool isMipTrackFlag)
+inline float Cluster::GetCorrectedElectromagneticEnergy(const Pandora &pandora) const
 {
-    m_isMipTrack = isMipTrackFlag;
+    if (!m_correctedElectromagneticEnergy.IsInitialized())
+        this->PerformEnergyCorrections(pandora);
+
+    return m_correctedElectromagneticEnergy.Get();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline void Cluster::SetCurrentFitResult(const ClusterHelper::ClusterFitResult &currentFitResult)
+inline float Cluster::GetCorrectedHadronicEnergy(const Pandora &pandora) const
 {
-    m_currentFitResult = currentFitResult;
+    if (!m_correctedHadronicEnergy.IsInitialized())
+        this->PerformEnergyCorrections(pandora);
+
+    return m_correctedHadronicEnergy.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float Cluster::GetTrackComparisonEnergy(const Pandora &pandora) const
+{
+    if (!m_trackComparisonEnergy.IsInitialized())
+        this->PerformEnergyCorrections(pandora);
+
+    return m_trackComparisonEnergy.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline bool Cluster::IsPhotonFast(const Pandora &pandora) const
+{
+    if (!m_isPhotonFast.IsInitialized())
+        this->CalculateFastPhotonFlag(pandora);
+
+    return m_isPhotonFast.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline unsigned int Cluster::GetShowerStartLayer(const Pandora &pandora) const
+{
+    if (!m_showerStartLayer.IsInitialized())
+        this->CalculateShowerStartLayer(pandora);
+
+    return m_showerStartLayer.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float Cluster::GetShowerProfileStart(const Pandora &pandora) const
+{
+    if (!m_showerProfileStart.IsInitialized())
+        this->CalculateShowerProfile(pandora);
+
+    return m_showerProfileStart.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float Cluster::GetShowerProfileDiscrepancy(const Pandora &pandora) const
+{
+    if (!m_showerProfileDiscrepancy.IsInitialized())
+        this->CalculateShowerProfile(pandora);
+
+    return m_showerProfileDiscrepancy.Get();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Persistency/XmlFileWriter.cc
+ *  @file   PandoraSDK/src/Persistency/XmlFileWriter.cc
  * 
  *  @brief  Implementation of the file writer class.
  * 
@@ -9,11 +9,10 @@
 #include "Api/PandoraContentApi.h"
 #include "Api/PandoraContentApiImpl.h"
 
-#include "Helpers/GeometryHelper.h"
-
 #include "Objects/CaloHit.h"
 #include "Objects/DetectorGap.h"
 #include "Objects/MCParticle.h"
+#include "Objects/SubDetector.h"
 #include "Objects/Track.h"
 
 #include "Persistency/XmlFileWriter.h"
@@ -82,50 +81,44 @@ StatusCode XmlFileWriter::WriteFooter()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode XmlFileWriter::WriteTracker()
+StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector)
 {
-    m_pCurrentXmlElement = new TiXmlElement("Tracker");
+    if (GEOMETRY != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    m_pCurrentXmlElement = new TiXmlElement("SubDetector");
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
 
-    try
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("SubDetectorName", pSubDetector->GetSubDetectorName()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerRCoordinate", pSubDetector->GetInnerRCoordinate()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerZCoordinate", pSubDetector->GetInnerZCoordinate()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerPhiCoordinate", pSubDetector->GetInnerPhiCoordinate()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerSymmetryOrder", pSubDetector->GetInnerSymmetryOrder()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterRCoordinate", pSubDetector->GetOuterRCoordinate()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterZCoordinate", pSubDetector->GetOuterZCoordinate()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterPhiCoordinate", pSubDetector->GetOuterPhiCoordinate()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterSymmetryOrder", pSubDetector->GetOuterSymmetryOrder()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsMirroredInZ", pSubDetector->IsMirroredInZ()));
+
+    const unsigned int nLayers(pSubDetector->GetNLayers());
+    const SubDetector::SubDetectorLayerList &subDetectorLayerList(pSubDetector->GetSubDetectorLayerList());
+
+    if (subDetectorLayerList.size() != nLayers)
+        return STATUS_CODE_FAILURE;
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NLayers", nLayers));
+    std::string closestDistanceToIpString, nRadiationLengthsString, nInteractionLengthsString;
+
+    for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
     {
-        const float mainTrackerInnerRadius(GeometryHelper::GetMainTrackerInnerRadius());
-        const float mainTrackerOuterRadius(GeometryHelper::GetMainTrackerOuterRadius());
-        const float mainTrackerZExtent(GeometryHelper::GetMainTrackerZExtent());
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("TrackerPresent", true));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("MainTrackerInnerRadius", mainTrackerInnerRadius));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("MainTrackerOuterRadius", mainTrackerOuterRadius));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("MainTrackerZExtent", mainTrackerZExtent));
-    }
-    catch (StatusCodeException &)
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("TrackerPresent", false));
+        closestDistanceToIpString += TypeToString(subDetectorLayerList[iLayer].m_closestDistanceToIp) + " ";
+        nRadiationLengthsString += TypeToString(subDetectorLayerList[iLayer].m_nRadiationLengths) + " ";
+        nInteractionLengthsString += TypeToString(subDetectorLayerList[iLayer].m_nInteractionLengths) + " ";
     }
 
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode XmlFileWriter::WriteCoil()
-{
-    m_pCurrentXmlElement = new TiXmlElement("Coil");
-    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
-
-    try
-    {
-        const float coilInnerRadius(GeometryHelper::GetCoilInnerRadius());
-        const float coilOuterRadius(GeometryHelper::GetCoilOuterRadius());
-        const float coilZExtent(GeometryHelper::GetCoilZExtent());
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CoilPresent", true));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CoilInnerRadius", coilInnerRadius));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CoilOuterRadius", coilOuterRadius));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CoilZExtent", coilZExtent));
-    }
-    catch (StatusCodeException &)
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CoilPresent", false));
-    }
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ClosestDistanceToIp", closestDistanceToIpString));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NRadiationLengths", nRadiationLengthsString));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NInteractionLengths", nInteractionLengthsString));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -148,100 +141,29 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
         m_pCurrentXmlElement = new TiXmlElement("BoxGap");
         m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Vertex", pBoxGap->m_vertex));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side1", pBoxGap->m_side1));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side2", pBoxGap->m_side2));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side3", pBoxGap->m_side3));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Vertex", pBoxGap->GetVertex()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side1", pBoxGap->GetSide1()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side2", pBoxGap->GetSide2()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side3", pBoxGap->GetSide3()));
     }
     else if (NULL != pConcentricGap)
     {
         m_pCurrentXmlElement = new TiXmlElement("ConcentricGap");
         m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("MinZCoordinate", pConcentricGap->m_minZCoordinate));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("MaxZCoordinate", pConcentricGap->m_maxZCoordinate));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerRCoordinate", pConcentricGap->m_innerRCoordinate));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerPhiCoordinate", pConcentricGap->m_innerPhiCoordinate));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerSymmetryOrder", pConcentricGap->m_innerSymmetryOrder));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterRCoordinate", pConcentricGap->m_outerRCoordinate));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterPhiCoordinate", pConcentricGap->m_outerPhiCoordinate));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterSymmetryOrder", pConcentricGap->m_outerSymmetryOrder));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("MinZCoordinate", pConcentricGap->GetMinZCoordinate()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("MaxZCoordinate", pConcentricGap->GetMaxZCoordinate()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerRCoordinate", pConcentricGap->GetInnerRCoordinate()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerPhiCoordinate", pConcentricGap->GetInnerPhiCoordinate()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerSymmetryOrder", pConcentricGap->GetInnerSymmetryOrder()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterRCoordinate", pConcentricGap->GetOuterRCoordinate()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterPhiCoordinate", pConcentricGap->GetOuterPhiCoordinate()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterSymmetryOrder", pConcentricGap->GetOuterSymmetryOrder()));
     }
     else
     {
         return STATUS_CODE_FAILURE;
     }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode XmlFileWriter::WriteAdditionalSubDetectors()
-{
-    const GeometryHelper::SubDetectorParametersMap &subDetectorParametersMap(GeometryHelper::GetAdditionalSubDetectors());
-
-    m_pCurrentXmlElement = m_pContainerXmlElement;
-
-    const unsigned int nAdditionalSubDetectors(subDetectorParametersMap.size());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NAdditionalSubDetectors", nAdditionalSubDetectors));
-
-    for (GeometryHelper::SubDetectorParametersMap::const_iterator iter = subDetectorParametersMap.begin(), iterEnd = subDetectorParametersMap.end();
-        iter != iterEnd; ++iter)
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSubDetector(iter->first, &iter->second));
-    }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode XmlFileWriter::WriteSubDetector(const std::string &subDetectorName, const GeometryHelper::SubDetectorParameters *const pSubDetectorParameters)
-{
-    if (GEOMETRY != m_containerId)
-        return STATUS_CODE_FAILURE;
-
-    m_pCurrentXmlElement = new TiXmlElement("SubDetector");
-    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("SubDetectorName", subDetectorName));
-
-    const bool isInitialized(pSubDetectorParameters->IsInitialized());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsInitialized", isInitialized));
-
-    if (!isInitialized)
-        return STATUS_CODE_SUCCESS;
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerRCoordinate", pSubDetectorParameters->GetInnerRCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerZCoordinate", pSubDetectorParameters->GetInnerZCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerPhiCoordinate", pSubDetectorParameters->GetInnerPhiCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("InnerSymmetryOrder", pSubDetectorParameters->GetInnerSymmetryOrder()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterRCoordinate", pSubDetectorParameters->GetOuterRCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterZCoordinate", pSubDetectorParameters->GetOuterZCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterPhiCoordinate", pSubDetectorParameters->GetOuterPhiCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterSymmetryOrder", pSubDetectorParameters->GetOuterSymmetryOrder()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsMirroredInZ", pSubDetectorParameters->IsMirroredInZ()));
-
-    const unsigned int nLayers(pSubDetectorParameters->GetNLayers());
-    const GeometryHelper::LayerParametersList &layerParametersList(pSubDetectorParameters->GetLayerParametersList());
-
-    if (layerParametersList.size() != nLayers)
-        return STATUS_CODE_FAILURE;
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NLayers", nLayers));
-    std::string closestDistanceToIpString, nRadiationLengthsString, nInteractionLengthsString;
-
-    for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
-    {
-        closestDistanceToIpString += TypeToString(layerParametersList[iLayer].m_closestDistanceToIp) + " ";
-        nRadiationLengthsString += TypeToString(layerParametersList[iLayer].m_nRadiationLengths) + " ";
-        nInteractionLengthsString += TypeToString(layerParametersList[iLayer].m_nInteractionLengths) + " ";
-    }
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ClosestDistanceToIp", closestDistanceToIpString));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NRadiationLengths", nRadiationLengthsString));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NInteractionLengths", nInteractionLengthsString));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -358,6 +280,9 @@ StatusCode XmlFileWriter::WriteMCParticle(const MCParticle *const pMCParticle)
 
 StatusCode XmlFileWriter::WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight)
 {
+    if (EVENT != m_containerId)
+        return STATUS_CODE_FAILURE;
+
     m_pCurrentXmlElement = new TiXmlElement("Relationship");
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
 

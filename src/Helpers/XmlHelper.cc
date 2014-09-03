@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Helpers/XmlHelper.cc
+ *  @file   PandoraSDK/src/Helpers/XmlHelper.cc
  * 
  *  @brief  Implementation of the xml helper class.
  * 
@@ -66,7 +66,7 @@ StatusCode XmlHelper::ProcessAlgorithmList(const Algorithm &algorithm, const TiX
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode XmlHelper::ProcessAlgorithmTool(Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &description,
+StatusCode XmlHelper::ProcessAlgorithmTool(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &description,
     AlgorithmTool *&pAlgorithmTool)
 {
     if ("algorithm" != xmlHandle.ToNode()->ValueStr())
@@ -98,7 +98,7 @@ StatusCode XmlHelper::ProcessAlgorithmTool(Algorithm &algorithm, const TiXmlHand
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode XmlHelper::ProcessAlgorithmToolList(Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
+StatusCode XmlHelper::ProcessAlgorithmToolList(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
     AlgorithmToolList &algorithmToolList)
 {
     if ("algorithm" != xmlHandle.ToNode()->ValueStr())

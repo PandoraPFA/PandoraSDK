@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Objects/CartesianVector.h
+ *  @file   PandoraSDK/include/Objects/CartesianVector.h
  * 
  *  @brief  Header file for the cartesian vector class.
  * 

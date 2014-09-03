@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Objects/CaloHit.h
+ *  @file   PandoraSDK/include/Objects/CaloHit.h
  * 
  *  @brief  Header file for the calo hit class.
  * 
@@ -126,7 +126,7 @@ public:
      * 
      *  @return the pseudo layer
      */
-    PseudoLayer GetPseudoLayer() const;
+    unsigned int GetPseudoLayer() const;
 
     /**
      *  @brief  Whether cell is in one of the outermost detector sampling layers
@@ -185,13 +185,6 @@ public:
     CellGeometry GetCellGeometry() const;
 
     /**
-     *  @brief  Get address of the mc particle associated with the calo hit
-     * 
-     *  @return the address of the mc particle
-     */
-    const MCParticle *GetMainMCParticle() const;
-
-    /**
      *  @brief  Get mc particle weight map for the calo hit
      * 
      *  @return the mc particle weight map
@@ -216,6 +209,20 @@ public:
      *  @param  cartesianPointList to receive the cartesian coordinates of the cell corners
      */
     virtual void GetCellCorners(CartesianPointList &cartesianPointList) const = 0;
+
+    /**
+     *  @brief  Set the isolated hit flag
+     * 
+     *  @param  isolatedFlag the isolated hit flag
+     */
+    void SetIsolatedFlag(const bool isolatedFlag);
+
+    /**
+     *  @brief  Set the possible mip flag
+     * 
+     *  @param  possibleMipFlag the possible mip flag
+     */
+    void SetPossibleMipFlag(const bool possibleMipFlag);
 
 protected:
     /**
@@ -243,21 +250,7 @@ protected:
      * 
      *  @param  pseudoLayer the pseudo layer
      */
-    StatusCode SetPseudoLayer(PseudoLayer pseudoLayer);
-
-    /**
-     *  @brief  Set the isolated hit flag
-     * 
-     *  @param  isolatedFlag the isolated hit flag
-     */
-    void SetIsolatedFlag(bool isolatedFlag);
-
-    /**
-     *  @brief  Set the possible mip flag
-     * 
-     *  @param  possibleMipFlag the possible mip flag
-     */
-    void SetPossibleMipFlag(bool possibleMipFlag);
+    StatusCode SetPseudoLayer(const unsigned int pseudoLayer);
 
     /**
      *  @brief  Set the mc particles associated with the calo hit
@@ -289,7 +282,7 @@ protected:
     const HitType           m_hitType;                  ///< The type of calorimeter hit
     const DetectorRegion    m_detectorRegion;           ///< Region of the detector in which the calo hit is located
     const unsigned int      m_layer;                    ///< The subdetector readout layer number
-    InputPseudoLayer        m_pseudoLayer;              ///< The pseudo layer to which the calo hit has been assigned
+    InputUInt               m_pseudoLayer;              ///< The pseudo layer to which the calo hit has been assigned
     const bool              m_isInOuterSamplingLayer;   ///< Whether cell is in one of the outermost detector sampling layers
 
     bool                    m_isPossibleMip;            ///< Whether the calo hit is a possible mip hit
@@ -508,7 +501,7 @@ inline unsigned int CaloHit::GetLayer() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline PseudoLayer CaloHit::GetPseudoLayer() const
+inline unsigned int CaloHit::GetPseudoLayer() const
 {
     return m_pseudoLayer.Get();
 }

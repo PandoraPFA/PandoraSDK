@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Api/PandoraApi.cc
+ *  @file   PandoraSDK/src/Api/PandoraApi.cc
  * 
  *  @brief  Redirection for pandora api class to its implementation.
  * 
@@ -103,27 +103,6 @@ pandora::StatusCode PandoraApi::GetPfoList(const pandora::Pandora &pandora, cons
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::SetBFieldCalculator(const pandora::Pandora &pandora, pandora::BFieldCalculator *pBFieldCalculator)
-{
-    return pandora.GetPandoraApiImpl()->SetBFieldCalculator(pBFieldCalculator);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-pandora::StatusCode PandoraApi::SetPseudoLayerCalculator(const pandora::Pandora &pandora, pandora::PseudoLayerCalculator *pPseudoLayerCalculator)
-{
-    return pandora.GetPandoraApiImpl()->SetPseudoLayerCalculator(pPseudoLayerCalculator);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-pandora::StatusCode PandoraApi::SetShowerProfileCalculator(const pandora::Pandora &pandora, pandora::ShowerProfileCalculator *pShowerProfileCalculator)
-{
-    return pandora.GetPandoraApiImpl()->SetShowerProfileCalculator(pShowerProfileCalculator);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 pandora::StatusCode PandoraApi::SetHitTypeGranularity(const pandora::Pandora &pandora, const pandora::HitType hitType,
     const pandora::Granularity granularity)
 {
@@ -132,41 +111,39 @@ pandora::StatusCode PandoraApi::SetHitTypeGranularity(const pandora::Pandora &pa
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::RegisterEnergyCorrectionFunction(const pandora::Pandora &pandora, const std::string &functionName,
-    const pandora::EnergyCorrectionType energyCorrectionType, pandora::EnergyCorrectionFunction *pEnergyCorrectionFunction)
+pandora::StatusCode PandoraApi::SetBFieldPlugin(const pandora::Pandora &pandora, pandora::BFieldPlugin *pBFieldPlugin)
 {
-    return pandora.GetPandoraApiImpl()->RegisterEnergyCorrectionFunction(functionName, energyCorrectionType, pEnergyCorrectionFunction);
+    return pandora.GetPandoraApiImpl()->SetBFieldPlugin(pBFieldPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::RegisterParticleIdFunction(const pandora::Pandora &pandora, const std::string &functionName,
-    pandora::ParticleIdFunction *pParticleIdFunction)
+pandora::StatusCode PandoraApi::SetPseudoLayerPlugin(const pandora::Pandora &pandora, pandora::PseudoLayerPlugin *pPseudoLayerPlugin)
 {
-    return pandora.GetPandoraApiImpl()->RegisterParticleIdFunction(functionName, pParticleIdFunction);
+    return pandora.GetPandoraApiImpl()->SetPseudoLayerPlugin(pPseudoLayerPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::RegisterResetFunction(const pandora::Pandora &pandora, pandora::ResetFunction *pResetFunction)
+pandora::StatusCode PandoraApi::SetShowerProfilePlugin(const pandora::Pandora &pandora, pandora::ShowerProfilePlugin *pShowerProfilePlugin)
 {
-    return pandora.GetPandoraApiImpl()->RegisterResetFunction(pResetFunction);
+    return pandora.GetPandoraApiImpl()->SetShowerProfilePlugin(pShowerProfilePlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::RegisterSettingsFunction(const pandora::Pandora &pandora, const std::string &xmlTagName,
-    pandora::SettingsFunction *pSettingsFunction)
+pandora::StatusCode PandoraApi::RegisterEnergyCorrectionPlugin(const pandora::Pandora &pandora, const std::string &name,
+    const pandora::EnergyCorrectionType energyCorrectionType, pandora::EnergyCorrectionPlugin *pEnergyCorrectionPlugin)
 {
-    return pandora.GetPandoraApiImpl()->RegisterSettingsFunction(xmlTagName, pSettingsFunction);
+    return pandora.GetPandoraApiImpl()->RegisterEnergyCorrectionPlugin(name, energyCorrectionType, pEnergyCorrectionPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::GetReclusterMonitoringResults(const pandora::Pandora &pandora, const void *pTrackParentAddress,
-    float &netEnergyChange, float &sumModulusEnergyChanges, float &sumSquaredEnergyChanges)
+pandora::StatusCode PandoraApi::RegisterParticleIdPlugin(const pandora::Pandora &pandora, const std::string &name,
+    pandora::ParticleIdPlugin *pParticleIdPlugin)
 {
-    return pandora.GetPandoraApiImpl()->GetReclusterMonitoringResults(pTrackParentAddress, netEnergyChange, sumModulusEnergyChanges, sumSquaredEnergyChanges);
+    return pandora.GetPandoraApiImpl()->RegisterParticleIdPlugin(name, pParticleIdPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -183,6 +160,6 @@ template class PandoraApi::ObjectCreationHelper<PandoraApi::MCParticle::Paramete
 template class PandoraApi::ObjectCreationHelper<PandoraApi::Track::Parameters>;
 template class PandoraApi::ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters>;
 template class PandoraApi::ObjectCreationHelper<PandoraApi::PointingCaloHit::Parameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::Parameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::BoxGap::Parameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::ConcentricGap::Parameters>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::SubDetector::Parameters>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::BoxGap::Parameters>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::ConcentricGap::Parameters>;

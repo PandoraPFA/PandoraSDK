@@ -1,5 +1,5 @@
 /**
- *  @file PandoraPFANew/Framework/src/Managers/ClusterManager.cc
+ *  @file PandoraSDK/src/Managers/ClusterManager.cc
  * 
  *  @brief Implementation of the cluster manager class.
  * 
@@ -11,8 +11,8 @@
 namespace pandora
 {
 
-ClusterManager::ClusterManager() :
-    AlgorithmObjectManager<Cluster>()
+ClusterManager::ClusterManager(const Pandora *const pPandora) :
+    AlgorithmObjectManager<Cluster>(pPandora)
 {
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateInitialLists());
 }

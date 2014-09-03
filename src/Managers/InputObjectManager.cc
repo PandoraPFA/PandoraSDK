@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Managers/InputObjectManager.cc
+ *  @file   PandoraSDK/src/Managers/InputObjectManager.cc
  * 
  *  @brief  Implementation of the input object manager class.
  * 
@@ -21,8 +21,8 @@ const std::string InputObjectManager<T>::INPUT_LIST_NAME = "Input";
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<typename T>
-InputObjectManager<T>::InputObjectManager() :
-    Manager<T>()
+InputObjectManager<T>::InputObjectManager(const Pandora *const pPandora) :
+    Manager<T>(pPandora)
 {
 }
 
@@ -81,6 +81,9 @@ StatusCode InputObjectManager<T>::SaveList(const std::string &listName, const Ob
 template<typename T>
 StatusCode InputObjectManager<T>::AddObjectsToList(const std::string &listName, const ObjectList &objectList)
 {
+    if (Manager<T>::NULL_LIST_NAME == listName)
+        return STATUS_CODE_NOT_ALLOWED;
+
     typename Manager<T>::NameToListMap::iterator listIter = Manager<T>::m_nameToListMap.find(listName);
 
     if (Manager<T>::m_nameToListMap.end() == listIter)

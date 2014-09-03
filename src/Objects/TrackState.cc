@@ -1,5 +1,5 @@
 /**
- *  @file PandoraPFANew/Framework/src/Objects/TrackState.cc
+ *  @file PandoraSDK/src/Objects/TrackState.cc
  * 
  *  @brief Implementation of the track state class.
  * 

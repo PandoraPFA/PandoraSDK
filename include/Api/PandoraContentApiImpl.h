@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Api/PandoraContentApiImpl.h
+ *  @file   PandoraSDK/include/Api/PandoraContentApiImpl.h
  *
  *  @brief  Header file for the pandora content api implementation class.
  * 
@@ -24,7 +24,7 @@ class Pandora;
  */
 class PandoraContentApiImpl
 {
-public:
+private:
     /* Object-creation functions */
 
     /**
@@ -51,6 +51,30 @@ public:
      *  @param  pVertex to receive the address of the vertex created
      */
     StatusCode CreateVertex(const CartesianVector &vertexPosition, Vertex *&pVertex) const;
+
+
+    /* Accessors for plugins and global settings */
+
+    /**
+     *  @brief  Get the pandora settings instance
+     * 
+     *  @return the address of the pandora settings instance
+     */
+    const PandoraSettings *GetSettings() const;
+
+    /**
+     *  @brief  Get the pandora geometry instance
+     * 
+     *  @return the address of the pandora geometry instance
+     */
+    const GeometryManager *GetGeometry() const;
+
+    /**
+     *  @brief  Get the pandora plugin instance, providing access to user registered functions and calculators
+     * 
+     *  @return the address of the pandora plugin instance
+     */
+    const PluginManager *GetPlugins() const;
 
 
     /* High-level steering functions */
@@ -454,7 +478,6 @@ public:
      */
     StatusCode EndReclustering(const Algorithm &algorithm, const std::string &selectedClusterListName) const;
 
-private:
     /**
      *  @brief  Constructor
      * 
@@ -505,6 +528,8 @@ private:
     Pandora    *m_pPandora;    ///< The pandora object to provide an interface to
 
     friend class Pandora;
+    friend class PandoraImpl;
+    friend class ::PandoraContentApi;
 };
 
 } // namespace pandora

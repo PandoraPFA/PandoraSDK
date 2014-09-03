@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Managers/Manager.h
+ *  @file   PandoraSDK/include/Managers/Manager.h
  * 
  *  @brief  Header file for the manager class.
  * 
@@ -15,6 +15,7 @@ namespace pandora
 {
 
 class Algorithm;
+class Pandora;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -26,9 +27,11 @@ class Manager
 {
 public:
     /**
-     *  @brief  Default constructor
+     *  @brief  Constructor
+     * 
+     *  @param  pPandora address of the associated pandora object
      */
-    Manager();
+    Manager(const Pandora *const pPandora);
 
     /**
      *  @brief  Destructor
@@ -156,6 +159,8 @@ protected:
     std::string                     m_currentListName;                  ///< The name of the current list
     StringSet                       m_savedLists;                       ///< The set of saved lists
     static const std::string        NULL_LIST_NAME;                     ///< The name of the default empty (NULL) list
+
+    const Pandora *const            m_pPandora;                         ///< The associated pandora object
 };
 
 } // namespace pandora

@@ -1,27 +1,27 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Managers/CaloHitManager.cc
+ *  @file   PandoraSDK/src/Managers/CaloHitManager.cc
  * 
  *  @brief  Implementation of the calo hit manager class.
  * 
  *  $Log: $
  */
 
-#include "Helpers/CaloHitHelper.h"
-#include "Helpers/GeometryHelper.h"
-
 #include "Managers/CaloHitManager.h"
+#include "Managers/PluginManager.h"
 
 #include "Objects/Cluster.h"
 
-#include "Pandora/PandoraSettings.h"
+#include "Pandora/Pandora.h"
+
+#include "Plugins/PseudoLayerPlugin.h"
 
 #include <cmath>
 
 namespace pandora
 {
 
-CaloHitManager::CaloHitManager() :
-    InputObjectManager<CaloHit>(),
+CaloHitManager::CaloHitManager(const Pandora *const pPandora) :
+    InputObjectManager<CaloHit>(pPandora),
     m_nReclusteringProcesses(0),
     m_pCurrentReclusterMetadata(NULL)
 {
@@ -49,7 +49,7 @@ StatusCode CaloHitManager::CreateCaloHit(const PARAMETERS &parameters, CaloHit *
         if (NULL == pCaloHit)
             throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        const PseudoLayer pseudoLayer = GeometryHelper::GetPseudoLayer(pCaloHit->GetPositionVector());
+        const unsigned int pseudoLayer(m_pPandora->GetPlugins()->GetPseudoLayerPlugin()->GetPseudoLayer(pCaloHit->GetPositionVector()));
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pCaloHit->SetPseudoLayer(pseudoLayer));
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
@@ -80,37 +80,6 @@ template <>
 CaloHit *CaloHitManager::HitInstantiation(const PandoraApi::PointingCaloHit::Parameters &parameters)
 {
     return new PointingCaloHit(parameters);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode CaloHitManager::CalculateCaloHitProperties() const
-{
-    try
-    {
-        NameToListMap::const_iterator listIter = m_nameToListMap.find(INPUT_LIST_NAME);
-
-        if (m_nameToListMap.end() == listIter)
-            return STATUS_CODE_NOT_INITIALIZED;
-
-        OrderedCaloHitList orderedCaloHitList;
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, orderedCaloHitList.Add(*(listIter->second)));
-
-        for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
-        {
-            for (CaloHitList::iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
-            {
-                CaloHitHelper::CalculateCaloHitProperties(*hitIter, &orderedCaloHitList);
-            }
-        }
-    }
-    catch (StatusCodeException &statusCodeException)
-    {
-        std::cout << "CaloHitManager: Failed to calculate calo hit properties, " << statusCodeException.ToString() << std::endl;
-        return statusCodeException.GetStatusCode();
-    }
-
-    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

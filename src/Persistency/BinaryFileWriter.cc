@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Persistency/BinaryFileWriter.cc
+ *  @file   PandoraSDK/src/Persistency/BinaryFileWriter.cc
  * 
  *  @brief  Implementation of the file writer class.
  * 
@@ -9,11 +9,10 @@
 #include "Api/PandoraContentApi.h"
 #include "Api/PandoraContentApiImpl.h"
 
-#include "Helpers/GeometryHelper.h"
-
 #include "Objects/CaloHit.h"
 #include "Objects/DetectorGap.h"
 #include "Objects/MCParticle.h"
+#include "Objects/SubDetector.h"
 #include "Objects/Track.h"
 
 #include "Persistency/BinaryFileWriter.h"
@@ -100,43 +99,36 @@ StatusCode BinaryFileWriter::WriteFooter()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileWriter::WriteTracker()
+StatusCode BinaryFileWriter::WriteSubDetector(const SubDetector *const pSubDetector)
 {
-    try
-    {
-        const float mainTrackerInnerRadius(GeometryHelper::GetMainTrackerInnerRadius());
-        const float mainTrackerOuterRadius(GeometryHelper::GetMainTrackerOuterRadius());
-        const float mainTrackerZExtent(GeometryHelper::GetMainTrackerZExtent());
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(true));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(mainTrackerInnerRadius));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(mainTrackerOuterRadius));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(mainTrackerZExtent));
-    }
-    catch (StatusCodeException &)
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(false));
-    }
+    if (GEOMETRY != m_containerId)
+        return STATUS_CODE_FAILURE;
 
-    return STATUS_CODE_SUCCESS;
-}
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(SUB_DETECTOR));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetSubDetectorName()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetInnerRCoordinate()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetInnerZCoordinate()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetInnerPhiCoordinate()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetInnerSymmetryOrder()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetOuterRCoordinate()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetOuterZCoordinate()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetOuterPhiCoordinate()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetOuterSymmetryOrder()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->IsMirroredInZ()));
 
-//------------------------------------------------------------------------------------------------------------------------------------------
+    const unsigned int nLayers(pSubDetector->GetNLayers());
+    const SubDetector::SubDetectorLayerList &subDetectorLayerList(pSubDetector->GetSubDetectorLayerList());
 
-StatusCode BinaryFileWriter::WriteCoil()
-{
-    try
+    if (subDetectorLayerList.size() != nLayers)
+        return STATUS_CODE_FAILURE;
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(nLayers));
+
+    for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
     {
-        const float coilInnerRadius(GeometryHelper::GetCoilInnerRadius());
-        const float coilOuterRadius(GeometryHelper::GetCoilOuterRadius());
-        const float coilZExtent(GeometryHelper::GetCoilZExtent());
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(true));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(coilInnerRadius));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(coilOuterRadius));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(coilZExtent));
-    }
-    catch (StatusCodeException &)
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(false));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerList[iLayer].m_closestDistanceToIp));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerList[iLayer].m_nRadiationLengths));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerList[iLayer].m_nInteractionLengths));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -158,88 +150,26 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
     if (NULL != pBoxGap)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(BOX_GAP));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->m_vertex));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->m_side1));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->m_side2));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->m_side3));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetVertex()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide1()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide2()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide3()));
     }
     else if (NULL != pConcentricGap)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(CONCENTRIC_GAP));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->m_minZCoordinate));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->m_maxZCoordinate));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->m_innerRCoordinate));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->m_innerPhiCoordinate));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->m_innerSymmetryOrder));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->m_outerRCoordinate));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->m_outerPhiCoordinate));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->m_outerSymmetryOrder));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetMinZCoordinate()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetMaxZCoordinate()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetInnerRCoordinate()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetInnerPhiCoordinate()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetInnerSymmetryOrder()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetOuterRCoordinate()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetOuterPhiCoordinate()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetOuterSymmetryOrder()));
     }
     else
     {
         return STATUS_CODE_FAILURE;
-    }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode BinaryFileWriter::WriteAdditionalSubDetectors()
-{
-    const GeometryHelper::SubDetectorParametersMap &subDetectorParametersMap(GeometryHelper::GetAdditionalSubDetectors());
-
-    const unsigned int nAdditionalSubDetectors(subDetectorParametersMap.size());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(nAdditionalSubDetectors));
-
-    for (GeometryHelper::SubDetectorParametersMap::const_iterator iter = subDetectorParametersMap.begin(), iterEnd = subDetectorParametersMap.end();
-        iter != iterEnd; ++iter)
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSubDetector(iter->first, &iter->second));
-    }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode BinaryFileWriter::WriteSubDetector(const std::string &subDetectorName, const GeometryHelper::SubDetectorParameters *const pSubDetectorParameters)
-{
-    if (GEOMETRY != m_containerId)
-        return STATUS_CODE_FAILURE;
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(SUB_DETECTOR));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorName));
-
-    const bool isInitialized(pSubDetectorParameters->IsInitialized());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(isInitialized));
-
-    if (!isInitialized)
-        return STATUS_CODE_SUCCESS;
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetectorParameters->GetInnerRCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetectorParameters->GetInnerZCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetectorParameters->GetInnerPhiCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetectorParameters->GetInnerSymmetryOrder()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetectorParameters->GetOuterRCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetectorParameters->GetOuterZCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetectorParameters->GetOuterPhiCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetectorParameters->GetOuterSymmetryOrder()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetectorParameters->IsMirroredInZ()));
-
-    const unsigned int nLayers(pSubDetectorParameters->GetNLayers());
-    const GeometryHelper::LayerParametersList &layerParametersList(pSubDetectorParameters->GetLayerParametersList());
-
-    if (layerParametersList.size() != nLayers)
-        return STATUS_CODE_FAILURE;
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(nLayers));
-
-    for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(layerParametersList[iLayer].m_closestDistanceToIp));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(layerParametersList[iLayer].m_nRadiationLengths));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(layerParametersList[iLayer].m_nInteractionLengths));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -351,6 +281,9 @@ StatusCode BinaryFileWriter::WriteMCParticle(const MCParticle *const pMCParticle
 
 StatusCode BinaryFileWriter::WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight)
 {
+    if (EVENT != m_containerId)
+        return STATUS_CODE_FAILURE;
+
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(RELATIONSHIP));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(relationshipId));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(address1));

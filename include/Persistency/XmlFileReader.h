@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Persistency/XmlFileReader.h
+ *  @file   PandoraSDK/include/Persistency/XmlFileReader.h
  * 
  *  @brief  Header file for the xml file reader class.
  * 
@@ -45,10 +45,11 @@ private:
     StatusCode GoToEvent(const unsigned int eventNumber);
     StatusCode ReadNextGeometryComponent();
     StatusCode ReadNextEventComponent();
-    StatusCode ReadTracker(PandoraApi::Geometry::Parameters *pGeometryParameters);
-    StatusCode ReadCoil(PandoraApi::Geometry::Parameters *pGeometryParameters);
-    StatusCode ReadAdditionalSubDetectors(PandoraApi::Geometry::Parameters *pGeometryParameters);
-    StatusCode ReadSubDetector(std::string &subDetectorName, PandoraApi::Geometry::Parameters::SubDetectorParameters *pSubDetectorParameters);
+
+    /**
+     *  @brief  Read a sub detector from the current position in the file
+     */
+    StatusCode ReadSubDetector();
 
     /**
      *  @brief  Read a box gap from the current position in the file

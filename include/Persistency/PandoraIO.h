@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Pandora/PandoraIO.h
+ *  @file   PandoraSDK/include/Pandora/PandoraIO.h
  * 
  *  @brief  Header file for pandora io structures.
  * 

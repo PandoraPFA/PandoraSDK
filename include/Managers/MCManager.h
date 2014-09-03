@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Managers/MCManager.h
+ *  @file   PandoraSDK/include/Managers/MCManager.h
  * 
  *  @brief  Header file for the mc particle manager class.
  * 
@@ -24,9 +24,11 @@ class MCManager : public InputObjectManager<MCParticle>
 {
 public:
     /**
-     *  @brief  Default constructor
+     *  @brief  Constructor
+     * 
+     *  @param  pPandora address of the associated pandora object
      */
-    MCManager();
+    MCManager(const Pandora *const pPandora);
 
     /**
      *  @brief  Destructor

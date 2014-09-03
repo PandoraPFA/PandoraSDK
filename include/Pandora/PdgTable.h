@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/PdgTable.h
+ *  @file   PandoraSDK/include/PdgTable.h
  * 
  *  @brief  Header file defining masses, widths, and mc id numbers from 2002 edition of rpp
  * 

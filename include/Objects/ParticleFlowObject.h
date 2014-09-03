@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Objects/ParticleFlowObject.h
+ *  @file   PandoraSDK/include/Objects/ParticleFlowObject.h
  * 
  *  @brief  Header file for the particle flow object class.
  * 
@@ -23,14 +23,6 @@ template<typename T> class AlgorithmObjectManager;
 class ParticleFlowObject
 {
 public:
-    /**
-     *  @brief  Sort pfos by descending energy 
-     * 
-     *  @param  pLhs address of first pfo
-     *  @param  pRhs address of second pfo
-     */
-    static bool SortByEnergy(const ParticleFlowObject *const pLhs, const ParticleFlowObject *const pRhs);
-
     /**
      *  @brief  Get the particle flow object id (PDG code)
      * 
@@ -253,13 +245,6 @@ private:
 };
 
 typedef ParticleFlowObject Pfo;                         ///< The ParticleFlowObject to Pfo typedef
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool ParticleFlowObject::SortByEnergy(const ParticleFlowObject *const pLhs, const ParticleFlowObject *const pRhs)
-{
-    return (pLhs->GetEnergy() > pRhs->GetEnergy());
-}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 

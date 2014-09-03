@@ -1,24 +1,21 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Api/PandoraContentApiImpl.cc
+ *  @file   PandoraSDK/src/Api/PandoraContentApiImpl.cc
  * 
  *  @brief  Implementation of the pandora content api class.
  * 
  *  $Log: $
  */
 
-#include "Pandora/Algorithm.h"
-#include "Pandora/AlgorithmTool.h"
-
 #include "Api/PandoraContentApiImpl.h"
-
-#include "Helpers/ReclusterHelper.h"
 
 #include "Managers/AlgorithmManager.h"
 #include "Managers/CaloHitManager.h"
 #include "Managers/ClusterManager.h"
+#include "Managers/GeometryManager.h"
 #include "Managers/MCManager.h"
-#include "Managers/TrackManager.h"
 #include "Managers/ParticleFlowObjectManager.h"
+#include "Managers/PluginManager.h"
+#include "Managers/TrackManager.h"
 #include "Managers/VertexManager.h"
 
 #include "Objects/Cluster.h"
@@ -26,6 +23,8 @@
 #include "Objects/Track.h"
 #include "Objects/Vertex.h"
 
+#include "Pandora/Algorithm.h"
+#include "Pandora/AlgorithmTool.h"
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraSettings.h"
 
@@ -114,6 +113,27 @@ StatusCode PandoraContentApiImpl::CreateObject(const PandoraApi::PointingCaloHit
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+const PandoraSettings *PandoraContentApiImpl::GetSettings() const
+{
+    return m_pPandora->GetSettings();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const GeometryManager *PandoraContentApiImpl::GetGeometry() const
+{
+    return m_pPandora->GetGeometry();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const PluginManager *PandoraContentApiImpl::GetPlugins() const
+{
+    return m_pPandora->GetPlugins();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode PandoraContentApiImpl::RepeatEventPreparation() const
 {
     return m_pPandora->PrepareEvent();
@@ -131,6 +151,44 @@ StatusCode PandoraContentApiImpl::CreateAlgorithmTool(TiXmlElement *const pXmlEl
 StatusCode PandoraContentApiImpl::CreateDaughterAlgorithm(TiXmlElement *const pXmlElement, std::string &daughterAlgorithmName) const
 {
     return m_pPandora->m_pAlgorithmManager->CreateAlgorithm(pXmlElement, daughterAlgorithmName);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PandoraContentApiImpl::RunAlgorithm(const std::string &algorithmName) const
+{
+    AlgorithmManager::AlgorithmMap::const_iterator iter = m_pPandora->m_pAlgorithmManager->m_algorithmMap.find(algorithmName);
+
+    if (m_pPandora->m_pAlgorithmManager->m_algorithmMap.end() == iter)
+        return STATUS_CODE_NOT_FOUND;
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PreRunAlgorithm(iter->second));
+
+    try
+    {
+        const bool shouldDisplayAlgorithmInfo(m_pPandora->GetSettings()->ShouldDisplayAlgorithmInfo());
+
+        if (shouldDisplayAlgorithmInfo)
+        {
+            for (unsigned int i = 1, iMax = m_pPandora->m_pCaloHitManager->m_algorithmInfoMap.size(); i < iMax; ++i) std::cout << "----";
+            std::cout << "> Running Algorithm: " << iter->first << ", " << iter->second->GetType() << std::endl;
+        }
+
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, iter->second->Run());
+    }
+    catch (StatusCodeException &statusCodeException)
+    {
+        std::cout << "Failure in algorithm " << iter->first << ", " << iter->second->GetType() << ", " << statusCodeException.ToString()
+                  << statusCodeException.GetBackTrace() << std::endl;
+    }
+    catch (...)
+    {
+        std::cout << "Failure in algorithm " << iter->first << ", " << iter->second->GetType() << ", unrecognized exception" << std::endl;
+    }
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PostRunAlgorithm(iter->second));
+
+    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -672,13 +730,6 @@ StatusCode PandoraContentApiImpl::RemoveAllTrackClusterAssociations() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraContentApiImpl::RepeatMCParticlePreparation() const
-{
-    return m_pPandora->PrepareMCParticles();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 StatusCode PandoraContentApiImpl::RemoveAllMCParticleRelationships() const
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pMCManager->RemoveAllMCParticleRelationships());
@@ -769,7 +820,7 @@ bool PandoraContentApiImpl::IsAddToClusterAllowed(Cluster *pCluster, CaloHit *pC
     if (!m_pPandora->m_pCaloHitManager->IsCaloHitAvailable(pCaloHit))
         return false;
 
-    if (!PandoraSettings::SingleHitTypeClusteringMode())
+    if (!m_pPandora->GetSettings()->SingleHitTypeClusteringMode())
         return true;
 
     CaloHit *pFirstCaloHit(NULL);
@@ -1041,7 +1092,6 @@ StatusCode PandoraContentApiImpl::InitializeReclustering(const Algorithm &algori
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pTrackManager->InitializeReclustering(&algorithm, inputTrackList, originalClustersListName));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->InitializeReclustering(&algorithm, inputClusterList, originalClustersListName));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, ReclusterHelper::InitializeReclusterMonitoring(inputTrackList));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -1062,45 +1112,6 @@ StatusCode PandoraContentApiImpl::EndReclustering(const Algorithm &algorithm, co
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->ResetAlgorithmInfo(&algorithm, false));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pTrackManager->ResetAlgorithmInfo(&algorithm, false));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->EndReclustering(&algorithm, selectedClusterListName));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, ReclusterHelper::EndReclusterMonitoring());
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode PandoraContentApiImpl::RunAlgorithm(const std::string &algorithmName) const
-{
-    AlgorithmManager::AlgorithmMap::const_iterator iter = m_pPandora->m_pAlgorithmManager->m_algorithmMap.find(algorithmName);
-
-    if (m_pPandora->m_pAlgorithmManager->m_algorithmMap.end() == iter)
-        return STATUS_CODE_NOT_FOUND;
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PreRunAlgorithm(iter->second));
-
-    try
-    {
-        const bool shouldDisplayAlgorithmInfo(PandoraSettings::ShouldDisplayAlgorithmInfo());
-
-        if (shouldDisplayAlgorithmInfo)
-        {
-            for (unsigned int i = 1, iMax = m_pPandora->m_pCaloHitManager->m_algorithmInfoMap.size(); i < iMax; ++i) std::cout << "----";
-            std::cout << "> Running Algorithm: " << iter->first << ", " << iter->second->GetAlgorithmType() << std::endl;
-        }
-
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, iter->second->Run());
-    }
-    catch (StatusCodeException &statusCodeException)
-    {
-        std::cout << "Failure in algorithm " << iter->first << ", " << iter->second->GetAlgorithmType() << ", " << statusCodeException.ToString()
-                  << statusCodeException.GetBackTrace() << std::endl;
-    }
-    catch (...)
-    {
-        std::cout << "Failure in algorithm " << iter->first << ", " << iter->second->GetAlgorithmType() << ", unrecognized exception" << std::endl;
-    }
-
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PostRunAlgorithm(iter->second));
 
     return STATUS_CODE_SUCCESS;
 }

@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Helpers/MCParticleHelper.h
+ *  @file   PandoraSDK/include/Helpers/MCParticleHelper.h
  * 
  *  @brief  Header file for the mc particle helper class.
  * 
@@ -14,10 +14,6 @@
 namespace pandora
 {
 
-class TiXmlHandle;
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 /**
  *  @brief  MCParticleHelper class
  */
@@ -25,23 +21,14 @@ class MCParticleHelper
 {
 public:
     /**
-     *  @brief  Find the mc particle making the largest electromagnetic energy contribution to a specified cluster
+     *  @brief  Find the mc particle making the largest contribution to a specified calo hit or cluster
      * 
-     *  @param  pCluster address of the cluster to examine
+     *  @param  pT address of the calo hit or cluster to examine
      * 
      *  @return address of the main mc particle
      */
-    static const MCParticle *GetMainMCParticle(const pandora::Cluster *const pCluster);
-
-private:
-    /**
-     *  @brief  Read the cluster helper settings
-     * 
-     *  @param  pXmlHandle address of the relevant xml handle
-     */
-    static StatusCode ReadSettings(const TiXmlHandle *const pXmlHandle);
-
-    friend class PandoraSettings;
+    template <typename T>
+    static const MCParticle *GetMainMCParticle(const T *const pT);
 };
 
 } // namespace pandora

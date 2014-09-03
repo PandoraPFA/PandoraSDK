@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Objects/Histograms.h
+ *  @file   PandoraSDK/include/Objects/Histograms.h
  * 
  *  @brief  Header file for histogram classes
  * 

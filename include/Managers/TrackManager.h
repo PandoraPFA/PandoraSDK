@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Managers/TrackManager.h
+ *  @file   PandoraSDK/include/Managers/TrackManager.h
  * 
  *  @brief  Header file for the track manager class.
  * 
@@ -24,9 +24,11 @@ class TrackManager : public InputObjectManager<Track>
 {
 public:
     /**
-     *  @brief  Default constructor
+     *  @brief  Constructor
+     * 
+     *  @param  pPandora address of the associated pandora object
      */
-    TrackManager();
+    TrackManager(const Pandora *const pPandora);
 
     /**
      *  @brief  Destructor

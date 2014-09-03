@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Managers/MCManager.cc
+ *  @file   PandoraSDK/src/Managers/MCManager.cc
  * 
  *  @brief  Implementation of the mc manager class.
  * 
@@ -10,6 +10,7 @@
 
 #include "Objects/MCParticle.h"
 
+#include "Pandora/Pandora.h"
 #include "Pandora/PandoraSettings.h"
 
 namespace pandora
@@ -19,8 +20,8 @@ const std::string MCManager::SELECTED_LIST_NAME = "Selected";
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-MCManager::MCManager() :
-    InputObjectManager<MCParticle>()
+MCManager::MCManager(const Pandora *const pPandora) :
+    InputObjectManager<MCParticle>(pPandora)
 {
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateInitialLists());
 }
@@ -121,7 +122,7 @@ StatusCode MCManager::SelectPfoTargets()
         m_nameToListMap.erase(selectedIter);
 
     // Strip down mc particles and relationships to just those of pfo targets, if specified
-    static const bool shouldCollapseMCParticlesToPfoTarget(PandoraSettings::ShouldCollapseMCParticlesToPfoTarget());
+    const bool shouldCollapseMCParticlesToPfoTarget(m_pPandora->GetSettings()->ShouldCollapseMCParticlesToPfoTarget());
 
     MCParticleList selectedMCPfoList;
 
@@ -152,9 +153,9 @@ StatusCode MCManager::SelectPfoTargets()
 
 StatusCode MCManager::ApplyPfoSelectionRules(MCParticle *const pMCParticle, MCParticleList &mcPfoList) const
 {
-    static const float selectionRadius(PandoraSettings::GetMCPfoSelectionRadius());
-    static const float selectionMomentum(PandoraSettings::GetMCPfoSelectionMomentum());
-    static const float selectionEnergyCutOffProtonsNeutrons(PandoraSettings::GetMCPfoSelectionLowEnergyNeutronProtonCutOff());
+    const float selectionRadius(m_pPandora->GetSettings()->GetMCPfoSelectionRadius());
+    const float selectionMomentum(m_pPandora->GetSettings()->GetMCPfoSelectionMomentum());
+    const float selectionEnergyCutOffProtonsNeutrons(m_pPandora->GetSettings()->GetMCPfoSelectionLowEnergyNeutronProtonCutOff());
 
     const int particleId(pMCParticle->GetParticleId());
 
@@ -252,7 +253,7 @@ StatusCode MCManager::RemoveMCParticleRelationships(MCParticle *const pMCParticl
 StatusCode MCManager::SetUidToMCParticleRelationship(const Uid objectUid, const Uid mcParticleUid, const float mcParticleWeight,
     ObjectRelationMap &objectRelationMap) const
 {
-    static const bool useSingleMCParticleAssociation(PandoraSettings::UseSingleMCParticleAssociation());
+    const bool useSingleMCParticleAssociation(m_pPandora->GetSettings()->UseSingleMCParticleAssociation());
     ObjectRelationMap::iterator iter = objectRelationMap.find(objectUid);
 
     if (objectRelationMap.end() != iter)
@@ -288,7 +289,7 @@ StatusCode MCManager::CreateUidToPfoTargetsMap(UidToMCParticleWeightMap &uidToMC
     if (m_uidToMCParticleMap.empty())
         return STATUS_CODE_SUCCESS;
 
-    static const bool shouldCollapseMCParticlesToPfoTarget(PandoraSettings::ShouldCollapseMCParticlesToPfoTarget());
+    const bool shouldCollapseMCParticlesToPfoTarget(m_pPandora->GetSettings()->ShouldCollapseMCParticlesToPfoTarget());
 
     for (ObjectRelationMap::const_iterator relationIter = objectRelationMap.begin(), relationIterEnd = objectRelationMap.end();
         relationIter != relationIterEnd; ++relationIter)

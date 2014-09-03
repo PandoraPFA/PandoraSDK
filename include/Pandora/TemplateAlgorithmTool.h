@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Pandora/TemplateAlgorithmTool.h
+ *  @file   PandoraSDK/include/Pandora/TemplateAlgorithmTool.h
  * 
  *  @brief  Header file for the template algorithm tool class.
  * 

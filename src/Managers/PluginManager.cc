@@ -1,139 +1,143 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Managers/PluginManager.cc
+ *  @file   PandoraSDK/src/Managers/PluginManager.cc
  * 
  *  @brief  Implementation of the pandora plugin manager class.
  * 
  *  $Log: $
  */
 
-#include "Helpers/EnergyCorrectionsHelper.h"
-#include "Helpers/ParticleIdHelper.h"
 #include "Helpers/XmlHelper.h"
 
 #include "Managers/PluginManager.h"
 
+#include "Plugins/BFieldPlugin.h"
+#include "Plugins/EnergyCorrectionsPlugin.h"
+#include "Plugins/ParticleIdPlugin.h"
+#include "Plugins/PseudoLayerPlugin.h"
+#include "Plugins/ShowerProfilePlugin.h"
+
 namespace pandora
 {
 
-PluginManager::PluginManager()
+PluginManager::PluginManager(const Pandora *const pPandora) :
+    m_pBFieldPlugin(NULL),
+    m_pPseudoLayerPlugin(NULL),
+    m_pShowerProfilePlugin(NULL),
+    m_pEnergyCorrections(NULL),
+    m_pParticleId(NULL),
+    m_pPandora(pPandora)
 {
+    try
+    {
+        m_pEnergyCorrections = new EnergyCorrections(m_pPandora);
+        m_pParticleId = new ParticleId(m_pPandora);
+    }
+    catch (StatusCodeException &statusCodeException)
+    {
+        std::cout << "Failed to create pandora plugin manager instance " << statusCodeException.ToString() << std::endl;
+        delete this;
+        throw statusCodeException;
+    }
+    catch (...)
+    {
+        std::cout << "Failed to create pandora plugin manager instance " << std::endl;
+        delete this;
+        throw;
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 PluginManager::~PluginManager()
 {
-    m_hadEnergyCorrectionFunctionMap.clear();
-    m_emEnergyCorrectionFunctionMap.clear();
-    m_particleIdFunctionMap.clear();
+    delete m_pBFieldPlugin;
+    delete m_pPseudoLayerPlugin;
+    delete m_pShowerProfilePlugin;
+
+    delete m_pEnergyCorrections;
+    delete m_pParticleId;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PluginManager::RegisterEnergyCorrectionFunction(const std::string &functionName, const EnergyCorrectionType energyCorrectionType,
-    EnergyCorrectionFunction *pEnergyCorrectionFunction)
+const BFieldPlugin *PluginManager::GetBFieldPlugin() const
 {
-    EnergyCorrectionFunctionMap &energyCorrectionFunctionMap(this->GetEnergyCorrectionFunctionMap(energyCorrectionType));
+    if (NULL == m_pBFieldPlugin)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
-    if (!energyCorrectionFunctionMap.insert(EnergyCorrectionFunctionMap::value_type(functionName, pEnergyCorrectionFunction)).second)
-        return STATUS_CODE_ALREADY_PRESENT;
+    return m_pBFieldPlugin;
+}
 
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const PseudoLayerPlugin *PluginManager::GetPseudoLayerPlugin() const
+{
+    if (NULL == m_pPseudoLayerPlugin)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
+    return m_pPseudoLayerPlugin;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const ShowerProfilePlugin *PluginManager::GetShowerProfilePlugin() const
+{
+    if (NULL == m_pShowerProfilePlugin)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
+    return m_pShowerProfilePlugin;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const EnergyCorrections *PluginManager::GetEnergyCorrections() const
+{
+    if (NULL == m_pEnergyCorrections)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
+    return m_pEnergyCorrections;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const ParticleId *PluginManager::GetParticleId() const
+{
+    if (NULL == m_pParticleId)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
+    return m_pParticleId;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PluginManager::SetBFieldPlugin(BFieldPlugin *pBFieldPlugin)
+{
+    if (NULL != m_pBFieldPlugin)
+        return STATUS_CODE_ALREADY_INITIALIZED;
+
+    m_pBFieldPlugin = pBFieldPlugin;
     return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PluginManager::InitializeEnergyCorrectionFunctions(const TiXmlHandle *const pXmlHandle, const std::string &xmlTagName,
-    const EnergyCorrectionType energyCorrectionType, EnergyCorrectionFunctionVector &energyCorrectionFunctionVector)
+StatusCode PluginManager::SetPseudoLayerPlugin(PseudoLayerPlugin *pPseudoLayerPlugin)
 {
-    StringVector requestedFunctionNames;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadVectorOfValues(*pXmlHandle,
-        xmlTagName, requestedFunctionNames));
+    if (NULL != m_pPseudoLayerPlugin)
+        return STATUS_CODE_ALREADY_INITIALIZED;
 
-    if (!requestedFunctionNames.empty())
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AssignEnergyCorrectionFunctions(requestedFunctionNames,
-            energyCorrectionType, energyCorrectionFunctionVector));
-    }
-
+    m_pPseudoLayerPlugin = pPseudoLayerPlugin;
     return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PluginManager::AssignEnergyCorrectionFunctions(const StringVector &functionNames, const EnergyCorrectionType energyCorrectionType,
-    EnergyCorrectionFunctionVector &energyCorrectionFunctionVector)
+StatusCode PluginManager::SetShowerProfilePlugin(ShowerProfilePlugin *pShowerProfilePlugin)
 {
-    EnergyCorrectionFunctionMap &energyCorrectionFunctionMap(this->GetEnergyCorrectionFunctionMap(energyCorrectionType));
+    if (NULL != m_pShowerProfilePlugin)
+        return STATUS_CODE_ALREADY_INITIALIZED;
 
-    for (StringVector::const_iterator nameIter = functionNames.begin(), nameIterEnd = functionNames.end(); nameIter != nameIterEnd; ++nameIter)
-    {
-        EnergyCorrectionFunctionMap::const_iterator iter = energyCorrectionFunctionMap.find(*nameIter);
-
-        if (energyCorrectionFunctionMap.end() == iter)
-            return STATUS_CODE_NOT_FOUND;
-
-        energyCorrectionFunctionVector.push_back(iter->second);
-    }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-PluginManager::EnergyCorrectionFunctionMap &PluginManager::GetEnergyCorrectionFunctionMap(const EnergyCorrectionType energyCorrectionType)
-{
-    switch (energyCorrectionType)
-    {
-    case HADRONIC:
-        return m_hadEnergyCorrectionFunctionMap;
-
-    case ELECTROMAGNETIC:
-        return m_emEnergyCorrectionFunctionMap;
-
-    default:
-        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
-    }
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode PluginManager::RegisterParticleIdFunction(const std::string &functionName, ParticleIdFunction *pParticleIdFunction)
-{
-    if (!m_particleIdFunctionMap.insert(ParticleIdFunctionMap::value_type(functionName, pParticleIdFunction)).second)
-        return STATUS_CODE_ALREADY_PRESENT;
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode PluginManager::InitializeParticleIdFunction(const TiXmlHandle *const pXmlHandle, const std::string &xmlTagName,
-    ParticleIdFunction *&pParticleIdFunction)
-{
-    std::string requestedFunctionName;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(*pXmlHandle,
-        xmlTagName, requestedFunctionName));
-
-    if (!requestedFunctionName.empty())
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AssignParticleIdFunction(requestedFunctionName, pParticleIdFunction));
-    }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode PluginManager::AssignParticleIdFunction(const std::string &functionName, ParticleIdFunction *&pParticleIdFunction) const
-{
-    ParticleIdFunctionMap::const_iterator iter = m_particleIdFunctionMap.find(functionName);
-
-    if (m_particleIdFunctionMap.end() == iter)
-        return STATUS_CODE_NOT_FOUND;
-
-    pParticleIdFunction = iter->second;
-
+    m_pShowerProfilePlugin = pShowerProfilePlugin;
     return STATUS_CODE_SUCCESS;
 }
 
@@ -141,37 +145,41 @@ StatusCode PluginManager::AssignParticleIdFunction(const std::string &functionNa
 
 StatusCode PluginManager::InitializePlugins(const TiXmlHandle *const pXmlHandle)
 {
-    // Energy correction functions
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitializeEnergyCorrectionFunctions(pXmlHandle,
-        "HadronicEnergyCorrectionFunctions", HADRONIC, EnergyCorrectionsHelper::m_hadEnergyCorrectionFunctions));
+    if (NULL != m_pBFieldPlugin)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBFieldPlugin->RegisterDetails(m_pPandora, "BFieldPlugin"));
+        TiXmlElement *pBFieldXmlElement(pXmlHandle->FirstChild("BFieldPlugin").Element());
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitializeEnergyCorrectionFunctions(pXmlHandle,
-        "ElectromagneticEnergyCorrectionFunctions", ELECTROMAGNETIC, EnergyCorrectionsHelper::m_emEnergyCorrectionFunctions));
+        if (NULL != pBFieldXmlElement)
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBFieldPlugin->ReadSettings(TiXmlHandle(pBFieldXmlElement)));
 
-    // Particle id functions
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitializeParticleIdFunction(pXmlHandle,
-        "EmShowerFastFunction", ParticleIdHelper::m_pEmShowerFastFunction));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBFieldPlugin->Initialize());
+    }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitializeParticleIdFunction(pXmlHandle,
-        "EmShowerFullFunction", ParticleIdHelper::m_pEmShowerFullFunction));
+    if (NULL != m_pPseudoLayerPlugin)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPseudoLayerPlugin->RegisterDetails(m_pPandora, "PseudoLayerPlugin"));
+        TiXmlElement *pPseudoLayerXmlElement(pXmlHandle->FirstChild("PseudoLayerPlugin").Element());
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitializeParticleIdFunction(pXmlHandle,
-        "PhotonFastFunction", ParticleIdHelper::m_pPhotonFastFunction));
+        if (NULL != pPseudoLayerXmlElement)
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPseudoLayerPlugin->ReadSettings(TiXmlHandle(pPseudoLayerXmlElement)));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitializeParticleIdFunction(pXmlHandle,
-        "PhotonFullFunction", ParticleIdHelper::m_pPhotonFullFunction));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPseudoLayerPlugin->Initialize());
+    }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitializeParticleIdFunction(pXmlHandle,
-        "ElectronFastFunction", ParticleIdHelper::m_pElectronFastFunction));
+    if (NULL != m_pShowerProfilePlugin)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pShowerProfilePlugin->RegisterDetails(m_pPandora, "ShowerProfilePlugin"));
+        TiXmlElement *pShowerProfileXmlElement(pXmlHandle->FirstChild("ShowerProfilePlugin").Element());
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitializeParticleIdFunction(pXmlHandle,
-        "ElectronFullFunction", ParticleIdHelper::m_pElectronFullFunction));
+        if (NULL != pShowerProfileXmlElement)
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pShowerProfilePlugin->ReadSettings(TiXmlHandle(pShowerProfileXmlElement)));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitializeParticleIdFunction(pXmlHandle,
-        "MuonFastFunction", ParticleIdHelper::m_pMuonFastFunction));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pShowerProfilePlugin->Initialize());
+    }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitializeParticleIdFunction(pXmlHandle,
-        "MuonFullFunction", ParticleIdHelper::m_pMuonFullFunction));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pEnergyCorrections->InitializePlugins(pXmlHandle));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pParticleId->InitializePlugins(pXmlHandle));
 
     return STATUS_CODE_SUCCESS;
 }

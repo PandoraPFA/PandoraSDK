@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Persistency/BinaryFileReader.cc
+ *  @file   PandoraSDK/src/Persistency/BinaryFileReader.cc
  * 
  *  @brief  Implementation of the binary file reader class.
  * 
@@ -153,6 +153,8 @@ StatusCode BinaryFileReader::ReadNextGeometryComponent()
 
     switch (componentId)
     {
+    case SUB_DETECTOR:
+        return this->ReadSubDetector(false);
     case BOX_GAP:
         return this->ReadBoxGap(false);
     case CONCENTRIC_GAP:
@@ -200,98 +202,22 @@ StatusCode BinaryFileReader::ReadNextEventComponent()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadTracker(PandoraApi::Geometry::Parameters *pGeometryParameters)
+StatusCode BinaryFileReader::ReadSubDetector(bool checkComponentId)
 {
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    bool readMainTrackerDetails(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(readMainTrackerDetails));
-
-    if (readMainTrackerDetails)
+    if (checkComponentId)
     {
-        float mainTrackerInnerRadius(0.f);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(mainTrackerInnerRadius));
-        float mainTrackerOuterRadius(0.f);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(mainTrackerOuterRadius));
-        float mainTrackerZExtent(0.f);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(mainTrackerZExtent));
-        pGeometryParameters->m_mainTrackerInnerRadius = mainTrackerInnerRadius;
-        pGeometryParameters->m_mainTrackerOuterRadius = mainTrackerOuterRadius;
-        pGeometryParameters->m_mainTrackerZExtent = mainTrackerZExtent;
+        ComponentId componentId(UNKNOWN_COMPONENT);
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
+
+        if (SUB_DETECTOR != componentId)
+            return STATUS_CODE_FAILURE;
     }
 
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode BinaryFileReader::ReadCoil(PandoraApi::Geometry::Parameters *pGeometryParameters)
-{
-    if (GEOMETRY != m_containerId)
-        return STATUS_CODE_FAILURE;
-
-    bool readCoilDetails(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(readCoilDetails));
-
-    if (readCoilDetails)
-    {
-        float coilInnerRadius(0.f);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(coilInnerRadius));
-        float coilOuterRadius(0.f);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(coilOuterRadius));
-        float coilZExtent(0.f);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(coilZExtent));
-        pGeometryParameters->m_coilInnerRadius = coilInnerRadius;
-        pGeometryParameters->m_coilOuterRadius = coilOuterRadius;
-        pGeometryParameters->m_coilZExtent = coilZExtent;
-    }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode BinaryFileReader::ReadAdditionalSubDetectors(PandoraApi::Geometry::Parameters *pGeometryParameters)
-{
-    if (GEOMETRY != m_containerId)
-        return STATUS_CODE_FAILURE;
-
-    unsigned int nAdditionalSubDetectors(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(nAdditionalSubDetectors));
-
-    for (unsigned int iSubDetector = 0; iSubDetector < nAdditionalSubDetectors; ++iSubDetector)
-    {
-        std::string subDetectorName;
-        PandoraApi::Geometry::Parameters::SubDetectorParameters subDetectorParameters;
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadSubDetector(subDetectorName, &subDetectorParameters));
-        pGeometryParameters->m_additionalSubDetectors.insert(std::make_pair(subDetectorName, subDetectorParameters));
-    }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode BinaryFileReader::ReadSubDetector(std::string &subDetectorName, PandoraApi::Geometry::Parameters::SubDetectorParameters *pSubDetectorParameters)
-{
-    if (GEOMETRY != m_containerId)
-        return STATUS_CODE_FAILURE;
-
-    ComponentId componentId(UNKNOWN_COMPONENT);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
-
-    if (SUB_DETECTOR != componentId)
-        return STATUS_CODE_FAILURE;
-
+    std::string subDetectorName;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(subDetectorName));
-
-    bool isInitialized(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(isInitialized));
-
-    if (!isInitialized)
-        return STATUS_CODE_SUCCESS;
-
     float innerRCoordinate(0.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(innerRCoordinate));
     float innerZCoordinate(0.f);
@@ -313,16 +239,18 @@ StatusCode BinaryFileReader::ReadSubDetector(std::string &subDetectorName, Pando
     unsigned int nLayers(0);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(nLayers));
 
-    pSubDetectorParameters->m_innerRCoordinate = innerRCoordinate;
-    pSubDetectorParameters->m_innerZCoordinate = innerZCoordinate;
-    pSubDetectorParameters->m_innerPhiCoordinate = innerPhiCoordinate;
-    pSubDetectorParameters->m_innerSymmetryOrder = innerSymmetryOrder;
-    pSubDetectorParameters->m_outerRCoordinate = outerRCoordinate;
-    pSubDetectorParameters->m_outerZCoordinate = outerZCoordinate;
-    pSubDetectorParameters->m_outerPhiCoordinate = outerPhiCoordinate;
-    pSubDetectorParameters->m_outerSymmetryOrder = outerSymmetryOrder;
-    pSubDetectorParameters->m_isMirroredInZ = isMirroredInZ;
-    pSubDetectorParameters->m_nLayers = nLayers;
+    PandoraApi::Geometry::SubDetector::Parameters parameters;
+    parameters.m_subDetectorName = subDetectorName;
+    parameters.m_innerRCoordinate = innerRCoordinate;
+    parameters.m_innerZCoordinate = innerZCoordinate;
+    parameters.m_innerPhiCoordinate = innerPhiCoordinate;
+    parameters.m_innerSymmetryOrder = innerSymmetryOrder;
+    parameters.m_outerRCoordinate = outerRCoordinate;
+    parameters.m_outerZCoordinate = outerZCoordinate;
+    parameters.m_outerPhiCoordinate = outerPhiCoordinate;
+    parameters.m_outerSymmetryOrder = outerSymmetryOrder;
+    parameters.m_isMirroredInZ = isMirroredInZ;
+    parameters.m_nLayers = nLayers;
 
     for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
     {
@@ -333,12 +261,14 @@ StatusCode BinaryFileReader::ReadSubDetector(std::string &subDetectorName, Pando
         float nInteractionLengths(0.f);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(nInteractionLengths));
 
-        PandoraApi::Geometry::Parameters::LayerParameters layerParameters;
+        PandoraApi::Geometry::LayerParameters layerParameters;
         layerParameters.m_closestDistanceToIp = closestDistanceToIp;
         layerParameters.m_nRadiationLengths = nRadiationLengths;
         layerParameters.m_nInteractionLengths = nInteractionLengths;
-        pSubDetectorParameters->m_layerParametersList.push_back(layerParameters);
+        parameters.m_layerParametersList.push_back(layerParameters);
     }
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::SubDetector::Create(*m_pPandora, parameters));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -368,12 +298,12 @@ StatusCode BinaryFileReader::ReadBoxGap(bool checkComponentId)
     CartesianVector side3(0.f, 0.f, 0.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(side3));
 
-    PandoraApi::BoxGap::Parameters parameters;
+    PandoraApi::Geometry::BoxGap::Parameters parameters;
     parameters.m_vertex = vertex;
     parameters.m_side1 = side1;
     parameters.m_side2 = side2;
     parameters.m_side3 = side3;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::BoxGap::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::BoxGap::Create(*m_pPandora, parameters));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -411,7 +341,7 @@ StatusCode BinaryFileReader::ReadConcentricGap(bool checkComponentId)
     unsigned int outerSymmetryOrder(0);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(outerSymmetryOrder));
 
-    PandoraApi::ConcentricGap::Parameters parameters;
+    PandoraApi::Geometry::ConcentricGap::Parameters parameters;
     parameters.m_minZCoordinate = minZCoordinate;
     parameters.m_maxZCoordinate = maxZCoordinate;
     parameters.m_innerRCoordinate = innerRCoordinate;
@@ -420,7 +350,7 @@ StatusCode BinaryFileReader::ReadConcentricGap(bool checkComponentId)
     parameters.m_outerRCoordinate = outerRCoordinate;
     parameters.m_outerPhiCoordinate = outerPhiCoordinate;
     parameters.m_outerSymmetryOrder = outerSymmetryOrder;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::ConcentricGap::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::ConcentricGap::Create(*m_pPandora, parameters));
 
     return STATUS_CODE_SUCCESS;
 }

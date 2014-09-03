@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Api/PandoraContentApi.h
+ *  @file   PandoraSDK/include/Api/PandoraContentApi.h
  *
  *  @brief  Header file for the pandora content api class.
  *
@@ -10,11 +10,10 @@
 
 #include "Api/PandoraApi.h"
 
-#include "Pandora/Pandora.h"
 #include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraInternal.h"
 
-namespace pandora { class Algorithm; class AlgorithmTool; class TiXmlElement; class TiXmlHandle; }
+namespace pandora { class Algorithm; class AlgorithmTool; class TiXmlElement; }
 namespace pandora { class CaloHit; class Cluster; class MCParticle; class ParticleFlowObject; class Track; class Vertex; }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -95,6 +94,36 @@ public:
     typedef ObjectCreationHelper<PandoraApi::PointingCaloHit::Parameters, pandora::CaloHit> PointingCaloHit;
 
 
+    /* Accessors for plugins and global settings */
+
+    /**
+     *  @brief  Get the pandora settings instance
+     * 
+     *  @param  algorithm the algorithm calling this function
+     * 
+     *  @return the address of the pandora settings instance
+     */
+    static const pandora::PandoraSettings *GetSettings(const pandora::Algorithm &algorithm);
+
+    /**
+     *  @brief  Get the pandora geometry instance
+     * 
+     *  @param  algorithm the algorithm calling this function
+     * 
+     *  @return the address of the pandora geometry instance
+     */
+    static const pandora::GeometryManager *GetGeometry(const pandora::Algorithm &algorithm);
+
+    /**
+     *  @brief  Get the pandora plugin instance, providing access to user registered functions and calculators
+     * 
+     *  @param  algorithm the algorithm calling this function
+     * 
+     *  @return the address of the pandora plugin instance
+     */
+    static const pandora::PluginManager *GetPlugins(const pandora::Algorithm &algorithm);
+
+
     /* High-level steering functions */
 
     /**
@@ -108,41 +137,41 @@ public:
      *  @brief  Create an algorithm tool instance, via one of the algorithm tool factories registered with pandora.
      *          This function is expected to be called whilst reading the settings for a parent algorithm.
      * 
-     *  @param  parentAlgorithm the parent algorithm, which will later run this algorithm tool
+     *  @param  algorithm the parent algorithm, which will later run this algorithm tool
      *  @param  pXmlElement address of the xml element describing the algorithm tool type and settings
      *  @param  pAlgorithmTool to receive the address of the algorithm tool instance
      */
-    static pandora::StatusCode CreateAlgorithmTool(const pandora::Algorithm &parentAlgorithm, pandora::TiXmlElement *const pXmlElement,
+    static pandora::StatusCode CreateAlgorithmTool(const pandora::Algorithm &algorithm, pandora::TiXmlElement *const pXmlElement,
         pandora::AlgorithmTool *&pAlgorithmTool);
 
     /**
      *  @brief  Create an algorithm instance, via one of the algorithm factories registered with pandora.
      *          This function is expected to be called whilst reading the settings for a parent algorithm.
      * 
-     *  @param  parentAlgorithm address of the parent algorithm, which will later run this daughter algorithm
+     *  @param  algorithm address of the parent algorithm, which will later run this daughter algorithm
      *  @param  pXmlElement address of the xml element describing the daughter algorithm type and settings
      *  @param  daughterAlgorithmName to receive the name of the daughter algorithm instance
      */
-    static pandora::StatusCode CreateDaughterAlgorithm(const pandora::Algorithm &parentAlgorithm, pandora::TiXmlElement *const pXmlElement,
+    static pandora::StatusCode CreateDaughterAlgorithm(const pandora::Algorithm &algorithm, pandora::TiXmlElement *const pXmlElement,
         std::string &daughterAlgorithmName);
 
     /**
      *  @brief  Run an algorithm registered with pandora, from within a parent algorithm
      * 
-     *  @param  parentAlgorithm the parent algorithm, now attempting to run a daughter algorithm
+     *  @param  algorithm the parent algorithm, now attempting to run a daughter algorithm
      *  @param  daughterAlgorithmName the name of the daughter algorithm instance to run
      */
-    static pandora::StatusCode RunDaughterAlgorithm(const pandora::Algorithm &parentAlgorithm, const std::string &daughterAlgorithmName);
+    static pandora::StatusCode RunDaughterAlgorithm(const pandora::Algorithm &algorithm, const std::string &daughterAlgorithmName);
 
     /**
      *  @brief  Run a clustering algorithm (an algorithm that will create new cluster objects)
      * 
-     *  @param  algorithm the algorithm calling this function
+     *  @param  algorithm the parent algorithm, now attempting to run a daughter clustering algorithm
      *  @param  clusteringAlgorithmName the name of the clustering algorithm to run
      *  @param  pNewClusterList to receive the address of the new cluster list populated
      *  @param  newClusterListName to receive the name of the new cluster list populated
      */
-    static pandora::StatusCode RunClusteringAlgorithm(const pandora::Algorithm &algorithm, const std::string &clusteringAlgorithmName, 
+    static pandora::StatusCode RunClusteringAlgorithm(const pandora::Algorithm &algorithm, const std::string &clusteringAlgorithmName,
         const pandora::ClusterList *&pNewClusterList, std::string &newClusterListName);
 
 
@@ -262,7 +291,8 @@ public:
      *  @param  t a subset of the old object list - only objects in both this and the old list will be saved
      */
     template <typename T>
-    static pandora::StatusCode SaveList(const pandora::Algorithm &algorithm, const std::string &oldListName, const std::string &newListName, const T &t);
+    static pandora::StatusCode SaveList(const pandora::Algorithm &algorithm, const std::string &oldListName, const std::string &newListName,
+        const T &t);
 
     /**
      *  @brief  Temporarily replace the current list with another list, which may only be a temporary list. This switch
@@ -427,13 +457,6 @@ public:
 
 
     /* MCParticle-related functions */
-
-    /**
-     *  @brief  Repeat the mc particle preparation, performing pfo target identification and forming relationships with tracks/calo hits
-     *
-     *  @param  algorithm the algorithm calling this function
-     */
-    static pandora::StatusCode RepeatMCParticlePreparation(const pandora::Algorithm &algorithm);
 
     /**
      *  @brief  Remove all mc particle relationships previously registered with the mc manager and linked to tracks/calo hits

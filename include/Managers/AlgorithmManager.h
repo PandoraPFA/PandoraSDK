@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Managers/AlgorithmManager.h
+ *  @file   PandoraSDK/include/Managers/AlgorithmManager.h
  * 
  *  @brief  Header file for the algorithm manager class.
  * 
@@ -11,9 +11,6 @@
 #include "Pandora/PandoraInternal.h"
 #include "Pandora/StatusCodes.h"
 
-class TiXmlElement;
-class TiXmlHandle;
-
 namespace pandora
 {
 
@@ -22,6 +19,8 @@ class AlgorithmTool;
 class AlgorithmFactory;
 class AlgorithmToolFactory;
 class Pandora;
+class TiXmlElement;
+class TiXmlHandle;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -32,11 +31,11 @@ class AlgorithmManager
 {
 public:
     /**
-     *  @brief  Default constructor
+     *  @brief  Constructor
      * 
-     *  @param  pPandora address of the pandora object to interface
+     *  @param  pPandora address of the associated pandora object
      */
-    AlgorithmManager(Pandora *pPandora);
+    AlgorithmManager(const Pandora *const pPandora);
 
     /**
      *  @brief  Destructor
@@ -48,7 +47,7 @@ public:
      *
      *  @return address of the list pandora algorithms
      */
-    const StringVector *GetPandoraAlgorithms() const;
+    const StringVector &GetPandoraAlgorithms() const;
 
 private:
     /**
@@ -114,7 +113,7 @@ private:
     AlgorithmToolList               m_algorithmToolList;                ///< The algorithm tool list
     AlgorithmToolFactoryMap         m_algorithmToolFactoryMap;          ///< The algorithm tool factory map
 
-    Pandora                         *m_pPandora;                        ///< The pandora object that will run the algorithms
+    const Pandora *const            m_pPandora;                        ///< The pandora object that will run the algorithms
 
     friend class PandoraApiImpl;
     friend class PandoraContentApiImpl;
@@ -123,9 +122,9 @@ private:
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const StringVector *AlgorithmManager::GetPandoraAlgorithms() const
+inline const StringVector &AlgorithmManager::GetPandoraAlgorithms() const
 {
-    return &m_pandoraAlgorithms;
+    return m_pandoraAlgorithms;
 }
 
 } // namespace pandora

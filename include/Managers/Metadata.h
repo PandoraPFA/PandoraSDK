@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Managers/Metadata.h
+ *  @file   PandoraSDK/include/Managers/Metadata.h
  * 
  *  @brief  Header file for metadata classes.
  * 

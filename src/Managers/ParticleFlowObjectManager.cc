@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Managers/ParticleFlowObjectManager.cc
+ *  @file   PandoraSDK/src/Managers/ParticleFlowObjectManager.cc
  * 
  *  @brief  Implementation of the particle flow object manager class.
  * 
@@ -13,8 +13,8 @@
 namespace pandora
 {
 
-ParticleFlowObjectManager::ParticleFlowObjectManager() :
-    AlgorithmObjectManager<ParticleFlowObject>()
+ParticleFlowObjectManager::ParticleFlowObjectManager(const Pandora *const pPandora) :
+    AlgorithmObjectManager<ParticleFlowObject>(pPandora)
 {
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateInitialLists());
 }

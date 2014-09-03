@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Pandora/PandoraInputTypes.h
+ *  @file   PandoraSDK/include/Pandora/PandoraInputTypes.h
  * 
  *  @brief  Header file for pandora input types and associated external typedefs exposed via the PandoraApi
  * 
@@ -18,6 +18,7 @@
 #include "Xml/tinyxml.h"
 
 #include <cmath>
+#include <string>
 #include <vector>
 
 namespace pandora
@@ -184,27 +185,17 @@ typedef PandoraInputType<int> InputInt;
 typedef PandoraInputType<float> InputFloat;
 typedef PandoraInputType<void *> InputAddress;
 typedef PandoraInputType<bool> InputBool;
+typedef PandoraInputType<std::string> InputString;
 
 typedef PandoraInputType<HitType> InputHitType;
 typedef PandoraInputType<MCParticleType> InputMCParticleType;
 typedef PandoraInputType<DetectorRegion> InputDetectorRegion;
-typedef PandoraInputType<unsigned int> InputPseudoLayer;
 typedef PandoraInputType<CartesianVector> InputCartesianVector;
 typedef PandoraInputType<TrackState> InputTrackState;
 typedef PandoraInputType<Track *> InputTrackAddress;
 
 typedef std::vector<const void *> CaloHitAddressList, TrackAddressList;
 typedef std::vector<CaloHitAddressList> ClusterAddressList;
-
-typedef void (EnergyCorrectionFunction)(const Cluster *const, float &);
-typedef bool (ParticleIdFunction)(const Cluster *const);
-typedef pandora::StatusCode (SettingsFunction)(const TiXmlHandle xmlHandle);
-typedef void (ResetFunction)();
-
-typedef std::vector<EnergyCorrectionFunction *> EnergyCorrectionFunctionVector;
-typedef std::vector<ParticleIdFunction *> ParticleIdFunctionVector;
-typedef std::vector<SettingsFunction *> SettingsFunctionVector;
-typedef std::vector<ResetFunction *> ResetFunctionVector;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -341,6 +332,12 @@ template <>
 inline bool PandoraInputType<void *>::IsValid(void *const &) const
 {
     return true;
+}
+
+template <>
+inline bool PandoraInputType<std::string>::IsValid(const std::string &t) const
+{
+    return !t.empty();
 }
 
 template <>

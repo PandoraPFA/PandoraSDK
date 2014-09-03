@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Managers/AlgorithmObjectManager.h
+ *  @file   PandoraSDK/include/Managers/AlgorithmObjectManager.h
  * 
  *  @brief  Header file for the algorithm object manager class.
  * 
@@ -21,9 +21,11 @@ class AlgorithmObjectManager : public Manager<T>
 {
 public:
     /**
-     *  @brief  Default constructor
+     *  @brief  Constructor
+     * 
+     *  @param  pPandora address of the associated pandora object
      */
-     AlgorithmObjectManager();
+     AlgorithmObjectManager(const Pandora *const pPandora);
 
     /**
      *  @brief  Destructor

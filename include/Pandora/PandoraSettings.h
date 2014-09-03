@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Pandora/PandoraSettings.h
+ *  @file   PandoraSDK/include/Pandora/PandoraSettings.h
  * 
  *  @brief  Header file for the pandora settings class.
  * 
@@ -13,6 +13,7 @@
 namespace pandora
 {
 
+class Pandora;
 class TiXmlHandle;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -24,195 +25,204 @@ class PandoraSettings
 {
 public:
     /**
+     *  @brief  Constructor
+     * 
+     *  @param  pPandora address of the associated pandora object
+     */
+    PandoraSettings(const Pandora *const pPandora);
+
+    /**
+     *  @brief  Destructor
+     */
+    ~PandoraSettings();
+
+    /**
      *  @brief  Whether monitoring is enabled
      * 
      *  @return boolean
      */
-    static bool IsMonitoringEnabled();
+    bool IsMonitoringEnabled() const;
 
     /**
      *  @brief  Whether to display algorithm information during processing
      * 
      *  @return boolean
      */
-    static bool ShouldDisplayAlgorithmInfo();
+    bool ShouldDisplayAlgorithmInfo() const;
 
     /**
      *  @brief  Whether to allow only single hit types in individual clusters
      * 
      *  @return boolean
      */
-    static bool SingleHitTypeClusteringMode();
-
-    /**
-     *  @brief  Get the electromagnetic energy resolution as a fraction, X, such that sigmaE = ( X * E / sqrt(E) )
-     * 
-     *  @return The electromagnetic energy resolution
-     */
-    static float GetElectromagneticEnergyResolution();
-
-    /**
-     *  @brief  Get the hadronic energy resolution as a fraction, X, such that sigmaE = ( X * E / sqrt(E) )
-     * 
-     *  @return The hadronic energy resolution
-     */
-    static float GetHadronicEnergyResolution();
-
-    /**
-     *  @brief  Get the radius used to select the pfo target from a mc particle decay chain, units mm
-     * 
-     *  @return The pfo selection radius
-     */
-    static float GetMCPfoSelectionRadius();
-
-    /**
-     *  @brief  Get the momentum magnitude used to select the pfo target from a mc particle decay chain, units GeV
-     * 
-     *  @return The pfo selection momentum magnitude
-     */
-    static float GetMCPfoSelectionMomentum();
-
-    /**
-     *  @brief  Get the low energy cut-off for selection of protons/neutrons as mc pfos
-     * 
-     *  @return The low energy cut-off for selection of protons/neutrons as mc pfos
-     */
-    static float GetMCPfoSelectionLowEnergyNeutronProtonCutOff();
+    bool SingleHitTypeClusteringMode() const;
 
     /**
      *  @brief  Whether to collapse mc particle decay chains down to just the pfo target
      * 
      *  @return boolean
      */
-    static bool ShouldCollapseMCParticlesToPfoTarget();
+    bool ShouldCollapseMCParticlesToPfoTarget() const;
 
     /**
      *  @brief  Whether to allow only single mc particle association to objects (largest weight)
      * 
      *  @return boolean
      */
-    static bool UseSingleMCParticleAssociation();
+    bool UseSingleMCParticleAssociation() const;
+
+    /**
+     *  @brief  Get the electromagnetic energy resolution as a fraction, X, such that sigmaE = ( X * E / sqrt(E) )
+     * 
+     *  @return The electromagnetic energy resolution
+     */
+    float GetElectromagneticEnergyResolution() const;
+
+    /**
+     *  @brief  Get the hadronic energy resolution as a fraction, X, such that sigmaE = ( X * E / sqrt(E) )
+     * 
+     *  @return The hadronic energy resolution
+     */
+    float GetHadronicEnergyResolution() const;
+
+    /**
+     *  @brief  Get the radius used to select the pfo target from a mc particle decay chain, units mm
+     * 
+     *  @return The pfo selection radius
+     */
+    float GetMCPfoSelectionRadius() const;
+
+    /**
+     *  @brief  Get the momentum magnitude used to select the pfo target from a mc particle decay chain, units GeV
+     * 
+     *  @return The pfo selection momentum magnitude
+     */
+    float GetMCPfoSelectionMomentum() const;
+
+    /**
+     *  @brief  Get the low energy cut-off for selection of protons/neutrons as mc pfos
+     * 
+     *  @return The low energy cut-off for selection of protons/neutrons as mc pfos
+     */
+    float GetMCPfoSelectionLowEnergyNeutronProtonCutOff() const;
+
+    /**
+     *  @brief  Get the tolerance allowed when declaring a point to be "in" a gap region, units mm
+     * 
+     *  @return the tolerance allowed when declaring a point to be "in" a gap region, units mm
+     */
+    float GetGapTolerance() const;
 
 private:
-    /**
-     *  @brief  Register a pandora settings function to e.g. read settings for a registered particle id or energy correction function
-     * 
-     *  @param  xmlTagName the name of the xml tag (within the <pandora></pandora> tags) containing the settings
-     *  @param  pSettingsFunction pointer to the pandora settings function
-     */
-    static StatusCode RegisterSettingsFunction(const std::string &xmlTagName, SettingsFunction *pSettingsFunction);
-
     /**
      *  @brief  Initialize pandora settings
      * 
      *  @param  pXmlHandle address of the relevant xml handle
      */
-    static StatusCode Initialize(const TiXmlHandle *const pXmlHandle);
-
-    /**
-     *  @brief  Run all registered settings functions
-     * 
-     *  @param  pXmlHandle address of the relevant xml handle
-     */
-    static StatusCode RunRegisteredSettingsFunctions(const TiXmlHandle *const pXmlHandle);
+    StatusCode Initialize(const TiXmlHandle *const pXmlHandle);
 
     /**
      *  @brief  Read global pandora settings
      * 
      *  @param  pXmlHandle address of the relevant xml handle
      */
-    static StatusCode ReadGlobalSettings(const TiXmlHandle *const pXmlHandle);
+    StatusCode ReadGlobalSettings(const TiXmlHandle *const pXmlHandle);
 
-    typedef std::map<SettingsFunction *, std::string> SettingsFunctionToNameMap;
+    bool     m_isMonitoringEnabled;                         ///< Whether monitoring is enabled
+    bool     m_shouldDisplayAlgorithmInfo;                  ///< Whether to display algorithm information during processing
+    bool     m_singleHitTypeClusteringMode;                 ///< Whether to allow only single hit types in individual clusters
+    bool     m_shouldCollapseMCParticlesToPfoTarget;        ///< Whether to collapse mc particle decay chains down to just the pfo target
+    bool     m_useSingleMCParticleAssociation;              ///< Whether to allow only single mc particle association to objects (largest weight)
 
-    static bool     m_isInitialized;                        ///< Whether the pandora settings have been initialized
+    float    m_electromagneticEnergyResolution;             ///< Electromagnetic energy resolution, X, such that sigmaE = ( X * E / sqrt(E) )
+    float    m_hadronicEnergyResolution;                    ///< Hadronic energy resolution, X, such that sigmaE = ( X * E / sqrt(E) )
+    float    m_mcPfoSelectionRadius;                        ///< Radius used to select pfo target from a mc decay chain, units mm
+    float    m_mcPfoSelectionMomentum;                      ///< Momentum magnitude used to select pfo target from a mc decay chain, units GeV/c
+    float    m_mcPfoSelectionLowEnergyNPCutOff;             ///< Low energy cut-off for selection of protons/neutrons as MCPFOs
 
-    static bool     m_isMonitoringEnabled;                  ///< Whether monitoring is enabled
-    static bool     m_shouldDisplayAlgorithmInfo;           ///< Whether to display algorithm information during processing
-    static bool     m_singleHitTypeClusteringMode;          ///< Whether to allow only single hit types in individual clusters
-    static bool     m_shouldCollapseMCParticlesToPfoTarget; ///< Whether to collapse mc particle decay chains down to just the pfo target
-    static bool     m_useSingleMCParticleAssociation;       ///< Whether to allow only single mc particle association to objects (largest weight)
+    float    m_gapTolerance;                                ///< Tolerance allowed when declaring a point to be "in" a gap region, units mm
 
-    static float    m_electromagneticEnergyResolution;      ///< Electromagnetic energy resolution, X, such that sigmaE = ( X * E / sqrt(E) )
-    static float    m_hadronicEnergyResolution;             ///< Hadronic energy resolution, X, such that sigmaE = ( X * E / sqrt(E) )
-    static float    m_mcPfoSelectionRadius;                 ///< Radius used to select pfo target from a mc decay chain, units mm
-    static float    m_mcPfoSelectionMomentum;               ///< Momentum magnitude used to select pfo target from a mc decay chain, units GeV/c
-    static float    m_mcPfoSelectionLowEnergyNPCutOff;      ///< Low energy cut-off for selection of protons/neutrons as MCPFOs
+    const Pandora *const m_pPandora;                        ///< The associated pandora object
 
-    static SettingsFunctionToNameMap m_settingsFunctionToNameMap;   ///< The settings function to xml tag name map
-
-    friend class Pandora;
     friend class PandoraApiImpl;
+    friend class PandoraImpl;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline bool PandoraSettings::IsMonitoringEnabled()
+inline bool PandoraSettings::IsMonitoringEnabled() const
 {
     return m_isMonitoringEnabled;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline bool PandoraSettings::ShouldDisplayAlgorithmInfo()
+inline bool PandoraSettings::ShouldDisplayAlgorithmInfo() const
 {
     return m_shouldDisplayAlgorithmInfo;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline bool PandoraSettings::SingleHitTypeClusteringMode()
+inline bool PandoraSettings::SingleHitTypeClusteringMode() const
 {
     return m_singleHitTypeClusteringMode;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline bool PandoraSettings::ShouldCollapseMCParticlesToPfoTarget()
+inline bool PandoraSettings::ShouldCollapseMCParticlesToPfoTarget() const
 {
     return m_shouldCollapseMCParticlesToPfoTarget;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline bool PandoraSettings::UseSingleMCParticleAssociation()
+inline bool PandoraSettings::UseSingleMCParticleAssociation() const
 {
     return m_useSingleMCParticleAssociation;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float PandoraSettings::GetElectromagneticEnergyResolution()
+inline float PandoraSettings::GetElectromagneticEnergyResolution() const
 {
     return m_electromagneticEnergyResolution;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float PandoraSettings::GetHadronicEnergyResolution()
+inline float PandoraSettings::GetHadronicEnergyResolution() const
 {
     return m_hadronicEnergyResolution;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float PandoraSettings::GetMCPfoSelectionRadius()
+inline float PandoraSettings::GetMCPfoSelectionRadius() const
 {
     return m_mcPfoSelectionRadius;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float PandoraSettings::GetMCPfoSelectionMomentum()
+inline float PandoraSettings::GetMCPfoSelectionMomentum() const
 {
     return m_mcPfoSelectionMomentum;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float PandoraSettings::GetMCPfoSelectionLowEnergyNeutronProtonCutOff()
+inline float PandoraSettings::GetMCPfoSelectionLowEnergyNeutronProtonCutOff() const
 {
     return m_mcPfoSelectionLowEnergyNPCutOff;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float PandoraSettings::GetGapTolerance() const
+{
+    return m_gapTolerance;
 }
 
 } // namespace pandora

@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Pandora/TemplateAlgorithmTool.cc
+ *  @file   PandoraSDK/src/Pandora/TemplateAlgorithmTool.cc
  * 
  *  @brief  Implementation of the template algorithm tool class.
  * 

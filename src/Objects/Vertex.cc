@@ -1,5 +1,5 @@
 /**
- *  @file PandoraPFANew/Framework/src/Objects/Vertex.cc
+ *  @file PandoraSDK/src/Objects/Vertex.cc
  * 
  *  @brief Implementation of the vertex class.
  * 

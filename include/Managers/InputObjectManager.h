@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/include/Managers/InputObjectManager.h
+ *  @file   PandoraSDK/include/Managers/InputObjectManager.h
  * 
  *  @brief  Header file for the input object manager class.
  * 
@@ -21,9 +21,11 @@ class InputObjectManager : public Manager<T>
 {
 public:
     /**
-     *  @brief  Default constructor
+     *  @brief  Constructor
+     * 
+     *  @param  pPandora address of the associated pandora object
      */
-    InputObjectManager();
+    InputObjectManager(const Pandora *const pPandora);
 
     /**
      *  @brief  Destructor

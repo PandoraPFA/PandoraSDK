@@ -1,19 +1,17 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Objects/DetectorGap.cc
+ *  @file   PandoraSDK/src/Objects/DetectorGap.cc
  * 
  *  @brief  Implementation of the detector gap class.
  * 
  *  $Log: $
  */
 
-#include "Helpers/GeometryHelper.h"
-
 #include "Objects/DetectorGap.h"
 
 namespace pandora
 {
 
-BoxGap::BoxGap(const PandoraApi::BoxGap::Parameters &parameters) :
+BoxGap::BoxGap(const PandoraApi::Geometry::BoxGap::Parameters &parameters) :
     m_vertex(parameters.m_vertex.Get()),
     m_side1(parameters.m_side1.Get()),
     m_side2(parameters.m_side2.Get()),
@@ -23,9 +21,8 @@ BoxGap::BoxGap(const PandoraApi::BoxGap::Parameters &parameters) :
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool BoxGap::IsInGap(const CartesianVector &positionVector) const
+bool BoxGap::IsInGap(const CartesianVector &positionVector, const float gapTolerance) const
 {
-    static const float gapTolerance(GeometryHelper::GetGapTolerance());
     const CartesianVector relativePosition(positionVector - m_vertex);
 
     const float projection1(relativePosition.GetDotProduct(m_side1.GetUnitVector()));
@@ -49,7 +46,7 @@ bool BoxGap::IsInGap(const CartesianVector &positionVector) const
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-ConcentricGap::ConcentricGap(const PandoraApi::ConcentricGap::Parameters &parameters) :
+ConcentricGap::ConcentricGap(const PandoraApi::Geometry::ConcentricGap::Parameters &parameters) :
     m_minZCoordinate(parameters.m_minZCoordinate.Get()),
     m_maxZCoordinate(parameters.m_maxZCoordinate.Get()),
     m_innerRCoordinate(parameters.m_innerRCoordinate.Get()),
@@ -69,9 +66,8 @@ ConcentricGap::ConcentricGap(const PandoraApi::ConcentricGap::Parameters &parame
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool ConcentricGap::IsInGap(const CartesianVector &positionVector) const
+bool ConcentricGap::IsInGap(const CartesianVector &positionVector, const float gapTolerance) const
 {
-    static const float gapTolerance(GeometryHelper::GetGapTolerance());
     const float z(positionVector.GetZ());
 
     if ((z < m_minZCoordinate - gapTolerance) || (z > m_maxZCoordinate + gapTolerance))

@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraPFANew/Framework/src/Objects/ParticleFlowObject.cc
+ *  @file   PandoraSDK/src/Objects/ParticleFlowObject.cc
  * 
  *  @brief  Implementation of the particle flow object class.
  * 
