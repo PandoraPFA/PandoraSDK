@@ -434,7 +434,6 @@ private:
     bool                        m_isFixedElectron;              ///< Whether the cluster has been flagged as a fixed electron cluster
     bool                        m_isFixedMuon;                  ///< Whether the cluster has been flagged as a fixed muon cluster
 
-    bool                        m_isMipTrack;                   ///< Whether the cluster has been flagged as a section of mip track
     const Track                *m_pTrackSeed;                   ///< Address of the track with which the cluster is seeded
 
     ValueByPseudoLayerMap       m_sumXByPseudoLayer;            ///< The sum of the x coordinates of the calo hits, stored by pseudo layer

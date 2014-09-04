@@ -112,7 +112,7 @@ public:
      * 
      *  @return the detector region
      */
-    DetectorRegion GetDetectorRegion() const;
+    HitRegion GetHitRegion() const;
 
     /**
      *  @brief  Get the subdetector readout layer number
@@ -280,7 +280,7 @@ protected:
 
     const bool              m_isDigital;                ///< Whether cell should be treated as digital (implies constant cell energy)
     const HitType           m_hitType;                  ///< The type of calorimeter hit
-    const DetectorRegion    m_detectorRegion;           ///< Region of the detector in which the calo hit is located
+    const HitRegion         m_hitRegion;                ///< Region of the detector in which the calo hit is located
     const unsigned int      m_layer;                    ///< The subdetector readout layer number
     InputUInt               m_pseudoLayer;              ///< The pseudo layer to which the calo hit has been assigned
     const bool              m_isInOuterSamplingLayer;   ///< Whether cell is in one of the outermost detector sampling layers
@@ -487,9 +487,9 @@ inline HitType CaloHit::GetHitType() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline DetectorRegion CaloHit::GetDetectorRegion() const
+inline HitRegion CaloHit::GetHitRegion() const
 {
-    return m_detectorRegion;
+    return m_hitRegion;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -25,11 +25,22 @@ namespace pandora
 {
 
 /**
+ *  @brief  EnergyCorrectionType enum
+ */
+enum EnergyCorrectionType
+{
+    HADRONIC,
+    ELECTROMAGNETIC
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
  *  @brief  Calorimeter hit type enum
  */
 enum HitType
 {
-    INNER_DETECTOR,
+    TRACKER,
     ECAL,
     HCAL,
     MUON,
@@ -37,7 +48,19 @@ enum HitType
     TPC_VIEW_V,
     TPC_VIEW_W,
     TPC_3D,
-    CUSTOM
+    HIT_CUSTOM
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ *  @brief  Calorimeter hit region enum
+ */
+enum HitRegion
+{
+    BARREL,
+    ENDCAP,
+    SINGLE_REGION
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -47,15 +70,44 @@ enum HitType
  */
 enum MCParticleType
 {
-    MC_STANDARD,
-    MC_VERTEX,
     MC_VIEW_U,
     MC_VIEW_V,
     MC_VIEW_W,
-    MC_VERTEX_U,
-    MC_VERTEX_V,
-    MC_VERTEX_W,
+    MC_3D,
     MC_CUSTOM
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ *  @brief  Subdetector type enum
+ */
+enum SubDetectorType
+{
+    INNER_TRACKER,
+    ECAL_BARREL,
+    ECAL_ENDCAP,
+    HCAL_BARREL,
+    HCAL_ENDCAP,
+    COIL,
+    MUON_BARREL,
+    MUON_ENDCAP,
+    LAR_TPC,
+    SUB_DETECTOR_OTHER
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ *  @brief  Vertex type enum
+ */
+enum VertexType
+{
+    VERTEX_U,
+    VERTEX_V,
+    VERTEX_W,
+    VERTEX_3D,
+    VERTEX_CUSTOM
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -69,28 +121,6 @@ enum Granularity
     FINE,
     COARSE,
     VERY_COARSE
-};
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-/**
- *  @brief  DetectorRegion enum
- */
-enum DetectorRegion
-{
-    BARREL,
-    ENDCAP
-};
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-/**
- *  @brief  EnergyCorrectionType enum
- */
-enum EnergyCorrectionType
-{
-    HADRONIC,
-    ELECTROMAGNETIC
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -188,8 +218,11 @@ typedef PandoraInputType<bool> InputBool;
 typedef PandoraInputType<std::string> InputString;
 
 typedef PandoraInputType<HitType> InputHitType;
+typedef PandoraInputType<HitRegion> InputHitRegion;
 typedef PandoraInputType<MCParticleType> InputMCParticleType;
-typedef PandoraInputType<DetectorRegion> InputDetectorRegion;
+typedef PandoraInputType<SubDetectorType> InputSubDetectorType;
+typedef PandoraInputType<VertexType> InputVertexType;
+
 typedef PandoraInputType<CartesianVector> InputCartesianVector;
 typedef PandoraInputType<TrackState> InputTrackState;
 typedef PandoraInputType<Track *> InputTrackAddress;
@@ -347,13 +380,25 @@ inline bool PandoraInputType<HitType>::IsValid(const HitType &t) const
 }
 
 template <>
+inline bool PandoraInputType<HitRegion>::IsValid(const HitRegion &t) const
+{
+    return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
+}
+
+template <>
 inline bool PandoraInputType<MCParticleType>::IsValid(const MCParticleType &t) const
 {
     return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
 }
 
 template <>
-inline bool PandoraInputType<DetectorRegion>::IsValid(const DetectorRegion &t) const
+inline bool PandoraInputType<SubDetectorType>::IsValid(const SubDetectorType &t) const
+{
+    return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
+}
+
+template <>
+inline bool PandoraInputType<VertexType>::IsValid(const VertexType &t) const
 {
     return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
 }

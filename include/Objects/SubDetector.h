@@ -44,6 +44,13 @@ public:
     const std::string &GetSubDetectorName() const;
 
     /**
+     *  @brief  Get the sub detector type, e.g. ECAL_BARREL, HCAL_ENDCAP, TPC, etc.
+     * 
+     *  @return The sub detector type
+     */
+    SubDetectorType GetSubDetectorType() const;
+
+    /**
      *  @brief  Get the inner cylindrical polar r coordinate, origin interaction point, units mm
      * 
      *  @return The inner cylindrical polar r coordinate
@@ -134,6 +141,7 @@ private:
     ~SubDetector();
 
     std::string             m_subDetectorName;      ///< The sub detector name, must uniquely specify a single sub detector
+    SubDetectorType         m_subDetectorType;      ///< The sub detector type, e.g. ECAL_BARREL, HCAL_ENDCAP, TPC, etc.
     float                   m_innerRCoordinate;     ///< Inner cylindrical polar r coordinate, origin interaction point, units mm
     float                   m_innerZCoordinate;     ///< Inner cylindrical polar z coordinate, origin interaction point, units mm
     float                   m_innerPhiCoordinate;   ///< Inner cylindrical polar phi coordinate (angle wrt cartesian x axis)
@@ -154,6 +162,13 @@ private:
 inline const std::string &SubDetector::GetSubDetectorName() const
 {
     return m_subDetectorName;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline SubDetectorType SubDetector::GetSubDetectorType() const
+{
+    return m_subDetectorType;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

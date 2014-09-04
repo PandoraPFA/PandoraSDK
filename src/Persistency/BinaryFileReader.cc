@@ -218,6 +218,8 @@ StatusCode BinaryFileReader::ReadSubDetector(bool checkComponentId)
 
     std::string subDetectorName;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(subDetectorName));
+    SubDetectorType subDetectorType(SUB_DETECTOR_OTHER);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(subDetectorType));
     float innerRCoordinate(0.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(innerRCoordinate));
     float innerZCoordinate(0.f);
@@ -241,6 +243,7 @@ StatusCode BinaryFileReader::ReadSubDetector(bool checkComponentId)
 
     PandoraApi::Geometry::SubDetector::Parameters parameters;
     parameters.m_subDetectorName = subDetectorName;
+    parameters.m_subDetectorType = subDetectorType;
     parameters.m_innerRCoordinate = innerRCoordinate;
     parameters.m_innerZCoordinate = innerZCoordinate;
     parameters.m_innerPhiCoordinate = innerPhiCoordinate;
@@ -399,8 +402,8 @@ StatusCode BinaryFileReader::ReadCaloHit(bool checkComponentId)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(isDigital));
     HitType hitType(ECAL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(hitType));
-    DetectorRegion detectorRegion(BARREL);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(detectorRegion));
+    HitRegion hitRegion(BARREL);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(hitRegion));
     unsigned int layer(0);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(layer));
     bool isInOuterSamplingLayer(false);
@@ -453,7 +456,7 @@ StatusCode BinaryFileReader::ReadCaloHit(bool checkComponentId)
     pBaseParameters->m_hadronicEnergy = hadronicEnergy;
     pBaseParameters->m_isDigital = isDigital;
     pBaseParameters->m_hitType = hitType;
-    pBaseParameters->m_detectorRegion = detectorRegion;
+    pBaseParameters->m_hitRegion = hitRegion;
     pBaseParameters->m_layer = layer;
     pBaseParameters->m_isInOuterSamplingLayer = isInOuterSamplingLayer;
     pBaseParameters->m_pParentAddress = pParentAddress;
@@ -564,7 +567,7 @@ StatusCode BinaryFileReader::ReadMCParticle(bool checkComponentId)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(endpoint));
     int particleId(-std::numeric_limits<int>::max());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(particleId));
-    MCParticleType mcParticleType(MC_STANDARD);
+    MCParticleType mcParticleType(MC_3D);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(mcParticleType));
     void *pParentAddress(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(pParentAddress));

@@ -31,7 +31,6 @@ Cluster::Cluster(const PandoraContentApi::Cluster::Parameters &parameters) :
     m_isFixedPhoton(false),
     m_isFixedElectron(false),
     m_isFixedMuon(false),
-    m_isMipTrack(parameters.m_pTrack.IsInitialized()),
     m_pTrackSeed(parameters.m_pTrack.IsInitialized() ? parameters.m_pTrack.Get() : NULL),
     m_initialDirection(0.f, 0.f, 0.f),
     m_isDirectionUpToDate(false),

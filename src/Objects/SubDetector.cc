@@ -13,6 +13,7 @@ namespace pandora
 
 SubDetector::SubDetector(const PandoraApi::Geometry::SubDetector::Parameters &inputParameters) :
     m_subDetectorName(inputParameters.m_subDetectorName.Get()),
+    m_subDetectorType(inputParameters.m_subDetectorType.Get()),
     m_innerRCoordinate(inputParameters.m_innerRCoordinate.Get()),
     m_innerZCoordinate(inputParameters.m_innerZCoordinate.Get()),
     m_innerPhiCoordinate(inputParameters.m_innerPhiCoordinate.Get()),

@@ -43,6 +43,16 @@ public:
     const SubDetector &GetSubDetector(const std::string &subDetectorName) const;
 
     /**
+     *  @brief  Get the sub detector corresponding to a specified type.
+     *          Will throw exception if there is not exactly one subdetector registered with the specified type.
+     * 
+     *  @param  subDetectorType the sub detector type
+     * 
+     *  @return the sub detector
+     */
+    const SubDetector &GetSubDetector(const SubDetectorType subDetectorType) const;
+
+    /**
      *  @brief  Get the map from name to sub detector parameters
      * 
      *  @return The map from name to sub detector parameters
@@ -109,7 +119,10 @@ private:
      */
     StatusCode SetHitTypeGranularity(const HitType hitType, const Granularity granularity);
 
-    SubDetectorMap              m_subDetectorMap;           ///< Map from name to sub detector parameters
+    typedef std::multimap<SubDetectorType, const SubDetector*> SubDetectorTypeMap;
+
+    SubDetectorMap              m_subDetectorMap;           ///< Map from sub detector name to sub detector
+    SubDetectorTypeMap          m_subDetectorTypeMap;       ///< Map from sub detector type to sub detector
     DetectorGapList             m_detectorGapList;          ///< List of gaps in the active detector volume
     HitTypeToGranularityMap     m_hitTypeToGranularityMap;  ///< The hit type to granularity map
 

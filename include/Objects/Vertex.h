@@ -27,8 +27,17 @@ class Vertex
 public:
     /**
      *  @brief  Get the vertex position
+     * 
+     *  @return the vertex position
      */
-     const CartesianVector &GetPosition() const;
+    const CartesianVector &GetPosition() const;
+
+    /**
+     *  @brief  Get the vertex type
+     * 
+     *  @return the vertex type
+     */
+    VertexType GetVertexType() const;
 
     /**
      *  @brief  Whether the vertex is available to be added to a particle flow object
@@ -58,6 +67,7 @@ private:
     void SetAvailability(bool isAvailable);
 
     CartesianVector         m_position;                 ///< The vertex position
+    VertexType              m_vertexType;               ///< The vertex type
     bool                    m_isAvailable;              ///< Whether the track is available to be added to a particle flow object
 
     friend class PandoraContentApiImpl;
@@ -78,6 +88,13 @@ std::ostream &operator<<(std::ostream &stream, const Vertex &vertex);
 inline const CartesianVector &Vertex::GetPosition() const
 {
     return m_position;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline VertexType Vertex::GetVertexType() const
+{
+    return m_vertexType;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
