@@ -46,6 +46,7 @@ AUX_SOURCE_DIRECTORY( ./src/Managers SDK_SRCS )
 AUX_SOURCE_DIRECTORY( ./src/Objects SDK_SRCS )
 AUX_SOURCE_DIRECTORY( ./src/Pandora SDK_SRCS )
 AUX_SOURCE_DIRECTORY( ./src/Persistency SDK_SRCS )
+AUX_SOURCE_DIRECTORY( ./src/Plugins SDK_SRCS )
 AUX_SOURCE_DIRECTORY( ./src/Xml SDK_SRCS )
 
 # require proper C++
