@@ -42,7 +42,7 @@ CaloHit::CaloHit(const PandoraApi::CaloHitBaseParameters &parameters) :
     m_hadronicEnergy(parameters.m_hadronicEnergy.Get()),
     m_isDigital(parameters.m_isDigital.Get()),
     m_hitType(parameters.m_hitType.Get()),
-    m_detectorRegion(parameters.m_detectorRegion.Get()),
+    m_hitRegion(parameters.m_hitRegion.Get()),
     m_layer(parameters.m_layer.Get()),
     m_isInOuterSamplingLayer(parameters.m_isInOuterSamplingLayer.Get()),
     m_isPossibleMip(false),
@@ -70,7 +70,7 @@ CaloHit::CaloHit(CaloHit *pCaloHit, const float weight) :
     m_hadronicEnergy(weight * pCaloHit->m_hadronicEnergy),
     m_isDigital(pCaloHit->m_isDigital),
     m_hitType(pCaloHit->m_hitType),
-    m_detectorRegion(pCaloHit->m_detectorRegion),
+    m_hitRegion(pCaloHit->m_hitRegion),
     m_layer(pCaloHit->m_layer),
     m_pseudoLayer(pCaloHit->m_pseudoLayer),
     m_isInOuterSamplingLayer(pCaloHit->m_isInOuterSamplingLayer),
@@ -145,7 +145,7 @@ void RectangularCaloHit::GetCellCorners(CartesianPointList &cartesianPointList) 
     const CartesianVector &position(this->GetPositionVector());
 
     CartesianVector normal(this->GetCellNormalVector());
-    CartesianVector dirU((ENDCAP == this->GetDetectorRegion()) ? CartesianVector(0.f, 1.f, 0.f) : CartesianVector(0.f, 0.f, 1.f));
+    CartesianVector dirU((BARREL == this->GetHitRegion()) ? CartesianVector(0.f, 0.f, 1.f) : CartesianVector(0.f, 1.f, 0.f) );
     CartesianVector dirV(normal.GetCrossProduct(dirU));
 
     dirU *= (this->GetCellSizeU() / 2.);
@@ -218,21 +218,21 @@ void PointingCaloHit::GetCellCorners(CartesianPointList &cartesianPointList) con
 
     float thetaMinRScale(1.f), thetaMaxRScale(1.f);
 
-    if (ENDCAP == this->GetDetectorRegion())
-    {
-        if (std::fabs(cosThetaMin) > std::numeric_limits<float>::epsilon())
-            thetaMinRScale = std::fabs(cosTheta / cosThetaMin);
-
-        if (std::fabs(cosThetaMax) > std::numeric_limits<float>::epsilon())
-            thetaMaxRScale = std::fabs(cosTheta / cosThetaMax);
-    }
-    else
+    if (BARREL == this->GetHitRegion())
     {
         if (std::fabs(sinThetaMin) > std::numeric_limits<float>::epsilon())
             thetaMinRScale = std::fabs(sinTheta / sinThetaMin);
 
         if (std::fabs(sinThetaMax) > std::numeric_limits<float>::epsilon())
             thetaMaxRScale = std::fabs(sinTheta / sinThetaMax);
+    }
+    else
+    {
+        if (std::fabs(cosThetaMin) > std::numeric_limits<float>::epsilon())
+            thetaMinRScale = std::fabs(cosTheta / cosThetaMin);
+
+        if (std::fabs(cosThetaMax) > std::numeric_limits<float>::epsilon())
+            thetaMaxRScale = std::fabs(cosTheta / cosThetaMax);
     }
 
     const float rMinAtThetaMin(thetaMinRScale * rMin), rMinAtThetaMax(thetaMaxRScale * rMin);

@@ -41,6 +41,21 @@ const SubDetector &GeometryManager::GetSubDetector(const std::string &subDetecto
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+const SubDetector &GeometryManager::GetSubDetector(const SubDetectorType subDetectorType) const
+{
+    SubDetectorTypeMap::const_iterator iter = m_subDetectorTypeMap.find(subDetectorType);
+
+    if (m_subDetectorTypeMap.end() == iter)
+        throw StatusCodeException(STATUS_CODE_NOT_FOUND);
+
+    if (m_subDetectorTypeMap.count(subDetectorType) != 1)
+        throw StatusCodeException(STATUS_CODE_OUT_OF_RANGE);
+
+    return *(iter->second);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 Granularity GeometryManager::GetHitTypeGranularity(const HitType hitType) const
 {
     HitTypeToGranularityMap::const_iterator iter = m_hitTypeToGranularityMap.find(hitType);
@@ -64,6 +79,8 @@ StatusCode GeometryManager::CreateSubDetector(const PandoraApi::Geometry::SubDet
 
         if (!m_subDetectorMap.insert(SubDetectorMap::value_type(pSubDetector->GetSubDetectorName(), pSubDetector)).second)
             throw StatusCodeException(STATUS_CODE_FAILURE);
+
+        m_subDetectorTypeMap.insert(SubDetectorTypeMap::value_type(pSubDetector->GetSubDetectorType(), pSubDetector));
     }
     catch (StatusCodeException &statusCodeException)
     {
@@ -134,6 +151,7 @@ StatusCode GeometryManager::EraseAllContent()
         delete *iter;
 
     m_subDetectorMap.clear();
+    m_subDetectorTypeMap.clear();
     m_detectorGapList.clear();
     m_hitTypeToGranularityMap.clear();
 
@@ -146,14 +164,14 @@ GeometryManager::HitTypeToGranularityMap GeometryManager::GetDefaultHitTypeToGra
 {
     HitTypeToGranularityMap hitTypeToGranularityMap;
 
-    if (!hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(INNER_DETECTOR, FINE)).second ||
+    if (!hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(TRACKER, VERY_FINE)).second ||
         !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(ECAL, FINE)).second ||
         !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(HCAL, COARSE)).second ||
         !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(MUON, VERY_COARSE)).second ||
-        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(TPC_VIEW_U, FINE)).second ||
-        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(TPC_VIEW_V, FINE)).second ||
-        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(TPC_VIEW_W, FINE)).second ||
-        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(TPC_3D, FINE)).second)
+        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(TPC_VIEW_U, VERY_FINE)).second ||
+        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(TPC_VIEW_V, VERY_FINE)).second ||
+        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(TPC_VIEW_W, VERY_FINE)).second ||
+        !hitTypeToGranularityMap.insert(HitTypeToGranularityMap::value_type(TPC_3D, VERY_FINE)).second)
     {
         throw StatusCodeException(STATUS_CODE_FAILURE);
     }

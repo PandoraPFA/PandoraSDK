@@ -47,13 +47,13 @@ public:
     class MCParticleParameters
     {
     public:
-        pandora::InputFloat             m_energy;                   ///< The energy of the MC particle, units GeV
-        pandora::InputCartesianVector   m_momentum;                 ///< The momentum of the MC particle, units GeV
-        pandora::InputCartesianVector   m_vertex;                   ///< The production vertex of the MC particle, units mm
-        pandora::InputCartesianVector   m_endpoint;                 ///< The endpoint of the MC particle, units mm
-        pandora::InputInt               m_particleId;               ///< The MC particle's ID (PDG code)
-        pandora::InputMCParticleType    m_mcParticleType;           ///< The type of mc particle, e.g. vertex, 2D-projection, etc.
-        pandora::InputAddress           m_pParentAddress;           ///< Address of the parent MC particle in the user framework
+        pandora::InputFloat                 m_energy;                   ///< The energy of the MC particle, units GeV
+        pandora::InputCartesianVector       m_momentum;                 ///< The momentum of the MC particle, units GeV
+        pandora::InputCartesianVector       m_vertex;                   ///< The production vertex of the MC particle, units mm
+        pandora::InputCartesianVector       m_endpoint;                 ///< The endpoint of the MC particle, units mm
+        pandora::InputInt                   m_particleId;               ///< The MC particle's ID (PDG code)
+        pandora::InputMCParticleType        m_mcParticleType;           ///< The type of mc particle, e.g. vertex, 2D-projection, etc.
+        pandora::InputAddress               m_pParentAddress;           ///< Address of the parent MC particle in the user framework
     };
 
     /**
@@ -62,21 +62,21 @@ public:
     class TrackParameters
     {
     public:
-        pandora::InputFloat             m_d0;                       ///< The 2D impact parameter wrt (0,0), units mm
-        pandora::InputFloat             m_z0;                       ///< The z coordinate at the 2D distance of closest approach, units mm
-        pandora::InputInt               m_particleId;               ///< The PDG code of the tracked particle
-        pandora::InputInt               m_charge;                   ///< The charge of the tracked particle
-        pandora::InputFloat             m_mass;                     ///< The mass of the tracked particle, units GeV
-        pandora::InputCartesianVector   m_momentumAtDca;            ///< Track momentum at the 2D distance of closest approach, units GeV
-        pandora::InputTrackState        m_trackStateAtStart;        ///< Track state at the start of the track, units mm and GeV
-        pandora::InputTrackState        m_trackStateAtEnd;          ///< Track state at the end of the track, units mm and GeV
-        pandora::InputTrackState        m_trackStateAtCalorimeter;  ///< The (sometimes projected) track state at the calorimeter, units mm and GeV
-        pandora::InputFloat             m_timeAtCalorimeter;        ///< The (sometimes projected) time at the calorimeter, units ns
-        pandora::InputBool              m_reachesCalorimeter;       ///< Whether the track actually reaches the calorimeter
-        pandora::InputBool              m_isProjectedToEndCap;      ///< Whether the calorimeter projection is to an endcap
-        pandora::InputBool              m_canFormPfo;               ///< Whether track should form a pfo, if it has an associated cluster
-        pandora::InputBool              m_canFormClusterlessPfo;    ///< Whether track should form a pfo, even if it has no associated cluster
-        pandora::InputAddress           m_pParentAddress;           ///< Address of the parent track in the user framework
+        pandora::InputFloat                 m_d0;                       ///< The 2D impact parameter wrt (0,0), units mm
+        pandora::InputFloat                 m_z0;                       ///< The z coordinate at the 2D distance of closest approach, units mm
+        pandora::InputInt                   m_particleId;               ///< The PDG code of the tracked particle
+        pandora::InputInt                   m_charge;                   ///< The charge of the tracked particle
+        pandora::InputFloat                 m_mass;                     ///< The mass of the tracked particle, units GeV
+        pandora::InputCartesianVector       m_momentumAtDca;            ///< Track momentum at the 2D distance of closest approach, units GeV
+        pandora::InputTrackState            m_trackStateAtStart;        ///< Track state at the start of the track, units mm and GeV
+        pandora::InputTrackState            m_trackStateAtEnd;          ///< Track state at the end of the track, units mm and GeV
+        pandora::InputTrackState            m_trackStateAtCalorimeter;  ///< The (sometimes projected) track state at the calorimeter, units mm and GeV
+        pandora::InputFloat                 m_timeAtCalorimeter;        ///< The (sometimes projected) time at the calorimeter, units ns
+        pandora::InputBool                  m_reachesCalorimeter;       ///< Whether the track actually reaches the calorimeter
+        pandora::InputBool                  m_isProjectedToEndCap;      ///< Whether the calorimeter projection is to an endcap
+        pandora::InputBool                  m_canFormPfo;               ///< Whether track should form a pfo, if it has an associated cluster
+        pandora::InputBool                  m_canFormClusterlessPfo;    ///< Whether track should form a pfo, even if it has no associated cluster
+        pandora::InputAddress               m_pParentAddress;           ///< Address of the parent track in the user framework
     };
 
     /**
@@ -85,23 +85,23 @@ public:
     class CaloHitBaseParameters
     {
     public:
-        pandora::InputCartesianVector   m_positionVector;           ///< Position vector of center of calorimeter cell, units mm
-        pandora::InputCartesianVector   m_expectedDirection;        ///< Unit vector in direction of expected hit propagation
-        pandora::InputCartesianVector   m_cellNormalVector;         ///< Unit normal to sampling layer, pointing outwards from the origin
-        pandora::InputFloat             m_cellThickness;            ///< Thickness of cell, units mm
-        pandora::InputFloat             m_nCellRadiationLengths;    ///< Absorber material in front of cell, units radiation lengths
-        pandora::InputFloat             m_nCellInteractionLengths;  ///< Absorber material in front of cell, units interaction lengths
-        pandora::InputFloat             m_time;                     ///< Time of (earliest) energy deposition in this cell, units ns
-        pandora::InputFloat             m_inputEnergy;              ///< Corrected energy of calorimeter cell in user framework, units GeV
-        pandora::InputFloat             m_mipEquivalentEnergy;      ///< The calibrated mip equivalent energy, units mip
-        pandora::InputFloat             m_electromagneticEnergy;    ///< The calibrated electromagnetic energy measure, units GeV
-        pandora::InputFloat             m_hadronicEnergy;           ///< The calibrated hadronic energy measure, units GeV
-        pandora::InputBool              m_isDigital;                ///< Whether cell should be treated as digital
-        pandora::InputHitType           m_hitType;                  ///< The type of calorimeter hit
-        pandora::InputDetectorRegion    m_detectorRegion;           ///< Region of the detector in which the calo hit is located
-        pandora::InputUInt              m_layer;                    ///< The subdetector readout layer number
-        pandora::InputBool              m_isInOuterSamplingLayer;   ///< Whether cell is in one of the outermost detector sampling layers
-        pandora::InputAddress           m_pParentAddress;           ///< Address of the parent calo hit in the user framework
+        pandora::InputCartesianVector       m_positionVector;           ///< Position vector of center of calorimeter cell, units mm
+        pandora::InputCartesianVector       m_expectedDirection;        ///< Unit vector in direction of expected hit propagation
+        pandora::InputCartesianVector       m_cellNormalVector;         ///< Unit normal to sampling layer, pointing outwards from the origin
+        pandora::InputFloat                 m_cellThickness;            ///< Thickness of cell, units mm
+        pandora::InputFloat                 m_nCellRadiationLengths;    ///< Absorber material in front of cell, units radiation lengths
+        pandora::InputFloat                 m_nCellInteractionLengths;  ///< Absorber material in front of cell, units interaction lengths
+        pandora::InputFloat                 m_time;                     ///< Time of (earliest) energy deposition in this cell, units ns
+        pandora::InputFloat                 m_inputEnergy;              ///< Corrected energy of calorimeter cell in user framework, units GeV
+        pandora::InputFloat                 m_mipEquivalentEnergy;      ///< The calibrated mip equivalent energy, units mip
+        pandora::InputFloat                 m_electromagneticEnergy;    ///< The calibrated electromagnetic energy measure, units GeV
+        pandora::InputFloat                 m_hadronicEnergy;           ///< The calibrated hadronic energy measure, units GeV
+        pandora::InputBool                  m_isDigital;                ///< Whether cell should be treated as digital
+        pandora::InputHitType               m_hitType;                  ///< The type of calorimeter hit
+        pandora::InputHitRegion             m_hitRegion;                ///< Region of the detector in which the calo hit is located
+        pandora::InputUInt                  m_layer;                    ///< The subdetector readout layer number
+        pandora::InputBool                  m_isInOuterSamplingLayer;   ///< Whether cell is in one of the outermost detector sampling layers
+        pandora::InputAddress               m_pParentAddress;           ///< Address of the parent calo hit in the user framework
     };
 
     /**
@@ -110,8 +110,8 @@ public:
     class RectangularCaloHitParameters : public CaloHitBaseParameters
     {
     public:
-        pandora::InputFloat             m_cellSizeU;                ///< Dimension of cell (up in ENDCAP, along beam in BARREL), units mm
-        pandora::InputFloat             m_cellSizeV;                ///< Dimension of cell (perpendicular to u and thickness), units mm
+        pandora::InputFloat                 m_cellSizeU;                ///< Dimension of cell (up in ENDCAP, along beam in BARREL), units mm
+        pandora::InputFloat                 m_cellSizeV;                ///< Dimension of cell (perpendicular to u and thickness), units mm
     };
 
     /**
@@ -120,8 +120,8 @@ public:
     class PointingCaloHitParameters : public CaloHitBaseParameters
     {
     public:
-        pandora::InputFloat             m_cellSizeEta;              ///< Dimension of cell, as measured by change in pseudo rapidity, eta
-        pandora::InputFloat             m_cellSizePhi;              ///< Dimension of cell, as measured by change in azimuthal angle, phi
+        pandora::InputFloat                 m_cellSizeEta;              ///< Dimension of cell, as measured by change in pseudo rapidity, eta
+        pandora::InputFloat                 m_cellSizePhi;              ///< Dimension of cell, as measured by change in azimuthal angle, phi
     };
 
     /**
@@ -136,9 +136,9 @@ public:
         class LayerParameters
         {
         public:
-            pandora::InputFloat         m_closestDistanceToIp;      ///< Closest distance of the layer from the interaction point, units mm
-            pandora::InputFloat         m_nRadiationLengths;        ///< Absorber material in front of layer, units radiation lengths
-            pandora::InputFloat         m_nInteractionLengths;      ///< Absorber material in front of layer, units interaction lengths
+            pandora::InputFloat             m_closestDistanceToIp;      ///< Closest distance of the layer from the interaction point, units mm
+            pandora::InputFloat             m_nRadiationLengths;        ///< Absorber material in front of layer, units radiation lengths
+            pandora::InputFloat             m_nInteractionLengths;      ///< Absorber material in front of layer, units interaction lengths
         };
 
         typedef std::vector<LayerParameters> LayerParametersList;
@@ -149,18 +149,19 @@ public:
         class SubDetectorParameters
         {
         public:
-            pandora::InputString        m_subDetectorName;          ///< The sub detector name, must uniquely specify a single sub detector
-            pandora::InputFloat         m_innerRCoordinate;         ///< Inner cylindrical polar r coordinate, origin interaction point, units mm
-            pandora::InputFloat         m_innerZCoordinate;         ///< Inner cylindrical polar z coordinate, origin interaction point, units mm
-            pandora::InputFloat         m_innerPhiCoordinate;       ///< Inner cylindrical polar phi coordinate (angle wrt cartesian x axis)
-            pandora::InputUInt          m_innerSymmetryOrder;       ///< Order of symmetry of the innermost edge of subdetector
-            pandora::InputFloat         m_outerRCoordinate;         ///< Outer cylindrical polar r coordinate, origin interaction point, units mm
-            pandora::InputFloat         m_outerZCoordinate;         ///< Outer cylindrical polar z coordinate, origin interaction point, units mm
-            pandora::InputFloat         m_outerPhiCoordinate;       ///< Outer cylindrical polar phi coordinate (angle wrt cartesian x axis)
-            pandora::InputUInt          m_outerSymmetryOrder;       ///< Order of symmetry of the outermost edge of subdetector
-            pandora::InputBool          m_isMirroredInZ;            ///< Whether to construct a second subdetector, via reflection in z=0 plane
-            pandora::InputUInt          m_nLayers;                  ///< The number of layers in the detector section
-            LayerParametersList         m_layerParametersList;      ///< The list of layer parameters for the detector section
+            pandora::InputString            m_subDetectorName;          ///< The sub detector name, must uniquely specify a single sub detector
+            pandora::InputSubDetectorType   m_subDetectorType;          ///< The sub detector type, e.g. ECAL_BARREL, HCAL_ENDCAP, TPC, etc.
+            pandora::InputFloat             m_innerRCoordinate;         ///< Inner cylindrical polar r coordinate, origin interaction point, units mm
+            pandora::InputFloat             m_innerZCoordinate;         ///< Inner cylindrical polar z coordinate, origin interaction point, units mm
+            pandora::InputFloat             m_innerPhiCoordinate;       ///< Inner cylindrical polar phi coordinate (angle wrt cartesian x axis)
+            pandora::InputUInt              m_innerSymmetryOrder;       ///< Order of symmetry of the innermost edge of subdetector
+            pandora::InputFloat             m_outerRCoordinate;         ///< Outer cylindrical polar r coordinate, origin interaction point, units mm
+            pandora::InputFloat             m_outerZCoordinate;         ///< Outer cylindrical polar z coordinate, origin interaction point, units mm
+            pandora::InputFloat             m_outerPhiCoordinate;       ///< Outer cylindrical polar phi coordinate (angle wrt cartesian x axis)
+            pandora::InputUInt              m_outerSymmetryOrder;       ///< Order of symmetry of the outermost edge of subdetector
+            pandora::InputBool              m_isMirroredInZ;            ///< Whether to construct a second subdetector, via reflection in z=0 plane
+            pandora::InputUInt              m_nLayers;                  ///< The number of layers in the detector section
+            LayerParametersList             m_layerParametersList;      ///< The list of layer parameters for the detector section
         };
 
         /**

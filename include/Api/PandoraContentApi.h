@@ -82,6 +82,7 @@ public:
     {
     public:
         pandora::InputCartesianVector   m_position;             ///< The vertex position
+        pandora::InputVertexType        m_vertexType;           ///< The vertex type
     };
 
     typedef ObjectCreationHelper<ClusterParameters, pandora::Cluster> Cluster;

@@ -233,6 +233,9 @@ StatusCode XmlFileReader::ReadSubDetector()
 
     std::string subDetectorName;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "SubDetectorName", subDetectorName));
+    unsigned int subDetectorTypeInput(0);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "SubDetectorType", subDetectorTypeInput));
+    const SubDetectorType subDetectorType(static_cast<SubDetectorType>(subDetectorTypeInput));
     float innerRCoordinate(0.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "InnerRCoordinate", innerRCoordinate));
     float innerZCoordinate(0.f);
@@ -256,6 +259,7 @@ StatusCode XmlFileReader::ReadSubDetector()
 
     PandoraApi::Geometry::SubDetector::Parameters parameters;
     parameters.m_subDetectorName = subDetectorName;
+    parameters.m_subDetectorType = subDetectorType;
     parameters.m_innerRCoordinate = innerRCoordinate;
     parameters.m_innerZCoordinate = innerZCoordinate;
     parameters.m_innerPhiCoordinate = innerPhiCoordinate;
@@ -396,9 +400,9 @@ StatusCode XmlFileReader::ReadCaloHit()
     unsigned int hitTypeInput(0);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "HitType", hitTypeInput));
     const HitType hitType(static_cast<HitType>(hitTypeInput));
-    unsigned int detectorRegionInput(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "DetectorRegion", detectorRegionInput));
-    const DetectorRegion detectorRegion(static_cast<DetectorRegion>(detectorRegionInput));
+    unsigned int hitRegionInput(0);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "HitRegion", hitRegionInput));
+    const HitRegion hitRegion(static_cast<HitRegion>(hitRegionInput));
     unsigned int layer(0);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Layer", layer));
     bool isInOuterSamplingLayer(false);
@@ -451,7 +455,7 @@ StatusCode XmlFileReader::ReadCaloHit()
     pBaseParameters->m_hadronicEnergy = hadronicEnergy;
     pBaseParameters->m_isDigital = isDigital;
     pBaseParameters->m_hitType = hitType;
-    pBaseParameters->m_detectorRegion = detectorRegion;
+    pBaseParameters->m_hitRegion = hitRegion;
     pBaseParameters->m_layer = layer;
     pBaseParameters->m_isInOuterSamplingLayer = isInOuterSamplingLayer;
     pBaseParameters->m_pParentAddress = pParentAddress;
