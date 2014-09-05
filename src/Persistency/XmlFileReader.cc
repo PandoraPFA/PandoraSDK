@@ -271,21 +271,24 @@ StatusCode XmlFileReader::ReadSubDetector()
     parameters.m_isMirroredInZ = isMirroredInZ;
     parameters.m_nLayers = nLayers;
 
-    FloatVector closestDistanceToIp, nRadiationLengths, nInteractionLengths;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, "ClosestDistanceToIp", closestDistanceToIp));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, "NRadiationLengths", nRadiationLengths));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, "NInteractionLengths", nInteractionLengths));
-
-    if ((closestDistanceToIp.size() != nLayers) || (nRadiationLengths.size() != nLayers) || (nInteractionLengths.size() != nLayers))
-        return STATUS_CODE_FAILURE;
-
-    for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
+    if (nLayers > 0)
     {
-        PandoraApi::Geometry::LayerParameters layerParameters;
-        layerParameters.m_closestDistanceToIp = closestDistanceToIp[iLayer];
-        layerParameters.m_nRadiationLengths = nRadiationLengths[iLayer];
-        layerParameters.m_nInteractionLengths = nInteractionLengths[iLayer];
-        parameters.m_layerParametersList.push_back(layerParameters);
+        FloatVector closestDistanceToIp, nRadiationLengths, nInteractionLengths;
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, "ClosestDistanceToIp", closestDistanceToIp));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, "NRadiationLengths", nRadiationLengths));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, "NInteractionLengths", nInteractionLengths));
+
+        if ((closestDistanceToIp.size() != nLayers) || (nRadiationLengths.size() != nLayers) || (nInteractionLengths.size() != nLayers))
+            return STATUS_CODE_FAILURE;
+
+        for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
+        {
+            PandoraApi::Geometry::LayerParameters layerParameters;
+            layerParameters.m_closestDistanceToIp = closestDistanceToIp[iLayer];
+            layerParameters.m_nRadiationLengths = nRadiationLengths[iLayer];
+            layerParameters.m_nInteractionLengths = nInteractionLengths[iLayer];
+            parameters.m_layerParametersList.push_back(layerParameters);
+        }
     }
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::SubDetector::Create(*m_pPandora, parameters));

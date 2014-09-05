@@ -108,18 +108,22 @@ StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector
         return STATUS_CODE_FAILURE;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NLayers", nLayers));
-    std::string closestDistanceToIpString, nRadiationLengthsString, nInteractionLengthsString;
 
-    for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
+    if (nLayers > 0)
     {
-        closestDistanceToIpString += TypeToString(subDetectorLayerList[iLayer].m_closestDistanceToIp) + " ";
-        nRadiationLengthsString += TypeToString(subDetectorLayerList[iLayer].m_nRadiationLengths) + " ";
-        nInteractionLengthsString += TypeToString(subDetectorLayerList[iLayer].m_nInteractionLengths) + " ";
-    }
+        std::string closestDistanceToIpString, nRadiationLengthsString, nInteractionLengthsString;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ClosestDistanceToIp", closestDistanceToIpString));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NRadiationLengths", nRadiationLengthsString));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NInteractionLengths", nInteractionLengthsString));
+        for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
+        {
+            closestDistanceToIpString += TypeToString(subDetectorLayerList[iLayer].m_closestDistanceToIp) + " ";
+            nRadiationLengthsString += TypeToString(subDetectorLayerList[iLayer].m_nRadiationLengths) + " ";
+            nInteractionLengthsString += TypeToString(subDetectorLayerList[iLayer].m_nInteractionLengths) + " ";
+        }
+
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ClosestDistanceToIp", closestDistanceToIpString));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NRadiationLengths", nRadiationLengthsString));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NInteractionLengths", nInteractionLengthsString));
+    }
 
     return STATUS_CODE_SUCCESS;
 }
