@@ -127,9 +127,9 @@ StatusCode BinaryFileWriter::WriteSubDetector(const SubDetector *const pSubDetec
 
     for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerList[iLayer].m_closestDistanceToIp));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerList[iLayer].m_nRadiationLengths));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerList[iLayer].m_nInteractionLengths));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerList[iLayer].GetClosestDistanceToIp()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerList[iLayer].GetNRadiationLengths()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerList[iLayer].GetNInteractionLengths()));
     }
 
     return STATUS_CODE_SUCCESS;

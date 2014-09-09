@@ -29,6 +29,37 @@ public:
     class SubDetectorLayer
     {
     public:
+        /**
+         *  @brief  Constructor
+         * 
+         *  @param  closestDistanceToIp the closest distance of the layer from the interaction point, units mm
+         *  @param  nRadiationLengths the absorber material in front of layer, units radiation lengths
+         *  @param  nInteractionLengths the absorber material in front of layer, units interaction lengths
+         */
+        SubDetectorLayer(const float closestDistanceToIp, const float nRadiationLengths, const float nInteractionLengths);
+
+        /**
+         *  @brief  Get the closest distance of the layer from the interaction point, units mm
+         * 
+         *  @return the closest distance of the layer from the interaction point
+         */
+        float GetClosestDistanceToIp() const;
+
+        /**
+         *  @brief  Get the absorber material in front of layer, units radiation lengths
+         * 
+         *  @return the absorber material in front of layer
+         */
+        float GetNRadiationLengths() const;
+
+        /**
+         *  @brief  Get the absorber material in front of layer, units interaction lengths
+         * 
+         *  @return the absorber material in front of layer
+         */
+        float GetNInteractionLengths() const;
+
+    private:
         float       m_closestDistanceToIp;              ///< Closest distance of the layer from the interaction point, units mm
         float       m_nRadiationLengths;                ///< Absorber material in front of layer, units radiation lengths
         float       m_nInteractionLengths;              ///< Absorber material in front of layer, units interaction lengths
@@ -157,6 +188,37 @@ private:
     friend class GeometryManager;
 };
 
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline SubDetector::SubDetectorLayer::SubDetectorLayer(const float closestDistanceToIp, const float nRadiationLengths, const float nInteractionLengths) :
+    m_closestDistanceToIp(closestDistanceToIp),
+    m_nRadiationLengths(nRadiationLengths),
+    m_nInteractionLengths(nInteractionLengths)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float SubDetector::SubDetectorLayer::GetClosestDistanceToIp() const
+{
+    return m_closestDistanceToIp;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float SubDetector::SubDetectorLayer::GetNRadiationLengths() const
+{
+    return m_nRadiationLengths;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float SubDetector::SubDetectorLayer::GetNInteractionLengths() const
+{
+    return m_nInteractionLengths;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 inline const std::string &SubDetector::GetSubDetectorName() const

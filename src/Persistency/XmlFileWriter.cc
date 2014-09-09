@@ -115,9 +115,9 @@ StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector
 
         for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
         {
-            closestDistanceToIpString += TypeToString(subDetectorLayerList[iLayer].m_closestDistanceToIp) + " ";
-            nRadiationLengthsString += TypeToString(subDetectorLayerList[iLayer].m_nRadiationLengths) + " ";
-            nInteractionLengthsString += TypeToString(subDetectorLayerList[iLayer].m_nInteractionLengths) + " ";
+            closestDistanceToIpString += TypeToString(subDetectorLayerList[iLayer].GetClosestDistanceToIp()) + " ";
+            nRadiationLengthsString += TypeToString(subDetectorLayerList[iLayer].GetNRadiationLengths()) + " ";
+            nInteractionLengthsString += TypeToString(subDetectorLayerList[iLayer].GetNInteractionLengths()) + " ";
         }
 
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ClosestDistanceToIp", closestDistanceToIpString));
