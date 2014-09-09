@@ -39,10 +39,7 @@ SubDetector::SubDetector(const PandoraApi::Geometry::SubDetector::Parameters &in
 
     for (PandoraApi::Geometry::LayerParametersList::const_iterator iter = inputParameters.m_layerParametersList.begin(); iter != inputParameters.m_layerParametersList.end(); ++iter)
     {
-        SubDetectorLayer subDetectorLayer;
-        subDetectorLayer.m_closestDistanceToIp = iter->m_closestDistanceToIp.Get();
-        subDetectorLayer.m_nRadiationLengths = iter->m_nRadiationLengths.Get();
-        subDetectorLayer.m_nInteractionLengths = iter->m_nInteractionLengths.Get();
+        SubDetectorLayer subDetectorLayer(iter->m_closestDistanceToIp.Get(), iter->m_nRadiationLengths.Get(), iter->m_nInteractionLengths.Get());
         m_subDetectorLayerList.push_back(subDetectorLayer);
     }
 }
