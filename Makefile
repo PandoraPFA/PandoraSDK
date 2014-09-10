@@ -1,5 +1,5 @@
 ifndef PROJECT_DIR
-    PROJECT_DIR = $(PANDORA_DIR)/FineGranularityContent
+    PROJECT_DIR = $(PANDORA_DIR)/LCContent
     PROJECT_LIBRARY_DIR = $(PANDORA_DIR)/lib
 else
     PROJECT_LIBRARY_DIR = $(PROJECT_DIR)/lib
@@ -51,7 +51,7 @@ endif
 
 LDFLAGS = $(LIBS) -Wl,-rpath
 
-LIBRARY = $(PROJECT_LIBRARY_DIR)/libFineGranularityContent.so
+LIBRARY = $(PROJECT_LIBRARY_DIR)/libLCContent.so
 
 all: $(SOURCES) $(OBJECTS)
 	$(CC) $(OBJECTS) $(LIBS) -shared -o $(LIBRARY)
@@ -69,7 +69,7 @@ ifdef INCLUDE_TARGET
 	rsync -r --exclude=.svn $(PROJECT_DIR)/include/ ${INCLUDE_TARGET}
 endif
 ifdef LIB_TARGET
-	cp $(PROJECT_LIBRARY_DIR)/libFineGranularityContent.so ${LIB_TARGET}
+	cp $(PROJECT_LIBRARY_DIR)/libLCContent.so ${LIB_TARGET}
 endif
 
 clean:
