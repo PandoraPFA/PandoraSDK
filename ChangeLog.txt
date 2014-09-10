@@ -1,0 +1,51 @@
+************************************************************************
+TAG V00-16
+************************************************************************
+Update to reflect changes to PandoraContentApi.
+
+************************************************************************
+TAG V00-15
+************************************************************************
+Update to reflect recent changes to PandoraSDK and PandoraMonitoring.
+The ifndef statements in header files are now fully qualified.
+Update PFO energy and mass following Particle ID.
+Enable Vertex visualization via VisualMonitoring algorithm.
+Improve estimate of photon momentum in PerfectParticleFlow algorithm.
+Remove some unused algorithms.
+
+************************************************************************
+TAG V00-14
+************************************************************************
+Specify pfo vertex positions.
+
+************************************************************************
+TAG V00-13 FOR ILCSOFT USAGE
+************************************************************************
+Update to reflect recent changes to mc particle handling in PandoraSDK.
+Update PerfectParticleFlow algorithm so that it can make use of new functionality, associating multiple mc particles with individual calo hits.
+Update PerfectClustering algorithm so that it can make use of new functionality, associating multiple mc particles with individual calo hits.
+
+************************************************************************
+TAG V00-12 FOR ILCSOFT USAGE
+************************************************************************
+Added first version of MC-cheating PerfectParticleFlow algorithm.
+Reorganized "cheating" fragment removal algorithms.
+Allowed correct isolated hit assignment when running a combination of standard and MC cheating algorithms.
+Ensured local include directory is first in include path.
+
+************************************************************************
+TAG V00-11 FOLLOWING REPOSITORY RESTRUCTURING
+************************************************************************
+Up to V00-11, the FineGranularityContent library was part of the PandoraPFANew parent package.
+PandoraPFANew is now a "metadata" package containing only Makefiles for downloading and building relevant Pandora libraries.
+The FineGranularityContent library is now maintained and released separately.
+
+GENERAL INFO:
+Pandora consists of the PandoraSDK (Software Development Kit), which comprises a single library and header files with flexible APIs.
+There is also an optional PandoraMonitoring library, which contains event display and tree/histogram-writing functionality.
+The PandoraMonitoring library depends on the PandoraSDK and ROOT.
+Pandora algorithms will necessarily depend upon the PandoraSDK (and also PandoraMonitoring, if desired).
+The algorithms can be built as part of a Pandora client application, such as MarlinPandora, or the standalone TestPandora binary.
+Algorithms declared to be suitably generic may be designed for use by multiple client applications.
+Such re-usable algorithms are best bundled together into a Pandora "content" library.
+Algorithms are always registered via the client application, using the PandoraAPIs, but the client app can link against as many content libraries as required.
