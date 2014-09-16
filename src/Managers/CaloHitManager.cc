@@ -201,12 +201,20 @@ StatusCode CaloHitManager::FragmentCaloHit(CaloHit *pOriginalCaloHit, const floa
     if (RECTANGULAR == pOriginalCaloHit->GetCellGeometry())
     {
         RectangularCaloHit *pOriginalRectangularCaloHit = dynamic_cast<RectangularCaloHit *>(pOriginalCaloHit);
+
+        if (NULL == pOriginalRectangularCaloHit)
+            return STATUS_CODE_FAILURE;
+
         pDaughterCaloHit1 = new RectangularCaloHit(pOriginalRectangularCaloHit, fraction1);
         pDaughterCaloHit2 = new RectangularCaloHit(pOriginalRectangularCaloHit, 1.f - fraction1);
     }
     else if (POINTING == pOriginalCaloHit->GetCellGeometry())
     {
         PointingCaloHit *pOriginalPointingCaloHit = dynamic_cast<PointingCaloHit *>(pOriginalCaloHit);
+
+        if (NULL == pOriginalPointingCaloHit)
+            return STATUS_CODE_FAILURE;
+
         pDaughterCaloHit1 = new PointingCaloHit(pOriginalPointingCaloHit, fraction1);
         pDaughterCaloHit2 = new PointingCaloHit(pOriginalPointingCaloHit, 1.f - fraction1);
     }
@@ -244,11 +252,19 @@ StatusCode CaloHitManager::MergeCaloHitFragments(CaloHit *pFragmentCaloHit1, Cal
     if ((RECTANGULAR == pFragmentCaloHit1->GetCellGeometry()) && (RECTANGULAR == pFragmentCaloHit2->GetCellGeometry()))
     {
         RectangularCaloHit *pOriginalRectangularCaloHit = dynamic_cast<RectangularCaloHit *>(pFragmentCaloHit1);
+
+        if (NULL == pOriginalRectangularCaloHit)
+            return STATUS_CODE_FAILURE;
+
         pMergedCaloHit = new RectangularCaloHit(pOriginalRectangularCaloHit, newWeight);
     }
     else if ((POINTING == pFragmentCaloHit1->GetCellGeometry()) && (POINTING == pFragmentCaloHit2->GetCellGeometry()))
     {
         PointingCaloHit *pOriginalPointingCaloHit = dynamic_cast<PointingCaloHit *>(pFragmentCaloHit1);
+
+        if (NULL == pOriginalPointingCaloHit)
+            return STATUS_CODE_FAILURE;
+
         pMergedCaloHit = new PointingCaloHit(pOriginalPointingCaloHit, newWeight);
     }
 

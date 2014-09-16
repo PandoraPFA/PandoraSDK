@@ -233,7 +233,6 @@ void Histogram::Scale(const float scaleFactor)
 void Histogram::WriteToXml(TiXmlDocument *pTiXmlDocument, const std::string &histogramXmlKey) const
 {
     TiXmlElement *pHistogramElement = new TiXmlElement(histogramXmlKey);
-    pTiXmlDocument->LinkEndChild(pHistogramElement);
 
     TiXmlElement *pNBinsXElement = new TiXmlElement("NBinsX");
     pNBinsXElement->LinkEndChild(new TiXmlText(TypeToString(m_nBinsX)));
@@ -256,6 +255,8 @@ void Histogram::WriteToXml(TiXmlDocument *pTiXmlDocument, const std::string &his
     TiXmlElement *pBinContentsElement = new TiXmlElement("BinContents");
     pBinContentsElement->LinkEndChild(new TiXmlText(binContentsString));
     pHistogramElement->LinkEndChild(pBinContentsElement);
+
+    pTiXmlDocument->LinkEndChild(pHistogramElement);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -638,7 +639,6 @@ void TwoDHistogram::Scale(const float scaleFactor)
 void TwoDHistogram::WriteToXml(TiXmlDocument *pTiXmlDocument, const std::string &histogramXmlKey) const
 {
     TiXmlElement *pHistogramElement = new TiXmlElement(histogramXmlKey);
-    pTiXmlDocument->LinkEndChild(pHistogramElement);
 
     TiXmlElement *pNBinsXElement = new TiXmlElement("NBinsX");
     pNBinsXElement->LinkEndChild(new TiXmlText(TypeToString(m_nBinsX)));
@@ -681,6 +681,8 @@ void TwoDHistogram::WriteToXml(TiXmlDocument *pTiXmlDocument, const std::string 
     }
 
     pHistogramElement->LinkEndChild(pBinContentsElement);
+
+    pTiXmlDocument->LinkEndChild(pHistogramElement);
 }
 
 } // namespace pandora
