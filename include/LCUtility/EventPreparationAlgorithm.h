@@ -33,8 +33,11 @@ private:
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
 
     std::string     m_outputTrackListName;          ///< The output track list name
-    std::string     m_outputMuonCaloHitListName;    ///< The output muon calo hit list name
     std::string     m_outputCaloHitListName;        ///< The output calo hit list name
+    std::string     m_outputMuonCaloHitListName;    ///< The output muon calo hit list name
+
+    std::string     m_replacementTrackListName;     ///< The replacement track list name
+    std::string     m_replacementCaloHitListName;   ///< The replacement calo hit list name
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

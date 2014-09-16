@@ -77,8 +77,7 @@ StatusCode ClusteringParentAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "ClusterListName", m_clusterListName));
 
-    m_replaceCurrentClusterList = true;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "ReplaceCurrentClusterList", m_replaceCurrentClusterList));
 
     return STATUS_CODE_SUCCESS;

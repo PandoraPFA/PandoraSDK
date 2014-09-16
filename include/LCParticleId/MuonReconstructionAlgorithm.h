@@ -54,9 +54,8 @@ private:
      *  @brief  Add appropriate calo hits in the ecal/hcal to the muon clusters
      * 
      *  @param  pMuonClusterList address of the muon cluster list
-     *  @param  inputCaloHitListName the name of the algorithm input calo hit list
      */
-    pandora::StatusCode AddCaloHits(const pandora::ClusterList *const pMuonClusterList, const std::string &inputCaloHitListName) const;
+    pandora::StatusCode AddCaloHits(const pandora::ClusterList *const pMuonClusterList) const;
 
     /**
      *  @brief  Create the muon pfos
@@ -68,11 +67,9 @@ private:
     /**
      *  @brief  Tidy all relevant pandora lists, saving the muon clusters and saving muon-removed track and calo hit lists
      * 
-     *  @param  inputTrackListName the name of the algorithm input track list
-     *  @param  inputCaloHitListName the name of the algorithm input calo hit list
      *  @param  muonClusterListName the name of the list containing the initial muon clusters
      */
-    pandora::StatusCode TidyLists(const std::string &inputTrackListName, const std::string &inputCaloHitListName, const std::string &muonClusterListName) const;
+    pandora::StatusCode TidyLists(const std::string &muonClusterListName) const;
 
     typedef std::pair<pandora::CaloHit *, float> TrackDistanceInfo;
     typedef std::vector<TrackDistanceInfo> TrackDistanceInfoVector;
@@ -94,8 +91,12 @@ private:
      */
     pandora::StatusCode GetPfoComponents(pandora::TrackList &pfoTrackList, pandora::CaloHitList &pfoCaloHitList, pandora::ClusterList &pfoClusterList) const;
 
-    std::string     m_muonCaloHitListName;          ///< The name of the original calo hit list containing muon hits
+    std::string     m_inputTrackListName;           ///< The name of the input track list
+    std::string     m_inputCaloHitListName;         ///< The name of the input calo hit list containing ecal and hcal hits
+    std::string     m_inputMuonCaloHitListName;     ///< The name of the input calo hit list containing muon yoke hits
     std::string     m_muonClusteringAlgName;        ///< The name of the muon clustering algorithm to run
+
+    bool            m_shouldClusterIsolatedHits;    ///< Whether to directly include isolated hits in newly formed clusters
 
     unsigned int    m_maxClusterCaloHits;           ///< The maximum number of calo hits in a muon cluster
     unsigned int    m_minClusterOccupiedLayers;     ///< The minimum number of occupied layers in a muon cluster
@@ -118,13 +119,16 @@ private:
     float           m_maxGenericDistance;           ///< Max generic distance to add ecal/hcal hit to muon
     float           m_isolatedMaxGenericDistance;   ///< Max generic distance to add ecal/hcal hit to isolated muon
 
-    std::string     m_outputMuonPfoListName;        ///< The name of the output muon pfo list
-    std::string     m_outputMuonClusterListName;    ///< The name of the output muon cluster list
     std::string     m_outputTrackListName;          ///< The name of the output muon-removed track list
     std::string     m_outputCaloHitListName;        ///< The name of the output muon-removed calo hit list
     std::string     m_outputMuonCaloHitListName;    ///< The name of the output muon calo hit list, after removal of hits in muon pfos
+    std::string     m_outputMuonClusterListName;    ///< The name of the output muon cluster list
+    std::string     m_outputMuonPfoListName;        ///< The name of the output muon pfo list
 
-    bool            m_shouldClusterIsolatedHits;    ///< Whether to directly include isolated hits in newly formed clusters
+    std::string     m_replacementTrackListName;     ///< The replacement track list name
+    std::string     m_replacementCaloHitListName;   ///< The replacement calo hit list name
+    bool            m_replaceCurrentClusterList;    ///< Whether to subsequently use the new cluster list as the "current" list
+    bool            m_replaceCurrentPfoList;        ///< Whether to subsequently use the new pfo list as the "current" list
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

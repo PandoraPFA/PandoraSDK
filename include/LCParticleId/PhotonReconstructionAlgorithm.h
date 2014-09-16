@@ -117,6 +117,7 @@ private:
 
     std::string             m_photonClusteringAlgName;      ///< The name of the photon clustering algorithm to run
     std::string             m_clusterListName;              ///< The name of the output cluster list 
+    bool                    m_replaceCurrentClusterList;    ///< Whether to subsequently use the new cluster list as the "current" list
 
     std::string             m_histogramFile;                ///< The name of the file containing (or to contain) pdf histograms
     bool                    m_shouldMakePdfHistograms;      ///< Whether to create pdf histograms, rather than perform photon reconstruction

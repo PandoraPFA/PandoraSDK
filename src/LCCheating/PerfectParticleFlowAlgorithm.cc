@@ -53,7 +53,10 @@ StatusCode PerfectParticleFlowAlgorithm::Run()
     }
 
     if (!pClusterList->empty())
+    {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::SaveList<Cluster>(*this, m_outputClusterListName));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<Cluster>(*this, m_outputClusterListName));
+    }
 
     if (!pPfoList->empty())
     {
@@ -341,12 +344,10 @@ void PerfectParticleFlowAlgorithm::PfoParameterDebugInformation(const MCParticle
 
 StatusCode PerfectParticleFlowAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_outputPfoListName = "PerfectPfoList";
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "OutputPfoListName", m_outputPfoListName));
 
-    m_outputClusterListName = "PerfectPfoClusterList";
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "OutputClusterListName", m_outputClusterListName));
 
     m_simpleCaloHitCollection = true;

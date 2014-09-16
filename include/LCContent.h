@@ -18,7 +18,6 @@
 #include "LCClustering/ConeClusteringAlgorithm.h"
 #include "LCClustering/ForcedClusteringAlgorithm.h"
 
-#include "LCFragmentRemoval/FragmentRemovalParentAlgorithm.h"
 #include "LCFragmentRemoval/MainFragmentRemovalAlgorithm.h"
 #include "LCFragmentRemoval/MergeSplitPhotonsAlgorithm.h"
 #include "LCFragmentRemoval/NeutralFragmentRemovalAlgorithm.h"
@@ -27,7 +26,6 @@
 
 #include "LCMonitoring/DumpPfosMonitoringAlgorithm.h"
 #include "LCMonitoring/EfficiencyMonitoringAlgorithm.h"
-#include "LCMonitoring/MCParticlesMonitoringAlgorithm.h"
 #include "LCMonitoring/VisualMonitoringAlgorithm.h"
 
 #include "LCParticleId/FinalParticleIdAlgorithm.h"
@@ -36,7 +34,6 @@
 #include "LCParticleId/PhotonRecoveryAlgorithm.h"
 
 #include "LCPfoConstruction/CLICPfoSelectionAlgorithm.h"
-#include "LCPfoConstruction/KinkPfoCreationAlgorithm.h"
 #include "LCPfoConstruction/PfoCreationAlgorithm.h"
 #include "LCPfoConstruction/PfoCreationParentAlgorithm.h"
 #include "LCPfoConstruction/V0PfoCreationAlgorithm.h"
@@ -49,7 +46,6 @@
 
 #include "LCReclustering/ExitingTrackAlg.h"
 #include "LCReclustering/ForceSplitTrackAssociationsAlg.h"
-#include "LCReclustering/ReclusteringParentAlgorithm.h"
 #include "LCReclustering/ResolveTrackAssociationsAlg.h"
 #include "LCReclustering/SplitMergedClustersAlg.h"
 #include "LCReclustering/SplitTrackAssociationsAlg.h"
@@ -100,7 +96,6 @@ public:
         d("ClusteringParent",                       lc_content::ClusteringParentAlgorithm::Factory)                             \
         d("ConeClustering",                         lc_content::ConeClusteringAlgorithm::Factory)                               \
         d("ForcedClustering",                       lc_content::ForcedClusteringAlgorithm::Factory)                             \
-        d("FragmentRemovalParent",                  lc_content::FragmentRemovalParentAlgorithm::Factory)                        \
         d("MainFragmentRemoval",                    lc_content::MainFragmentRemovalAlgorithm::Factory)                          \
         d("MergeSplitPhotons",                      lc_content::MergeSplitPhotonsAlgorithm::Factory)                            \
         d("NeutralFragmentRemoval",                 lc_content::NeutralFragmentRemovalAlgorithm::Factory)                       \
@@ -108,20 +103,17 @@ public:
         d("BeamHaloMuonRemoval",                    lc_content::BeamHaloMuonRemovalAlgorithm::Factory)                          \
         d("DumpPfosMonitoring",                     lc_content::DumpPfosMonitoringAlgorithm::Factory)                           \
         d("EfficiencyMonitoring",                   lc_content::EfficiencyMonitoringAlgorithm::Factory)                         \
-        d("MCParticlesMonitoring",                  lc_content::MCParticlesMonitoringAlgorithm::Factory)                        \
         d("VisualMonitoring",                       lc_content::VisualMonitoringAlgorithm::Factory)                             \
         d("FinalParticleId",                        lc_content::FinalParticleIdAlgorithm::Factory)                              \
         d("MuonReconstruction",                     lc_content::MuonReconstructionAlgorithm::Factory)                           \
         d("PhotonReconstruction",                   lc_content::PhotonReconstructionAlgorithm::Factory)                         \
         d("PhotonRecovery",                         lc_content::PhotonRecoveryAlgorithm::Factory)                               \
         d("CLICPfoSelection",                       lc_content::CLICPfoSelectionAlgorithm::Factory)                             \
-        d("KinkPfoCreation",                        lc_content::KinkPfoCreationAlgorithm::Factory)                              \
         d("PfoCreation",                            lc_content::PfoCreationAlgorithm::Factory)                                  \
         d("PfoCreationParent",                      lc_content::PfoCreationParentAlgorithm::Factory)                            \
         d("V0PfoCreation",                          lc_content::V0PfoCreationAlgorithm::Factory)                                \
         d("ExitingTrack",                           lc_content::ExitingTrackAlg::Factory)                                       \
         d("ForceSplitTrackAssociations",            lc_content::ForceSplitTrackAssociationsAlg::Factory)                        \
-        d("ReclusteringParent",                     lc_content::ReclusteringParentAlgorithm::Factory)                           \
         d("ResolveTrackAssociations",               lc_content::ResolveTrackAssociationsAlg::Factory)                           \
         d("SplitMergedClusters",                    lc_content::SplitMergedClustersAlg::Factory)                                \
         d("SplitTrackAssociations",                 lc_content::SplitTrackAssociationsAlg::Factory)                             \
