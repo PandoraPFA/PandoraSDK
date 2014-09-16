@@ -66,10 +66,8 @@ private:
 
     /**
      *  @brief  Tidy all relevant pandora lists, saving the muon clusters and saving muon-removed track and calo hit lists
-     * 
-     *  @param  muonClusterListName the name of the list containing the initial muon clusters
      */
-    pandora::StatusCode TidyLists(const std::string &muonClusterListName) const;
+    pandora::StatusCode TidyLists() const;
 
     typedef std::pair<pandora::CaloHit *, float> TrackDistanceInfo;
     typedef std::vector<TrackDistanceInfo> TrackDistanceInfoVector;
