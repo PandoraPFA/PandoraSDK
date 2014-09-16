@@ -17,17 +17,10 @@ namespace lc_content
 
 StatusCode MuonReconstructionAlgorithm::Run()
 {
-    // Store names of input track and calo hit lists
-    std::string inputTrackListName;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentListName<Track>(*this, inputTrackListName));
-
-    std::string inputCaloHitListName;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentListName<CaloHit>(*this, inputCaloHitListName));
-
     // Cluster the muon hits
     std::string muonClusterListName;
     const ClusterList *pMuonClusterList = NULL;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<CaloHit>(*this, m_muonCaloHitListName));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<CaloHit>(*this, m_inputMuonCaloHitListName));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::RunClusteringAlgorithm(*this, m_muonClusteringAlgName, pMuonClusterList,
         muonClusterListName));
 
@@ -35,12 +28,12 @@ StatusCode MuonReconstructionAlgorithm::Run()
     if (!pMuonClusterList->empty())
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AssociateMuonTracks(pMuonClusterList));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddCaloHits(pMuonClusterList, inputCaloHitListName));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddCaloHits(pMuonClusterList));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateMuonPfos(pMuonClusterList));
     }
 
     // Tidy up
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->TidyLists(inputTrackListName, inputCaloHitListName, muonClusterListName));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->TidyLists(muonClusterListName));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -218,14 +211,14 @@ StatusCode MuonReconstructionAlgorithm::GetMuonEntryPoint(const Helix *const pHe
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MuonReconstructionAlgorithm::AddCaloHits(const ClusterList *const pMuonClusterList, const std::string &inputCaloHitListName) const
+StatusCode MuonReconstructionAlgorithm::AddCaloHits(const ClusterList *const pMuonClusterList) const
 {
     const GeometryManager *const pGeometryManager(PandoraContentApi::GetGeometry(*this));
     const float hCalEndCapInnerR(pGeometryManager->GetSubDetector(HCAL_ENDCAP).GetInnerRCoordinate());
     const float eCalEndCapInnerR(pGeometryManager->GetSubDetector(ECAL_ENDCAP).GetInnerRCoordinate());
 
     const CaloHitList *pCaloHitList = NULL;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetList(*this, inputCaloHitListName, pCaloHitList));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetList(*this, m_inputCaloHitListName, pCaloHitList));
 
     OrderedCaloHitList orderedCaloHitList;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, orderedCaloHitList.Add(*pCaloHitList));
@@ -365,7 +358,9 @@ StatusCode MuonReconstructionAlgorithm::CreateMuonPfos(const ClusterList *const 
     if (!pPfoList->empty())
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::SaveList<Pfo>(*this, m_outputMuonPfoListName));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<Pfo>(*this, m_outputMuonPfoListName));
+
+        if (m_replaceCurrentPfoList)
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<Pfo>(*this, m_outputMuonPfoListName));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -373,8 +368,7 @@ StatusCode MuonReconstructionAlgorithm::CreateMuonPfos(const ClusterList *const 
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MuonReconstructionAlgorithm::TidyLists(const std::string &inputTrackListName, const std::string &inputCaloHitListName,
-    const std::string &muonClusterListName) const
+StatusCode MuonReconstructionAlgorithm::TidyLists(const std::string &muonClusterListName) const
 {
     // Make list of all tracks, clusters and calo hits in muon pfos
     TrackList pfoTrackList; CaloHitList pfoCaloHitList; ClusterList pfoClusterList;
@@ -382,7 +376,7 @@ StatusCode MuonReconstructionAlgorithm::TidyLists(const std::string &inputTrackL
 
     // Save the muon-removed track list
     const TrackList *pInputTrackList = NULL;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetList(*this, inputTrackListName, pInputTrackList));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetList(*this, m_inputTrackListName, pInputTrackList));
 
     TrackList outputTrackList(*pInputTrackList);
 
@@ -393,13 +387,13 @@ StatusCode MuonReconstructionAlgorithm::TidyLists(const std::string &inputTrackL
     }
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::SaveList(*this, outputTrackList, m_outputTrackListName));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<Track>(*this, m_outputTrackListName));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<Track>(*this, m_replacementTrackListName));
 
     // Save the muon-removed calo hit list
     const CaloHitList *pInputCaloHitList = NULL;
     const CaloHitList *pMuonCaloHitList = NULL;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetList(*this, inputCaloHitListName, pInputCaloHitList));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetList(*this, m_muonCaloHitListName, pMuonCaloHitList));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetList(*this, m_inputCaloHitListName, pInputCaloHitList));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetList(*this, m_inputMuonCaloHitListName, pMuonCaloHitList));
 
     CaloHitList outputCaloHitList(*pInputCaloHitList);
     CaloHitList outputMuonCaloHitList(*pMuonCaloHitList);
@@ -415,12 +409,15 @@ StatusCode MuonReconstructionAlgorithm::TidyLists(const std::string &inputTrackL
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::SaveList(*this, outputMuonCaloHitList, m_outputMuonCaloHitListName));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::SaveList(*this, outputCaloHitList, m_outputCaloHitListName));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<CaloHit>(*this, m_outputCaloHitListName));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<CaloHit>(*this, m_replacementCaloHitListName));
 
     // Save the muon cluster list
     if (!pfoClusterList.empty())
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::SaveList(*this, muonClusterListName, m_outputMuonClusterListName, pfoClusterList));
+
+        if (m_replaceCurrentClusterList)
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<Cluster>(*this, m_outputMuonClusterListName));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -460,12 +457,22 @@ StatusCode MuonReconstructionAlgorithm::GetPfoComponents(TrackList &pfoTrackList
 StatusCode MuonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
     // Input lists
-    m_muonCaloHitListName = "MuonYokeHits";
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "m_muonCaloHitListName", m_muonCaloHitListName));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        "InputTrackListName", m_inputTrackListName));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        "InputCaloHitListName", m_inputCaloHitListName));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        "InputMuonCaloHitListName", m_inputMuonCaloHitListName));
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ProcessAlgorithm(*this, xmlHandle,
         "MuonClusterFormation", m_muonClusteringAlgName));
+
+    // Clustering
+    m_shouldClusterIsolatedHits = false;
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "ShouldClusterIsolatedHits", m_shouldClusterIsolatedHits));
 
     // Cluster-track association
     m_maxClusterCaloHits = 30;
@@ -541,29 +548,33 @@ StatusCode MuonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHandle
         "IsolatedMaxGenericDistance", m_isolatedMaxGenericDistance));
 
     // Output lists
-    m_outputMuonClusterListName = "MuonClusters";
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "OutputMuonClusterListName", m_outputMuonClusterListName));
-
-    m_outputMuonPfoListName = "PrimaryPfoList";
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "OutputMuonPfoListName", m_outputMuonPfoListName));
-
-    m_outputTrackListName = "MuonRemovedTracks";
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "OutputTrackListName", m_outputTrackListName));
 
-    m_outputCaloHitListName = "MuonRemovedCaloHits";
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "OutputCaloHitListName", m_outputCaloHitListName));
 
-    m_outputMuonCaloHitListName = "MuonRemovedYokeHits";
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "OutputMuonCaloHitListName", m_outputMuonCaloHitListName));
 
-    m_shouldClusterIsolatedHits = false;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "ShouldClusterIsolatedHits", m_shouldClusterIsolatedHits));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        "OutputMuonClusterListName", m_outputMuonClusterListName));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        "OutputMuonPfoListName", m_outputMuonPfoListName));
+
+    // Current list management
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        "ReplacementTrackListName", m_replacementTrackListName));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        "ReplacementCaloHitListName", m_replacementCaloHitListName));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        "ReplaceCurrentClusterList", m_replaceCurrentClusterList));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        "ReplaceCurrentPfoList", m_replaceCurrentPfoList));
 
     return STATUS_CODE_SUCCESS;
 }

@@ -143,10 +143,9 @@ StatusCode TrackPreparationAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
         "CandidateListNames", m_candidateListNames));
 
     if (m_candidateListNames.empty())
-        m_candidateListNames.push_back("Input");
+        return STATUS_CODE_INVALID_PARAMETER;
 
-    m_mergedCandidateListName = "PfoCandidates";
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "MergedCandidateListName", m_mergedCandidateListName));
 
     m_shouldMakeAssociations = true;
@@ -163,8 +162,7 @@ StatusCode TrackPreparationAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldMakePfoTrackList", m_shouldMakePfoTrackList));
 
-    m_pfoTrackListName = "PfoCreation";
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "PfoTrackListName", m_pfoTrackListName));
 
     return STATUS_CODE_SUCCESS;

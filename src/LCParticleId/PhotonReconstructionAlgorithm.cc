@@ -33,9 +33,14 @@ PhotonReconstructionAlgorithm::~PhotonReconstructionAlgorithm()
 
 StatusCode PhotonReconstructionAlgorithm::Run()
 {
-    // Obtain current track list for later reference
+    // Obtain current lists for later reference
+    const ClusterList *pInputClusterList = NULL;
+    std::string inputClusterListName;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pInputClusterList, inputClusterListName));
+
     const TrackList *pTrackList = NULL;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pTrackList));
+
     TrackVector trackVector(pTrackList->begin(), pTrackList->end());
     std::sort(trackVector.begin(), trackVector.end(), SortingHelper::SortTracksByEnergy);
 
@@ -44,6 +49,9 @@ StatusCode PhotonReconstructionAlgorithm::Run()
     std::string photonClusterListName;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::RunClusteringAlgorithm(*this, m_photonClusteringAlgName,
         pPhotonClusterList, photonClusterListName));
+
+    if (pPhotonClusterList->empty())
+        return STATUS_CODE_SUCCESS;
 
     // Fragmentation can only proceed with reference to a saved cluster list, so save these temporary clusters
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::SaveList<Cluster>(*this, m_clusterListName));
@@ -177,6 +185,9 @@ StatusCode PhotonReconstructionAlgorithm::Run()
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Delete(*this, pCluster));
         }
     }
+
+    const std::string replacementListName(m_replaceCurrentClusterList ? m_clusterListName : inputClusterListName);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<Cluster>(*this, replacementListName));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -417,6 +428,9 @@ StatusCode PhotonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHand
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ProcessAlgorithm(*this, xmlHandle,
         "PhotonClusterFormation", m_photonClusteringAlgName));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        "ReplaceCurrentClusterList", m_replaceCurrentClusterList));
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "ClusterListName", m_clusterListName));

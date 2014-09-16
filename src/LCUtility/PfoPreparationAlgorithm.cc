@@ -52,8 +52,7 @@ StatusCode PfoPreparationAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
     if (m_candidateListNames.empty())
         return STATUS_CODE_INVALID_PARAMETER;
 
-    m_mergedCandidateListName = "OutputPfoList";
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "MergedCandidateListName", m_mergedCandidateListName));
 
     return STATUS_CODE_SUCCESS;
