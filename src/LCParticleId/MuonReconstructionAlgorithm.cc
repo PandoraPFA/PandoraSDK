@@ -351,16 +351,13 @@ StatusCode MuonReconstructionAlgorithm::CreateMuonPfos(const ClusterList *const 
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ParticleFlowObject::Create(*this, pfoParameters, pPfo));
     }
 
-    if (!pMuonClusterList->empty())
+    if (!pMuonClusterList->empty() && !pPfoList->empty())
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::SaveList<Cluster>(*this, m_outputMuonClusterListName));
 
         if (m_replaceCurrentClusterList)
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<Cluster>(*this, m_outputMuonClusterListName));
-    }
 
-    if (!pPfoList->empty())
-    {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::SaveList<Pfo>(*this, m_outputMuonPfoListName));
 
         if (m_replaceCurrentPfoList)
