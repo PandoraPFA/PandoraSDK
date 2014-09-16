@@ -87,7 +87,6 @@ StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector
         return STATUS_CODE_FAILURE;
 
     m_pCurrentXmlElement = new TiXmlElement("SubDetector");
-    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("SubDetectorName", pSubDetector->GetSubDetectorName()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("SubDetectorType", pSubDetector->GetSubDetectorType()));
@@ -125,6 +124,8 @@ StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NInteractionLengths", nInteractionLengthsString));
     }
 
+    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
+
     return STATUS_CODE_SUCCESS;
 }
 
@@ -144,17 +145,17 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
     if (NULL != pBoxGap)
     {
         m_pCurrentXmlElement = new TiXmlElement("BoxGap");
-        m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
 
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Vertex", pBoxGap->GetVertex()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side1", pBoxGap->GetSide1()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side2", pBoxGap->GetSide2()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side3", pBoxGap->GetSide3()));
+
+        m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
     }
     else if (NULL != pConcentricGap)
     {
         m_pCurrentXmlElement = new TiXmlElement("ConcentricGap");
-        m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
 
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("MinZCoordinate", pConcentricGap->GetMinZCoordinate()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("MaxZCoordinate", pConcentricGap->GetMaxZCoordinate()));
@@ -164,6 +165,8 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterRCoordinate", pConcentricGap->GetOuterRCoordinate()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterPhiCoordinate", pConcentricGap->GetOuterPhiCoordinate()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterSymmetryOrder", pConcentricGap->GetOuterSymmetryOrder()));
+
+        m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
     }
     else
     {
@@ -181,7 +184,6 @@ StatusCode XmlFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
         return STATUS_CODE_FAILURE;
 
     m_pCurrentXmlElement = new TiXmlElement("CaloHit");
-    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
 
     const CellGeometry cellGeometry(pCaloHit->GetCellGeometry());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CellGeometry", cellGeometry));
@@ -228,6 +230,8 @@ StatusCode XmlFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
         return STATUS_CODE_FAILURE;
     }
 
+    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
+
     return STATUS_CODE_SUCCESS;
 }
 
@@ -239,7 +243,6 @@ StatusCode XmlFileWriter::WriteTrack(const Track *const pTrack)
         return STATUS_CODE_FAILURE;
 
     m_pCurrentXmlElement = new TiXmlElement("Track");
-    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("D0", pTrack->GetD0()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Z0", pTrack->GetZ0()));
@@ -257,6 +260,8 @@ StatusCode XmlFileWriter::WriteTrack(const Track *const pTrack)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CanFormClusterlessPfo", pTrack->CanFormClusterlessPfo()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ParentTrackAddress", pTrack->GetParentTrackAddress()));
 
+    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
+
     return STATUS_CODE_SUCCESS;
 }
 
@@ -268,7 +273,6 @@ StatusCode XmlFileWriter::WriteMCParticle(const MCParticle *const pMCParticle)
         return STATUS_CODE_FAILURE;
 
     m_pCurrentXmlElement = new TiXmlElement("MCParticle");
-    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Energy", pMCParticle->GetEnergy()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Momentum", pMCParticle->GetMomentum()));
@@ -277,6 +281,8 @@ StatusCode XmlFileWriter::WriteMCParticle(const MCParticle *const pMCParticle)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ParticleId", pMCParticle->GetParticleId()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("MCParticleType", pMCParticle->GetMCParticleType()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Uid", pMCParticle->GetUid()));
+
+    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
 
     return STATUS_CODE_SUCCESS;
 }
@@ -289,12 +295,13 @@ StatusCode XmlFileWriter::WriteRelationship(const RelationshipId relationshipId,
         return STATUS_CODE_FAILURE;
 
     m_pCurrentXmlElement = new TiXmlElement("Relationship");
-    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("RelationshipId", relationshipId));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Address1", address1));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Address2", address2));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Weight", weight));
+
+    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
 
     return STATUS_CODE_SUCCESS;
 }

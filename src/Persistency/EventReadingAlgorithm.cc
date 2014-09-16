@@ -15,6 +15,11 @@
 using namespace pandora;
 
 EventReadingAlgorithm::EventReadingAlgorithm() :
+    m_geometryFileType(UNKNOWN_FILE_TYPE),
+    m_eventFileType(UNKNOWN_FILE_TYPE),
+    m_shouldReadGeometry(false),
+    m_shouldReadEvents(true),
+    m_skipToEvent(0),
     m_pEventFileReader(NULL)
 {
 }
@@ -86,11 +91,8 @@ StatusCode EventReadingAlgorithm::Run()
 
 StatusCode EventReadingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_shouldReadGeometry = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldReadGeometry", m_shouldReadGeometry));
-
-    m_geometryFileType = UNKNOWN_FILE_TYPE;
 
     if (m_shouldReadGeometry)
     {
@@ -115,11 +117,8 @@ StatusCode EventReadingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
         }
     }
 
-    m_shouldReadEvents = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldReadEvents", m_shouldReadEvents));
-
-    m_eventFileType = UNKNOWN_FILE_TYPE;
 
     if (m_shouldReadEvents)
     {
@@ -144,7 +143,6 @@ StatusCode EventReadingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
         }
     }
 
-    m_skipToEvent = 0;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "SkipToEvent", m_skipToEvent));
 

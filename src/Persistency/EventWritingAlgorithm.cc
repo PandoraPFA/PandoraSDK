@@ -15,6 +15,14 @@
 using namespace pandora;
 
 EventWritingAlgorithm::EventWritingAlgorithm() :
+    m_geometryFileType(UNKNOWN_FILE_TYPE),
+    m_eventFileType(UNKNOWN_FILE_TYPE),
+    m_shouldWriteGeometry(false),
+    m_shouldWriteEvents(true),
+    m_shouldWriteMCRelationships(true),
+    m_shouldWriteTrackRelationships(true),
+    m_shouldOverwriteEventFile(false),
+    m_shouldOverwriteGeometryFile(false),
     m_pEventFileWriter(NULL)
 {
 }
@@ -97,11 +105,8 @@ StatusCode EventWritingAlgorithm::Run()
 
 StatusCode EventWritingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_shouldWriteGeometry = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldWriteGeometry", m_shouldWriteGeometry));
-
-    m_geometryFileType = UNKNOWN_FILE_TYPE;
 
     if (m_shouldWriteGeometry)
     {
@@ -126,11 +131,8 @@ StatusCode EventWritingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
         }
     }
 
-    m_shouldWriteEvents = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldWriteEvents", m_shouldWriteEvents));
-
-    m_eventFileType = UNKNOWN_FILE_TYPE;
 
     if (m_shouldWriteEvents)
     {
@@ -155,19 +157,15 @@ StatusCode EventWritingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
         }
     }
 
-    m_shouldOverwriteEventFile = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldOverwriteEventFile", m_shouldOverwriteEventFile));
 
-    m_shouldOverwriteGeometryFile = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldOverwriteGeometryFile", m_shouldOverwriteGeometryFile));
 
-    m_shouldWriteMCRelationships = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldWriteMCRelationships", m_shouldWriteMCRelationships));
 
-    m_shouldWriteTrackRelationships = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldWriteTrackRelationships", m_shouldWriteTrackRelationships));
 
