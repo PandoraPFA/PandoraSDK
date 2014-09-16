@@ -278,6 +278,15 @@ StatusCode AlgorithmObjectManager<T>::ReplaceCurrentAndAlgorithmInputLists(const
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<typename T>
+StatusCode AlgorithmObjectManager<T>::DropCurrentList(const Algorithm *const pAlgorithm)
+{
+    m_canMakeNewObjects = false;
+    return Manager<T>::DropCurrentList(pAlgorithm);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template<typename T>
 StatusCode AlgorithmObjectManager<T>::ResetAlgorithmInfo(const Algorithm *const pAlgorithm, bool isAlgorithmFinished)
 {
     ObjectList objectList;
@@ -304,15 +313,6 @@ StatusCode AlgorithmObjectManager<T>::EraseAllContent()
 
     m_canMakeNewObjects = false;
     return Manager<T>::EraseAllContent();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template<typename T>
-StatusCode AlgorithmObjectManager<T>::DropCurrentList()
-{
-    m_canMakeNewObjects = false;
-    return Manager<T>::DropCurrentList();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

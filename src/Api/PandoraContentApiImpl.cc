@@ -320,39 +320,39 @@ StatusCode PandoraContentApiImpl::ReplaceCurrentList<Vertex>(const Algorithm &al
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <>
-StatusCode PandoraContentApiImpl::DropCurrentList<CaloHit>() const
+StatusCode PandoraContentApiImpl::DropCurrentList<CaloHit>(const Algorithm &algorithm) const
 {
-    return m_pPandora->m_pCaloHitManager->DropCurrentList();
+    return m_pPandora->m_pCaloHitManager->DropCurrentList(&algorithm);
 }
 
 template <>
-StatusCode PandoraContentApiImpl::DropCurrentList<Track>() const
+StatusCode PandoraContentApiImpl::DropCurrentList<Track>(const Algorithm &algorithm) const
 {
-    return m_pPandora->m_pTrackManager->DropCurrentList();
+    return m_pPandora->m_pTrackManager->DropCurrentList(&algorithm);
 }
 
 template <>
-StatusCode PandoraContentApiImpl::DropCurrentList<MCParticle>() const
+StatusCode PandoraContentApiImpl::DropCurrentList<MCParticle>(const Algorithm &algorithm) const
 {
-    return m_pPandora->m_pMCManager->DropCurrentList();
+    return m_pPandora->m_pMCManager->DropCurrentList(&algorithm);
 }
 
 template <>
-StatusCode PandoraContentApiImpl::DropCurrentList<Cluster>() const
+StatusCode PandoraContentApiImpl::DropCurrentList<Cluster>(const Algorithm &algorithm) const
 {
-    return m_pPandora->m_pClusterManager->DropCurrentList();
+    return m_pPandora->m_pClusterManager->DropCurrentList(&algorithm);
 }
 
 template <>
-StatusCode PandoraContentApiImpl::DropCurrentList<Pfo>() const
+StatusCode PandoraContentApiImpl::DropCurrentList<Pfo>(const Algorithm &algorithm) const
 {
-    return m_pPandora->m_pPfoManager->DropCurrentList();
+    return m_pPandora->m_pPfoManager->DropCurrentList(&algorithm);
 }
 
 template <>
-StatusCode PandoraContentApiImpl::DropCurrentList<Vertex>() const
+StatusCode PandoraContentApiImpl::DropCurrentList<Vertex>(const Algorithm &algorithm) const
 {
-    return m_pPandora->m_pVertexManager->DropCurrentList();
+    return m_pPandora->m_pVertexManager->DropCurrentList(&algorithm);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

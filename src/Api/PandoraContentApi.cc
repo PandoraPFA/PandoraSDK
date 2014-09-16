@@ -116,7 +116,7 @@ pandora::StatusCode PandoraContentApi::ReplaceCurrentList(const pandora::Algorit
 template <typename T>
 pandora::StatusCode PandoraContentApi::DropCurrentList(const pandora::Algorithm &algorithm)
 {
-    return algorithm.GetPandora().GetPandoraContentApiImpl()->DropCurrentList<T>();
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->DropCurrentList<T>(algorithm);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -133,6 +133,14 @@ StatusCode Manager<T>::ReplaceCurrentAndAlgorithmInputLists(const Algorithm *con
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<typename T>
+StatusCode Manager<T>::DropCurrentList(const Algorithm *const pAlgorithm)
+{
+    return this->ReplaceCurrentAndAlgorithmInputLists(pAlgorithm, NULL_LIST_NAME);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template<typename T>
 StatusCode Manager<T>::CreateTemporaryListAndSetCurrent(const Algorithm *const pAlgorithm, std::string &temporaryListName)
 {
     typename AlgorithmInfoMap::iterator iter = m_algorithmInfoMap.find(pAlgorithm);
@@ -240,15 +248,6 @@ StatusCode Manager<T>::CreateInitialLists()
     m_nameToListMap[NULL_LIST_NAME] = new ObjectList;
     m_savedLists.insert(NULL_LIST_NAME);
 
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template<typename T>
-StatusCode Manager<T>::DropCurrentList()
-{
-    m_currentListName = NULL_LIST_NAME;
     return STATUS_CODE_SUCCESS;
 }
 

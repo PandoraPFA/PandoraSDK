@@ -152,9 +152,11 @@ private:
 
     /**
      *  @brief  Drop the current list, returning the current list to its default empty/null state
+     * 
+     *  @param  algorithm the algorithm calling this function
      */
     template <typename T>
-    StatusCode DropCurrentList() const;
+    StatusCode DropCurrentList(const Algorithm &algorithm) const;
 
     /**
      *  @brief  Get a named list
