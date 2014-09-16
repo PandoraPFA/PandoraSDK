@@ -156,6 +156,13 @@ protected:
     virtual StatusCode ReplaceCurrentAndAlgorithmInputLists(const Algorithm *const pAlgorithm, const std::string &listName);
 
     /**
+     *  @brief  Drop the current list, returning the current list to its default empty/null state
+     * 
+     *  @param  pAlgorithm address of the algorithm altering the lists
+     */
+    virtual StatusCode DropCurrentList(const Algorithm *const pAlgorithm);
+
+    /**
      *  @brief  Remove temporary lists and reset the current cluster list to that when algorithm was initialized
      * 
      *  @param  pAlgorithm the algorithm associated with the temporary objects
@@ -167,11 +174,6 @@ protected:
      *  @brief  Erase all manager content
      */
     virtual StatusCode EraseAllContent();
-
-    /**
-     *  @brief  Drop the current list, returning the current list to its default empty/null state
-     */
-    virtual StatusCode DropCurrentList();
 
     bool        m_canMakeNewObjects;            ///< Whether the manager is allowed to make new objects when requested by algorithms
 };
