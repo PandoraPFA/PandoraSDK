@@ -138,9 +138,9 @@ StatusCode DumpPfosMonitoringAlgorithm::Run()
     m_badNeutralEnergy = 0.f;
 
     // Alter formatting options, caching original parameters
-    (void) std::cout.setf(std::ios::fixed, std::ios::floatfield);
     const int originalPrecision(std::cout.precision(precision));
     const int originalWidth(std::cout.width());
+    (void) std::cout.setf(std::ios::fixed, std::ios::floatfield);
 
     const PfoList *pPfoList = NULL;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pPfoList));

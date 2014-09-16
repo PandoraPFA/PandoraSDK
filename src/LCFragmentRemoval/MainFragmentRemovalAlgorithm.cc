@@ -279,7 +279,7 @@ float MainFragmentRemovalAlgorithm::GetTotalEvidenceForMerge(const ChargedCluste
         trackExtrapolationEvidence += (m_meanTrackEvidence1 - chargedClusterContact.GetMeanDistanceToHelix()) / m_meanTrackEvidence1d;
 
         if (chargedClusterContact.GetMeanDistanceToHelix() < m_meanTrackEvidence2)
-            trackExtrapolationEvidence += (m_meanTrackEvidence2 - chargedClusterContact.GetClosestDistanceToHelix()) / m_meanTrackEvidence2d;
+            trackExtrapolationEvidence += (m_meanTrackEvidence2 - chargedClusterContact.GetMeanDistanceToHelix()) / m_meanTrackEvidence2d;
     }
 
     // 4. Distance of closest approach
