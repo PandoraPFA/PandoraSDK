@@ -27,14 +27,14 @@ SoftClusterMergingAlgorithm::SoftClusterMergingAlgorithm() :
     m_minClusterHadEnergy(0.25f),
     m_minClusterEMEnergy(0.025f),
     m_minCosOpeningAngle(0.f),
+    m_minHitsInCluster(5),
     m_closestDistanceCut0(50.f),
     m_closestDistanceCut1(100.f),
     m_innerLayerCut1(20),
     m_closestDistanceCut2(250.f),
     m_innerLayerCut2(40),
     m_maxClusterDistanceFine(100.f),
-    m_maxClusterDistanceCoarse(250.f),
-    m_minHitsInCluster(5)
+    m_maxClusterDistanceCoarse(250.f)
 {
 }
 
@@ -275,6 +275,9 @@ StatusCode SoftClusterMergingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle
         "MinCosOpeningAngle", m_minCosOpeningAngle));
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "MinHitsInCluster", m_minHitsInCluster));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ClosestDistanceCut0", m_closestDistanceCut0));
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
@@ -294,9 +297,6 @@ StatusCode SoftClusterMergingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxClusterDistanceCoarse", m_maxClusterDistanceCoarse));
-
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "MinHitsInCluster", m_minHitsInCluster));
 
     return STATUS_CODE_SUCCESS;
 }
