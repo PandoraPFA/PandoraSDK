@@ -1299,10 +1299,11 @@ const char* TiXmlUnknown::Parse( const char* p, TiXmlParsingData* data, TiXmlEnc
 		++p;
 	}
 
-	if ( !p )
-	{
-		if ( document )	document->SetError( TIXML_ERROR_PARSING_UNKNOWN, 0, 0, encoding );
-	}
+	// Coverity notnull: At condition p, the value of p cannot be NULL.
+	//if ( !p )
+	//{
+	//	if ( document )	document->SetError( TIXML_ERROR_PARSING_UNKNOWN, 0, 0, encoding );
+	//}
 	if ( *p == '>' )
 		return p+1;
 	return p;
