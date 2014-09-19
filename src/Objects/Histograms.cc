@@ -59,7 +59,7 @@ Histogram::Histogram(const TiXmlHandle *const pXmlHandle, const std::string &xml
     if (orderedBinContents.size() != static_cast<unsigned int>(m_nBinsX) + 2)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
-    for (int binX = -1; binX <= m_nBinsX; ++binX)
+    for (int binX = -1, endBinX = m_nBinsX; binX <= endBinX; ++binX)
     {
         const float value(orderedBinContents[binX + 1]);
 
@@ -320,14 +320,14 @@ TwoDHistogram::TwoDHistogram(const TiXmlHandle *const pXmlHandle, const std::str
     if (histogramEntryList.size() != static_cast<unsigned int>(m_nBinsY) + 2)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
-    for (int binY = -1; binY <= m_nBinsY; ++binY)
+    for (int binY = -1, endBinY = m_nBinsY; binY <= endBinY; ++binY)
     {
         const FloatVector &orderedBinContents(histogramEntryList[binY + 1]);
 
         if (orderedBinContents.size() != static_cast<unsigned int>(m_nBinsX) + 2)
             throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
-        for (int binX = -1; binX <= m_nBinsX; ++binX)
+        for (int binX = -1, endBinX = m_nBinsX; binX <= endBinX; ++binX)
         {
             const float value(orderedBinContents[binX + 1]);
             if (std::fabs(value) > std::numeric_limits<float>::epsilon())
