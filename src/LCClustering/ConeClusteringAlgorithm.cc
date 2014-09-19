@@ -15,6 +15,47 @@ using namespace pandora;
 namespace lc_content
 {
 
+ConeClusteringAlgorithm::ConeClusteringAlgorithm() :
+    m_clusterSeedStrategy(2),
+    m_shouldUseOnlyECalHits(false),
+    m_shouldUseIsolatedHits(false),
+    m_layersToStepBackFine(3),
+    m_layersToStepBackCoarse(3),
+    m_clusterFormationStrategy(0),
+    m_genericDistanceCut(1.f),
+    m_minHitTrackCosAngle(0.f),
+    m_minHitClusterCosAngle(0.f),
+    m_shouldUseTrackSeed(true),
+    m_trackSeedCutOffLayer(0),
+    m_shouldFollowInitialDirection(false),
+    m_sameLayerPadWidthsFine(2.8f),
+    m_sameLayerPadWidthsCoarse(1.8f),
+    m_coneApproachMaxSeparation2(1000.f * 1000.f),
+    m_tanConeAngleFine(0.3f),
+    m_tanConeAngleCoarse(0.5f),
+    m_additionalPadWidthsFine(2.5f),
+    m_additionalPadWidthsCoarse(2.5f),
+    m_maxClusterDirProjection(200.f),
+    m_minClusterDirProjection(-10.f),
+    m_trackPathWidth(2.f),
+    m_maxTrackSeedSeparation2(250.f * 250.f),
+    m_maxLayersToTrackSeed(3),
+    m_maxLayersToTrackLikeHit(3),
+    m_nLayersSpannedForFit(6),
+    m_nLayersSpannedForApproxFit(10),
+    m_nLayersToFit(8),
+    m_nLayersToFitLowMipCut(0.5f),
+    m_nLayersToFitLowMipMultiplier(2),
+    m_fitSuccessDotProductCut1(0.75f),
+    m_fitSuccessChi2Cut1(5.0f),
+    m_fitSuccessDotProductCut2(0.50f),
+    m_fitSuccessChi2Cut2(2.5f),
+    m_mipTrackChi2Cut(2.5f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode ConeClusteringAlgorithm::Run()
 {
     const CaloHitList *pCaloHitList = NULL;
@@ -601,155 +642,120 @@ StatusCode ConeClusteringAlgorithm::RemoveEmptyClusters(ClusterVector &clusterVe
 StatusCode ConeClusteringAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
     // Track seeding parameters
-    m_clusterSeedStrategy = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ClusterSeedStrategy", m_clusterSeedStrategy));
 
     // High level clustering parameters
-    m_shouldUseOnlyECalHits = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldUseOnlyECalHits", m_shouldUseOnlyECalHits));
 
-    m_shouldUseIsolatedHits = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldUseIsolatedHits", m_shouldUseIsolatedHits));
 
-    m_layersToStepBackFine = 3;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "LayersToStepBackFine", m_layersToStepBackFine));
 
-    m_layersToStepBackCoarse = 3;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "LayersToStepBackCoarse", m_layersToStepBackCoarse));
 
-    m_clusterFormationStrategy = 0;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ClusterFormationStrategy", m_clusterFormationStrategy));
 
-    m_genericDistanceCut = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "GenericDistanceCut", m_genericDistanceCut));
 
-    m_minHitTrackCosAngle = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitTrackCosAngle", m_minHitTrackCosAngle));
 
-    m_minHitClusterCosAngle = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitClusterCosAngle", m_minHitClusterCosAngle));
 
-    m_shouldUseTrackSeed = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldUseTrackSeed", m_shouldUseTrackSeed));
 
-    m_trackSeedCutOffLayer = 0;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TrackSeedCutOffLayer", m_trackSeedCutOffLayer));
 
-    m_shouldFollowInitialDirection = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldFollowInitialDirection", m_shouldFollowInitialDirection));
 
     // Same layer distance parameters
-    m_sameLayerPadWidthsFine = 2.8f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "SameLayerPadWidthsFine", m_sameLayerPadWidthsFine));
 
-    m_sameLayerPadWidthsCoarse = 1.8f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "SameLayerPadWidthsCoarse", m_sameLayerPadWidthsCoarse));
 
     // Cone approach distance parameters
-    float coneApproachMaxSeparation = 1000.f;
+    float coneApproachMaxSeparation = std::sqrt(m_coneApproachMaxSeparation2);
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ConeApproachMaxSeparation", coneApproachMaxSeparation));
-
     m_coneApproachMaxSeparation2 = coneApproachMaxSeparation * coneApproachMaxSeparation;
 
-    m_tanConeAngleFine = 0.3f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TanConeAngleFine", m_tanConeAngleFine));
 
-    m_tanConeAngleCoarse = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TanConeAngleCoarse", m_tanConeAngleCoarse));
 
-    m_additionalPadWidthsFine = 2.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "AdditionalPadWidthsFine", m_additionalPadWidthsFine));
 
-    m_additionalPadWidthsCoarse = 2.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "AdditionalPadWidthsCoarse", m_additionalPadWidthsCoarse));
 
-    m_maxClusterDirProjection = 200.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxClusterDirProjection", m_maxClusterDirProjection));
 
-    m_minClusterDirProjection = -10.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinClusterDirProjection", m_minClusterDirProjection));
 
     // Track seed distance parameters
-    m_trackPathWidth = 2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TrackPathWidth", m_trackPathWidth));
 
-    float maxTrackSeedSeparation = 250.f;
+    float maxTrackSeedSeparation = std::sqrt(m_maxTrackSeedSeparation2);
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxTrackSeedSeparation", maxTrackSeedSeparation));
-
     m_maxTrackSeedSeparation2 = maxTrackSeedSeparation * maxTrackSeedSeparation;
 
     if (m_shouldUseTrackSeed && (m_maxTrackSeedSeparation2 < std::numeric_limits<float>::epsilon()))
         return STATUS_CODE_INVALID_PARAMETER;
 
-    m_maxLayersToTrackSeed = 3;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxLayersToTrackSeed", m_maxLayersToTrackSeed));
 
-    m_maxLayersToTrackLikeHit = 3;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxLayersToTrackLikeHit", m_maxLayersToTrackLikeHit));
 
     // Cluster current direction and mip track parameters
-    m_nLayersSpannedForFit = 6;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NLayersSpannedForFit", m_nLayersSpannedForFit));
 
-    m_nLayersSpannedForApproxFit = 10;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NLayersSpannedForApproxFit", m_nLayersSpannedForApproxFit));
 
-    m_nLayersToFit = 8;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NLayersToFit", m_nLayersToFit));
 
-    m_nLayersToFitLowMipCut = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NLayersToFitLowMipCut", m_nLayersToFitLowMipCut));
 
-    m_nLayersToFitLowMipMultiplier = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NLayersToFitLowMipMultiplier", m_nLayersToFitLowMipMultiplier));
 
-    m_fitSuccessDotProductCut1 = 0.75f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FitSuccessDotProductCut1", m_fitSuccessDotProductCut1));
 
-    m_fitSuccessChi2Cut1 = 5.0f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FitSuccessChi2Cut1", m_fitSuccessChi2Cut1));
 
-    m_fitSuccessDotProductCut2 = 0.50f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FitSuccessDotProductCut2", m_fitSuccessDotProductCut2));
 
-    m_fitSuccessChi2Cut2 = 2.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FitSuccessChi2Cut2", m_fitSuccessChi2Cut2));
 
-    m_mipTrackChi2Cut = 2.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MipTrackChi2Cut", m_mipTrackChi2Cut));
 

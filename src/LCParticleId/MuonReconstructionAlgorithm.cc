@@ -15,6 +15,30 @@ using namespace pandora;
 namespace lc_content
 {
 
+MuonReconstructionAlgorithm::MuonReconstructionAlgorithm() :
+    m_shouldClusterIsolatedHits(false),
+    m_maxClusterCaloHits(30),
+    m_minClusterOccupiedLayers(8),
+    m_minClusterLayerSpan(8),
+    m_nClusterLayersToFit(100),
+    m_maxClusterFitChi2(4.f),
+    m_maxDistanceToTrack(200.f),
+    m_minTrackCandidateEnergy(7.f),
+    m_minHelixClusterCosAngle(0.98f),
+    m_nExpectedTracksPerCluster(1),
+    m_nExpectedParentTracks(1),
+    m_minHelixCaloHitCosAngle(0.95f),
+    m_region1GenericDistance(3.f),
+    m_region2GenericDistance(6.f),
+    m_isolatedMinRegion1Hits(1),
+    m_isolatedMaxRegion2Hits(0),
+    m_maxGenericDistance(6.f),
+    m_isolatedMaxGenericDistance(3.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode MuonReconstructionAlgorithm::Run()
 {
     std::string muonClusterListName;
@@ -464,80 +488,62 @@ StatusCode MuonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHandle
         "MuonClusterFormation", m_muonClusteringAlgName));
 
     // Clustering
-    m_shouldClusterIsolatedHits = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldClusterIsolatedHits", m_shouldClusterIsolatedHits));
 
     // Cluster-track association
-    m_maxClusterCaloHits = 30;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxClusterCaloHits", m_maxClusterCaloHits));
 
-    m_minClusterOccupiedLayers = 8;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinClusterOccupiedLayers", m_minClusterOccupiedLayers));
 
-    m_minClusterLayerSpan = 8;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinClusterLayerSpan", m_minClusterLayerSpan));
 
-    m_nClusterLayersToFit = 100;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NClusterLayersToFit", m_nClusterLayersToFit));
 
-    m_maxClusterFitChi2 = 4.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxClusterFitChi2", m_maxClusterFitChi2));
 
-    m_maxDistanceToTrack = 200.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxDistanceToTrack", m_maxDistanceToTrack));
 
-    m_minTrackCandidateEnergy = 7.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinTrackCandidateEnergy", m_minTrackCandidateEnergy));
 
-    m_minHelixClusterCosAngle = 0.98f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHelixClusterCosAngle", m_minHelixClusterCosAngle));
 
     // Addition of ecal/hcal hits
-    m_nExpectedTracksPerCluster = 1;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NExpectedTracksPerCluster", m_nExpectedTracksPerCluster));
 
     if (0 == m_nExpectedTracksPerCluster)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    m_nExpectedParentTracks = 1;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NExpectedParentTracks", m_nExpectedParentTracks));
 
-    m_minHelixCaloHitCosAngle = 0.95f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHelixCaloHitCosAngle", m_minHelixCaloHitCosAngle));
 
-    m_region1GenericDistance = 3.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "Region1GenericDistance", m_region1GenericDistance));
 
-    m_region2GenericDistance = 6.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "Region2GenericDistance", m_region2GenericDistance));
 
-    m_isolatedMinRegion1Hits = 1;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "IsolatedMinRegion1Hits", m_isolatedMinRegion1Hits));
 
-    m_isolatedMaxRegion2Hits = 0;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "IsolatedMaxRegion2Hits", m_isolatedMaxRegion2Hits));
 
-    m_maxGenericDistance = 6.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxGenericDistance", m_maxGenericDistance));
 
-    m_isolatedMaxGenericDistance = 3.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "IsolatedMaxGenericDistance", m_isolatedMaxGenericDistance));
 

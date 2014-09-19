@@ -18,6 +18,22 @@ using namespace pandora;
 namespace lc_content
 {
 
+MergeSplitPhotonsAlgorithm::MergeSplitPhotonsAlgorithm() :
+    m_minShowerMaxCosAngle(0.98f),
+    m_contactDistanceThreshold(2.f),
+    m_minContactLayers(3),
+    m_minContactFraction(0.5f),
+    m_transProfileMaxLayer(30),
+    m_acceptMaxSmallFragmentEnergy(0.2f),
+    m_acceptMaxSubsidiaryPeakEnergy(0.5f),
+    m_acceptFragmentEnergyRatio(0.05f),
+    m_acceptSubsidiaryPeakEnergyRatio(0.1f),
+    m_earlyTransProfileMaxLayer(20)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode MergeSplitPhotonsAlgorithm::Run()
 {
     const ClusterList *pClusterList = NULL;
@@ -191,43 +207,33 @@ unsigned int MergeSplitPhotonsAlgorithm::GetShowerMaxLayer(const Cluster *const 
 
 StatusCode MergeSplitPhotonsAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_minShowerMaxCosAngle = 0.98f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinShowerMaxCosAngle", m_minShowerMaxCosAngle));
 
-    m_contactDistanceThreshold = 2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ContactDistanceThreshold", m_contactDistanceThreshold));
 
-    m_minContactLayers = 3;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinContactLayers", m_minContactLayers));
 
-    m_minContactFraction = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinContactFraction", m_minContactFraction));
 
-    m_transProfileMaxLayer = 30;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TransProfileMaxLayer", m_transProfileMaxLayer));
 
-    m_acceptMaxSmallFragmentEnergy = 0.2f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "AcceptMaxSmallFragmentEnergy", m_acceptMaxSmallFragmentEnergy));
 
-    m_acceptMaxSubsidiaryPeakEnergy = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "AcceptMaxSubsidiaryPeakEnergy", m_acceptMaxSubsidiaryPeakEnergy));
 
-    m_acceptFragmentEnergyRatio = 0.05f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "AcceptFragmentEnergyRatio", m_acceptFragmentEnergyRatio));
 
-    m_acceptSubsidiaryPeakEnergyRatio = 0.1f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "AcceptSubsidiaryPeakEnergyRatio", m_acceptSubsidiaryPeakEnergyRatio));
 
-    m_earlyTransProfileMaxLayer = 20;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "EarlyTransProfileMaxLayer", m_earlyTransProfileMaxLayer));
 

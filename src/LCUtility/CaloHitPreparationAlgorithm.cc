@@ -15,6 +15,21 @@ using namespace pandora;
 namespace lc_content
 {
 
+CaloHitPreparationAlgorithm::CaloHitPreparationAlgorithm() :
+    m_caloHitMaxSeparation2(100.f * 100.f),
+    m_isolationCaloHitMaxSeparation2(1000.f * 1000.f),
+    m_isolationNLayers(2),
+    m_isolationCutDistanceFine2(25.f * 25.f),
+    m_isolationCutDistanceCoarse2(200.f * 200.f),
+    m_isolationMaxNearbyHits(2),
+    m_mipLikeMipCut(5.f),
+    m_mipNCellsForNearbyHit(2),
+    m_mipMaxNearbyHits(1)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode CaloHitPreparationAlgorithm::Run()
 {
     try
@@ -180,43 +195,38 @@ unsigned int CaloHitPreparationAlgorithm::MipCountNearbyHits(const CaloHit *cons
 
 StatusCode CaloHitPreparationAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    float caloHitMaxSeparation(100.f);
+    float caloHitMaxSeparation(std::sqrt(m_caloHitMaxSeparation2));
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CaloHitMaxSeparation", caloHitMaxSeparation));
     m_caloHitMaxSeparation2 = caloHitMaxSeparation * caloHitMaxSeparation;
 
-    float isolationCaloHitMaxSeparation(1000.f);
+    float isolationCaloHitMaxSeparation(std::sqrt(m_isolationCaloHitMaxSeparation2));
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "IsolationCaloHitMaxSeparation", isolationCaloHitMaxSeparation));
     m_isolationCaloHitMaxSeparation2 = isolationCaloHitMaxSeparation * isolationCaloHitMaxSeparation;
 
-    m_isolationNLayers = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "IsolationNLayers", m_isolationNLayers));
 
-    float isolationCutDistanceFine(25.f);
+    float isolationCutDistanceFine(std::sqrt(m_isolationCutDistanceFine2));
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "IsolationCutDistanceFine", isolationCutDistanceFine));
     m_isolationCutDistanceFine2 = isolationCutDistanceFine * isolationCutDistanceFine;
 
-    float isolationCutDistanceCoarse(200.f);
+    float isolationCutDistanceCoarse(std::sqrt(m_isolationCutDistanceCoarse2));
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "IsolationCutDistanceCoarse", isolationCutDistanceCoarse));
     m_isolationCutDistanceCoarse2 = isolationCutDistanceCoarse * isolationCutDistanceCoarse;
 
-    m_isolationMaxNearbyHits = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "IsolationMaxNearbyHits", m_isolationMaxNearbyHits));
 
-    m_mipLikeMipCut = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MipLikeMipCut", m_mipLikeMipCut));
 
-    m_mipNCellsForNearbyHit = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MipNCellsForNearbyHit", m_mipNCellsForNearbyHit));
 
-    m_mipMaxNearbyHits = 1;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MipMaxNearbyHits", m_mipMaxNearbyHits));
 

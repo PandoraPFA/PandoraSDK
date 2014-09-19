@@ -17,6 +17,15 @@ using namespace pandora;
 namespace lc_content
 {
 
+BeamHaloMuonRemovalAlgorithm::BeamHaloMuonRemovalAlgorithm() :
+    m_monitoring(false),
+    m_displayRetainedClusters(false),
+    m_displayRejectedClusters(false)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode BeamHaloMuonRemovalAlgorithm::Run()
 {
     const ClusterList *pClusterList = NULL;
@@ -302,15 +311,12 @@ bool BeamHaloMuonRemovalAlgorithm::IsBeamHaloMuon(pandora::Cluster * pCluster) c
 
 StatusCode BeamHaloMuonRemovalAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_monitoring = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "Monitoring", m_monitoring));
 
-    m_displayRetainedClusters = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DisplayRetainedClusters", m_displayRetainedClusters));
 
-    m_displayRejectedClusters = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DisplayRejectedClusters", m_displayRejectedClusters));
 

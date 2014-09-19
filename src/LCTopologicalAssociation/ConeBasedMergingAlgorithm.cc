@@ -18,6 +18,28 @@ using namespace pandora;
 namespace lc_content
 {
 
+ConeBasedMergingAlgorithm::ConeBasedMergingAlgorithm() :
+    m_canMergeMinMipFraction(0.7f),
+    m_canMergeMaxRms(5.f),
+    m_minHitsInCluster(6),
+    m_minLayersToShowerStart(4),
+    m_minConeFraction(0.5f),
+    m_maxInnerLayerSeparation(1000.f),
+    m_maxInnerLayerSeparationNoTrack(250.f),
+    m_coneCosineHalfAngle(0.9f),
+    m_minDaughterHadronicEnergy(1.f),
+    m_maxTrackClusterChi(2.5f),
+    m_maxTrackClusterDChi2(1.f),
+    m_minCosConeAngleWrtRadial(0.25f),
+    m_cosConeAngleWrtRadialCut1(0.5f),
+    m_minHitSeparationCut1(std::sqrt(1000.f)),
+    m_cosConeAngleWrtRadialCut2(0.75f),
+    m_minHitSeparationCut2(std::sqrt(1500.f))
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode ConeBasedMergingAlgorithm::Run()
 {
     // Begin by recalculating track-cluster associations
@@ -241,67 +263,51 @@ StatusCode ConeBasedMergingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ProcessFirstAlgorithm(*this, xmlHandle, m_trackClusterAssociationAlgName));
 
-    m_canMergeMinMipFraction = 0.7f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMinMipFraction", m_canMergeMinMipFraction));
 
-    m_canMergeMaxRms = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMaxRms", m_canMergeMaxRms));
 
-    m_minHitsInCluster = 6;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitsInCluster", m_minHitsInCluster));
 
-    m_minLayersToShowerStart = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinLayersToShowerStart", m_minLayersToShowerStart));
 
-    m_minConeFraction = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinConeFraction", m_minConeFraction));
 
-    m_maxInnerLayerSeparation = 1000.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxInnerLayerSeparation", m_maxInnerLayerSeparation));
 
-    m_maxInnerLayerSeparationNoTrack = 250.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxInnerLayerSeparationNoTrack", m_maxInnerLayerSeparationNoTrack));
 
-    m_coneCosineHalfAngle = 0.9f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ConeCosineHalfAngle", m_coneCosineHalfAngle));
 
-    m_minDaughterHadronicEnergy = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinDaughterHadronicEnergy", m_minDaughterHadronicEnergy));
 
-    m_maxTrackClusterChi = 2.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxTrackClusterChi", m_maxTrackClusterChi));
 
-    m_maxTrackClusterDChi2 = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxTrackClusterDChi2", m_maxTrackClusterDChi2));
 
-    m_minCosConeAngleWrtRadial = 0.25f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinCosConeAngleWrtRadial", m_minCosConeAngleWrtRadial));
 
-    m_cosConeAngleWrtRadialCut1 = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CosConeAngleWrtRadialCut1", m_cosConeAngleWrtRadialCut1));
 
-    m_minHitSeparationCut1 = std::sqrt(1000.f);
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitSeparationCut1", m_minHitSeparationCut1));
 
-    m_cosConeAngleWrtRadialCut2 = 0.75f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CosConeAngleWrtRadialCut2", m_cosConeAngleWrtRadialCut2));
 
-    m_minHitSeparationCut2 = std::sqrt(1500.f);
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitSeparationCut2", m_minHitSeparationCut2));
 

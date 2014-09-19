@@ -15,6 +15,13 @@ using namespace pandora;
 namespace lc_content
 {
 
+V0PfoCreationAlgorithm::V0PfoCreationAlgorithm() :
+    m_mcMonitoring(false)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode V0PfoCreationAlgorithm::Run()
 {
     const PfoList *pPfoList = NULL;
@@ -218,7 +225,6 @@ StatusCode V0PfoCreationAlgorithm::GetV0Mass(const CartesianVector &momentum1, c
 
 StatusCode V0PfoCreationAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_mcMonitoring = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "McMonitoring", m_mcMonitoring));
 

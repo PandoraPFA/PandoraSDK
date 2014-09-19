@@ -15,6 +15,43 @@ using namespace pandora;
 namespace lc_content
 {
 
+PhotonFragmentRemovalAlgorithm::PhotonFragmentRemovalAlgorithm() :
+    m_nMaxPasses(200),
+    m_minDaughterCaloHits(5),
+    m_minDaughterHadronicEnergy(0.025f),
+    m_innerLayerTolerance(5),
+    m_minCosOpeningAngle(0.95f),
+    m_useOnlyPhotonLikeDaughters(true),
+    m_photonLikeMaxInnerLayer(10),
+    m_photonLikeMinDCosR(0.5f),
+    m_photonLikeMaxShowerStart(5.f),
+    m_photonLikeMaxProfileDiscrepancy(0.75f),
+    m_contactCutMaxDistance(20.f),
+    m_contactCutNLayers(2),
+    m_contactCutConeFraction1(0.5f),
+    m_contactCutCloseHitFraction1(0.5f),
+    m_contactCutCloseHitFraction2(0.2f),
+    m_contactEvidenceNLayers(2),
+    m_contactEvidenceFraction(0.5f),
+    m_coneEvidenceFraction1(0.5f),
+    m_distanceEvidence1(100.f),
+    m_distanceEvidence1d(100.f),
+    m_distanceEvidenceCloseFraction1Multiplier(1.f),
+    m_distanceEvidenceCloseFraction2Multiplier(2.f),
+    m_contactWeight(1.f),
+    m_coneWeight(1.f),
+    m_distanceWeight(1.f),
+    m_minEvidence(2.f)
+{
+    m_contactParameters.m_coneCosineHalfAngle1 = 0.95f;
+    m_contactParameters.m_closeHitDistance1 = 40.f;
+    m_contactParameters.m_closeHitDistance2 = 20.f;
+    m_contactParameters.m_minCosOpeningAngle = 0.95f;
+    m_contactParameters.m_distanceThreshold = 2.f;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode PhotonFragmentRemovalAlgorithm::Run()
 {
     unsigned int nPasses(0);
@@ -268,137 +305,106 @@ StatusCode PhotonFragmentRemovalAlgorithm::GetAffectedClusters(const ClusterCont
 StatusCode PhotonFragmentRemovalAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
     // Cluster contact parameters
-    m_contactParameters.m_coneCosineHalfAngle1 = 0.95f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ConeCosineHalfAngle1", m_contactParameters.m_coneCosineHalfAngle1));
 
-    m_contactParameters.m_closeHitDistance1 = 40.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CloseHitDistance1", m_contactParameters.m_closeHitDistance1));
 
-    m_contactParameters.m_closeHitDistance2 = 20.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CloseHitDistance2", m_contactParameters.m_closeHitDistance2));
 
-    m_contactParameters.m_minCosOpeningAngle = 0.95f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinCosOpeningAngle", m_contactParameters.m_minCosOpeningAngle));
 
-    m_contactParameters.m_distanceThreshold = 2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DistanceThreshold", m_contactParameters.m_distanceThreshold));
 
-    m_nMaxPasses = 200;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NMaxPasses", m_nMaxPasses));
 
     // Initial cluster candidate selection
-    m_minDaughterCaloHits = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinDaughterCaloHits", m_minDaughterCaloHits));
 
-    m_minDaughterHadronicEnergy = 0.025f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinDaughterHadronicEnergy", m_minDaughterHadronicEnergy));
 
-    m_innerLayerTolerance = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "InnerLayerTolerance", m_innerLayerTolerance));
 
-    m_minCosOpeningAngle = 0.95f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinCosOpeningAngle", m_minCosOpeningAngle));
 
-    m_useOnlyPhotonLikeDaughters = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "UseOnlyPhotonLikeDaughters", m_useOnlyPhotonLikeDaughters));
 
     // Photon-like cuts
-    m_photonLikeMaxInnerLayer = 10;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PhotonLikeMaxInnerLayer", m_photonLikeMaxInnerLayer));
 
-    m_photonLikeMinDCosR = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PhotonLikeMinDCosR", m_photonLikeMinDCosR));
 
-    m_photonLikeMaxShowerStart = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PhotonLikeMaxShowerStart", m_photonLikeMaxShowerStart));
 
-    m_photonLikeMaxProfileDiscrepancy = 0.75f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PhotonLikeMaxProfileDiscrepancy", m_photonLikeMaxProfileDiscrepancy));
 
     // Cluster contact cuts
-    m_contactCutMaxDistance = 20.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ContactCutMaxDistance", m_contactCutMaxDistance));
 
-    m_contactCutNLayers = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ContactCutNLayers", m_contactCutNLayers));
 
-    m_contactCutConeFraction1 = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ContactCutConeFraction1", m_contactCutConeFraction1));
 
-    m_contactCutCloseHitFraction1 = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ContactCutCloseHitFraction1", m_contactCutCloseHitFraction1));
 
-    m_contactCutCloseHitFraction2 = 0.2f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ContactCutCloseHitFraction2", m_contactCutCloseHitFraction2));
 
     // Total evidence: Contact evidence
-    m_contactEvidenceNLayers = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ContactEvidenceNLayers", m_contactEvidenceNLayers));
 
-    m_contactEvidenceFraction = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ContactEvidenceFraction", m_contactEvidenceFraction));
 
     // Cone evidence
-    m_coneEvidenceFraction1 = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ConeEvidenceFraction1", m_coneEvidenceFraction1));
 
     // Distance of closest approach evidence
-    m_distanceEvidence1 = 100.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DistanceEvidence1", m_distanceEvidence1));
 
-    m_distanceEvidence1d = 100.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DistanceEvidence1d", m_distanceEvidence1d));
 
     if (m_distanceEvidence1d < std::numeric_limits<float>::epsilon())
         return STATUS_CODE_INVALID_PARAMETER;
 
-    m_distanceEvidenceCloseFraction1Multiplier = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DistanceEvidenceCloseFraction1Multiplier", m_distanceEvidenceCloseFraction1Multiplier));
 
-    m_distanceEvidenceCloseFraction2Multiplier = 2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DistanceEvidenceCloseFraction2Multiplier", m_distanceEvidenceCloseFraction2Multiplier));
 
     // Evidence weightings
-    m_contactWeight = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ContactWeight", m_contactWeight));
 
-    m_coneWeight = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ConeWeight", m_coneWeight));
 
-    m_distanceWeight = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DistanceWeight", m_distanceWeight));
 
-    m_minEvidence = 2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinEvidence", m_minEvidence));
 

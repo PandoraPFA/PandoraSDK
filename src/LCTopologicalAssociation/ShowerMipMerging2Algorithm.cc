@@ -18,6 +18,23 @@ using namespace pandora;
 namespace lc_content
 {
 
+ShowerMipMerging2Algorithm::ShowerMipMerging2Algorithm() :
+    m_canMergeMinMipFraction(0.7f),
+    m_canMergeMaxRms(5.f),
+    m_minHitsInCluster(4),
+    m_minOccupiedLayersInCluster(2),
+    m_fitToAllHitsChi2Cut(5.f),
+    m_nPointsToFit(8),
+    m_maxLayerDifference(6),
+    m_maxCentroidDifference(2000.f),
+    m_maxFitDirectionDotProduct(-0.8f),
+    m_perpendicularDistanceCutFine(50.f),
+    m_perpendicularDistanceCutCoarse(75.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode ShowerMipMerging2Algorithm::Run()
 {
     const ClusterList *pClusterList = NULL;
@@ -121,47 +138,36 @@ StatusCode ShowerMipMerging2Algorithm::Run()
 
 StatusCode ShowerMipMerging2Algorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_canMergeMinMipFraction = 0.7f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMinMipFraction", m_canMergeMinMipFraction));
 
-    m_canMergeMaxRms = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMaxRms", m_canMergeMaxRms));
 
-    m_minHitsInCluster = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitsInCluster", m_minHitsInCluster));
 
-    m_minOccupiedLayersInCluster = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinOccupiedLayersInCluster", m_minOccupiedLayersInCluster));
 
-    m_fitToAllHitsChi2Cut = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FitToAllHitsChi2Cut", m_fitToAllHitsChi2Cut));
 
-    m_nPointsToFit = 8;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NPointsToFit", m_nPointsToFit));
 
-    m_maxLayerDifference = 6;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxLayerDifference", m_maxLayerDifference));
 
-    m_maxCentroidDifference = 2000.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxCentroidDifference", m_maxCentroidDifference));
 
-    m_maxFitDirectionDotProduct = -0.8f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxFitDirectionDotProduct", m_maxFitDirectionDotProduct));
 
-    m_perpendicularDistanceCutFine = 50.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PerpendicularDistanceCutFine", m_perpendicularDistanceCutFine));
 
-    m_perpendicularDistanceCutCoarse = 75.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PerpendicularDistanceCutCoarse", m_perpendicularDistanceCutCoarse));
 

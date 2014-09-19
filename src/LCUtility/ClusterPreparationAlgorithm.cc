@@ -51,7 +51,7 @@ StatusCode ClusterPreparationAlgorithm::Run()
 
 StatusCode ClusterPreparationAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadVectorOfValues(xmlHandle,
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle,
         "CandidateListNames", m_candidateListNames));
 
     if (m_candidateListNames.empty())

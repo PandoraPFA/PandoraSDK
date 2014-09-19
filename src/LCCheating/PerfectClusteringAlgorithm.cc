@@ -15,6 +15,16 @@ using namespace pandora;
 namespace lc_content
 {
 
+PerfectClusteringAlgorithm::PerfectClusteringAlgorithm() :
+    m_shouldUseOnlyECalHits(false),
+    m_shouldUseIsolatedHits(false),
+    m_simpleMCParticleCollection(true),
+    m_minWeightFraction(0.01f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 bool PerfectClusteringAlgorithm::SelectMCParticlesForClustering(const MCParticle *const pMCParticle) const
 {
     if (m_particleIdList.empty())
@@ -199,19 +209,15 @@ StatusCode PerfectClusteringAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadVectorOfValues(xmlHandle,
         "ParticleIdList", m_particleIdList));
 
-    m_shouldUseOnlyECalHits = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldUseOnlyECalHits", m_shouldUseOnlyECalHits));
 
-    m_shouldUseIsolatedHits = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldUseIsolatedHits", m_shouldUseIsolatedHits));
 
-    m_simpleMCParticleCollection = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "SimpleMCParticleCollection", m_simpleMCParticleCollection));
 
-    m_minWeightFraction = 0.01f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinWeightFraction", m_minWeightFraction));
 

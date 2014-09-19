@@ -15,6 +15,15 @@ using namespace pandora;
 namespace lc_content
 {
 
+ForcedClusteringAlgorithm::ForcedClusteringAlgorithm() :
+    m_shouldRunStandardClusteringAlgorithm(false),
+    m_shouldClusterIsolatedHits(false),
+    m_shouldAssociateIsolatedHits(false)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode ForcedClusteringAlgorithm::Run()
 {
     // Read current track list
@@ -136,7 +145,6 @@ StatusCode ForcedClusteringAlgorithm::RemoveEmptyClusters() const
 
 StatusCode ForcedClusteringAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_shouldRunStandardClusteringAlgorithm = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldRunStandardClusteringAlgorithm", m_shouldRunStandardClusteringAlgorithm));
 
@@ -146,11 +154,9 @@ StatusCode ForcedClusteringAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
             m_standardClusteringAlgorithmName));
     }
 
-    m_shouldClusterIsolatedHits = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldClusterIsolatedHits", m_shouldClusterIsolatedHits));
 
-    m_shouldAssociateIsolatedHits = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldAssociateIsolatedHits", m_shouldAssociateIsolatedHits));
 

@@ -15,6 +15,14 @@ using namespace pandora;
 namespace lc_content
 {
 
+PerfectParticleFlowAlgorithm::PerfectParticleFlowAlgorithm() :
+    m_simpleCaloHitCollection(true),
+    m_minWeightFraction(0.01f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode PerfectParticleFlowAlgorithm::Run()
 {
     const MCParticleList *pMCParticleList = NULL;
@@ -350,11 +358,9 @@ StatusCode PerfectParticleFlowAlgorithm::ReadSettings(const TiXmlHandle xmlHandl
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "OutputClusterListName", m_outputClusterListName));
 
-    m_simpleCaloHitCollection = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "SimpleCaloHitCollection", m_simpleCaloHitCollection));
 
-    m_minWeightFraction = 0.01f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinWeightFraction", m_minWeightFraction));
 

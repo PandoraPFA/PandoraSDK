@@ -15,6 +15,42 @@ using namespace pandora;
 namespace lc_content
 {
 
+CLICPfoSelectionAlgorithm::CLICPfoSelectionAlgorithm() :
+    m_monitoring(false),
+    m_displaySelectedPfos(false),
+    m_displayRejectedPfos(true),
+    m_monitoringPfoEnergyToDisplay(1.f),
+    m_farForwardCosTheta(0.975f),
+    m_ptCutForTightTiming(0.75f),
+    m_photonPtCut(0.f),
+    m_photonPtCutForLooseTiming(4.f),
+    m_photonLooseTimingCut(2.f),
+    m_photonTightTimingCut(1.f),
+    m_chargedPfoPtCut(0.f),
+    m_chargedPfoPtCutForLooseTiming(4.f),
+    m_chargedPfoLooseTimingCut(3.f),
+    m_chargedPfoTightTimingCut(1.5f),
+    m_chargedPfoNegativeLooseTimingCut(-2.f),
+    m_chargedPfoNegativeTightTimingCut(-2.f),
+    m_neutralHadronPtCut(0.f),
+    m_neutralHadronPtCutForLooseTiming(8.f),
+    m_neutralHadronLooseTimingCut(2.5f),
+    m_neutralHadronTightTimingCut(1.5f),
+    m_neutralFarForwardLooseTimingCut(2.f),
+    m_neutralFarForwardTightTimingCut(1.f),
+    m_hCalBarrelLooseTimingCut(20.f),
+    m_hCalBarrelTightTimingCut(10.f),
+    m_hCalEndCapTimingFactor(1.f),
+    m_neutralHadronBarrelPtCutForLooseTiming(3.5f),
+    m_minECalHitsForTiming(5),
+    m_minHCalEndCapHitsForTiming(5),
+    m_useClusterLessPfos(true),
+    m_minMomentumForClusterLessPfos(0.5f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode CLICPfoSelectionAlgorithm::Run()
 {
     const PfoList *pPfoList = NULL;
@@ -260,123 +296,93 @@ void CLICPfoSelectionAlgorithm::GetClusterTimes(const Cluster *const pCluster, f
 
 StatusCode CLICPfoSelectionAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_monitoring = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "Monitoring", m_monitoring));
 
-    m_displaySelectedPfos = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DisplaySelectedPfos", m_displaySelectedPfos));
 
-    m_displayRejectedPfos = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DisplayRejectedPfos", m_displayRejectedPfos));
 
-    m_monitoringPfoEnergyToDisplay = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MonitoringPfoEnergyToDisplay", m_monitoringPfoEnergyToDisplay));
 
-    m_farForwardCosTheta = 0.975f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FarForwardCosTheta", m_farForwardCosTheta));
 
-    m_ptCutForTightTiming = 0.75f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PtCutForTightTiming", m_ptCutForTightTiming));
 
-    m_photonPtCut = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PhotonPtCut", m_photonPtCut));
 
-    m_photonPtCutForLooseTiming = 4.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PhotonPtCutForLooseTiming", m_photonPtCutForLooseTiming));
 
-    m_photonLooseTimingCut = 2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PhotonLooseTimingCut", m_photonLooseTimingCut));
 
-    m_photonTightTimingCut = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PhotonTightTimingCut", m_photonTightTimingCut));
 
-    m_chargedPfoPtCut = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ChargedPfoPtCut", m_chargedPfoPtCut));
 
-    m_chargedPfoPtCutForLooseTiming = 4.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ChargedPfoPtCutForLooseTiming", m_chargedPfoPtCutForLooseTiming));
 
-    m_chargedPfoLooseTimingCut = 3.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ChargedPfoLooseTimingCut", m_chargedPfoLooseTimingCut));
 
-    m_chargedPfoTightTimingCut = 1.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ChargedPfoTightTimingCut", m_chargedPfoTightTimingCut));
 
-    m_chargedPfoNegativeLooseTimingCut = -2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ChargedPfoNegativeLooseTimingCut", m_chargedPfoNegativeLooseTimingCut));
 
-    m_chargedPfoNegativeTightTimingCut = -2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ChargedPfoNegativeTightTimingCut", m_chargedPfoNegativeTightTimingCut));
 
-    m_neutralHadronPtCut = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NeutralHadronPtCut", m_neutralHadronPtCut));
 
-    m_neutralHadronPtCutForLooseTiming = 8.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NeutralHadronPtCutForLooseTiming", m_neutralHadronPtCutForLooseTiming));
 
-    m_neutralHadronLooseTimingCut = 2.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NeutralHadronLooseTimingCut", m_neutralHadronLooseTimingCut));
 
-    m_neutralHadronTightTimingCut = 1.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NeutralHadronTightTimingCut", m_neutralHadronTightTimingCut));
 
-    m_neutralFarForwardLooseTimingCut = 2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NeutralFarForwardLooseTimingCut",  m_neutralFarForwardLooseTimingCut));
 
-    m_neutralFarForwardTightTimingCut = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NeutralFarForwardTightTimingCut",  m_neutralFarForwardTightTimingCut));
 
-    m_hCalBarrelLooseTimingCut = 20.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "HCalBarrelLooseTimingCut", m_hCalBarrelLooseTimingCut));
 
-    m_hCalBarrelTightTimingCut = 10.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "HCalBarrelTightTimingCut", m_hCalBarrelTightTimingCut));
 
-    m_hCalEndCapTimingFactor = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "HCalEndCapTimingFactor", m_hCalBarrelLooseTimingCut));
 
-    m_neutralHadronBarrelPtCutForLooseTiming = 3.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NeutralHadronBarrelPtCutForLooseTiming", m_neutralHadronBarrelPtCutForLooseTiming));
 
-    m_minECalHitsForTiming = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinECalHitsForTiming", m_minECalHitsForTiming));
 
-    m_minHCalEndCapHitsForTiming = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHCalEndCapHitsForTiming", m_minHCalEndCapHitsForTiming));
 
-    m_useClusterLessPfos = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "UseClusterLessPfos", m_useClusterLessPfos));
- 
-    m_minMomentumForClusterLessPfos = 0.5f;
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinMomentumForClusterLessPfos", m_minMomentumForClusterLessPfos));
 

@@ -17,6 +17,16 @@ using namespace pandora;
 namespace lc_content
 {
 
+IsolatedHitMergingAlgorithm::IsolatedHitMergingAlgorithm() :
+    m_shouldUseCurrentClusterList(true),
+    m_minHitsInCluster(4),
+    m_maxRecombinationDistance(250.f),
+    m_minCosOpeningAngle(0.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode IsolatedHitMergingAlgorithm::Run()
 {
     // HACK
@@ -188,22 +198,18 @@ float IsolatedHitMergingAlgorithm::GetDistanceToHit(const Cluster *const pCluste
 
 StatusCode IsolatedHitMergingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_shouldUseCurrentClusterList = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldUseCurrentClusterList", m_shouldUseCurrentClusterList));
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadVectorOfValues(xmlHandle,
         "AdditionalClusterListNames", m_additionalClusterListNames));
 
-    m_minHitsInCluster = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitsInCluster", m_minHitsInCluster));
 
-    m_maxRecombinationDistance = 250.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxRecombinationDistance", m_maxRecombinationDistance));
 
-    m_minCosOpeningAngle = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinCosOpeningAngle", m_minCosOpeningAngle));
 

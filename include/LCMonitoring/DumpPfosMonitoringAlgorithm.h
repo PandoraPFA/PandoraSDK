@@ -170,6 +170,11 @@ public:
     };
 
     /**
+     *  @brief Default constructor
+     */
+    DumpPfosMonitoringAlgorithm();
+
+    /**
      *  @brief  Destructor
      */
     ~DumpPfosMonitoringAlgorithm();
@@ -177,7 +182,6 @@ public:
 private:
     pandora::StatusCode Run();
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
-    pandora::StatusCode Initialize();
 
     /**
      *  @brief  DumpChargedPfo

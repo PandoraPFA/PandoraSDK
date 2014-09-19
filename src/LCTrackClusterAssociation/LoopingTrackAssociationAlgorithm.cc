@@ -18,6 +18,30 @@ using namespace pandora;
 namespace lc_content
 {
 
+LoopingTrackAssociationAlgorithm::LoopingTrackAssociationAlgorithm() :
+    m_maxTrackClusterDeltaZ(50.f),
+    m_minHitsInCluster(4),
+    m_minOccupiedLayersInCluster(4),
+    m_maxClusterInnerLayer(9),
+    m_maxAbsoluteTrackClusterChi(2.f),
+    m_maxDeltaR(50.f),
+    m_minDeltaR(-100.f),
+    m_nClusterFitLayers(10),
+    m_nClusterDeltaRLayers(9),
+    m_directionCosineCut(0.975f),
+    m_clusterMipFractionCut(0.5f),
+    m_directionCosineCut1(0.925f),
+    m_directionCosineCut2(0.85f),
+    m_deltaRCut2(50.f),
+    m_directionCosineCut3(0.75f),
+    m_deltaRCut3(25.f),
+    m_directionCosineCut4(0.f),
+    m_deltaRCut4(10.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode LoopingTrackAssociationAlgorithm::Run()
 {
     const TrackList *pTrackList = NULL;
@@ -234,75 +258,57 @@ float LoopingTrackAssociationAlgorithm::GetMeanDeltaR(Cluster *const pCluster, c
 
 StatusCode LoopingTrackAssociationAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_maxTrackClusterDeltaZ = 50.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxTrackClusterDeltaZ", m_maxTrackClusterDeltaZ));
 
-    m_minHitsInCluster = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitsInCluster", m_minHitsInCluster));
 
-    m_minOccupiedLayersInCluster = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinOccupiedLayersInCluster", m_minOccupiedLayersInCluster));
 
-    m_maxClusterInnerLayer = 9;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxClusterInnerLayer", m_maxClusterInnerLayer));
 
-    m_maxAbsoluteTrackClusterChi = 2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxAbsoluteTrackClusterChi", m_maxAbsoluteTrackClusterChi));
 
-    m_maxDeltaR = 50.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxDeltaR", m_maxDeltaR));
 
-    m_minDeltaR = -100.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinDeltaR", m_minDeltaR));
 
-    m_nClusterFitLayers = 10;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NClusterFitLayers", m_nClusterFitLayers));
 
-    m_nClusterDeltaRLayers = 9;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NClusterDeltaRLayers", m_nClusterDeltaRLayers));
 
-    m_directionCosineCut = 0.975f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DirectionCosineCut", m_directionCosineCut));
 
-    m_clusterMipFractionCut = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ClusterMipFractionCut", m_clusterMipFractionCut));
 
-    m_directionCosineCut1 = 0.925f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DirectionCosineCut1", m_directionCosineCut1));
 
-    m_directionCosineCut2 = 0.85f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DirectionCosineCut2", m_directionCosineCut2));
 
-    m_deltaRCut2 = 50.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DeltaRCut2", m_deltaRCut2));
 
-    m_directionCosineCut3 = 0.75f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DirectionCosineCut3", m_directionCosineCut3));
 
-    m_deltaRCut3 = 25.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DeltaRCut3", m_deltaRCut3));
 
-    m_directionCosineCut4 = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DirectionCosineCut4", m_directionCosineCut4));
 
-    m_deltaRCut4 = 10.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DeltaRCut4", m_deltaRCut4));
 

@@ -18,6 +18,19 @@ using namespace pandora;
 namespace lc_content
 {
 
+BackscatteredTracks2Algorithm::BackscatteredTracks2Algorithm() :
+    m_canMergeMinMipFraction(0.7f),
+    m_canMergeMaxRms(5.f),
+    m_minCaloHitsPerCluster(6),
+    m_maxFitRms(15.f),
+    m_nFitProjectionLayers(2),
+    m_maxFitDistanceToClosestHit(30.f),
+    m_maxCentroidDistance(1000.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode BackscatteredTracks2Algorithm::Run()
 {
     const ClusterList *pClusterList = NULL;
@@ -119,31 +132,24 @@ StatusCode BackscatteredTracks2Algorithm::Run()
 
 StatusCode BackscatteredTracks2Algorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_canMergeMinMipFraction = 0.7f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMinMipFraction", m_canMergeMinMipFraction));
 
-    m_canMergeMaxRms = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMaxRms", m_canMergeMaxRms));
 
-    m_minCaloHitsPerCluster = 6;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinCaloHitsPerCluster", m_minCaloHitsPerCluster));
 
-    m_maxFitRms = 15.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxFitRms", m_maxFitRms));
 
-    m_nFitProjectionLayers = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NFitProjectionLayers", m_nFitProjectionLayers));
 
-    m_maxFitDistanceToClosestHit = 30.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxFitDistanceToClosestHit", m_maxFitDistanceToClosestHit));
 
-    m_maxCentroidDistance = 1000.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxCentroidDistance", m_maxCentroidDistance));
 

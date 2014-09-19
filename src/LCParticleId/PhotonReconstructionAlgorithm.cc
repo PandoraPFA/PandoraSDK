@@ -18,6 +18,45 @@ using namespace pandora;
 namespace lc_content
 {
 
+PhotonReconstructionAlgorithm::PhotonReconstructionAlgorithm() :
+    m_replaceCurrentClusterList(false),
+    m_shouldMakePdfHistograms(false),
+    m_shouldDrawPdfHistograms(false),
+    m_nEnergyBins(0),
+    m_pSigPeakRms(NULL),
+    m_pBkgPeakRms(NULL),
+    m_pSigLongProfileStart(NULL),
+    m_pBkgLongProfileStart(NULL),
+    m_pSigLongProfileDiscrepancy(NULL),
+    m_pBkgLongProfileDiscrepancy(NULL),
+    m_pSigPeakEnergyFraction(NULL),
+    m_pBkgPeakEnergyFraction(NULL),
+    m_pSigMinDistanceToTrack(NULL),
+    m_pBkgMinDistanceToTrack(NULL),
+    m_pidCut(0.4f),
+    m_minClusterEnergy(0.2f),
+    m_transProfileMaxLayer(30),
+    m_minPeakEnergy(0.2f),
+    m_maxPeakRms(5.f),
+    m_minPeakCaloHits(5),
+    m_maxLongProfileStart(10.f),
+    m_maxLongProfileDiscrepancy(1.f),
+    m_maxSearchLayer(9),
+    m_parallelDistanceCut(100.f),
+    m_minTrackClusterCosAngle(0.f),
+    m_minDistanceToTrackCut(3.f),
+    m_oldClusterEnergyFraction0(0.95f),
+    m_oldClusterEnergyFraction1(0.9f),
+    m_oldClusterEnergyDifference1(2.f),
+    m_oldClusterEnergyFraction2(0.8f),
+    m_oldClusterEnergyDifference2(1.f),
+    m_oldClusterEnergyFraction3(0.5f),
+    m_oldClusterEnergyDifference3(0.5f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 PhotonReconstructionAlgorithm::~PhotonReconstructionAlgorithm()
 {
     if (m_shouldMakePdfHistograms)
@@ -438,7 +477,6 @@ StatusCode PhotonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHand
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "HistogramFile", m_histogramFile));
 
-    m_nEnergyBins = 0;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "NEnergyBins", m_nEnergyBins));
 
@@ -448,11 +486,9 @@ StatusCode PhotonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHand
         return STATUS_CODE_INVALID_PARAMETER;
     }
 
-    m_shouldMakePdfHistograms = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldMakePdfHistograms", m_shouldMakePdfHistograms));
 
-    m_shouldDrawPdfHistograms = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldDrawPdfHistograms", m_shouldDrawPdfHistograms));
 
@@ -605,79 +641,60 @@ StatusCode PhotonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHand
         }
     }
 
-    m_pidCut = 0.4f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PidCut", m_pidCut));
 
-    m_minClusterEnergy = 0.2f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinClusterEnergy", m_minClusterEnergy));
 
-    m_transProfileMaxLayer = 30;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TransProfileMaxLayer", m_transProfileMaxLayer));
 
-    m_minPeakEnergy = 0.2f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinPeakEnergy", m_minPeakEnergy));
 
-    m_maxPeakRms = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxPeakRms", m_maxPeakRms));
 
-    m_minPeakCaloHits = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinPeakCaloHits", m_minPeakCaloHits));
 
-    m_maxLongProfileStart = 10.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxLongProfileStart", m_maxLongProfileStart));
 
-    m_maxLongProfileDiscrepancy = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxLongProfileDiscrepancy", m_maxLongProfileDiscrepancy));
 
-    m_maxSearchLayer = 9;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxSearchLayer", m_maxSearchLayer));
 
-    m_parallelDistanceCut = 100.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ParallelDistanceCut", m_parallelDistanceCut));
 
-    m_minTrackClusterCosAngle = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinTrackClusterCosAngle", m_minTrackClusterCosAngle));
 
-    m_minDistanceToTrackCut = 3.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinDistanceToTrackCut", m_minDistanceToTrackCut));
 
-    m_oldClusterEnergyFraction0 = 0.95f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "OldClusterEnergyFraction0", m_oldClusterEnergyFraction0));
 
-    m_oldClusterEnergyFraction1 = 0.9f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "OldClusterEnergyFraction1", m_oldClusterEnergyFraction1));
 
-    m_oldClusterEnergyDifference1 = 2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "OldClusterEnergyDifference1", m_oldClusterEnergyDifference1));
 
-    m_oldClusterEnergyFraction2 = 0.8f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "OldClusterEnergyFraction2", m_oldClusterEnergyFraction2));
 
-    m_oldClusterEnergyDifference2 = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "OldClusterEnergyDifference2", m_oldClusterEnergyDifference2));
 
-    m_oldClusterEnergyFraction3 = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "OldClusterEnergyFraction3", m_oldClusterEnergyFraction3));
 
-    m_oldClusterEnergyDifference3 = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "OldClusterEnergyDifference3", m_oldClusterEnergyDifference3));
 

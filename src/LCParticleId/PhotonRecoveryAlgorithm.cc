@@ -15,6 +15,35 @@ using namespace pandora;
 namespace lc_content
 {
 
+PhotonRecoveryAlgorithm::PhotonRecoveryAlgorithm() :
+    m_minElectromagneticEnergy(1.5f),
+    m_maxInnerLayer(14),
+    m_profileStartCut1(4.1f),
+    m_profileStartEnergyCut(5.f),
+    m_profileStartCut2(5.1f),
+    m_profileStartCut3(2.75f),
+    m_profileDiscrepancyCut1(0.4f),
+    m_profileDiscrepancyEnergyCut(2.5f),
+    m_profileDiscrepancyCutParameter1(0.5f),
+    m_profileDiscrepancyCutParameter2(0.02f),
+    m_minProfileDiscrepancy(0.f),
+    m_profileDiscrepancyCut2(0.5f),
+    m_maxOverlapInnerLayer(10),
+    m_maxOverlapMipFraction(0.5f),
+    m_minOverlapRadialDirectionCosine(0.9f),
+    m_maxBarrelEndCapSplit(0.9f),
+    m_softPhotonMinCaloHits(0),
+    m_softPhotonMaxCaloHits(25),
+    m_softPhotonMaxEnergy(1.f),
+    m_softPhotonMaxInnerLayer(15),
+    m_softPhotonMaxDCosR(0.9f),
+    m_softPhotonLowEnergyCut(0.5f),
+    m_softPhotonLowEnergyMaxDCosR(0.8f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode PhotonRecoveryAlgorithm::Run()
 {
     // Begin by recalculating track-cluster associations
@@ -194,96 +223,73 @@ StatusCode PhotonRecoveryAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ProcessFirstAlgorithm(*this, xmlHandle, m_trackClusterAssociationAlgName));
 
     // Photons identified as hadrons
-    m_minElectromagneticEnergy = 1.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinElectromagneticEnergy", m_minElectromagneticEnergy));
 
-    m_maxInnerLayer = 14;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxInnerLayer", m_maxInnerLayer));
 
-    m_profileStartCut1 = 4.1f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ProfileStartCut1", m_profileStartCut1));
 
-    m_profileStartEnergyCut = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ProfileStartEnergyCut", m_profileStartEnergyCut));
 
-    m_profileStartCut2 = 5.1f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ProfileStartCut2", m_profileStartCut2));
 
-    m_profileDiscrepancyCut1 = 0.4f;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "ProfileDiscrepancyCut1", m_profileDiscrepancyCut1));
-
-    m_profileDiscrepancyEnergyCut = 2.5f;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "ProfileDiscrepancyEnergyCut", m_profileDiscrepancyEnergyCut));
-
-    m_profileDiscrepancyCutParameter1 = 0.5f;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "ProfileDiscrepancyCutParameter1", m_profileDiscrepancyCutParameter1));
-
-    m_profileDiscrepancyCutParameter2 = 0.02f;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "ProfileDiscrepancyCutParameter2", m_profileDiscrepancyCutParameter2));
-
-    m_minProfileDiscrepancy = 0.f;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "MinProfileDiscrepancy", m_minProfileDiscrepancy));
-
-    m_profileDiscrepancyCut2 = 0.5f;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "ProfileDiscrepancyCut2", m_profileDiscrepancyCut2));
-
-    m_profileStartCut3 = 2.75f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ProfileStartCut3", m_profileStartCut3));
 
-    m_maxOverlapInnerLayer = 10;
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "ProfileDiscrepancyCut1", m_profileDiscrepancyCut1));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "ProfileDiscrepancyEnergyCut", m_profileDiscrepancyEnergyCut));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "ProfileDiscrepancyCutParameter1", m_profileDiscrepancyCutParameter1));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "ProfileDiscrepancyCutParameter2", m_profileDiscrepancyCutParameter2));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "MinProfileDiscrepancy", m_minProfileDiscrepancy));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "ProfileDiscrepancyCut2", m_profileDiscrepancyCut2));
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxOverlapInnerLayer", m_maxOverlapInnerLayer));
 
-    m_maxOverlapMipFraction = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxOverlapMipFraction", m_maxOverlapMipFraction));
 
-    m_minOverlapRadialDirectionCosine = 0.9f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinOverlapRadialDirectionCosine", m_minOverlapRadialDirectionCosine));
 
-    m_maxBarrelEndCapSplit = 0.9f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxBarrelEndCapSplit", m_maxBarrelEndCapSplit));
 
     // Soft photon id
-    m_softPhotonMinCaloHits = 0;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "SoftPhotonMinCaloHits", m_softPhotonMinCaloHits));
 
-    m_softPhotonMaxCaloHits = 25;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "SoftPhotonMaxCaloHits", m_softPhotonMaxCaloHits));
 
-    m_softPhotonMaxEnergy = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "SoftPhotonMaxEnergy", m_softPhotonMaxEnergy));
 
-    m_softPhotonMaxInnerLayer = 15;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "SoftPhotonMaxInnerLayer", m_softPhotonMaxInnerLayer));
 
-    m_softPhotonMaxDCosR = 0.9f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "SoftPhotonMaxDCosR", m_softPhotonMaxDCosR));
 
-    m_softPhotonLowEnergyCut = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "SoftPhotonLowEnergyCut", m_softPhotonLowEnergyCut));
 
-    m_softPhotonLowEnergyMaxDCosR = 0.8f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "SoftPhotonLowEnergyMaxDCosR", m_softPhotonLowEnergyMaxDCosR));
 

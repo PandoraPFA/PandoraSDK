@@ -18,6 +18,22 @@ using namespace pandora;
 namespace lc_content
 {
 
+ShowerMipMerging3Algorithm::ShowerMipMerging3Algorithm() :
+    m_canMergeMinMipFraction(0.7f),
+    m_canMergeMaxRms(5.f),
+    m_minCaloHitsInDaughter(6),
+    m_minOccupiedLayersInDaughter(4),
+    m_minCaloHitsInParent(3),
+    m_nPointsToFit(10),
+    m_maxFitChi2(10.f),
+    m_nFitProjectionLayers(4),
+    m_maxFitDistanceToClosestHit(30.f),
+    m_maxClusterApproach(250.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode ShowerMipMerging3Algorithm::Run()
 {
     const ClusterList *pClusterList = NULL;
@@ -112,43 +128,33 @@ StatusCode ShowerMipMerging3Algorithm::Run()
 
 StatusCode ShowerMipMerging3Algorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_canMergeMinMipFraction = 0.7f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMinMipFraction", m_canMergeMinMipFraction));
 
-    m_canMergeMaxRms = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMaxRms", m_canMergeMaxRms));
 
-    m_minCaloHitsInDaughter = 6;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinCaloHitsInDaughter", m_minCaloHitsInDaughter));
 
-    m_minOccupiedLayersInDaughter = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinOccupiedLayersInDaughter", m_minOccupiedLayersInDaughter));
 
-    m_minCaloHitsInParent = 3;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinCaloHitsInParent", m_minCaloHitsInParent));
 
-    m_nPointsToFit = 10;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NPointsToFit", m_nPointsToFit));
 
-    m_maxFitChi2 = 10.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxFitChi2", m_maxFitChi2));
 
-    m_nFitProjectionLayers = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NFitProjectionLayers", m_nFitProjectionLayers));
 
-    m_maxFitDistanceToClosestHit = 30.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxFitDistanceToClosestHit", m_maxFitDistanceToClosestHit));
 
-    m_maxClusterApproach = 250.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxClusterApproach", m_maxClusterApproach));
 

@@ -15,6 +15,14 @@ using namespace pandora;
 namespace lc_content
 {
 
+ClusteringParentAlgorithm::ClusteringParentAlgorithm() :
+    m_restoreOriginalCaloHitList(false),
+    m_replaceCurrentClusterList(true)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode ClusteringParentAlgorithm::Run()
 {
     // If specified, change the current calo hit list, i.e. the input to the clustering algorithm

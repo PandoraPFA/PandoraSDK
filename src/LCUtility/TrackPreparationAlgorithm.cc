@@ -15,6 +15,14 @@ using namespace pandora;
 namespace lc_content
 {
 
+TrackPreparationAlgorithm::TrackPreparationAlgorithm() :
+    m_shouldMakeAssociations(true),
+    m_shouldMakePfoTrackList(true)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode TrackPreparationAlgorithm::Run()
 {
     // Create candidate track list, containing all tracks that could be associated to clusters and so used in final pfo creation
@@ -139,7 +147,7 @@ bool TrackPreparationAlgorithm::HasAssociatedClusters(const Track *const pTrack,
 
 StatusCode TrackPreparationAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadVectorOfValues(xmlHandle,
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle,
         "CandidateListNames", m_candidateListNames));
 
     if (m_candidateListNames.empty())
@@ -148,7 +156,6 @@ StatusCode TrackPreparationAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "MergedCandidateListName", m_mergedCandidateListName));
 
-    m_shouldMakeAssociations = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldMakeAssociations", m_shouldMakeAssociations));
 
@@ -158,12 +165,14 @@ StatusCode TrackPreparationAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
             "trackClusterAssociationAlgorithms", m_associationAlgorithms));
     }
 
-    m_shouldMakePfoTrackList = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldMakePfoTrackList", m_shouldMakePfoTrackList));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
-        "PfoTrackListName", m_pfoTrackListName));
+    if (m_shouldMakePfoTrackList)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+            "PfoTrackListName", m_pfoTrackListName));
+    }
 
     return STATUS_CODE_SUCCESS;
 }

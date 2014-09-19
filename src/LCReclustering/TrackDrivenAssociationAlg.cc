@@ -20,6 +20,26 @@ using namespace pandora;
 namespace lc_content
 {
 
+TrackDrivenAssociationAlg::TrackDrivenAssociationAlg() :
+    m_minTrackAssociations(1),
+    m_maxTrackAssociations(std::numeric_limits<unsigned int>::max()),
+    m_chiToAttemptReclustering(-3.f),
+    m_minChi2Improvement(1.f),
+    m_coneCosineHalfAngle(0.9f),
+    m_minFractionOfHitsInCone(0.2f),
+    m_contactDistanceThreshold(2.5f),
+    m_minContactLayers(5),
+    m_minClusterEnergyForTrackAssociation(0.1f),
+    m_chi2ForAutomaticClusterSelection(1.f),
+    m_usingOrderedAlgorithms(false),
+    m_bestChi2ForReclusterHalt(4.f),
+    m_currentChi2ForReclusterHalt(16.f),
+    m_minExcessEnergy(0.1f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode TrackDrivenAssociationAlg::Run()
 {
     // Begin by recalculating track-cluster associations
@@ -254,62 +274,48 @@ StatusCode TrackDrivenAssociationAlg::ReadSettings(const TiXmlHandle xmlHandle)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ProcessAlgorithm(*this, xmlHandle, "TrackClusterAssociation",
         m_trackClusterAssociationAlgName));
 
-    m_minTrackAssociations = 1;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinTrackAssociations", m_minTrackAssociations));
 
     if (m_minTrackAssociations < 1)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    m_maxTrackAssociations = std::numeric_limits<unsigned int>::max();
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxTrackAssociations", m_maxTrackAssociations));
 
-    m_chiToAttemptReclustering = -3.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ChiToAttemptReclustering", m_chiToAttemptReclustering));
 
-    m_minChi2Improvement = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinChi2Improvement", m_minChi2Improvement));
 
-    m_coneCosineHalfAngle = 0.9f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ConeCosineHalfAngle", m_coneCosineHalfAngle));
 
-    m_minFractionOfHitsInCone = 0.2f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinFractionOfHitsInCone", m_minFractionOfHitsInCone));
 
-    m_contactDistanceThreshold = 2.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ContactDistanceThreshold", m_contactDistanceThreshold));
 
-    m_minContactLayers = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinContactLayers", m_minContactLayers));
 
-    m_minClusterEnergyForTrackAssociation = 0.1f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinClusterEnergyForTrackAssociation", m_minClusterEnergyForTrackAssociation));
 
-    m_chi2ForAutomaticClusterSelection = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "Chi2ForAutomaticClusterSelection", m_chi2ForAutomaticClusterSelection));
 
-    m_usingOrderedAlgorithms = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "UsingOrderedAlgorithms", m_usingOrderedAlgorithms));
 
-    m_bestChi2ForReclusterHalt = 4.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "BestChi2ForReclusterHalt", m_bestChi2ForReclusterHalt));
 
-    m_currentChi2ForReclusterHalt = 16.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CurrentChi2ForReclusterHalt", m_currentChi2ForReclusterHalt));
 
-    m_minExcessEnergy = 0.1f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinExcessEnergy", m_minExcessEnergy));
 
