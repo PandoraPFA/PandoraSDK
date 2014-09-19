@@ -29,6 +29,62 @@ const int widthInt = 5;
 const int widthInt4 = 4;
 const int widthFlag = 2;
 
+DumpPfosMonitoringAlgorithm::DumpPfosMonitoringAlgorithm() :
+    m_trackRecoAsTrackEnergy(0.f),
+    m_trackRecoAsPhotonEnergy(0.f),
+    m_trackRecoAsNeutralEnergy(0.f),
+    m_photonRecoAsTrackEnergy(0.f),
+    m_photonRecoAsPhotonEnergy(0.f),
+    m_photonRecoAsNeutralEnergy(0.f),
+    m_neutralRecoAsTrackEnergy(0.f),
+    m_neutralRecoAsPhotonEnergy(0.f),
+    m_neutralRecoAsNeutralEnergy(0.f),
+    m_count(0),
+    m_photonOrNeutralRecoAsTrackEnergySum(0.f),
+    m_photonOrNeutralRecoAsTrackEnergySum2(0.f),
+    m_trackRecoAsPhotonOrNeutralEnergySum(0.f),
+    m_trackRecoAsPhotonOrNeutralEnergySum2(0.f),
+    m_confusionCorrelation(0.f),
+    m_minPfoEnergyToDisplay(0.f),
+    m_minAbsChiToDisplay(3.f),
+    m_minConfusionEnergyToDisplay(5.f),
+    m_minFragmentEnergyToDisplay(5.f),
+    m_totalPfoEnergyDisplayLessThan(1000000.f),
+    m_totalPfoEnergyDisplayGreaterThan(0.f),
+    m_fragmentEnergyToDisplay(5.f),
+    m_photonIdEnergyToDisplay(5.f),
+    m_trackRecoAsTrackEnergySum(0.f),
+    m_trackRecoAsPhotonEnergySum(0.f),
+    m_trackRecoAsNeutralEnergySum(0.f),
+    m_photonRecoAsTrackEnergySum(0.f),
+    m_photonRecoAsPhotonEnergySum(0.f),
+    m_photonRecoAsNeutralEnergySum(0.f),
+    m_neutralRecoAsTrackEnergySum(0.f),
+    m_neutralRecoAsPhotonEnergySum(0.f),
+    m_neutralRecoAsNeutralEnergySum(0.f),
+    m_goodTrackEnergy(0.f),
+    m_goodPhotonEnergy(0.f),
+    m_goodIdedPhotonEnergy(0.f),
+    m_goodNeutralEnergy(0.f),
+    m_goodIdedNeutralEnergy(0.f),
+    m_badTrackEnergy(0.f),
+    m_badPhotonEnergy(0.f),
+    m_badNeutralEnergy(0.f),
+    m_goodTrackEnergySum(0.f),
+    m_goodPhotonEnergySum(0.f),
+    m_goodIdedPhotonEnergySum(0.f),
+    m_goodNeutralEnergySum(0.f),
+    m_goodIdedNeutralEnergySum(0.f),
+    m_badTrackEnergySum(0.f),
+    m_badPhotonEnergySum(0.f),
+    m_badNeutralEnergySum(0.f),
+    m_goodFractionCut(0.9f),
+    m_firstChargedPfoToPrint(true),
+    m_firstNeutralPfoToPrint(true),
+    m_firstPhotonPfoToPrint(true)
+{
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 DumpPfosMonitoringAlgorithm::~DumpPfosMonitoringAlgorithm()
@@ -759,72 +815,32 @@ float DumpPfosMonitoringAlgorithm::ClusterTime(const Cluster *const pCluster) co
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode DumpPfosMonitoringAlgorithm::Initialize()
-{
-    m_count = 0;
-    m_trackRecoAsTrackEnergySum = 0.f;
-    m_photonRecoAsTrackEnergySum = 0.f;
-    m_neutralRecoAsTrackEnergySum = 0.f;
-    m_photonOrNeutralRecoAsTrackEnergySum = 0.f;
-    m_photonOrNeutralRecoAsTrackEnergySum2 = 0.f;
-    m_trackRecoAsPhotonOrNeutralEnergySum = 0.f;
-    m_trackRecoAsPhotonOrNeutralEnergySum2 = 0.f;
-    m_confusionCorrelation = 0.f;
-    m_trackRecoAsPhotonEnergySum = 0.f;
-    m_photonRecoAsPhotonEnergySum = 0.f;
-    m_neutralRecoAsPhotonEnergySum = 0.f;
-    m_trackRecoAsNeutralEnergySum = 0.f;
-    m_photonRecoAsNeutralEnergySum = 0.f;
-    m_neutralRecoAsNeutralEnergySum= 0.f;
-    m_goodTrackEnergySum = 0.f;
-    m_goodPhotonEnergySum = 0.f;
-    m_goodIdedPhotonEnergySum = 0.f;
-    m_goodNeutralEnergySum = 0.f;
-    m_goodIdedNeutralEnergySum = 0.f;
-    m_badTrackEnergySum = 0.f;
-    m_badPhotonEnergySum = 0.f;
-    m_badNeutralEnergySum = 0.f;
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 StatusCode DumpPfosMonitoringAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_minPfoEnergyToDisplay = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinPfoEnergyToDisplay", m_minPfoEnergyToDisplay));
 
-    m_minAbsChiToDisplay = 3.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinAbsChiToDisplay", m_minAbsChiToDisplay));
 
-    m_minConfusionEnergyToDisplay = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinConfusionEnergyToDisplay", m_minConfusionEnergyToDisplay));
 
-    m_minFragmentEnergyToDisplay = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinFragmentEnergyToDisplay", m_minFragmentEnergyToDisplay));
 
-    m_totalPfoEnergyDisplayLessThan = 1000000.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TotalPfoEnergyDisplayLessThan", m_totalPfoEnergyDisplayLessThan));
- 
-    m_totalPfoEnergyDisplayGreaterThan = 0.f;
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TotalPfoEnergyDisplayGreaterThan", m_totalPfoEnergyDisplayGreaterThan));
- 
-    m_fragmentEnergyToDisplay = 5.f;
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FragmentEnergyToDisplay", m_fragmentEnergyToDisplay));
- 
-    m_photonIdEnergyToDisplay = 5.f;
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PhotonIdEnergyToDisplay", m_photonIdEnergyToDisplay));
 
-    m_goodFractionCut = 0.9f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "GoodFractionCut", m_goodFractionCut));
 

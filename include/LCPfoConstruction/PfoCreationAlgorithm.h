@@ -30,6 +30,11 @@ public:
         pandora::Algorithm *CreateAlgorithm() const;
     };
 
+    /**
+     *  @brief Default constructor
+     */
+    PfoCreationAlgorithm();
+
 private:
     typedef PandoraContentApi::ParticleFlowObject::Parameters PfoParameters;
 

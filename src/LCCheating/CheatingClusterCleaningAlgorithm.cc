@@ -18,18 +18,7 @@ namespace lc_content
 StatusCode CheatingClusterCleaningAlgorithm::Run()
 {
     const ClusterList *pClusterList = NULL;
-
-    if (!m_inputClusterListName.empty())
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetList(*this, m_inputClusterListName, pClusterList));
-    }
-    else
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pClusterList));
-    }
-
-    if (NULL == pClusterList)
-        return STATUS_CODE_NOT_INITIALIZED;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pClusterList));
 
     // Examine clusters, reducing each to just the hits corresponding to the main mc particle
     for (ClusterList::const_iterator itCluster = pClusterList->begin(), itClusterEnd = pClusterList->end(); itCluster != itClusterEnd; ++itCluster )
@@ -92,11 +81,8 @@ StatusCode CheatingClusterCleaningAlgorithm::Run()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CheatingClusterCleaningAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
+StatusCode CheatingClusterCleaningAlgorithm::ReadSettings(const TiXmlHandle /*xmlHandle*/)
 {
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "InputClusterListName", m_inputClusterListName));
-
     return STATUS_CODE_SUCCESS;
 }
 

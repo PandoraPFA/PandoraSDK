@@ -28,6 +28,11 @@ public:
         pandora::Algorithm *CreateAlgorithm() const;
     };
 
+    /**
+     *  @brief Default constructor
+     */
+    PerfectClusteringAlgorithm();
+
 protected:
     virtual bool SelectMCParticlesForClustering(const pandora::MCParticle *const pMCParticle) const;
 

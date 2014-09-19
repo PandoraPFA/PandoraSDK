@@ -15,6 +15,16 @@ using namespace pandora;
 namespace lc_content
 {
 
+MuonPhotonSeparationAlgorithm::MuonPhotonSeparationAlgorithm() :
+    m_highEnergyMuonCut(0.f),
+    m_nTransitionLayers(1)
+{
+    m_additionalPadWidthsFine = 0.7071f;
+    m_additionalPadWidthsCoarse = 0.7071f;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode MuonPhotonSeparationAlgorithm::PerformFragmentation(Cluster *const pOriginalCluster, Track *const pTrack, unsigned int showerStartLayer,
     unsigned int showerEndLayer) const
 {
@@ -134,26 +144,13 @@ StatusCode MuonPhotonSeparationAlgorithm::MakeClusterFragments(const unsigned in
 
 StatusCode MuonPhotonSeparationAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    // Read base class settings
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, MipPhotonSeparationAlgorithm::ReadSettings(xmlHandle));
-
-    m_additionalPadWidthsFine = 0.7071f;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "AdditionalPadWidthsFine", m_additionalPadWidthsFine));
-
-    m_additionalPadWidthsCoarse = 0.7071f;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "AdditionalPadWidthsCoarse", m_additionalPadWidthsCoarse));
-
-    m_highEnergyMuonCut = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "HighEnergyMuonCut", m_highEnergyMuonCut));
 
-    m_nTransitionLayers = 1;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NTransitionLayers", m_nTransitionLayers));
 
-    return STATUS_CODE_SUCCESS;
+    return MipPhotonSeparationAlgorithm::ReadSettings(xmlHandle);
 }
 
 } // namespace lc_content

@@ -19,6 +19,23 @@ using namespace pandora;
 namespace lc_content
 {
 
+TrackRecoveryHelixAlgorithm::TrackRecoveryHelixAlgorithm() :
+    m_maxTrackClusterDeltaZ(250.f),
+    m_maxAbsoluteTrackClusterChi(2.5f),
+    m_maxLayersCrossed(50),
+    m_maxSearchLayer(19),
+    m_parallelDistanceCut(100.f),
+    m_minTrackClusterCosAngle(0.f),
+    m_helixComparisonNLayers(20),
+    m_helixComparisonMaxOccupiedLayers(9),
+    m_maxTrackClusterDistance(100.f),
+    m_maxClosestHelixClusterDistance(100.f),
+    m_maxMeanHelixClusterDistance(150.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode TrackRecoveryHelixAlgorithm::Run()
 {
     TrackAssociationInfoMap trackAssociationInfoMap;
@@ -190,47 +207,36 @@ StatusCode TrackRecoveryHelixAlgorithm::MakeTrackClusterAssociations(TrackAssoci
 
 StatusCode TrackRecoveryHelixAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_maxTrackClusterDeltaZ = 250.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxTrackClusterDeltaZ", m_maxTrackClusterDeltaZ));
 
-    m_maxAbsoluteTrackClusterChi = 2.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxAbsoluteTrackClusterChi", m_maxAbsoluteTrackClusterChi));
 
-    m_maxLayersCrossed = 50;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxLayersCrossed", m_maxLayersCrossed));
 
-    m_maxSearchLayer = 19;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxSearchLayer", m_maxSearchLayer));
 
-    m_parallelDistanceCut = 100.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ParallelDistanceCut", m_parallelDistanceCut));
 
-    m_minTrackClusterCosAngle = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinTrackClusterCosAngle", m_minTrackClusterCosAngle));
 
-    m_helixComparisonNLayers = 20;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "HelixComparisonNLayers", m_helixComparisonNLayers));
 
-    m_helixComparisonMaxOccupiedLayers = 9;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "HelixComparisonMaxOccupiedLayers", m_helixComparisonMaxOccupiedLayers));
 
-    m_maxTrackClusterDistance = 100.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxTrackClusterDistance", m_maxTrackClusterDistance));
 
-    m_maxClosestHelixClusterDistance = 100.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxClosestHelixClusterDistance", m_maxClosestHelixClusterDistance));
 
-    m_maxMeanHelixClusterDistance = 150.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxMeanHelixClusterDistance", m_maxMeanHelixClusterDistance));
 

@@ -18,6 +18,28 @@ using namespace pandora;
 namespace lc_content
 {
 
+SoftClusterMergingAlgorithm::SoftClusterMergingAlgorithm() :
+    m_shouldUseCurrentClusterList(true),
+    m_updateCurrentTrackClusterAssociations(true),
+    m_maxHitsInSoftCluster(5),
+    m_maxLayersSpannedBySoftCluster(3),
+    m_maxHadEnergyForSoftClusterNoTrack(2.f),
+    m_minClusterHadEnergy(0.25f),
+    m_minClusterEMEnergy(0.025f),
+    m_minCosOpeningAngle(0.f),
+    m_closestDistanceCut0(50.f),
+    m_closestDistanceCut1(100.f),
+    m_innerLayerCut1(20),
+    m_closestDistanceCut2(250.f),
+    m_innerLayerCut2(40),
+    m_maxClusterDistanceFine(100.f),
+    m_maxClusterDistanceCoarse(250.f),
+    m_minHitsInCluster(5)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode SoftClusterMergingAlgorithm::Run()
 {
     // Read specified lists of input clusters
@@ -219,11 +241,9 @@ StatusCode SoftClusterMergingAlgorithm::GetClusterListName(Cluster *const pClust
 
 StatusCode SoftClusterMergingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_shouldUseCurrentClusterList = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldUseCurrentClusterList", m_shouldUseCurrentClusterList));
 
-    m_updateCurrentTrackClusterAssociations = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "UpdateCurrentTrackClusterAssociations", m_updateCurrentTrackClusterAssociations));
 
@@ -236,59 +256,45 @@ StatusCode SoftClusterMergingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadVectorOfValues(xmlHandle,
         "AdditionalClusterListNames", m_additionalClusterListNames));
 
-    m_maxHitsInSoftCluster = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxHitsInSoftCluster", m_maxHitsInSoftCluster));
 
-    m_maxLayersSpannedBySoftCluster = 3;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxLayersSpannedBySoftCluster", m_maxLayersSpannedBySoftCluster));
 
-    m_maxHadEnergyForSoftClusterNoTrack = 2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxHadEnergyForSoftClusterNoTrack", m_maxHadEnergyForSoftClusterNoTrack));
 
-    m_minClusterHadEnergy = 0.25f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinClusterHadEnergy", m_minClusterHadEnergy));
 
-    m_minClusterEMEnergy = 0.025f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinClusterEMEnergy", m_minClusterEMEnergy));
 
-    m_minCosOpeningAngle = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinCosOpeningAngle", m_minCosOpeningAngle));
 
-    m_closestDistanceCut0 = 50.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ClosestDistanceCut0", m_closestDistanceCut0));
 
-    m_closestDistanceCut1 = 100.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ClosestDistanceCut1", m_closestDistanceCut1));
 
-    m_innerLayerCut1 = 20;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "InnerLayerCut1", m_innerLayerCut1));
 
-    m_closestDistanceCut2 = 250.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ClosestDistanceCut2", m_closestDistanceCut2));
 
-    m_innerLayerCut2 = 40;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "InnerLayerCut2", m_innerLayerCut2));
 
-    m_maxClusterDistanceFine = 100.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxClusterDistanceFine", m_maxClusterDistanceFine));
 
-    m_maxClusterDistanceCoarse = 250.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxClusterDistanceCoarse", m_maxClusterDistanceCoarse));
 
-    m_minHitsInCluster = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitsInCluster", m_minHitsInCluster));
 

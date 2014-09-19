@@ -29,6 +29,11 @@ public:
     };
 
     /**
+     *  @brief Default constructor
+     */
+    EfficiencyMonitoringAlgorithm();
+
+    /**
      *  @brief  Destructor
      */
     ~EfficiencyMonitoringAlgorithm();

@@ -17,6 +17,13 @@ using namespace pandora;
 namespace lc_content
 {
 
+EfficiencyMonitoringAlgorithm::EfficiencyMonitoringAlgorithm() :
+    m_mcThresholdEnergy(0.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 EfficiencyMonitoringAlgorithm::~EfficiencyMonitoringAlgorithm()
 {
     PANDORA_MONITORING_API(SaveTree(this->GetPandora(), "EffTree", m_monitoringFileName, "UPDATE"));
@@ -101,7 +108,6 @@ StatusCode EfficiencyMonitoringAlgorithm::ReadSettings(const TiXmlHandle xmlHand
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "MonitoringFileName", m_monitoringFileName));
 
-    m_mcThresholdEnergy = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MCThresholdEnergy", m_mcThresholdEnergy));
 

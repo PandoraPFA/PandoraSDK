@@ -15,6 +15,16 @@ using namespace pandora;
 namespace lc_content
 {
 
+PfoCreationParentAlgorithm::PfoCreationParentAlgorithm() :
+    m_restoreOriginalClusterList(false),
+    m_restoreOriginalTrackList(false),
+    m_replaceCurrentPfoList(true),
+    m_replaceCurrentVertexList(true)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode PfoCreationParentAlgorithm::Run()
 {
     // If specified, change the current cluster and tracks lists, i.e. the inputs to the pfo creation algorithm
@@ -103,12 +113,10 @@ StatusCode PfoCreationParentAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "VertexListName", m_vertexListName));
 
-    m_replaceCurrentPfoList = true;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "ReplaceCurrentPfoList", m_replaceCurrentPfoList));
 
-    m_replaceCurrentVertexList = true;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "ReplaceCurrentVertexList", m_replaceCurrentVertexList));
 
     return STATUS_CODE_SUCCESS;

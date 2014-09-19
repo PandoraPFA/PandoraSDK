@@ -123,6 +123,11 @@ public:
         pandora::Algorithm *CreateAlgorithm() const;
     };
 
+    /**
+     *  @brief Default constructor
+     */
+    MainFragmentRemovalAlgorithm();
+
 private:
     pandora::StatusCode Run();
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
@@ -269,8 +274,8 @@ private:
     float               m_trackExtrapolationWeight;                 ///< Weight for track extrapolation evidence
 
     unsigned int        m_layerCorrectionLayerValue1;               ///< Max value of correction layer for layer correction contribution 1
-    unsigned int        m_layerCorrectionLayerValue3;               ///< Max value of correction layer for layer correction contribution 3
     unsigned int        m_layerCorrectionLayerValue2;               ///< Max value of correction layer for layer correction contribution 2
+    unsigned int        m_layerCorrectionLayerValue3;               ///< Max value of correction layer for layer correction contribution 3
     float               m_layerCorrection1;                         ///< Layer correction contribution 1
     float               m_layerCorrection2;                         ///< Layer correction contribution 2
     float               m_layerCorrection3;                         ///< Layer correction contribution 3
@@ -286,10 +291,10 @@ private:
 
     float               m_lowEnergyCorrectionThreshold;             ///< Low energy correction threshold
     unsigned int        m_lowEnergyCorrectionNHitLayers1;           ///< Number of hit layers below which to apply contribution 1
-    float               m_lowEnergyCorrection1;                     ///< Low energy correction contribution 1
     unsigned int        m_lowEnergyCorrectionNHitLayers2;           ///< Number of hit layers below which to apply contribution 2   
-    float               m_lowEnergyCorrection2;                     ///< Low energy correction contribution 2
     unsigned int        m_lowEnergyCorrectionNHitLayers3;           ///< Number of hit layers above which to apply contribution 3
+    float               m_lowEnergyCorrection1;                     ///< Low energy correction contribution 1
+    float               m_lowEnergyCorrection2;                     ///< Low energy correction contribution 2
     float               m_lowEnergyCorrection3;                     ///< Low energy correction contribution 3
 
     float               m_angularCorrectionOffset;                  ///< Offset value for angular correction

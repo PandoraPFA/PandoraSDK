@@ -18,6 +18,31 @@ using namespace pandora;
 namespace lc_content
 {
 
+LoopingTracksAlgorithm::LoopingTracksAlgorithm() :
+    m_nLayersToFit(5),
+    m_fitChi2Cut(100.f),
+    m_canMergeMinMipFraction(0.7f),
+    m_canMergeMaxRms(5.f),
+    m_minHitsInCluster(4),
+    m_minOccupiedLayersInCluster(2),
+    m_maxOuterLayerDifference(6),
+    m_maxCentroidDifference(2000.f),
+    m_fitDirectionDotProductCutFine(-0.1f),
+    m_fitDirectionDotProductCutCoarse(0.f),
+    m_closestHitDistanceCutFine(250.f),
+    m_closestHitDistanceCutCoarse(500.f),
+    m_fitResultsClosestApproachCutFine(50.f),
+    m_fitResultsClosestApproachCutCoarse(200.f),
+    m_nGoodFeaturesForClusterMerge(2),
+    m_goodFeaturesMaxFitDotProduct(-0.5f),
+    m_goodFeaturesMaxFitApproach(50.f),
+    m_goodFeaturesMaxLayerDifference(4),
+    m_goodFeaturesMinMipFraction(0.9f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode LoopingTracksAlgorithm::Run()
 {
     const ClusterList *pClusterList = NULL;
@@ -203,79 +228,60 @@ float LoopingTracksAlgorithm::GetClosestDistanceBetweenOuterLayerHits(const Clus
 
 StatusCode LoopingTracksAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_nLayersToFit = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NLayersToFit", m_nLayersToFit));
 
-    m_fitChi2Cut = 100.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FitChi2Cut", m_fitChi2Cut));
 
-    m_canMergeMinMipFraction = 0.7f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMinMipFraction", m_canMergeMinMipFraction));
 
-    m_canMergeMaxRms = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMaxRms", m_canMergeMaxRms));
 
-    m_minHitsInCluster = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitsInCluster", m_minHitsInCluster));
 
-    m_minOccupiedLayersInCluster = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinOccupiedLayersInCluster", m_minOccupiedLayersInCluster));
 
-    m_maxOuterLayerDifference = 6;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxOuterLayerDifference", m_maxOuterLayerDifference));
 
-    m_maxCentroidDifference = 2000.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxCentroidDifference", m_maxCentroidDifference));
 
-    m_fitDirectionDotProductCutFine = -0.1f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FitDirectionDotProductCutFine", m_fitDirectionDotProductCutFine));
 
-    m_fitDirectionDotProductCutCoarse = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FitDirectionDotProductCutCoarse", m_fitDirectionDotProductCutCoarse));
 
-    m_closestHitDistanceCutFine = 250.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ClosestHitDistanceCutFine", m_closestHitDistanceCutFine));
 
-    m_closestHitDistanceCutCoarse = 500.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ClosestHitDistanceCutCoarse", m_closestHitDistanceCutCoarse));
 
-    m_fitResultsClosestApproachCutFine = 50.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FitResultsClosestApproachCutFine", m_fitResultsClosestApproachCutFine));
 
-    m_fitResultsClosestApproachCutCoarse = 200.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FitResultsClosestApproachCutCoarse", m_fitResultsClosestApproachCutCoarse));
 
-    m_nGoodFeaturesForClusterMerge = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NGoodFeaturesForClusterMerge", m_nGoodFeaturesForClusterMerge));
 
-    m_goodFeaturesMaxFitDotProduct = -0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NGoodFeaturesForClusterMerge", m_nGoodFeaturesForClusterMerge));
 
-    m_goodFeaturesMaxFitApproach = 50.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "GoodFeaturesMaxFitApproach", m_goodFeaturesMaxFitApproach));
 
-    m_goodFeaturesMaxLayerDifference = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "GoodFeaturesMaxLayerDifference", m_goodFeaturesMaxLayerDifference));
 
-    m_goodFeaturesMinMipFraction = 0.9f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "GoodFeaturesMinMipFraction", m_goodFeaturesMinMipFraction));
 

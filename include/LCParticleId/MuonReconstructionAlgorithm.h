@@ -28,6 +28,11 @@ public:
         pandora::Algorithm *CreateAlgorithm() const;
     };
 
+    /**
+     *  @brief Default constructor
+     */
+    MuonReconstructionAlgorithm();
+
 private:
     typedef const void *Uid;
 

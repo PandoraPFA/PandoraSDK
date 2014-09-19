@@ -15,6 +15,13 @@ using namespace pandora;
 namespace lc_content
 {
 
+ForceSplitTrackAssociationsAlg::ForceSplitTrackAssociationsAlg() :
+    m_minTrackAssociations(2)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode ForceSplitTrackAssociationsAlg::Run()
 {
     const ClusterList *pClusterList = NULL;
@@ -146,7 +153,6 @@ StatusCode ForceSplitTrackAssociationsAlg::Run()
 
 StatusCode ForceSplitTrackAssociationsAlg::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_minTrackAssociations = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinTrackAssociations", m_minTrackAssociations));
 

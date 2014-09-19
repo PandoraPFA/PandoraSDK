@@ -18,6 +18,21 @@ using namespace pandora;
 namespace lc_content
 {
 
+ShowerMipMerging4Algorithm::ShowerMipMerging4Algorithm() :
+    m_canMergeMinMipFraction(0.7f),
+    m_canMergeMaxRms(5.f),
+    m_minCaloHitsPerDaughterCluster(6),
+    m_minCaloHitsPerParentCluster(11),
+    m_maxLayerDifference(4),
+    m_maxProjectionDistance(50.f),
+    m_maxProjectionDistanceRatio(0.9f),
+    m_nProjectionExaminationLayers(4),
+    m_maxCentroidDistance(500.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode ShowerMipMerging4Algorithm::Run()
 {
     const ClusterList *pClusterList = NULL;
@@ -139,39 +154,30 @@ float ShowerMipMerging4Algorithm::GetDistanceFromInitialProjection(const Cluster
 
 StatusCode ShowerMipMerging4Algorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_canMergeMinMipFraction = 0.7f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMinMipFraction", m_canMergeMinMipFraction));
 
-    m_canMergeMaxRms = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMaxRms", m_canMergeMaxRms));
 
-    m_minCaloHitsPerDaughterCluster = 6;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinCaloHitsPerDaughterCluster", m_minCaloHitsPerDaughterCluster));
 
-    m_minCaloHitsPerParentCluster = 11;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinCaloHitsPerParentCluster", m_minCaloHitsPerParentCluster));
 
-    m_maxLayerDifference = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxLayerDifference", m_maxLayerDifference));
 
-    m_maxProjectionDistance = 50.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxProjectionDistance", m_maxProjectionDistance));
 
-    m_maxProjectionDistanceRatio = 0.9f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxProjectionDistanceRatio", m_maxProjectionDistanceRatio));
 
-    m_nProjectionExaminationLayers = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NProjectionExaminationLayers", m_nProjectionExaminationLayers));
 
-    m_maxCentroidDistance = 500.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxCentroidDistance", m_maxCentroidDistance));
 

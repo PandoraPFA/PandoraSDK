@@ -33,8 +33,6 @@ public:
 private:
     pandora::StatusCode Run();
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
-
-    std::string     m_inputClusterListName;         ///< The input cluster list name; if not specified, use current list
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

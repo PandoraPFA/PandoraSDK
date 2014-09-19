@@ -28,6 +28,11 @@ public:
         pandora::Algorithm *CreateAlgorithm() const;
     };
 
+    /**
+     *  @brief Default constructor
+     */
+    MergeSplitPhotonsAlgorithm();
+
 private:
     /**
      *  @brief  Get the cluster layer in which the maximum electromagnetic energy has been deposited

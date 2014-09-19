@@ -18,6 +18,28 @@ using namespace pandora;
 namespace lc_content
 {
 
+BrokenTracksAlgorithm::BrokenTracksAlgorithm() :
+    m_canMergeMinMipFraction(0.7f),
+    m_minHitsInCluster(4),
+    m_minOccupiedLayersForStartFit(4),
+    m_minOccupiedLayersForEndFit(2),
+    m_nStartLayersToFit(5),
+    m_nEndLayersToFit(8),
+    m_maxFitRms(35.f),
+    m_fitDirectionDotProductCut(0.5f),
+    m_trackMergeCutFine(45.f),
+    m_trackMergeCutCoarse(45.f),
+    m_trackMergePerpCutFine(50.f),
+    m_trackMergePerpCutCoarse(75.f),
+    m_maxLayerDifference(10),
+    m_maxCentroidDifference(2000.f),
+    m_shouldPerformGapCheck(true),
+    m_maxChi2ForGapCheck(2.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode BrokenTracksAlgorithm::Run()
 {
     const ClusterList *pClusterList = NULL;
@@ -175,69 +197,53 @@ StatusCode BrokenTracksAlgorithm::Run()
 
 StatusCode BrokenTracksAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_canMergeMinMipFraction = 0.7f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMinMipFraction", m_canMergeMinMipFraction));
 
-    m_minHitsInCluster = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitsInCluster", m_minHitsInCluster));
 
-    m_minOccupiedLayersForStartFit = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinOccupiedLayersForStartFit", m_minOccupiedLayersForStartFit));
 
-    m_minOccupiedLayersForEndFit = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinOccupiedLayersForEndFit", m_minOccupiedLayersForEndFit));
 
-    m_nStartLayersToFit = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NStartLayersToFit", m_nStartLayersToFit));
 
-    m_nEndLayersToFit = 8;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NEndLayersToFit", m_nEndLayersToFit));
 
-    m_maxFitRms = 35.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxFitRms", m_maxFitRms));
 
-    m_fitDirectionDotProductCut = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "FitDirectionDotProductCut", m_fitDirectionDotProductCut));
 
-    m_trackMergeCutFine = 45.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TrackMergeCutFine", m_trackMergeCutFine));
 
-    m_trackMergeCutCoarse = 45.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TrackMergeCutCoarse", m_trackMergeCutCoarse));
 
-    m_trackMergePerpCutFine = 50.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TrackMergePerpCutFine", m_trackMergePerpCutFine));
 
-    m_trackMergePerpCutCoarse = 75.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TrackMergePerpCutCoarse", m_trackMergePerpCutCoarse));
 
-    m_maxLayerDifference = 10;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxLayerDifference", m_maxLayerDifference));
 
-    m_maxCentroidDifference = 2000.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxCentroidDifference", m_maxCentroidDifference));
 
-    m_maxChi2ForGapCheck = 2.f;
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "MaxChi2ForGapCheck", m_maxChi2ForGapCheck));
-
-    m_shouldPerformGapCheck = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldPerformGapCheck", m_shouldPerformGapCheck));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "MaxChi2ForGapCheck", m_maxChi2ForGapCheck));
 
     return STATUS_CODE_SUCCESS;
 }

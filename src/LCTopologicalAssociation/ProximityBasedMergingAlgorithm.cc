@@ -19,6 +19,32 @@ using namespace pandora;
 namespace lc_content
 {
 
+ProximityBasedMergingAlgorithm::ProximityBasedMergingAlgorithm() :
+    m_canMergeMinMipFraction(0.7f),
+    m_canMergeMaxRms(5.f),
+    m_minClusterInnerLayer(6),
+    m_minLayerSpan(-2),
+    m_minShowerLayerSpan(-4),
+    m_maxTrackClusterChi(2.5f),
+    m_maxTrackClusterDChi2(1.f),
+    m_nGenericDistanceLayers(5),
+    m_maxGenericDistance(50.f),
+    m_nAdjacentLayersToExamine(2),
+    m_maxParallelDistance(1000.f),
+    m_maxInnerLayerSeparation(500.f),
+    m_clusterContactThreshold(2.f),
+    m_minContactFraction(0.3f),
+    m_closeHitThreshold(50.f),
+    m_minCloseHitFraction(0.2f),
+    m_maxHelixPathlengthToDaughter(300.f),
+    m_helixDistanceNLayers(20),
+    m_helixDistanceMaxOccupiedLayers(10),
+    m_maxClusterHelixDistance(50.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode ProximityBasedMergingAlgorithm::Run()
 {
     // Begin by recalculating track-cluster associations
@@ -278,83 +304,63 @@ StatusCode ProximityBasedMergingAlgorithm::ReadSettings(const TiXmlHandle xmlHan
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ProcessFirstAlgorithm(*this, xmlHandle, m_trackClusterAssociationAlgName));
 
-    m_canMergeMinMipFraction = 0.7f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMinMipFraction", m_canMergeMinMipFraction));
 
-    m_canMergeMaxRms = 5.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CanMergeMaxRms", m_canMergeMaxRms));
 
-    m_minClusterInnerLayer = 6;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinClusterInnerLayer", m_minClusterInnerLayer));
 
-    m_minLayerSpan = -2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinLayerSpan", m_minLayerSpan));
 
-    m_minShowerLayerSpan = -4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinShowerLayerSpan", m_minShowerLayerSpan));
 
-    m_maxTrackClusterChi = 2.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxTrackClusterChi", m_maxTrackClusterChi));
 
-    m_maxTrackClusterDChi2 = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxTrackClusterDChi2", m_maxTrackClusterDChi2));
 
-    m_nGenericDistanceLayers = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NGenericDistanceLayers", m_nGenericDistanceLayers));
 
-    m_maxGenericDistance = 50.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxGenericDistance", m_maxGenericDistance));
 
-    m_nAdjacentLayersToExamine = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NAdjacentLayersToExamine", m_nAdjacentLayersToExamine));
 
-    m_maxParallelDistance = 1000.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxParallelDistance", m_maxParallelDistance));
 
-    m_maxInnerLayerSeparation = 500.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxInnerLayerSeparation", m_maxInnerLayerSeparation));
 
-    m_clusterContactThreshold = 2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ClusterContactThreshold", m_clusterContactThreshold));
 
-    m_minContactFraction = 0.3f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinContactFraction", m_minContactFraction));
 
-    m_closeHitThreshold = 50.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CloseHitThreshold", m_closeHitThreshold));
 
-    m_minCloseHitFraction = 0.2f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinCloseHitFraction", m_minCloseHitFraction));
 
-    m_maxHelixPathlengthToDaughter = 300.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxHelixPathlengthToDaughter", m_maxHelixPathlengthToDaughter));
 
-    m_helixDistanceNLayers = 20;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "HelixDistanceNLayers", m_helixDistanceNLayers));
 
-    m_helixDistanceMaxOccupiedLayers = 10;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "HelixDistanceMaxOccupiedLayers", m_helixDistanceMaxOccupiedLayers));
 
-    m_maxClusterHelixDistance = 50.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxClusterHelixDistance", m_maxClusterHelixDistance));
 

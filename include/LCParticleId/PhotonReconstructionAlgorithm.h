@@ -29,6 +29,11 @@ public:
     };
 
     /**
+     *  @brief Default constructor
+     */
+    PhotonReconstructionAlgorithm();
+
+    /**
      *  @param  Destructor
      */
     ~PhotonReconstructionAlgorithm();

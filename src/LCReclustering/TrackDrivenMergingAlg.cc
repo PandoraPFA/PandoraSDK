@@ -20,6 +20,20 @@ using namespace pandora;
 namespace lc_content
 {
 
+TrackDrivenMergingAlg::TrackDrivenMergingAlg() :
+    m_minTrackAssociations(1),
+    m_maxTrackAssociations(std::numeric_limits<unsigned int>::max()),
+    m_chiToAttemptMerging(-2.5f),
+    m_coarseDaughterChiCut(200.5f),
+    m_coneCosineHalfAngle(0.9f),
+    m_minConeFractionSingle(0.5f),
+    m_minConeFractionMultiple(0.4f),
+    m_maxLayerSeparationMultiple(5)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode TrackDrivenMergingAlg::Run()
 {
     // Begin by recalculating track-cluster associations
@@ -173,38 +187,30 @@ StatusCode TrackDrivenMergingAlg::ReadSettings(const TiXmlHandle xmlHandle)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ProcessAlgorithm(*this, xmlHandle, "TrackClusterAssociation",
         m_trackClusterAssociationAlgName));
 
-    m_minTrackAssociations = 1;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinTrackAssociations", m_minTrackAssociations));
 
     if (m_minTrackAssociations < 1)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    m_maxTrackAssociations = std::numeric_limits<unsigned int>::max();
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxTrackAssociations", m_maxTrackAssociations));
 
-    m_chiToAttemptMerging = -2.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ChiToAttemptMerging", m_chiToAttemptMerging));
 
-    m_coarseDaughterChiCut = 200.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CoarseDaughterChiCut", m_coarseDaughterChiCut));
 
-    m_coneCosineHalfAngle = 0.9f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ConeCosineHalfAngle", m_coneCosineHalfAngle));
 
-    m_minConeFractionSingle = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinConeFractionSingle", m_minConeFractionSingle));
 
-    m_minConeFractionMultiple = 0.4f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinConeFractionMultiple", m_minConeFractionMultiple));
 
-    m_maxLayerSeparationMultiple = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxLayerSeparationMultiple", m_maxLayerSeparationMultiple));
 

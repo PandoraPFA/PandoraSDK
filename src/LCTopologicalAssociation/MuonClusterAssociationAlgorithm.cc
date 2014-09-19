@@ -19,6 +19,21 @@ using namespace pandora;
 namespace lc_content
 {
 
+MuonClusterAssociationAlgorithm::MuonClusterAssociationAlgorithm() :
+    m_dCosCut(0.95f),
+    m_minHitsInMuonCluster(3),
+    m_shouldEstimateEnergyLostInCoil(true),
+    m_coilCorrectionMinInnerRadius(4000.f),
+    m_coilCorrectionMinInnerLayerHits(3),
+    m_coilEnergyLossCorrection(10.f),
+    m_minClusterHadronicEnergy(0.25f),
+    m_minHitsInCluster(5),
+    m_clusterAssociationChi(3.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode MuonClusterAssociationAlgorithm::Run()
 {
     // Get the muon cluster list, which will only exist if there are muon hits to cluster
@@ -198,39 +213,30 @@ StatusCode MuonClusterAssociationAlgorithm::ReadSettings(const TiXmlHandle xmlHa
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "MuonClusterListName", m_muonClusterListName));
 
-    m_dCosCut = 0.95f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DCosCut", m_dCosCut));
 
-    m_minHitsInMuonCluster = 3;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitsInMuonCluster", m_minHitsInMuonCluster));
 
-    m_shouldEstimateEnergyLostInCoil = true;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldEstimateEnergyLostInCoil", m_shouldEstimateEnergyLostInCoil));
 
-    m_coilCorrectionMinInnerRadius = 4000.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CoilCorrectionMinInnerRadius", m_coilCorrectionMinInnerRadius));
 
-    m_coilCorrectionMinInnerLayerHits = 3;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CoilCorrectionMinInnerLayerHits", m_coilCorrectionMinInnerLayerHits));
 
-    m_coilEnergyLossCorrection = 10.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CoilEnergyLossCorrection", m_coilEnergyLossCorrection));
 
-    m_minClusterHadronicEnergy = 0.25f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinClusterHadronicEnergy", m_minClusterHadronicEnergy));
 
-    m_minHitsInCluster = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitsInCluster", m_minHitsInCluster));
 
-    m_clusterAssociationChi = 3.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ClusterAssociationChi", m_clusterAssociationChi));
 

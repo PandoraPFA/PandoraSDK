@@ -19,6 +19,28 @@ using namespace pandora;
 namespace lc_content
 {
 
+MipPhotonSeparationAlgorithm::MipPhotonSeparationAlgorithm() :
+    m_nLayersForMipRegion(2),
+    m_nLayersForShowerRegion(2),
+    m_maxLayersMissed(1),
+    m_minMipRegion2Span(4),
+    m_maxShowerStartLayer(20),
+    m_minShowerRegionSpan(4),
+    m_maxShowerStartLayer2(5),
+    m_minShowerRegionSpan2(200),
+    m_nonPhotonDeltaChi2Cut(0.f),
+    m_photonDeltaChi2Cut(1.f),
+    m_minHitsInPhotonCluster(6),
+    m_genericDistanceCut(1.f),
+    m_trackPathWidth(2.f),
+    m_maxTrackSeparation2(1000.f * 1000.f),
+    m_additionalPadWidthsFine(2.5f),
+    m_additionalPadWidthsCoarse(2.5f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode MipPhotonSeparationAlgorithm::Run()
 {
     // Begin by recalculating track-cluster associations
@@ -326,74 +348,58 @@ StatusCode MipPhotonSeparationAlgorithm::ReadSettings(const TiXmlHandle xmlHandl
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ProcessFirstAlgorithm(*this, xmlHandle, m_trackClusterAssociationAlgName));
 
     // Parameters aiding decision whether to proceed with fragmentation
-    m_nLayersForMipRegion = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NLayersForMipRegion", m_nLayersForMipRegion));
 
-    m_nLayersForShowerRegion = 2;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NLayersForShowerRegion", m_nLayersForShowerRegion));
 
-    m_maxLayersMissed = 1;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxLayersMissed", m_maxLayersMissed));
 
-    m_minMipRegion2Span = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinMipRegion2Span", m_minMipRegion2Span));
 
-    m_maxShowerStartLayer = 20;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxShowerStartLayer", m_maxShowerStartLayer));
 
-    m_minShowerRegionSpan = 4;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinShowerRegionSpan", m_minShowerRegionSpan));
 
-    m_maxShowerStartLayer2 = 5;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxShowerStartLayer2", m_maxShowerStartLayer2));
 
-    m_minShowerRegionSpan2 = 200;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinShowerRegionSpan2", m_minShowerRegionSpan2));
 
     // Parameters aiding selection of original clusters or new fragments
-    m_nonPhotonDeltaChi2Cut = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NonPhotonDeltaChi2Cut", m_nonPhotonDeltaChi2Cut));
 
-    m_photonDeltaChi2Cut = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PhotonDeltaChi2Cut", m_photonDeltaChi2Cut));
 
-    m_minHitsInPhotonCluster = 6;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinHitsInPhotonCluster", m_minHitsInPhotonCluster));
 
     // Generic distance to track parameters
-    m_genericDistanceCut = 1.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "GenericDistanceCut", m_genericDistanceCut));
 
-    m_trackPathWidth = 2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TrackPathWidth", m_trackPathWidth));
 
-    float maxTrackSeparation = 1000.f;
+    float maxTrackSeparation = std::sqrt(m_maxTrackSeparation2);
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxTrackSeparation", maxTrackSeparation));
-
     m_maxTrackSeparation2 = maxTrackSeparation * maxTrackSeparation;
 
     if (m_maxTrackSeparation2 < std::numeric_limits<float>::epsilon())
         return STATUS_CODE_INVALID_PARAMETER;
 
-    m_additionalPadWidthsFine = 2.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "AdditionalPadWidthsFine", m_additionalPadWidthsFine));
 
-    m_additionalPadWidthsCoarse = 2.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "AdditionalPadWidthsCoarse", m_additionalPadWidthsCoarse));
 

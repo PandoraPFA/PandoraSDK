@@ -17,6 +17,13 @@ using namespace pandora;
 namespace lc_content
 {
 
+PerfectFragmentRemovalAlgorithm::PerfectFragmentRemovalAlgorithm() :
+    m_shouldMergeChargedClusters(false)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode PerfectFragmentRemovalAlgorithm::Run()
 {
     const ClusterList *pClusterList = NULL;
@@ -107,7 +114,6 @@ StatusCode PerfectFragmentRemovalAlgorithm::Run()
 
 StatusCode PerfectFragmentRemovalAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_shouldMergeChargedClusters = false;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldMergeChargedClusters", m_shouldMergeChargedClusters));
 

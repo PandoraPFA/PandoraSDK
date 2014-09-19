@@ -19,6 +19,20 @@ using namespace pandora;
 namespace lc_content
 {
 
+TrackRecoveryInteractionsAlgorithm::TrackRecoveryInteractionsAlgorithm() :
+    m_maxTrackClusterDistance(200.f),
+    m_trackClusterDistanceCut(100.f),
+    m_clusterEnergyCut(0.5f),
+    m_directionCosineCut(0.9f),
+    m_maxTrackAssociationChi(2.f),
+    m_maxSearchLayer(19),
+    m_parallelDistanceCut(100.f),
+    m_minTrackClusterCosAngle(0.f)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode TrackRecoveryInteractionsAlgorithm::Run()
 {
     const TrackList *pTrackList = NULL;
@@ -110,35 +124,27 @@ StatusCode TrackRecoveryInteractionsAlgorithm::Run()
 
 StatusCode TrackRecoveryInteractionsAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    m_maxTrackClusterDistance = 200.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxTrackClusterDistance", m_maxTrackClusterDistance));
 
-    m_trackClusterDistanceCut = 100.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TrackClusterDistanceCut", m_trackClusterDistanceCut));
 
-    m_clusterEnergyCut = 0.5f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ClusterEnergyCut", m_clusterEnergyCut));
 
-    m_directionCosineCut = 0.9f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "DirectionCosineCut", m_directionCosineCut));
 
-    m_maxTrackAssociationChi = 2.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxTrackAssociationChi", m_maxTrackAssociationChi));
 
-    m_maxSearchLayer = 19;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxSearchLayer", m_maxSearchLayer));
 
-    m_parallelDistanceCut = 100.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ParallelDistanceCut", m_parallelDistanceCut));
 
-    m_minTrackClusterCosAngle = 0.f;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinTrackClusterCosAngle", m_minTrackClusterCosAngle));
 
