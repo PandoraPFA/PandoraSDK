@@ -277,98 +277,96 @@ StatusCode DumpPfosMonitoringAlgorithm::Run()
         }
     }
 
-    if ((totalPfoEnergy > m_totalPfoEnergyDisplayLessThan) && (totalPfoEnergy < m_totalPfoEnergyDisplayGreaterThan))
-        return STATUS_CODE_SUCCESS;
-
-
-    std::cout << " <---------------------------------DumpPfosMonitoringAlgorithm----------------------------------------->" <<  std::endl;
-    std::cout << " Total RECO PFO Energy = " << totalPfoEnergy << std::endl;
-
-    // Now order the lists
-    ParticleFlowObjectVector sortedChargedPfos(chargedPfos.begin(), chargedPfos.end());
-    ParticleFlowObjectVector sortedPhotonPfos(photonPfos.begin(), photonPfos.end());
-    ParticleFlowObjectVector sortedNeutralHadronPfos(neutralHadronPfos.begin(), neutralHadronPfos.end());
-    std::sort(sortedChargedPfos.begin(), sortedChargedPfos.end(), SortingHelper::SortPfosByEnergy);
-    std::sort(sortedPhotonPfos.begin(),  sortedPhotonPfos.end(), SortingHelper::SortPfosByEnergy);
-    std::sort(sortedNeutralHadronPfos.begin(), sortedNeutralHadronPfos.end(), SortingHelper::SortPfosByEnergy);
-
-    for (ParticleFlowObjectVector::const_iterator pfoIter = sortedChargedPfos.begin(); pfoIter != sortedChargedPfos.end(); ++pfoIter)
+    if ((totalPfoEnergy > m_totalPfoEnergyDisplayGreaterThan) && (totalPfoEnergy < m_totalPfoEnergyDisplayLessThan))
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->DumpChargedPfo(*pfoIter));
-    }
+        std::cout << " <---------------------------------DumpPfosMonitoringAlgorithm----------------------------------------->" <<  std::endl;
+        std::cout << " Total RECO PFO Energy = " << totalPfoEnergy << std::endl;
 
-    for (ParticleFlowObjectVector::const_iterator pfoIter = sortedPhotonPfos.begin(); pfoIter != sortedPhotonPfos.end(); ++pfoIter)
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->DumpPhotonPfo(*pfoIter));
-    }
+        // Now order the lists
+        ParticleFlowObjectVector sortedChargedPfos(chargedPfos.begin(), chargedPfos.end());
+        ParticleFlowObjectVector sortedPhotonPfos(photonPfos.begin(), photonPfos.end());
+        ParticleFlowObjectVector sortedNeutralHadronPfos(neutralHadronPfos.begin(), neutralHadronPfos.end());
+        std::sort(sortedChargedPfos.begin(), sortedChargedPfos.end(), SortingHelper::SortPfosByEnergy);
+        std::sort(sortedPhotonPfos.begin(),  sortedPhotonPfos.end(), SortingHelper::SortPfosByEnergy);
+        std::sort(sortedNeutralHadronPfos.begin(), sortedNeutralHadronPfos.end(), SortingHelper::SortPfosByEnergy);
 
-    for (ParticleFlowObjectVector::const_iterator pfoIter = sortedNeutralHadronPfos.begin(); pfoIter != sortedNeutralHadronPfos.end(); ++pfoIter)
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->DumpNeutralPfo(*pfoIter));
-    }
-
-    m_trackRecoAsTrackEnergySum     += m_trackRecoAsTrackEnergy;
-    m_photonRecoAsTrackEnergySum    += m_photonRecoAsTrackEnergy;
-    m_neutralRecoAsTrackEnergySum   += m_neutralRecoAsTrackEnergy;
-    m_trackRecoAsPhotonEnergySum    += m_trackRecoAsPhotonEnergy;
-    m_photonRecoAsPhotonEnergySum   += m_photonRecoAsPhotonEnergy; 
-    m_neutralRecoAsPhotonEnergySum  += m_neutralRecoAsPhotonEnergy;
-    m_trackRecoAsNeutralEnergySum   += m_trackRecoAsNeutralEnergy;
-    m_photonRecoAsNeutralEnergySum  += m_photonRecoAsNeutralEnergy;
-    m_neutralRecoAsNeutralEnergySum += m_neutralRecoAsNeutralEnergy;
-    m_goodTrackEnergySum   += m_goodTrackEnergy;
-    m_goodPhotonEnergySum  += m_goodPhotonEnergy;
-    m_goodIdedPhotonEnergySum  += m_goodIdedPhotonEnergy;
-    m_goodNeutralEnergySum += m_goodNeutralEnergy;
-    m_goodIdedNeutralEnergySum += m_goodIdedNeutralEnergy;
-    m_badTrackEnergySum    += m_badTrackEnergy;
-    m_badPhotonEnergySum   += m_badPhotonEnergy;
-    m_badNeutralEnergySum  += m_badNeutralEnergy;
-
-    const float confmat[3][3] =
-    {
-        {m_trackRecoAsTrackEnergy, m_photonRecoAsTrackEnergy, m_neutralRecoAsTrackEnergy},
-        {m_trackRecoAsPhotonEnergy, m_photonRecoAsPhotonEnergy, m_neutralRecoAsPhotonEnergy},
-        {m_trackRecoAsNeutralEnergy, m_photonRecoAsNeutralEnergy, m_neutralRecoAsNeutralEnergy}
-    };
-
-    std::cout << std::endl;
-    FORMATTED_OUTPUT_CONFUSION(confmat[0][0], confmat[0][1], confmat[0][2], confmat[1][0], confmat[1][1], confmat[1][2], confmat[2][0],
-        confmat[2][1], confmat[2][2]);
-
-    const float sumCal(m_trackRecoAsTrackEnergy + m_photonRecoAsTrackEnergy + m_neutralRecoAsTrackEnergy +
-        m_trackRecoAsPhotonEnergy + m_photonRecoAsPhotonEnergy + m_neutralRecoAsPhotonEnergy + m_trackRecoAsNeutralEnergy +
-        m_photonRecoAsNeutralEnergy + m_neutralRecoAsNeutralEnergy);
-
-    const float nSumCal(sumCal / 100.f);
-
-    if (nSumCal > 0.f)
-    {
-
-        m_count++;
-        float confusionA = (m_photonRecoAsTrackEnergy + m_neutralRecoAsTrackEnergy) / nSumCal;
-        float confusionB = (m_trackRecoAsPhotonEnergy + m_trackRecoAsNeutralEnergy) / nSumCal;
-
-        m_photonOrNeutralRecoAsTrackEnergySum  += confusionA; 
-        m_photonOrNeutralRecoAsTrackEnergySum2 += confusionA*confusionA;
-        m_trackRecoAsPhotonOrNeutralEnergySum  += confusionB;
-        m_trackRecoAsPhotonOrNeutralEnergySum2 += confusionB*confusionB;
-        m_confusionCorrelation                 += confusionA*confusionB;
-
-        const float econfmat[3][3] =
+        for (ParticleFlowObjectVector::const_iterator pfoIter = sortedChargedPfos.begin(); pfoIter != sortedChargedPfos.end(); ++pfoIter)
         {
-            {m_trackRecoAsTrackEnergy / nSumCal, m_photonRecoAsTrackEnergy / nSumCal, m_neutralRecoAsTrackEnergy / nSumCal},
-            {m_trackRecoAsPhotonEnergy / nSumCal, m_photonRecoAsPhotonEnergy / nSumCal, m_neutralRecoAsPhotonEnergy / nSumCal},
-            {m_trackRecoAsNeutralEnergy / nSumCal, m_photonRecoAsNeutralEnergy / nSumCal, m_neutralRecoAsNeutralEnergy / nSumCal}
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->DumpChargedPfo(*pfoIter));
+        }
+
+        for (ParticleFlowObjectVector::const_iterator pfoIter = sortedPhotonPfos.begin(); pfoIter != sortedPhotonPfos.end(); ++pfoIter)
+        {
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->DumpPhotonPfo(*pfoIter));
+        }
+
+        for (ParticleFlowObjectVector::const_iterator pfoIter = sortedNeutralHadronPfos.begin(); pfoIter != sortedNeutralHadronPfos.end(); ++pfoIter)
+        {
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->DumpNeutralPfo(*pfoIter));
+        }
+
+        m_trackRecoAsTrackEnergySum     += m_trackRecoAsTrackEnergy;
+        m_photonRecoAsTrackEnergySum    += m_photonRecoAsTrackEnergy;
+        m_neutralRecoAsTrackEnergySum   += m_neutralRecoAsTrackEnergy;
+        m_trackRecoAsPhotonEnergySum    += m_trackRecoAsPhotonEnergy;
+        m_photonRecoAsPhotonEnergySum   += m_photonRecoAsPhotonEnergy; 
+        m_neutralRecoAsPhotonEnergySum  += m_neutralRecoAsPhotonEnergy;
+        m_trackRecoAsNeutralEnergySum   += m_trackRecoAsNeutralEnergy;
+        m_photonRecoAsNeutralEnergySum  += m_photonRecoAsNeutralEnergy;
+        m_neutralRecoAsNeutralEnergySum += m_neutralRecoAsNeutralEnergy;
+        m_goodTrackEnergySum   += m_goodTrackEnergy;
+        m_goodPhotonEnergySum  += m_goodPhotonEnergy;
+        m_goodIdedPhotonEnergySum  += m_goodIdedPhotonEnergy;
+        m_goodNeutralEnergySum += m_goodNeutralEnergy;
+        m_goodIdedNeutralEnergySum += m_goodIdedNeutralEnergy;
+        m_badTrackEnergySum    += m_badTrackEnergy;
+        m_badPhotonEnergySum   += m_badPhotonEnergy;
+        m_badNeutralEnergySum  += m_badNeutralEnergy;
+
+        const float confmat[3][3] =
+        {
+            {m_trackRecoAsTrackEnergy, m_photonRecoAsTrackEnergy, m_neutralRecoAsTrackEnergy},
+            {m_trackRecoAsPhotonEnergy, m_photonRecoAsPhotonEnergy, m_neutralRecoAsPhotonEnergy},
+            {m_trackRecoAsNeutralEnergy, m_photonRecoAsNeutralEnergy, m_neutralRecoAsNeutralEnergy}
         };
 
-        FORMATTED_OUTPUT_CONFUSION(econfmat[0][0], econfmat[0][1], econfmat[0][2], econfmat[1][0], econfmat[1][1], econfmat[1][2], econfmat[2][0],
-            econfmat[2][1], econfmat[2][2]);
+        std::cout << std::endl;
+        FORMATTED_OUTPUT_CONFUSION(confmat[0][0], confmat[0][1], confmat[0][2], confmat[1][0], confmat[1][1], confmat[1][2], confmat[2][0],
+            confmat[2][1], confmat[2][2]);
 
-        float goodEnergy = m_goodTrackEnergy + m_goodPhotonEnergy + m_goodNeutralEnergy;
-        float badEnergy  = m_badTrackEnergy  + m_badPhotonEnergy  + m_badNeutralEnergy;
-        FORMATTED_OUTPUT_GOODENERGY(m_goodTrackEnergy, m_goodPhotonEnergy, m_goodNeutralEnergy, goodEnergy);
-        FORMATTED_OUTPUT_BADENERGY(m_badTrackEnergy, m_badPhotonEnergy, m_badNeutralEnergy, badEnergy);
+        const float sumCal(m_trackRecoAsTrackEnergy + m_photonRecoAsTrackEnergy + m_neutralRecoAsTrackEnergy +
+            m_trackRecoAsPhotonEnergy + m_photonRecoAsPhotonEnergy + m_neutralRecoAsPhotonEnergy + m_trackRecoAsNeutralEnergy +
+            m_photonRecoAsNeutralEnergy + m_neutralRecoAsNeutralEnergy);
+
+        const float nSumCal(sumCal / 100.f);
+
+        if (nSumCal > 0.f)
+        {
+            m_count++;
+            float confusionA = (m_photonRecoAsTrackEnergy + m_neutralRecoAsTrackEnergy) / nSumCal;
+            float confusionB = (m_trackRecoAsPhotonEnergy + m_trackRecoAsNeutralEnergy) / nSumCal;
+
+            m_photonOrNeutralRecoAsTrackEnergySum  += confusionA; 
+            m_photonOrNeutralRecoAsTrackEnergySum2 += confusionA*confusionA;
+            m_trackRecoAsPhotonOrNeutralEnergySum  += confusionB;
+            m_trackRecoAsPhotonOrNeutralEnergySum2 += confusionB*confusionB;
+            m_confusionCorrelation                 += confusionA*confusionB;
+
+            const float econfmat[3][3] =
+            {
+                {m_trackRecoAsTrackEnergy / nSumCal, m_photonRecoAsTrackEnergy / nSumCal, m_neutralRecoAsTrackEnergy / nSumCal},
+                {m_trackRecoAsPhotonEnergy / nSumCal, m_photonRecoAsPhotonEnergy / nSumCal, m_neutralRecoAsPhotonEnergy / nSumCal},
+                {m_trackRecoAsNeutralEnergy / nSumCal, m_photonRecoAsNeutralEnergy / nSumCal, m_neutralRecoAsNeutralEnergy / nSumCal}
+            };
+
+            FORMATTED_OUTPUT_CONFUSION(econfmat[0][0], econfmat[0][1], econfmat[0][2], econfmat[1][0], econfmat[1][1], econfmat[1][2], econfmat[2][0],
+                econfmat[2][1], econfmat[2][2]);
+
+            float goodEnergy = m_goodTrackEnergy + m_goodPhotonEnergy + m_goodNeutralEnergy;
+            float badEnergy  = m_badTrackEnergy  + m_badPhotonEnergy  + m_badNeutralEnergy;
+            FORMATTED_OUTPUT_GOODENERGY(m_goodTrackEnergy, m_goodPhotonEnergy, m_goodNeutralEnergy, goodEnergy);
+            FORMATTED_OUTPUT_BADENERGY(m_badTrackEnergy, m_badPhotonEnergy, m_badNeutralEnergy, badEnergy);
+        }
     }
 
     // Restore formatting options
