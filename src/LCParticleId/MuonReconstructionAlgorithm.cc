@@ -33,7 +33,9 @@ MuonReconstructionAlgorithm::MuonReconstructionAlgorithm() :
     m_isolatedMinRegion1Hits(1),
     m_isolatedMaxRegion2Hits(0),
     m_maxGenericDistance(6.f),
-    m_isolatedMaxGenericDistance(3.f)
+    m_isolatedMaxGenericDistance(3.f),
+    m_replaceCurrentClusterList(false),
+    m_replaceCurrentPfoList(false)
 {
 }
 
