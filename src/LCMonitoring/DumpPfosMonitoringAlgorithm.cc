@@ -123,19 +123,19 @@ DumpPfosMonitoringAlgorithm::~DumpPfosMonitoringAlgorithm()
         const float confusionB = m_trackRecoAsPhotonOrNeutralEnergySum / static_cast<float>(m_count);
         const float sigmaA = std::sqrt(m_photonOrNeutralRecoAsTrackEnergySum2 / static_cast<float>(m_count) - confusionA * confusionA);
         const float sigmaB = std::sqrt(m_trackRecoAsPhotonOrNeutralEnergySum2 / static_cast<float>(m_count) - confusionB * confusionB);
-        const float covarianceAB = m_confusionCorrelation / static_cast<float>(m_count)-confusionA * confusionB;
+        const float covarianceAB = m_confusionCorrelation / static_cast<float>(m_count) - confusionA * confusionB;
         const float rhoAB = covarianceAB / sigmaA / sigmaB;
 
         std::cout << std::endl;
         std::cout << " Confusion covariance " << std::endl;
-        std::cout << " photon/neutral reconstruced as charged mean : " << confusionA << std::endl;
-        std::cout << "                                        rms  : " << sigmaA << std::endl;
-        std::cout << " charged reconstruced as neutral/photon      : " << confusionB << std::endl;
-        std::cout << "                                        rms  : " << sigmaB << std::endl;
-        std::cout << " Covariance                                  : " << covarianceAB << std::endl;
-        std::cout << " Correlation coefficient                     : " << rhoAB << std::endl;
-        std::cout << " Rms total confusion                         : " << std::sqrt(sigmaA * sigmaA + sigmaB * sigmaB + 2 * rhoAB * sigmaA * sigmaB) << std::endl;
-        std::cout << " Rms net   confusion                         : " << std::sqrt(sigmaA * sigmaA + sigmaB * sigmaB - 2 * rhoAB * sigmaA * sigmaB) << std::endl;
+        std::cout << " photon/neutral reconstructed as charged mean : " << confusionA << std::endl;
+        std::cout << "                                         rms  : " << sigmaA << std::endl;
+        std::cout << " charged reconstructed as neutral/photon mean : " << confusionB << std::endl;
+        std::cout << "                                         rms  : " << sigmaB << std::endl;
+        std::cout << " Covariance                                   : " << covarianceAB << std::endl;
+        std::cout << " Correlation coefficient                      : " << rhoAB << std::endl;
+        std::cout << " Rms total confusion                          : " << std::sqrt(sigmaA * sigmaA + sigmaB * sigmaB + 2 * rhoAB * sigmaA * sigmaB) << std::endl;
+        std::cout << " Rms net confusion                            : " << std::sqrt(sigmaA * sigmaA + sigmaB * sigmaB - 2 * rhoAB * sigmaA * sigmaB) << std::endl;
         std::cout << std::endl;
 
         const float nSumCal(sumCal / 100.f);
