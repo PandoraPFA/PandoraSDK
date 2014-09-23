@@ -115,7 +115,7 @@ std::string StatusCodeToString(const StatusCode statusCode);
 /**
  *  @brief  StatusCodeException class
  */
-class StatusCodeException : public std::exception
+class StatusCodeException
 {
 public:
     /**
