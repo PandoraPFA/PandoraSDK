@@ -188,14 +188,14 @@ private:
      * 
      *  @param  pPfo
      */
-    pandora::StatusCode DumpChargedPfo(const pandora::ParticleFlowObject *const pPfo);
+    void DumpChargedPfo(const pandora::ParticleFlowObject *const pPfo);
 
     /**
      *  @brief  DumpNeutralPfo
      * 
      *  @param  pPfo
      */
-    pandora::StatusCode DumpNeutralPfo(const pandora::ParticleFlowObject *const pPfo);
+    void DumpNeutralPfo(const pandora::ParticleFlowObject *const pPfo);
 
     /**
      *  @brief  DumpNeutralOrPhotonPfo
@@ -203,14 +203,14 @@ private:
      *  @param  pPfo
      *  @param  isPhotonPfo
      */
-    pandora::StatusCode DumpNeutralOrPhotonPfo(const pandora::ParticleFlowObject *const pPfo, bool isPhotonPfo);
+    void DumpNeutralOrPhotonPfo(const pandora::ParticleFlowObject *const pPfo, bool isPhotonPfo);
 
     /**
      *  @brief  DumpPhotonPfo
      * 
      *  @param  pPfo
      */
-    pandora::StatusCode DumpPhotonPfo(const pandora::ParticleFlowObject *const pPfo);
+    void DumpPhotonPfo(const pandora::ParticleFlowObject *const pPfo);
 
     /**
      *  @brief  ClusterEnergyFractions
@@ -305,14 +305,14 @@ private:
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline pandora::StatusCode DumpPfosMonitoringAlgorithm::DumpPhotonPfo(const pandora::ParticleFlowObject *pPfo)
+inline void DumpPfosMonitoringAlgorithm::DumpPhotonPfo(const pandora::ParticleFlowObject *pPfo)
 {
     return this->DumpNeutralOrPhotonPfo(pPfo, true);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline pandora::StatusCode DumpPfosMonitoringAlgorithm::DumpNeutralPfo(const pandora::ParticleFlowObject *pPfo)
+inline void DumpPfosMonitoringAlgorithm::DumpNeutralPfo(const pandora::ParticleFlowObject *pPfo)
 {
     return this->DumpNeutralOrPhotonPfo(pPfo, false);
 }

@@ -89,6 +89,11 @@ DumpPfosMonitoringAlgorithm::DumpPfosMonitoringAlgorithm() :
 
 DumpPfosMonitoringAlgorithm::~DumpPfosMonitoringAlgorithm()
 {
+    // Alter formatting options, caching original parameters
+    const int originalPrecision(std::cout.precision(precision));
+    const int originalWidth(std::cout.width());
+    (void) std::cout.setf(std::ios::fixed, std::ios::floatfield);
+
     std::cout << " ------------------------------------------------------------ " << std::endl;
     std::cout << " ---------- DumpPfosMonitoringAlgorithm : Summary ----------- " << std::endl;
     std::cout << " ------------------------------------------------------------ " << std::endl;
@@ -110,59 +115,68 @@ DumpPfosMonitoringAlgorithm::~DumpPfosMonitoringAlgorithm()
         m_trackRecoAsPhotonEnergySum + m_photonRecoAsPhotonEnergySum + m_neutralRecoAsPhotonEnergySum + m_trackRecoAsNeutralEnergySum +
         m_photonRecoAsNeutralEnergySum + m_neutralRecoAsNeutralEnergySum);
 
-    const float nSumCal(sumCal / 100.f);
     std::cout << std::endl;
 
-    float confusionA   = m_photonOrNeutralRecoAsTrackEnergySum/float(m_count);
-    float confusionB   = m_trackRecoAsPhotonOrNeutralEnergySum/float(m_count);
-    float sigmaA       = sqrt(m_photonOrNeutralRecoAsTrackEnergySum2/float(m_count) - confusionA*confusionA);
-    float sigmaB       = sqrt(m_trackRecoAsPhotonOrNeutralEnergySum2/float(m_count) - confusionB*confusionB);
-    float covarianceAB = m_confusionCorrelation/float(m_count)-confusionA*confusionB;
-    float rhoAB        = covarianceAB/sigmaA/sigmaB;
-
-    std::cout << std::endl;
-    std::cout << " Confusion covariance " << std::endl;
-    std::cout << " photon/neutral reconstruced as charged mean : " << confusionA << std::endl;
-    std::cout << "                                        rms  : " << sigmaA << std::endl;
-    std::cout << " charged reconstruced as neutral/photon      : " << confusionB << std::endl;
-    std::cout << "                                        rms  : " << sigmaB << std::endl;
-    std::cout << " Covariance                                  : " << covarianceAB << std::endl;
-    std::cout << " Correlation coefficient                     : " << rhoAB << std::endl;
-    std::cout << " Rms total confusion                         : " << sqrt(sigmaA*sigmaA+sigmaB*sigmaB+2*rhoAB*sigmaA*sigmaB) << std::endl;
-    std::cout << " Rms net   confusion                         : " << sqrt(sigmaA*sigmaA+sigmaB*sigmaB-2*rhoAB*sigmaA*sigmaB) << std::endl;
-    std::cout << std::endl;
-
-    if (0.f != nSumCal)
+    if (m_count > 0)
     {
-        const float econfmat[3][3] =
+        const float confusionA = m_photonOrNeutralRecoAsTrackEnergySum / static_cast<float>(m_count);
+        const float confusionB = m_trackRecoAsPhotonOrNeutralEnergySum / static_cast<float>(m_count);
+        const float sigmaA = std::sqrt(m_photonOrNeutralRecoAsTrackEnergySum2 / static_cast<float>(m_count) - confusionA * confusionA);
+        const float sigmaB = std::sqrt(m_trackRecoAsPhotonOrNeutralEnergySum2 / static_cast<float>(m_count) - confusionB * confusionB);
+        const float covarianceAB = m_confusionCorrelation / static_cast<float>(m_count)-confusionA * confusionB;
+        const float rhoAB = covarianceAB / sigmaA / sigmaB;
+
+        std::cout << std::endl;
+        std::cout << " Confusion covariance " << std::endl;
+        std::cout << " photon/neutral reconstruced as charged mean : " << confusionA << std::endl;
+        std::cout << "                                        rms  : " << sigmaA << std::endl;
+        std::cout << " charged reconstruced as neutral/photon      : " << confusionB << std::endl;
+        std::cout << "                                        rms  : " << sigmaB << std::endl;
+        std::cout << " Covariance                                  : " << covarianceAB << std::endl;
+        std::cout << " Correlation coefficient                     : " << rhoAB << std::endl;
+        std::cout << " Rms total confusion                         : " << std::sqrt(sigmaA * sigmaA + sigmaB * sigmaB + 2 * rhoAB * sigmaA * sigmaB) << std::endl;
+        std::cout << " Rms net   confusion                         : " << std::sqrt(sigmaA * sigmaA + sigmaB * sigmaB - 2 * rhoAB * sigmaA * sigmaB) << std::endl;
+        std::cout << std::endl;
+
+        const float nSumCal(sumCal / 100.f);
+
+        if (nSumCal > std::numeric_limits<float>::epsilon())
         {
-            {m_trackRecoAsTrackEnergySum / nSumCal, m_photonRecoAsTrackEnergySum / nSumCal, m_neutralRecoAsTrackEnergySum / nSumCal},
-            {m_trackRecoAsPhotonEnergySum / nSumCal, m_photonRecoAsPhotonEnergySum / nSumCal, m_neutralRecoAsPhotonEnergySum / nSumCal},
-            {m_trackRecoAsNeutralEnergySum / nSumCal, m_photonRecoAsNeutralEnergySum / nSumCal, m_neutralRecoAsNeutralEnergySum / nSumCal}
-        };
+            const float econfmat[3][3] =
+            {
+                {m_trackRecoAsTrackEnergySum / nSumCal, m_photonRecoAsTrackEnergySum / nSumCal, m_neutralRecoAsTrackEnergySum / nSumCal},
+                {m_trackRecoAsPhotonEnergySum / nSumCal, m_photonRecoAsPhotonEnergySum / nSumCal, m_neutralRecoAsPhotonEnergySum / nSumCal},
+                {m_trackRecoAsNeutralEnergySum / nSumCal, m_photonRecoAsNeutralEnergySum / nSumCal, m_neutralRecoAsNeutralEnergySum / nSumCal}
+            };
 
-        FORMATTED_OUTPUT_CONFUSION(econfmat[0][0], econfmat[0][1], econfmat[0][2], econfmat[1][0], econfmat[1][1], econfmat[1][2], econfmat[2][0],
-            econfmat[2][1], econfmat[2][2]);
+            FORMATTED_OUTPUT_CONFUSION(econfmat[0][0], econfmat[0][1], econfmat[0][2], econfmat[1][0], econfmat[1][1], econfmat[1][2], econfmat[2][0],
+                econfmat[2][1], econfmat[2][2]);
 
-        std::cout << std::endl;
-        std::cout << " Well constructed PFOs summary " << std::endl;
-        std::cout << std::endl;
+            std::cout << std::endl;
+            std::cout << " Well constructed PFOs summary " << std::endl;
+            std::cout << std::endl;
 
-        float goodEnergy = m_goodTrackEnergySum + m_goodPhotonEnergySum + m_goodNeutralEnergySum;
-        float badEnergy  = m_badTrackEnergySum  + m_badPhotonEnergySum  + m_badNeutralEnergySum;
-        FORMATTED_OUTPUT_GOODENERGY(m_goodTrackEnergySum, m_goodPhotonEnergySum, m_goodNeutralEnergySum, goodEnergy);
-        FORMATTED_OUTPUT_BADENERGY(m_badTrackEnergySum, m_badPhotonEnergySum, m_badNeutralEnergySum, badEnergy); 
+            const float goodEnergy = m_goodTrackEnergySum + m_goodPhotonEnergySum + m_goodNeutralEnergySum;
+            const float badEnergy = m_badTrackEnergySum  + m_badPhotonEnergySum  + m_badNeutralEnergySum;
+            FORMATTED_OUTPUT_GOODENERGY(m_goodTrackEnergySum, m_goodPhotonEnergySum, m_goodNeutralEnergySum, goodEnergy);
+            FORMATTED_OUTPUT_BADENERGY(m_badTrackEnergySum, m_badPhotonEnergySum, m_badNeutralEnergySum, badEnergy); 
 
-        std::cout << std::endl;
-        std::cout << " Particle ID Summary (Neutral/Photon Separation) " << std::endl;
-        std::cout << std::endl;
+            std::cout << std::endl;
+            std::cout << " Particle ID Summary (Neutral/Photon Separation) " << std::endl;
+            std::cout << std::endl;
 
-        if (m_goodPhotonEnergySum)
-            std::cout <<  " Correctly IDed Photon  Energy Fraction : " << m_goodIdedPhotonEnergySum/m_goodPhotonEnergySum << std::endl;
+            if (m_goodPhotonEnergySum > std::numeric_limits<float>::epsilon())
+                std::cout <<  " Correctly IDed Photon  Energy Fraction : " << m_goodIdedPhotonEnergySum / m_goodPhotonEnergySum << std::endl;
 
-        if (m_goodNeutralEnergySum)
-            std::cout << " Correctly IDed Neutral Energy Fraction : " << m_goodIdedNeutralEnergySum/m_goodNeutralEnergySum << std::endl;
+            if (m_goodNeutralEnergySum > std::numeric_limits<float>::epsilon())
+                std::cout << " Correctly IDed Neutral Energy Fraction : " << m_goodIdedNeutralEnergySum / m_goodNeutralEnergySum << std::endl;
+        }
     }
+
+    // Restore formatting options
+    (void) std::cout.unsetf(std::ios::fixed);
+    (void) std::cout.precision(originalPrecision);
+    (void) std::cout.width(originalWidth);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -193,13 +207,13 @@ StatusCode DumpPfosMonitoringAlgorithm::Run()
     m_badPhotonEnergy = 0.f;
     m_badNeutralEnergy = 0.f;
 
+    const PfoList *pPfoList = NULL;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pPfoList));
+
     // Alter formatting options, caching original parameters
     const int originalPrecision(std::cout.precision(precision));
     const int originalWidth(std::cout.width());
     (void) std::cout.setf(std::ios::fixed, std::ios::floatfield);
-
-    const PfoList *pPfoList = NULL;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pPfoList));
 
     PfoList chargedPfos;
     PfoList photonPfos;
@@ -292,17 +306,17 @@ StatusCode DumpPfosMonitoringAlgorithm::Run()
 
         for (ParticleFlowObjectVector::const_iterator pfoIter = sortedChargedPfos.begin(); pfoIter != sortedChargedPfos.end(); ++pfoIter)
         {
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->DumpChargedPfo(*pfoIter));
+            this->DumpChargedPfo(*pfoIter);
         }
 
         for (ParticleFlowObjectVector::const_iterator pfoIter = sortedPhotonPfos.begin(); pfoIter != sortedPhotonPfos.end(); ++pfoIter)
         {
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->DumpPhotonPfo(*pfoIter));
+            this->DumpPhotonPfo(*pfoIter);
         }
 
         for (ParticleFlowObjectVector::const_iterator pfoIter = sortedNeutralHadronPfos.begin(); pfoIter != sortedNeutralHadronPfos.end(); ++pfoIter)
         {
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->DumpNeutralPfo(*pfoIter));
+            this->DumpNeutralPfo(*pfoIter);
         }
 
         m_trackRecoAsTrackEnergySum     += m_trackRecoAsTrackEnergy;
@@ -379,7 +393,7 @@ StatusCode DumpPfosMonitoringAlgorithm::Run()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode DumpPfosMonitoringAlgorithm::DumpChargedPfo(const ParticleFlowObject *const pPfo)
+void DumpPfosMonitoringAlgorithm::DumpChargedPfo(const ParticleFlowObject *const pPfo)
 {
     const TrackList &trackList(pPfo->GetTrackList());
     const int pfoPid(pPfo->GetParticleId());
@@ -541,13 +555,11 @@ StatusCode DumpPfosMonitoringAlgorithm::DumpChargedPfo(const ParticleFlowObject 
             std::cout << std::endl;
         }
     }
-
-    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode DumpPfosMonitoringAlgorithm::DumpNeutralOrPhotonPfo(const ParticleFlowObject *const pPfo, bool isPhotonPfo)
+void DumpPfosMonitoringAlgorithm::DumpNeutralOrPhotonPfo(const ParticleFlowObject *const pPfo, bool isPhotonPfo)
 {
     float fCharged(0.f);
     float fPhoton(0.f);
@@ -698,8 +710,6 @@ StatusCode DumpPfosMonitoringAlgorithm::DumpNeutralOrPhotonPfo(const ParticleFlo
             std::cout << std::endl;
         }
     }
-
-    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
