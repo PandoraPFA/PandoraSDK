@@ -15,8 +15,14 @@ SET( PandoraSDK_VERSION_MINOR 17 )
 SET( PandoraSDK_VERSION_PATCH 0 )
 
 
-# load default settings from ILCSOFT_CMAKE_MODULES
-INCLUDE( ilcsoft_default_settings )
+### DEPENDENCIES ############################################################
+FIND_PACKAGE( ILCUTIL COMPONENTS ILCSOFT_CMAKE_MODULES QUIET )
+
+IF( ILCUTIL_FOUND )
+    INCLUDE( ilcsoft_default_settings )
+ELSE()
+    INCLUDE( Default_settings )
+ENDIF()
 
 
 ### DOCUMENTATION ############################################################
@@ -54,11 +60,6 @@ ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
 
 # need long long for int64 for now
 ADD_DEFINITIONS( "-Wno-long-long -Wno-sign-compare -fno-strict-aliasing" )
-
-
-### DEPENDENCIES ############################################################
-
-FIND_PACKAGE( ILCUTIL COMPONENTS ILCSOFT_CMAKE_MODULES REQUIRED )
 
 
 ### LIBRARY #################################################################
