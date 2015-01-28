@@ -10,6 +10,8 @@
 
 #include "LCClustering/ConeClusteringAlgorithmFast.h"
 
+#include "LCUtility/KDTreeLinkerAlgoT.h"
+
 using namespace pandora;
 
 namespace lc_content

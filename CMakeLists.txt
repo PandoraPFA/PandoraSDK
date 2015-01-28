@@ -76,7 +76,7 @@ AUX_SOURCE_DIRECTORY( ./src/LCTrackClusterAssociation LCContent_SRCS )
 AUX_SOURCE_DIRECTORY( ./src/LCUtility LCContent_SRCS )
 
 # require proper C++
-ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
+ADD_DEFINITIONS( "-Wall -ansi -pedantic -std=c++11" )
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
