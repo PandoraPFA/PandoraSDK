@@ -1,12 +1,12 @@
 /**
- *  @file   LCContent/include/LCClustering/ConeClusteringAlgorithm.h
+ *  @file   LCContent/include/LCClustering/ConeClusteringAlgorithmFast.h
  * 
  *  @brief  Header file for the clustering algorithm class.
  * 
  *  $Log: $
  */
-#ifndef LC_CONE_CLUSTERING_ALGORITHM_H
-#define LC_CONE_CLUSTERING_ALGORITHM_H 1
+#ifndef LC_CONE_CLUSTERING_ALGORITHM_FAST_H
+#define LC_CONE_CLUSTERING_ALGORITHM_FAST_H 1
 
 #include "Pandora/Algorithm.h"
 
@@ -39,9 +39,9 @@ typedef std::set<pandora::CaloHit *, CustomHitOrder> CustomSortedCaloHitList;
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
- *  @brief  ConeClusteringAlgorithm class
+ *  @brief  ConeClusteringAlgorithmFast class
  */
-class ConeClusteringAlgorithm : public pandora::Algorithm
+class ConeClusteringAlgorithmFast : public pandora::Algorithm
 {
 public:
     /**
@@ -56,7 +56,7 @@ public:
     /**
      *  @brief Default constructor
      */
-    ConeClusteringAlgorithm();
+    ConeClusteringAlgorithmFast();
 
 private:
     pandora::StatusCode Run();
@@ -240,9 +240,9 @@ inline bool CustomHitOrder::operator()(const pandora::CaloHit *lhs, const pandor
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline pandora::Algorithm *ConeClusteringAlgorithm::Factory::CreateAlgorithm() const
+inline pandora::Algorithm *ConeClusteringAlgorithmFast::Factory::CreateAlgorithm() const
 {
-    return new ConeClusteringAlgorithm();
+    return new ConeClusteringAlgorithmFast();
 }
 
 } // namespace lc_content
