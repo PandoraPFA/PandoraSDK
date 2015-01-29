@@ -14,6 +14,21 @@
 
 using namespace pandora;
 
+#define RETURN_IF_NOT_SUCCESS(FUNC) \
+  PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, \
+			   !=, \
+			   FUNC)
+
+#define RETURN_IF_NOT_SUCCESS_OR_UNCHANGED(FUNC) \
+  PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, \
+				  STATUS_CODE_UNCHANGED, \
+				  !=, FUNC)
+
+#define RETURN_IF_GOOD_OR_BAD_READ(FUNC)		       \
+  PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, \
+				  STATUS_CODE_NOT_FOUND, \
+				  !=, \
+				  FUNC)
 namespace lc_content
 {
 
@@ -60,17 +75,17 @@ ConeClusteringAlgorithmFast::ConeClusteringAlgorithmFast() :
 
 StatusCode ConeClusteringAlgorithmFast::Run()
 {
-    const CaloHitList *pCaloHitList = NULL;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pCaloHitList));
+    const CaloHitList *pCaloHitList = nullptr;
+    RETURN_IF_NOT_SUCCESS(PandoraContentApi::GetCurrentList(*this, pCaloHitList));
 
     if (pCaloHitList->empty())
         return STATUS_CODE_SUCCESS;
 
     OrderedCaloHitList orderedCaloHitList;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, orderedCaloHitList.Add(*pCaloHitList));
+    RETURN_IF_NOT_SUCCESS(orderedCaloHitList.Add(*pCaloHitList));
 
     ClusterVector clusterVector;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SeedClustersWithTracks(clusterVector));
+    RETURN_IF_NOT_SUCCESS(this->SeedClustersWithTracks(clusterVector));
 
     for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
     {
@@ -84,18 +99,19 @@ StatusCode ConeClusteringAlgorithmFast::Run()
             if ((m_shouldUseIsolatedHits || !pCaloHit->IsIsolated()) &&
                 (!m_shouldUseOnlyECalHits || (ECAL == pCaloHit->GetHitType())) &&
                 (PandoraContentApi::IsAvailable(*this, pCaloHit)))
-            {
-                customSortedCaloHitList.insert(pCaloHit);
+	    {
+	        auto pos = std::upper_bound( customSortedCaloHitList.begin(), customSortedCaloHitList.end(),pCaloHit);
+                customSortedCaloHitList.insert(pos,pCaloHit);
             }
         }
 
         ClusterFitResultMap clusterFitResultMap;
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetCurrentClusterFitResults(clusterVector, clusterFitResultMap));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FindHitsInPreviousLayers(pseudoLayer, &customSortedCaloHitList, clusterFitResultMap, clusterVector));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FindHitsInSameLayer(pseudoLayer, &customSortedCaloHitList, clusterFitResultMap, clusterVector));
+        RETURN_IF_NOT_SUCCESS(this->GetCurrentClusterFitResults(clusterVector, clusterFitResultMap));
+        RETURN_IF_NOT_SUCCESS(this->FindHitsInPreviousLayers(pseudoLayer, &customSortedCaloHitList, clusterFitResultMap, clusterVector));
+        RETURN_IF_NOT_SUCCESS(this->FindHitsInSameLayer(pseudoLayer, &customSortedCaloHitList, clusterFitResultMap, clusterVector));
     }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveEmptyClusters(clusterVector));
+    RETURN_IF_NOT_SUCCESS(this->RemoveEmptyClusters(clusterVector));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -107,8 +123,8 @@ StatusCode ConeClusteringAlgorithmFast::SeedClustersWithTracks(ClusterVector &cl
     if (0 == m_clusterSeedStrategy)
         return STATUS_CODE_SUCCESS;
 
-    const TrackList *pTrackList = NULL;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pTrackList));
+    const TrackList *pTrackList = nullptr;
+    RETURN_IF_NOT_SUCCESS(PandoraContentApi::GetCurrentList(*this, pTrackList));
 
     for (TrackList::const_iterator iter = pTrackList->begin(), iterEnd = pTrackList->end(); iter != iterEnd; ++iter)
     {
@@ -130,10 +146,10 @@ StatusCode ConeClusteringAlgorithmFast::SeedClustersWithTracks(ClusterVector &cl
 
         if (useTrack)
         {
-            Cluster *pCluster = NULL;
+            Cluster *pCluster = nullptr;
             PandoraContentApi::Cluster::Parameters parameters;
             parameters.m_pTrack = pTrack;
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, parameters, pCluster));
+            RETURN_IF_NOT_SUCCESS(PandoraContentApi::Cluster::Create(*this, parameters, pCluster));
             clusterVector.push_back(pCluster);
         }
     }
@@ -202,12 +218,12 @@ StatusCode ConeClusteringAlgorithmFast::GetCurrentClusterFitResults(ClusterVecto
 StatusCode ConeClusteringAlgorithmFast::FindHitsInPreviousLayers(unsigned int pseudoLayer, CustomSortedCaloHitList *const pCustomSortedCaloHitList,
     const ClusterFitResultMap &clusterFitResultMap, ClusterVector &clusterVector) const
 {
-    for (CustomSortedCaloHitList::iterator iter = pCustomSortedCaloHitList->begin(), iterEnd = pCustomSortedCaloHitList->end();
-        iter != iterEnd;)
+    for (CustomSortedCaloHitList::iterator iter = pCustomSortedCaloHitList->begin();
+        iter != pCustomSortedCaloHitList->end();)
     {
         CaloHit *pCaloHit = *iter;
 
-        Cluster *pBestCluster = NULL;
+        Cluster *pBestCluster = nullptr;
         float bestClusterEnergy(0.f);
         float smallestGenericDistance(m_genericDistanceCut);
         const unsigned int layersToStepBack((PandoraContentApi::GetGeometry(*this)->GetHitTypeGranularity(pCaloHit->GetHitType()) <= FINE) ?
@@ -218,6 +234,11 @@ StatusCode ConeClusteringAlgorithmFast::FindHitsInPreviousLayers(unsigned int ps
         {
             const unsigned int searchLayer(pseudoLayer - stepBackLayer);
 
+	    // need to reorganize this to use a kd-tree 
+	    // on the clusters we are presently mutating
+	    // goal -> determine search distances for KD-tree 
+	    //         from cut values and associated scalings
+
             // See if hit should be associated with any existing clusters
             for (ClusterVector::iterator clusterIter = clusterVector.begin(), clusterIterEnd = clusterVector.end();
                 clusterIter != clusterIterEnd; ++clusterIter)
@@ -226,10 +247,11 @@ StatusCode ConeClusteringAlgorithmFast::FindHitsInPreviousLayers(unsigned int ps
                 float genericDistance(std::numeric_limits<float>::max());
                 const float clusterEnergy(pCluster->GetHadronicEnergy());
 
-                PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_UNCHANGED, !=, this->GetGenericDistanceToHit(pCluster,
+                RETURN_IF_NOT_SUCCESS_OR_UNCHANGED(this->GetGenericDistanceToHit(pCluster,
                     pCaloHit, searchLayer, clusterFitResultMap, genericDistance));
 
-                if ((genericDistance < smallestGenericDistance) || ((genericDistance == smallestGenericDistance) && (clusterEnergy > bestClusterEnergy)))
+                if ( (genericDistance < smallestGenericDistance) || 
+		     ( (genericDistance == smallestGenericDistance) && (clusterEnergy > bestClusterEnergy) ) )
                 {
                     pBestCluster = pCluster;
                     bestClusterEnergy = clusterEnergy;
@@ -238,27 +260,27 @@ StatusCode ConeClusteringAlgorithmFast::FindHitsInPreviousLayers(unsigned int ps
             }
 
             // Add best hit found after completing examination of a stepback layer
-            if ((0 == m_clusterFormationStrategy) && (NULL != pBestCluster))
+            if ((0 == m_clusterFormationStrategy) && (nullptr != pBestCluster))
             {
-                PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AddToCluster(*this, pBestCluster, pCaloHit));
+                RETURN_IF_NOT_SUCCESS(PandoraContentApi::AddToCluster(*this, pBestCluster, pCaloHit));
                 break;
             }
         }
 
         // Add best hit found after examining all stepback layers
-        if ((1 == m_clusterFormationStrategy) && (NULL != pBestCluster))
+        if ((1 == m_clusterFormationStrategy) && (nullptr != pBestCluster))
         {
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AddToCluster(*this, pBestCluster, pCaloHit));
+            RETURN_IF_NOT_SUCCESS(PandoraContentApi::AddToCluster(*this, pBestCluster, pCaloHit));
         }
 
         // Tidy the energy sorted calo hit list
         if (!PandoraContentApi::IsAvailable(*this, pCaloHit))
         {
-            pCustomSortedCaloHitList->erase(iter++);
+	    iter = pCustomSortedCaloHitList->erase(iter);
         }
         else
         {
-            iter++;
+            ++iter;
         }
     }
 
@@ -283,7 +305,7 @@ StatusCode ConeClusteringAlgorithmFast::FindHitsInSameLayer(unsigned int pseudoL
             {
                 CaloHit *pCaloHit = *iter;
 
-                Cluster *pBestCluster = NULL;
+                Cluster *pBestCluster = nullptr;
                 float bestClusterEnergy(0.f);
                 float smallestGenericDistance(m_genericDistanceCut);
 
@@ -295,7 +317,7 @@ StatusCode ConeClusteringAlgorithmFast::FindHitsInSameLayer(unsigned int pseudoL
                     float genericDistance(std::numeric_limits<float>::max());
                     const float clusterEnergy(pCluster->GetHadronicEnergy());
 
-                    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_UNCHANGED, !=, this->GetGenericDistanceToHit(pCluster,
+		    RETURN_IF_NOT_SUCCESS_OR_UNCHANGED(this->GetGenericDistanceToHit(pCluster,
                         pCaloHit, pseudoLayer, clusterFitResultMap, genericDistance));
 
                     if ((genericDistance < smallestGenericDistance) || ((genericDistance == smallestGenericDistance) && (clusterEnergy > bestClusterEnergy)))
@@ -306,9 +328,9 @@ StatusCode ConeClusteringAlgorithmFast::FindHitsInSameLayer(unsigned int pseudoL
                     }
                 }
 
-                if (NULL != pBestCluster)
+                if (nullptr != pBestCluster)
                 {
-                    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AddToCluster(*this, pBestCluster, pCaloHit));
+                    RETURN_IF_NOT_SUCCESS(PandoraContentApi::AddToCluster(*this, pBestCluster, pCaloHit));
                     pCustomSortedCaloHitList->erase(iter++);
                     clustersModified = true;
                 }
@@ -325,10 +347,10 @@ StatusCode ConeClusteringAlgorithmFast::FindHitsInSameLayer(unsigned int pseudoL
             CaloHit *pCaloHit = *(pCustomSortedCaloHitList->begin());
             pCustomSortedCaloHitList->erase(pCaloHit);
 
-            Cluster *pCluster = NULL;
+            Cluster *pCluster = nullptr;
             PandoraContentApi::Cluster::Parameters parameters;
             parameters.m_caloHitList.insert(pCaloHit);
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, parameters, pCluster));
+            RETURN_IF_NOT_SUCCESS(PandoraContentApi::Cluster::Create(*this, parameters, pCluster));
             clusterVector.push_back(pCluster);
         }
     }
@@ -505,7 +527,7 @@ StatusCode ConeClusteringAlgorithmFast::GetConeApproachDistanceToHit(CaloHit *co
         CaloHit *pHitInCluster = *iter;
         float hitDistance(std::numeric_limits<float>::max());
 
-        PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_UNCHANGED, !=, this->GetConeApproachDistanceToHit(pCaloHit,
+	RETURN_IF_NOT_SUCCESS_OR_UNCHANGED(this->GetConeApproachDistanceToHit(pCaloHit,
             pHitInCluster->GetPositionVector(), clusterDirection, hitDistance));
 
         if (hitDistance < smallestDistance)
@@ -575,7 +597,7 @@ StatusCode ConeClusteringAlgorithmFast::GetDistanceToTrackSeed(Cluster *const pC
         for (CaloHitList::const_iterator iter = listIter->second->begin(), iterEnd = listIter->second->end(); iter != iterEnd; ++iter)
         {
             float tempDistance(std::numeric_limits<float>::max());
-            PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_UNCHANGED, !=, this->GetDistanceToTrackSeed(pCluster, *iter,
+	    RETURN_IF_NOT_SUCCESS_OR_UNCHANGED(this->GetDistanceToTrackSeed(pCluster, *iter,
                 tempDistance));
 
             if (tempDistance < m_genericDistanceCut)
@@ -627,13 +649,13 @@ StatusCode ConeClusteringAlgorithmFast::RemoveEmptyClusters(ClusterVector &clust
         if (0 == (*iter)->GetNCaloHits())
         {
             clusterDeletionList.insert(*iter);
-            (*iter) = NULL;
+            (*iter) = nullptr;
         }
     }
 
     if (!clusterDeletionList.empty())
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Delete(*this, &clusterDeletionList));
+        RETURN_IF_NOT_SUCCESS(PandoraContentApi::Delete(*this, &clusterDeletionList));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -644,121 +666,121 @@ StatusCode ConeClusteringAlgorithmFast::RemoveEmptyClusters(ClusterVector &clust
 StatusCode ConeClusteringAlgorithmFast::ReadSettings(const TiXmlHandle xmlHandle)
 {
     // Track seeding parameters
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "ClusterSeedStrategy", m_clusterSeedStrategy));
 
     // High level clustering parameters
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "ShouldUseOnlyECalHits", m_shouldUseOnlyECalHits));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "ShouldUseIsolatedHits", m_shouldUseIsolatedHits));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "LayersToStepBackFine", m_layersToStepBackFine));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "LayersToStepBackCoarse", m_layersToStepBackCoarse));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "ClusterFormationStrategy", m_clusterFormationStrategy));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "GenericDistanceCut", m_genericDistanceCut));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "MinHitTrackCosAngle", m_minHitTrackCosAngle));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "MinHitClusterCosAngle", m_minHitClusterCosAngle));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "ShouldUseTrackSeed", m_shouldUseTrackSeed));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "TrackSeedCutOffLayer", m_trackSeedCutOffLayer));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "ShouldFollowInitialDirection", m_shouldFollowInitialDirection));
 
     // Same layer distance parameters
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "SameLayerPadWidthsFine", m_sameLayerPadWidthsFine));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "SameLayerPadWidthsCoarse", m_sameLayerPadWidthsCoarse));
 
     // Cone approach distance parameters
     float coneApproachMaxSeparation = std::sqrt(m_coneApproachMaxSeparation2);
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "ConeApproachMaxSeparation", coneApproachMaxSeparation));
     m_coneApproachMaxSeparation2 = coneApproachMaxSeparation * coneApproachMaxSeparation;
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "TanConeAngleFine", m_tanConeAngleFine));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "TanConeAngleCoarse", m_tanConeAngleCoarse));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "AdditionalPadWidthsFine", m_additionalPadWidthsFine));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "AdditionalPadWidthsCoarse", m_additionalPadWidthsCoarse));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "MaxClusterDirProjection", m_maxClusterDirProjection));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "MinClusterDirProjection", m_minClusterDirProjection));
 
     // Track seed distance parameters
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "TrackPathWidth", m_trackPathWidth));
 
     float maxTrackSeedSeparation = std::sqrt(m_maxTrackSeedSeparation2);
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "MaxTrackSeedSeparation", maxTrackSeedSeparation));
     m_maxTrackSeedSeparation2 = maxTrackSeedSeparation * maxTrackSeedSeparation;
 
     if (m_shouldUseTrackSeed && (m_maxTrackSeedSeparation2 < std::numeric_limits<float>::epsilon()))
         return STATUS_CODE_INVALID_PARAMETER;
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "MaxLayersToTrackSeed", m_maxLayersToTrackSeed));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "MaxLayersToTrackLikeHit", m_maxLayersToTrackLikeHit));
 
     // Cluster current direction and mip track parameters
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "NLayersSpannedForFit", m_nLayersSpannedForFit));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "NLayersSpannedForApproxFit", m_nLayersSpannedForApproxFit));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "NLayersToFit", m_nLayersToFit));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "NLayersToFitLowMipCut", m_nLayersToFitLowMipCut));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "NLayersToFitLowMipMultiplier", m_nLayersToFitLowMipMultiplier));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "FitSuccessDotProductCut1", m_fitSuccessDotProductCut1));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "FitSuccessChi2Cut1", m_fitSuccessChi2Cut1));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "FitSuccessDotProductCut2", m_fitSuccessDotProductCut2));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "FitSuccessChi2Cut2", m_fitSuccessChi2Cut2));
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+    RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
         "MipTrackChi2Cut", m_mipTrackChi2Cut));
 
     return STATUS_CODE_SUCCESS;

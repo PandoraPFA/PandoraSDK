@@ -15,6 +15,8 @@
 #include "Objects/CaloHit.h"
 #include "Objects/CartesianVector.h"
 
+#include <unordered_map>
+
 namespace lc_content
 {
 
@@ -34,7 +36,8 @@ public:
     bool operator()(const pandora::CaloHit *lhs, const pandora::CaloHit *rhs) const;
 };
 
-typedef std::set<pandora::CaloHit *, CustomHitOrder> CustomSortedCaloHitList;
+//, CustomHitOrder
+typedef std::vector<pandora::CaloHit *> CustomSortedCaloHitList;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -69,7 +72,7 @@ private:
      */
     pandora::StatusCode SeedClustersWithTracks(pandora::ClusterVector &clusterVector) const;
 
-    typedef std::map<pandora::Cluster*, pandora::ClusterFitResult> ClusterFitResultMap;
+    typedef std::unordered_map<pandora::Cluster*, pandora::ClusterFitResult> ClusterFitResultMap;
 
     /**
      *  @brief  Update the properties of the current clusters, calculating their current directions and storing the fit results
