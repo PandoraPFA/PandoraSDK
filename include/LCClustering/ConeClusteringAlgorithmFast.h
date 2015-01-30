@@ -78,11 +78,11 @@ private:
      * 
      *  @param  clusterVector to receive the addresses of clusters created (which could also be accessed via current cluster list)
      */
-    pandora::StatusCode SeedClustersWithTracks(const pandora::TrackList*, pandora::ClusterVector &clusterVector) const;
+    pandora::StatusCode SeedClustersWithTracks(const pandora::TrackList*, pandora::ClusterVector &clusterVector);
 
     typedef std::unordered_map<pandora::Cluster*, pandora::ClusterFitResult> ClusterFitResultMap;
-    typedef KDTreeLinkerAlgo<pandora::CaloHit*,3> HitKDTree;
-    typedef KDTreeNodeInfoT<pandora::CaloHit*,3> HitKDNode;
+    typedef KDTreeLinkerAlgo<pandora::CaloHit*,4> HitKDTree;
+    typedef KDTreeNodeInfoT<pandora::CaloHit*,4> HitKDNode;
     typedef KDTreeLinkerAlgo<pandora::Track*,3> TrackKDTree;
     typedef KDTreeNodeInfoT<pandora::Track*,3> TrackKDNode;
 
@@ -104,7 +104,7 @@ private:
      *  @param  clusterVector vector containing addresses of current clusters
      */
     pandora::StatusCode FindHitsInPreviousLayers(unsigned int pseudoLayer, CustomSortedCaloHitList *const pCustomSortedCaloHitList,
-        const ClusterFitResultMap &clusterFitResultMap, pandora::ClusterVector &clusterVector) const;
+        const ClusterFitResultMap &clusterFitResultMap, pandora::ClusterVector &clusterVector);
 
     /**
      *  @brief  Match clusters to calo hits in current pseudo layer
@@ -115,7 +115,7 @@ private:
      *  @param  clusterVector vector containing addresses of current clusters
      */
     pandora::StatusCode FindHitsInSameLayer(unsigned int pseudoLayer, CustomSortedCaloHitList *const pCustomSortedCaloHitList,
-        const ClusterFitResultMap &clusterFitResultMap, pandora::ClusterVector &clusterVector) const;
+        const ClusterFitResultMap &clusterFitResultMap, pandora::ClusterVector &clusterVector);
 
     /**
      *  @brief  Get the "generic distance" between a calo hit and a cluster; the smaller the distance, the stronger the association
@@ -206,8 +206,13 @@ private:
     
     /**
      *  @brief  hashtable to look up hits in clusters
-     */
+     */    
     std::unordered_map<pandora::CaloHit*, pandora::Cluster*> m_hitsToClusters;
+
+    /**
+     *  @brief  hashtable to look up hits in clusters
+     */    
+    std::unordered_map<pandora::Track*, pandora::Cluster*> m_tracksToClusters;
 
     unsigned int    m_clusterSeedStrategy;          ///< Flag determining if and how clusters should be seeded with tracks
 
