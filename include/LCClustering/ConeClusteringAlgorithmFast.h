@@ -15,6 +15,7 @@
 #include "Objects/CaloHit.h"
 #include "Objects/CartesianVector.h"
 
+#include "LCUtility/KDTreeLinkerAlgoT.h"
 #include <unordered_map>
 
 namespace lc_content
@@ -66,13 +67,24 @@ private:
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
 
     /**
+     *  @brief  Fill the kd-trees we will use to do fast lookups of clusters
+     * 
+     *  @param  none, just internal initialization
+     */
+    pandora::StatusCode InitializeKDTrees(const pandora::TrackList*, const pandora::CaloHitList*);
+
+    /**
      *  @brief  Use current track list to make seed clusters
      * 
      *  @param  clusterVector to receive the addresses of clusters created (which could also be accessed via current cluster list)
      */
-    pandora::StatusCode SeedClustersWithTracks(pandora::ClusterVector &clusterVector) const;
+    pandora::StatusCode SeedClustersWithTracks(const pandora::TrackList*, pandora::ClusterVector &clusterVector) const;
 
     typedef std::unordered_map<pandora::Cluster*, pandora::ClusterFitResult> ClusterFitResultMap;
+    typedef KDTreeLinkerAlgo<pandora::CaloHit*,3> HitKDTree;
+    typedef KDTreeNodeInfoT<pandora::CaloHit*,3> HitKDNode;
+    typedef KDTreeLinkerAlgo<pandora::Track*,3> TrackKDTree;
+    typedef KDTreeNodeInfoT<pandora::Track*,3> TrackKDNode;
 
     /**
      *  @brief  Update the properties of the current clusters, calculating their current directions and storing the fit results
@@ -179,6 +191,23 @@ private:
      *  @param  clusterVector containing the addresses of all clusters created
      */
     pandora::StatusCode RemoveEmptyClusters(pandora::ClusterVector &clusterVector) const;
+
+    /**
+     *  @brief  kd-tree containing all tracks in given to the clusterizer
+     */
+    std::vector<TrackKDNode> m_trackNodes;
+    TrackKDTree m_tracksKdTree;
+    
+    /**
+     *  @brief  kd-tree containing all rechits given to the clusterizer
+     */
+    std::vector<HitKDNode> m_hitNodes;
+    HitKDTree m_hitsKdTree;
+    
+    /**
+     *  @brief  hashtable to look up hits in clusters
+     */
+    std::unordered_map<pandora::CaloHit*, pandora::Cluster*> m_hitsToClusters;
 
     unsigned int    m_clusterSeedStrategy;          ///< Flag determining if and how clusters should be seeded with tracks
 

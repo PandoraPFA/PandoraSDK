@@ -1,6 +1,10 @@
 #ifndef KDTreeLinkerToolsTemplated_h
 #define KDTreeLinkerToolsTemplated_h
 
+#include "Objects/CaloHit.h"
+#include "Objects/Track.h"
+#include "Objects/CartesianVector.h"
+
 #include <array>
 
 // Box structure used to define 2D field.
@@ -78,5 +82,93 @@ struct KDTreeNodeT
     region = regionBox;
   }
 };
+
+std::pair<float,float> minmax(const float a, const float b) {
+  return ( b < a ? 
+	   std::pair<float,float>(b, a) : 
+	   std::pair<float,float>(a, b)   );
+}
+
+template<typename T> 
+struct kdtree_type_adaptor{
+  static const pandora::CartesianVector& position(const T* t) { 
+    return t->GetPosition(); 
+  }
+};
+
+template<>
+struct kdtree_type_adaptor<pandora::Track>{
+  static const pandora::CartesianVector& position(const pandora::Track* t) { 
+    const pandora::TrackState & trackState(t->GetTrackStateAtCalorimeter());    
+    return trackState.GetPosition(); 
+  }
+};
+
+template<>
+struct kdtree_type_adaptor<pandora::CaloHit>{
+  static const pandora::CartesianVector& position(const pandora::CaloHit* t) { 
+    return t->GetPositionVector(); 
+  }
+};
+
+namespace pandora {
+  class Algorithm;
+}
+
+template<typename T>
+KDTreeCube fill_and_bound_3d_kd_tree(pandora::Algorithm* const  caller,
+				     const std::unordered_set<T*>& points,
+				     std::vector<KDTreeNodeInfoT<T*,3> >& nodes) {
+  std::array<float,3> minpos{ {0.0f,0.0f,0.0f} }, maxpos{ {0.0f,0.0f,0.0f} };
+  unsigned i = 0;
+  for( T* point : points ) {
+    if (!PandoraContentApi::IsAvailable(*caller, point)) continue;
+    const pandora::CartesianVector& pos = kdtree_type_adaptor<T>::position(point);
+    nodes.emplace_back(point, (float)pos.GetX(), (float)pos.GetY(), (float)pos.GetZ());
+    if( i == 0 ) {
+      minpos[0] = pos.GetX(); minpos[1] = pos.GetY(); minpos[2] = pos.GetZ();
+      maxpos[0] = pos.GetX(); maxpos[1] = pos.GetY(); maxpos[2] = pos.GetZ();
+    } else {
+      minpos[0] = std::min((float)pos.GetX(),minpos[0]);
+      minpos[1] = std::min((float)pos.GetY(),minpos[1]);
+      minpos[2] = std::min((float)pos.GetZ(),minpos[2]);
+      maxpos[0] = std::max((float)pos.GetX(),maxpos[0]);
+      maxpos[1] = std::max((float)pos.GetY(),maxpos[1]);
+      maxpos[2] = std::max((float)pos.GetZ(),maxpos[2]);
+    }
+    ++i;
+  }
+  return KDTreeCube(minpos[0],maxpos[0],
+		    minpos[1],maxpos[1],
+		    minpos[2],maxpos[2]);
+}
+
+template<>
+KDTreeCube fill_and_bound_3d_kd_tree<pandora::CaloHit>(pandora::Algorithm* const  caller,
+						       const std::unordered_set<pandora::CaloHit*>& points,
+						       std::vector<KDTreeNodeInfoT<pandora::CaloHit*,3> >& nodes) {
+  std::array<float,3> minpos{ {0.0f,0.0f,0.0f} }, maxpos{ {0.0f,0.0f,0.0f} };
+  unsigned i = 0;
+  for( pandora::CaloHit* point : points ) {
+    if (!PandoraContentApi::IsAvailable(*caller, point)) continue;
+    const pandora::CartesianVector& pos = kdtree_type_adaptor<pandora::CaloHit>::position(point);
+    nodes.emplace_back(point, (float)pos.GetX(), (float)pos.GetY(), (float)point->GetPseudoLayer());
+    if( i == 0 ) {
+      minpos[0] = pos.GetX(); minpos[1] = pos.GetY(); minpos[2] = point->GetPseudoLayer();
+      maxpos[0] = pos.GetX(); maxpos[1] = pos.GetY(); maxpos[2] = point->GetPseudoLayer();
+    } else {
+      minpos[0] = std::min((float)pos.GetX(),minpos[0]);
+      minpos[1] = std::min((float)pos.GetY(),minpos[1]);
+      minpos[2] = std::min((float)point->GetPseudoLayer(),minpos[2]);
+      maxpos[0] = std::max((float)pos.GetX(),maxpos[0]);
+      maxpos[1] = std::max((float)pos.GetY(),maxpos[1]);
+      maxpos[2] = std::max((float)point->GetPseudoLayer(),maxpos[2]);
+    }
+    ++i;
+  }
+  return KDTreeCube(minpos[0],maxpos[0],
+		    minpos[1],maxpos[1],
+		    minpos[2],maxpos[2]);
+}
 
 #endif
