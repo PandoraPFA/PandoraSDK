@@ -89,13 +89,13 @@ StatusCode ConeClusteringAlgorithmFast::Run()
 
     OrderedCaloHitList orderedCaloHitList;
     RETURN_IF_NOT_SUCCESS(orderedCaloHitList.Add(*pCaloHitList));
-
+    
     ClusterVector clusterVector;
+    m_tracksToClusters.clear();
     RETURN_IF_NOT_SUCCESS(this->SeedClustersWithTracks(pTrackList,clusterVector));
 
     // do the clustering
-    m_hitsToClusters.clear();
-    m_tracksToClusters.clear();
+    m_hitsToClusters.clear();    
     for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
     {
         const unsigned int pseudoLayer(iter->first);
@@ -216,8 +216,7 @@ StatusCode ConeClusteringAlgorithmFast::GetCurrentClusterFitResults(ClusterVecto
             const unsigned int outerLayer(pCluster->GetOuterPseudoLayer());
             const unsigned int nLayersSpanned(outerLayer - innerLayer);
 
-            if (nLayersSpanned > m_nLayersSpannedForFit)
-            {
+            if (nLayersSpanned > m_nLayersSpannedForFit) {
                 unsigned int nLayersToFit(m_nLayersToFit);
 
                 if (pCluster->GetMipFraction() - m_nLayersToFitLowMipCut < std::numeric_limits<float>::epsilon())
@@ -237,9 +236,7 @@ StatusCode ConeClusteringAlgorithmFast::GetCurrentClusterFitResults(ClusterVecto
                         clusterFitResult.SetSuccessFlag(false);
                     }
                 }
-            }
-            else if (nLayersSpanned > m_nLayersSpannedForApproxFit)
-            {
+            } else if (nLayersSpanned > m_nLayersSpannedForApproxFit) {
                 const CartesianVector centroidChange(pCluster->GetCentroid(outerLayer) - pCluster->GetCentroid(innerLayer));
                 clusterFitResult.Reset();
                 clusterFitResult.SetDirection(centroidChange.GetUnitVector());
@@ -260,12 +257,18 @@ StatusCode ConeClusteringAlgorithmFast::FindHitsInPreviousLayers(unsigned int ps
     const ClusterFitResultMap &clusterFitResultMap, ClusterVector &clusterVector)
 {
     const float maxTrackSeedSeparation = std::sqrt(m_maxTrackSeedSeparation2);
-    const unsigned int firstLayer(PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp());
+    //const unsigned int firstLayer(PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp());
+    
     for (CustomSortedCaloHitList::iterator iter = pCustomSortedCaloHitList->begin();
 	 iter != pCustomSortedCaloHitList->end();)
     {
         CaloHit *pCaloHit = *iter;
 	if (!PandoraContentApi::IsAvailable(*this, pCaloHit)) continue;
+
+	const float additionalPadWidths = ((PandoraContentApi::GetGeometry(*this)->GetHitTypeGranularity(pCaloHit->GetHitType()) <= FINE) ?
+					  m_additionalPadWidthsFine * pCaloHit->GetCellLengthScale() : 
+					  m_additionalPadWidthsCoarse * pCaloHit->GetCellLengthScale());
+	const float largestAllowedDistanceForSearch = std::max(maxTrackSeedSeparation,std::sqrt(m_maxClusterDirProjection)+additionalPadWidths);
 
         Cluster *pBestCluster = nullptr;
         float bestClusterEnergy(0.f);
@@ -283,19 +286,42 @@ StatusCode ConeClusteringAlgorithmFast::FindHitsInPreviousLayers(unsigned int ps
 	    // goal -> determine search distances for KD-tree 
 	    //         from cut values and associated scalings
 	    ClusterList nearby_clusters;
-	    if( (searchLayer == 0) || (searchLayer < firstLayer) ) {
-	      KDTreeCube searchRegion = 
-		build_3d_kd_search_region(*iter,
-					  maxTrackSeedSeparation,
-					  maxTrackSeedSeparation,
-					  maxTrackSeedSeparation);
-	      std::vector<TrackKDNode> found_tracks;
-	      m_tracksKdTree.search(searchRegion,found_tracks);
-	      for( auto& track : found_tracks ) {
-		nearby_clusters.insert(m_tracksToClusters[track.data]);
+	    // search for tracks that would satisfy the search criteria
+	    // in GetGenericDistanceToHit()	    
+	    KDTreeCube searchRegionTks = 
+	      build_3d_kd_search_region(*iter,
+					largestAllowedDistanceForSearch,
+					largestAllowedDistanceForSearch,
+					largestAllowedDistanceForSearch);
+	    std::vector<TrackKDNode> found_tracks;
+	    m_tracksKdTree.search(searchRegionTks,found_tracks);
+	    for( auto& track : found_tracks ) {
+	      auto assc_cluster = m_tracksToClusters.find(track.data);
+	      if( assc_cluster != m_tracksToClusters.end() ) {
+		nearby_clusters.insert(assc_cluster->second);
 	      }
 	    }
-
+	    // now search for hits-in-clusters that would also satisfy the criteria
+	    KDTreeTesseract searchRegionHits = 
+	      build_4d_kd_search_region(*iter,
+					largestAllowedDistanceForSearch,
+					largestAllowedDistanceForSearch,
+					largestAllowedDistanceForSearch,
+					searchLayer);
+	    std::vector<HitKDNode> found_hits;
+	    m_hitsKdTree.search(searchRegionHits,found_hits);
+	    for( auto& hit : found_hits ) {
+	      auto assc_cluster = m_hitsToClusters.find(hit.data);
+	      if( assc_cluster != m_hitsToClusters.end() ) {
+		nearby_clusters.insert(assc_cluster->second);
+	      }
+	    }
+	    
+	    // instead of using the full cluster list we use only those clusters
+	    // that are found to be nearby according to the KD-tree
+	    // ---- This can be optimized further for sure. 
+	    // (for instance having a match by KD-tree qualifies a ton of the loops
+	    // later
             // See if hit should be associated with any existing clusters
             for (ClusterList::iterator clusterIter = nearby_clusters.begin(), clusterIterEnd = nearby_clusters.end();
 		 clusterIter != clusterIterEnd; ++clusterIter)
@@ -346,6 +372,8 @@ StatusCode ConeClusteringAlgorithmFast::FindHitsInPreviousLayers(unsigned int ps
 StatusCode ConeClusteringAlgorithmFast::FindHitsInSameLayer(unsigned int pseudoLayer, CustomSortedCaloHitList *const pCustomSortedCaloHitList,
     const ClusterFitResultMap &clusterFitResultMap, ClusterVector &clusterVector)
 {
+    const float maxTrackSeedSeparation = std::sqrt(m_maxTrackSeedSeparation2);
+
     while (!pCustomSortedCaloHitList->empty())
     {
         bool clustersModified = true;
@@ -356,19 +384,54 @@ StatusCode ConeClusteringAlgorithmFast::FindHitsInSameLayer(unsigned int pseudoL
 
             for (CustomSortedCaloHitList::iterator iter = pCustomSortedCaloHitList->begin();
 		 iter != pCustomSortedCaloHitList->end();)
-            {
+            {	      
                 CaloHit *pCaloHit = *iter;
 		if (!PandoraContentApi::IsAvailable(*this, pCaloHit)) continue;
+
+		const float additionalPadWidths = ((PandoraContentApi::GetGeometry(*this)->GetHitTypeGranularity(pCaloHit->GetHitType()) <= FINE) ?
+						m_additionalPadWidthsFine * pCaloHit->GetCellLengthScale() : 
+						m_additionalPadWidthsCoarse * pCaloHit->GetCellLengthScale());
+		const float largestAllowedDistanceForSearch = std::max(maxTrackSeedSeparation,std::sqrt(m_maxClusterDirProjection)+additionalPadWidths);
+
 
                 Cluster *pBestCluster = nullptr;
                 float bestClusterEnergy(0.f);
                 float smallestGenericDistance(m_genericDistanceCut);
 
-		// need to use a kd-tree here as well to limit us to the patch of calorimeter
-		// we are interested in (big gain here since this is the most highly iterative part)
-		
+		ClusterList nearby_clusters;
+		// search for tracks that would satisfy the search criteria
+		// in GetGenericDistanceToHit()	    
+		KDTreeCube searchRegionTks = 
+		  build_3d_kd_search_region(*iter,
+					    largestAllowedDistanceForSearch,
+					    largestAllowedDistanceForSearch,
+					    largestAllowedDistanceForSearch);
+		std::vector<TrackKDNode> found_tracks;
+		m_tracksKdTree.search(searchRegionTks,found_tracks);
+		for( auto& track : found_tracks ) {
+		  auto assc_cluster = m_tracksToClusters.find(track.data);
+		  if( assc_cluster != m_tracksToClusters.end() ) {
+		    nearby_clusters.insert(assc_cluster->second);
+		  }
+		}
+		// now search for hits-in-clusters that would also satisfy the criteria
+		KDTreeTesseract searchRegionHits = 
+		  build_4d_kd_search_region(*iter,
+					    largestAllowedDistanceForSearch,
+					    largestAllowedDistanceForSearch,
+					    largestAllowedDistanceForSearch,
+					    pseudoLayer);
+		std::vector<HitKDNode> found_hits;
+		m_hitsKdTree.search(searchRegionHits,found_hits);
+		for( auto& hit : found_hits ) {
+		  auto assc_cluster = m_hitsToClusters.find(hit.data);
+		  if( assc_cluster != m_hitsToClusters.end() ) {
+		    nearby_clusters.insert(assc_cluster->second);
+		  }
+		}		
+
                 // See if hit should be associated with any existing clusters
-                for (ClusterVector::iterator clusterIter = clusterVector.begin(), clusterIterEnd = clusterVector.end();
+                for (ClusterList::iterator clusterIter = nearby_clusters.begin(), clusterIterEnd = nearby_clusters.end();
 		     clusterIter != clusterIterEnd; ++clusterIter)
                 {
 		    Cluster *pCluster = *clusterIter;
