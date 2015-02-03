@@ -24,6 +24,7 @@
 #include "LCFragmentRemoval/PhotonFragmentRemovalAlgorithm.h"
 #include "LCFragmentRemoval/BeamHaloMuonRemovalAlgorithm.h"
 
+#include "LCMonitoring/ClusterComparisonAlgorithm.h"
 #include "LCMonitoring/DumpPfosMonitoringAlgorithm.h"
 #include "LCMonitoring/EfficiencyMonitoringAlgorithm.h"
 #include "LCMonitoring/VisualMonitoringAlgorithm.h"
@@ -101,6 +102,7 @@ public:
         d("NeutralFragmentRemoval",                 lc_content::NeutralFragmentRemovalAlgorithm::Factory)                       \
         d("PhotonFragmentRemoval",                  lc_content::PhotonFragmentRemovalAlgorithm::Factory)                        \
         d("BeamHaloMuonRemoval",                    lc_content::BeamHaloMuonRemovalAlgorithm::Factory)                          \
+        d("ClusterComparison",                      lc_content::ClusterComparisonAlgorithm::Factory)                            \
         d("DumpPfosMonitoring",                     lc_content::DumpPfosMonitoringAlgorithm::Factory)                           \
         d("EfficiencyMonitoring",                   lc_content::EfficiencyMonitoringAlgorithm::Factory)                         \
         d("VisualMonitoring",                       lc_content::VisualMonitoringAlgorithm::Factory)                             \
