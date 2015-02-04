@@ -18,7 +18,7 @@
 #include "LCUtility/KDTreeLinkerAlgoT.h"
 #include <unordered_map>
 
-namespace lc_content
+namespace lc_content_fast
 {
 
 /**
@@ -43,9 +43,9 @@ typedef std::vector<pandora::CaloHit *> CustomSortedCaloHitList;
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
- *  @brief  ConeClusteringAlgorithmFast class
+ *  @brief  ConeClusteringAlgorithm class
  */
-class ConeClusteringAlgorithmFast : public pandora::Algorithm
+class ConeClusteringAlgorithm : public pandora::Algorithm
 {
 public:
     /**
@@ -60,7 +60,7 @@ public:
     /**
      *  @brief Default constructor
      */
-    ConeClusteringAlgorithmFast();
+    ConeClusteringAlgorithm();
 
 private:
     pandora::StatusCode Run();
@@ -277,11 +277,11 @@ inline bool CustomHitOrder::operator()(const pandora::CaloHit *lhs, const pandor
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline pandora::Algorithm *ConeClusteringAlgorithmFast::Factory::CreateAlgorithm() const
+inline pandora::Algorithm *ConeClusteringAlgorithm::Factory::CreateAlgorithm() const
 {
-    return new ConeClusteringAlgorithmFast();
+    return new ConeClusteringAlgorithm();
 }
 
-} // namespace lc_content
+} // namespace lc_content_fast
 
 #endif // #ifndef LC_CONE_CLUSTERING_ALGORITHM_H

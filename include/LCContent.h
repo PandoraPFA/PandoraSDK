@@ -97,7 +97,7 @@ public:
         d("PerfectParticleFlow",                    lc_content::PerfectParticleFlowAlgorithm::Factory)                          \
         d("ClusteringParent",                       lc_content::ClusteringParentAlgorithm::Factory)                             \
         d("ConeClustering",                         lc_content::ConeClusteringAlgorithm::Factory)                               \
-	d("ConeClusteringFast",                     lc_content::ConeClusteringAlgorithmFast::Factory)                           \
+	d("ConeClusteringFast",                     lc_content_fast::ConeClusteringAlgorithm::Factory)                           \
         d("ForcedClustering",                       lc_content::ForcedClusteringAlgorithm::Factory)                             \
         d("MainFragmentRemoval",                    lc_content::MainFragmentRemovalAlgorithm::Factory)                          \
         d("MergeSplitPhotons",                      lc_content::MergeSplitPhotonsAlgorithm::Factory)                            \

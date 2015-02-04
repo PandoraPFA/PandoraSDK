@@ -28,10 +28,10 @@ using namespace pandora;
 				  STATUS_CODE_NOT_FOUND, \
 				  !=, \
 				  FUNC)
-namespace lc_content
+namespace lc_content_fast
 {
 
-ConeClusteringAlgorithmFast::ConeClusteringAlgorithmFast() :
+ConeClusteringAlgorithm::ConeClusteringAlgorithm() :
     m_clusterSeedStrategy(2),
     m_shouldUseOnlyECalHits(false),
     m_shouldUseIsolatedHits(false),
@@ -72,7 +72,7 @@ ConeClusteringAlgorithmFast::ConeClusteringAlgorithmFast() :
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ConeClusteringAlgorithmFast::Run()
+StatusCode ConeClusteringAlgorithm::Run()
 {
     const CaloHitList *pCaloHitList = nullptr;
     RETURN_IF_NOT_SUCCESS(PandoraContentApi::GetCurrentList(*this, pCaloHitList));
@@ -133,7 +133,7 @@ StatusCode ConeClusteringAlgorithmFast::Run()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ConeClusteringAlgorithmFast::InitializeKDTrees(const TrackList* pTrackList, const CaloHitList* pCaloHitList) 
+StatusCode ConeClusteringAlgorithm::InitializeKDTrees(const TrackList* pTrackList, const CaloHitList* pCaloHitList) 
 {
     // load the kd-tree of tracks that we will use
     m_tracksKdTree.clear();
@@ -157,7 +157,7 @@ StatusCode ConeClusteringAlgorithmFast::InitializeKDTrees(const TrackList* pTrac
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ConeClusteringAlgorithmFast::SeedClustersWithTracks(const TrackList* pTrackList, ClusterVector &clusterVector)
+StatusCode ConeClusteringAlgorithm::SeedClustersWithTracks(const TrackList* pTrackList, ClusterVector &clusterVector)
 {
     if (0 == m_clusterSeedStrategy)
         return STATUS_CODE_SUCCESS;
@@ -200,7 +200,7 @@ StatusCode ConeClusteringAlgorithmFast::SeedClustersWithTracks(const TrackList* 
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ConeClusteringAlgorithmFast::GetCurrentClusterFitResults(ClusterVector &clusterVector, ClusterFitResultMap &clusterFitResultMap) const
+StatusCode ConeClusteringAlgorithm::GetCurrentClusterFitResults(ClusterVector &clusterVector, ClusterFitResultMap &clusterFitResultMap) const
 {
     if (!clusterFitResultMap.empty())
         return STATUS_CODE_INVALID_PARAMETER;
@@ -253,7 +253,7 @@ StatusCode ConeClusteringAlgorithmFast::GetCurrentClusterFitResults(ClusterVecto
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 // inprogress
-StatusCode ConeClusteringAlgorithmFast::FindHitsInPreviousLayers(unsigned int pseudoLayer, CustomSortedCaloHitList *const pCustomSortedCaloHitList,
+StatusCode ConeClusteringAlgorithm::FindHitsInPreviousLayers(unsigned int pseudoLayer, CustomSortedCaloHitList *const pCustomSortedCaloHitList,
 								 const ClusterFitResultMap &clusterFitResultMap, ClusterVector & /*clusterVector*/)
 {
     const float maxTrackSeedSeparation = std::sqrt(m_maxTrackSeedSeparation2);
@@ -369,7 +369,7 @@ StatusCode ConeClusteringAlgorithmFast::FindHitsInPreviousLayers(unsigned int ps
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ConeClusteringAlgorithmFast::FindHitsInSameLayer(unsigned int pseudoLayer, CustomSortedCaloHitList *const pCustomSortedCaloHitList,
+StatusCode ConeClusteringAlgorithm::FindHitsInSameLayer(unsigned int pseudoLayer, CustomSortedCaloHitList *const pCustomSortedCaloHitList,
     const ClusterFitResultMap &clusterFitResultMap, ClusterVector &clusterVector)
 {
     const float maxTrackSeedSeparation = std::sqrt(m_maxTrackSeedSeparation2);
@@ -481,7 +481,7 @@ StatusCode ConeClusteringAlgorithmFast::FindHitsInSameLayer(unsigned int pseudoL
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ConeClusteringAlgorithmFast::GetGenericDistanceToHit(Cluster *const pCluster, CaloHit *const pCaloHit, const unsigned int searchLayer,
+StatusCode ConeClusteringAlgorithm::GetGenericDistanceToHit(Cluster *const pCluster, CaloHit *const pCaloHit, const unsigned int searchLayer,
     const ClusterFitResultMap &clusterFitResultMap, float &genericDistance) const
 {
     const unsigned int firstLayer(PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp());
@@ -599,7 +599,7 @@ StatusCode ConeClusteringAlgorithmFast::GetGenericDistanceToHit(Cluster *const p
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ConeClusteringAlgorithmFast::GetDistanceToHitInSameLayer(CaloHit *const pCaloHit, const CaloHitList *const pCaloHitList,
+StatusCode ConeClusteringAlgorithm::GetDistanceToHitInSameLayer(CaloHit *const pCaloHit, const CaloHitList *const pCaloHitList,
     float &distance) const
 {
     const float dCut ((PandoraContentApi::GetGeometry(*this)->GetHitTypeGranularity(pCaloHit->GetHitType()) <= FINE) ?
@@ -638,7 +638,7 @@ StatusCode ConeClusteringAlgorithmFast::GetDistanceToHitInSameLayer(CaloHit *con
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ConeClusteringAlgorithmFast::GetConeApproachDistanceToHit(CaloHit *const pCaloHit, const CaloHitList *const pCaloHitList,
+StatusCode ConeClusteringAlgorithm::GetConeApproachDistanceToHit(CaloHit *const pCaloHit, const CaloHitList *const pCaloHitList,
     const CartesianVector &clusterDirection, float &distance) const
 {
     bool hitFound(false);
@@ -668,7 +668,7 @@ StatusCode ConeClusteringAlgorithmFast::GetConeApproachDistanceToHit(CaloHit *co
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ConeClusteringAlgorithmFast::GetConeApproachDistanceToHit(CaloHit *const pCaloHit, const CartesianVector &clusterPosition,
+StatusCode ConeClusteringAlgorithm::GetConeApproachDistanceToHit(CaloHit *const pCaloHit, const CartesianVector &clusterPosition,
     const CartesianVector &clusterDirection, float &distance) const
 {
     const CartesianVector &hitPosition(pCaloHit->GetPositionVector());
@@ -699,7 +699,7 @@ StatusCode ConeClusteringAlgorithmFast::GetConeApproachDistanceToHit(CaloHit *co
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ConeClusteringAlgorithmFast::GetDistanceToTrackSeed(Cluster *const pCluster, CaloHit *const pCaloHit, unsigned int searchLayer,
+StatusCode ConeClusteringAlgorithm::GetDistanceToTrackSeed(Cluster *const pCluster, CaloHit *const pCaloHit, unsigned int searchLayer,
     float &distance) const
 {
     if (searchLayer < m_maxLayersToTrackSeed)
@@ -732,7 +732,7 @@ StatusCode ConeClusteringAlgorithmFast::GetDistanceToTrackSeed(Cluster *const pC
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ConeClusteringAlgorithmFast::GetDistanceToTrackSeed(Cluster *const pCluster, CaloHit *const pCaloHit, float &distance) const
+StatusCode ConeClusteringAlgorithm::GetDistanceToTrackSeed(Cluster *const pCluster, CaloHit *const pCaloHit, float &distance) const
 {
     const CartesianVector &hitPosition(pCaloHit->GetPositionVector());
     const CartesianVector &trackSeedPosition(pCluster->GetTrackSeed()->GetTrackStateAtCalorimeter().GetPosition());
@@ -762,7 +762,7 @@ StatusCode ConeClusteringAlgorithmFast::GetDistanceToTrackSeed(Cluster *const pC
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ConeClusteringAlgorithmFast::RemoveEmptyClusters(ClusterVector &clusterVector) const
+StatusCode ConeClusteringAlgorithm::RemoveEmptyClusters(ClusterVector &clusterVector) const
 {
     ClusterList clusterDeletionList;
 
@@ -785,7 +785,7 @@ StatusCode ConeClusteringAlgorithmFast::RemoveEmptyClusters(ClusterVector &clust
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ConeClusteringAlgorithmFast::ReadSettings(const TiXmlHandle xmlHandle)
+StatusCode ConeClusteringAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
     // Track seeding parameters
     RETURN_IF_GOOD_OR_BAD_READ(XmlHelper::ReadValue(xmlHandle,
