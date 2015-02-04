@@ -262,6 +262,8 @@ private:
     float           m_fitSuccessChi2Cut2;           ///< 2. Max value of fit chi2 for fit success
 
     float           m_mipTrackChi2Cut;              ///< Max value of fit chi2 for track seeded cluster to retain its IsMipTrack status
+    
+    unsigned int    m_firstLayer; /// cache the pseudo layer at IP when we call run!
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

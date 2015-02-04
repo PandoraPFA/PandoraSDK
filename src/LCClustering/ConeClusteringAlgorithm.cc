@@ -10,7 +10,7 @@
 
 #include "LCClustering/ConeClusteringAlgorithm.h"
 
-#define DEBUG 1
+//#define DEBUG 1
 
 #ifdef DEBUG
 #define DEBUG_PRINT(X) std::cout << X << std::endl

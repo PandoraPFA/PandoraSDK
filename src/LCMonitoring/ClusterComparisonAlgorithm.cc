@@ -92,6 +92,9 @@ void ClusterComparisonAlgorithm::RunReclustering() const
 
 void ClusterComparisonAlgorithm::CompareClusters(const ClusterList &clusterList1, const ClusterList &clusterList2) const
 {
+  std::cout << "original cluster list size = " << clusterList1.size() << std::endl;
+  std::cout << "new cluster list size = " << clusterList2.size() << std::endl;
+
     ClusterToHitListMap clusterToHitListMap1, clusterToHitListMap2;
     HitToClusterMap hitToClusterMap1, hitToClusterMap2;
     this->PopulateMaps(clusterList1, clusterToHitListMap1, hitToClusterMap1);
