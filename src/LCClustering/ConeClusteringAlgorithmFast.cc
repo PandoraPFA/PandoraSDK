@@ -284,8 +284,9 @@ StatusCode ConeClusteringAlgorithm::GetCurrentClusterFitResults(ClusterVector &c
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 // inprogress
+
 StatusCode ConeClusteringAlgorithm::FindHitsInPreviousLayers(unsigned int pseudoLayer, CustomSortedCaloHitList *const pCustomSortedCaloHitList,
-								 const ClusterFitResultMap &clusterFitResultMap, ClusterVector & /*clusterVector*/)
+							     const ClusterFitResultMap &clusterFitResultMap, ClusterVector & /*clusterVector*/)
 {
     const float maxTrackSeedSeparation = std::sqrt(m_maxTrackSeedSeparation2);
     //const float maxConeApproachSeparation = std::sqrt(m_coneApproachMaxSeparation2);
