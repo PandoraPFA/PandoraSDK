@@ -10,6 +10,14 @@
 
 #include "LCClustering/ConeClusteringAlgorithm.h"
 
+#define DEBUG 1
+
+#ifdef DEBUG
+#define DEBUG_PRINT(X) std::cout << X << std::endl
+#else
+#define DEBUG_PRINT(X) 
+#endif
+
 using namespace pandora;
 
 namespace lc_content
@@ -52,12 +60,14 @@ ConeClusteringAlgorithm::ConeClusteringAlgorithm() :
     m_fitSuccessChi2Cut2(2.5f),
     m_mipTrackChi2Cut(2.5f)
 {
+  DEBUG_PRINT("Built ConeClusteringAlgorithm!");
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode ConeClusteringAlgorithm::Run()
 {
+  DEBUG_PRINT("Start ConeClusteringAlgorithm!");
     const CaloHitList *pCaloHitList = NULL;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pCaloHitList));
 
@@ -67,12 +77,15 @@ StatusCode ConeClusteringAlgorithm::Run()
     OrderedCaloHitList orderedCaloHitList;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, orderedCaloHitList.Add(*pCaloHitList));
 
+    DEBUG_PRINT("Seeding clusters with tracks");
     ClusterVector clusterVector;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SeedClustersWithTracks(clusterVector));
+    DEBUG_PRINT("Seeded clusters with tracks");
 
     for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
     {
         const unsigned int pseudoLayer(iter->first);
+	DEBUG_PRINT("\trunning ConeClusteringAlgorithm on pseudolayer: " << pseudoLayer);
         CustomSortedCaloHitList customSortedCaloHitList;
 
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
@@ -87,13 +100,23 @@ StatusCode ConeClusteringAlgorithm::Run()
             }
         }
 
+	DEBUG_PRINT("\tbuilt list in PS: " << pseudoLayer << " with " << customSortedCaloHitList.size() << " hits");
+
         ClusterFitResultMap clusterFitResultMap;
+	DEBUG_PRINT("\tGetting ClusterFitResults");
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetCurrentClusterFitResults(clusterVector, clusterFitResultMap));
+	DEBUG_PRINT("\tGot ClusterFitResults");
+	DEBUG_PRINT("\tFinding HitsInPreviousLayers");
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FindHitsInPreviousLayers(pseudoLayer, &customSortedCaloHitList, clusterFitResultMap, clusterVector));
+	DEBUG_PRINT("\tFound HitsInPreviousLayers");
+	DEBUG_PRINT("\tFinding HitsInSameLayer");
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FindHitsInSameLayer(pseudoLayer, &customSortedCaloHitList, clusterFitResultMap, clusterVector));
+	DEBUG_PRINT("\tFound HitsInSameLayer");
     }
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveEmptyClusters(clusterVector));
+
+    DEBUG_PRINT("End ConeClusteringAlgorithm");
 
     return STATUS_CODE_SUCCESS;
 }
