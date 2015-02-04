@@ -89,12 +89,12 @@ KDTreeLinkerAlgo<DATA,DIM>::build(std::vector<KDTreeNodeInfoT<DATA,DIM> >  &eltL
   if (eltList.size()) {
     initialEltList = &eltList;
     
-    size_t size = initialEltList->size();
-    nodePoolSize_ = size * 2 - 1;
+    size_t mysize = initialEltList->size();
+    nodePoolSize_ = mysize * 2 - 1;
     nodePool_ = new KDTreeNodeT<DATA,DIM>[nodePoolSize_];
     
     // Here we build the KDTree
-    root_ = recBuild(0, size, 0, region);
+    root_ = recBuild(0, mysize, 0, region);
     
     initialEltList = 0;
   }

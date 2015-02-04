@@ -254,7 +254,7 @@ StatusCode ConeClusteringAlgorithmFast::GetCurrentClusterFitResults(ClusterVecto
 //------------------------------------------------------------------------------------------------------------------------------------------
 // inprogress
 StatusCode ConeClusteringAlgorithmFast::FindHitsInPreviousLayers(unsigned int pseudoLayer, CustomSortedCaloHitList *const pCustomSortedCaloHitList,
-    const ClusterFitResultMap &clusterFitResultMap, ClusterVector &clusterVector)
+								 const ClusterFitResultMap &clusterFitResultMap, ClusterVector & /*clusterVector*/)
 {
     const float maxTrackSeedSeparation = std::sqrt(m_maxTrackSeedSeparation2);
     //const unsigned int firstLayer(PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp());
