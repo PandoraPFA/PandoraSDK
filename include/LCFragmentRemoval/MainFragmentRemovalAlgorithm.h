@@ -12,6 +12,8 @@
 
 #include "LCHelpers/FragmentRemovalHelper.h"
 
+#include <unordered_map>
+
 namespace lc_content
 {
 
