@@ -175,7 +175,6 @@ KDTreeCube fill_and_bound_3d_kd_tree(const std::unordered_set<T*>& points,
 		    minpos[2],maxpos[2]);
 }
 
-
 KDTreeTesseract fill_and_bound_4d_kd_tree(pandora::Algorithm* const  caller,
 					  const std::unordered_set<pandora::CaloHit*>& points,
 					  std::vector<KDTreeNodeInfoT<pandora::CaloHit*,4> >& nodes,
