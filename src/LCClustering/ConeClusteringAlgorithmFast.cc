@@ -287,6 +287,7 @@ StatusCode ConeClusteringAlgorithm::FindHitsInPreviousLayers(unsigned int pseudo
 								 const ClusterFitResultMap &clusterFitResultMap, ClusterVector & /*clusterVector*/)
 {
     const float maxTrackSeedSeparation = std::sqrt(m_maxTrackSeedSeparation2);
+    //const float maxConeApproachSeparation = std::sqrt(m_coneApproachMaxSeparation2);
     //const unsigned int firstLayer(PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp());
     
     for (CustomSortedCaloHitList::iterator iter = pCustomSortedCaloHitList->begin();
@@ -298,7 +299,7 @@ StatusCode ConeClusteringAlgorithm::FindHitsInPreviousLayers(unsigned int pseudo
 	const float additionalPadWidths = ((PandoraContentApi::GetGeometry(*this)->GetHitTypeGranularity(pCaloHit->GetHitType()) <= FINE) ?
 					  m_additionalPadWidthsFine * pCaloHit->GetCellLengthScale() : 
 					  m_additionalPadWidthsCoarse * pCaloHit->GetCellLengthScale());
-	const float largestAllowedDistanceForSearch = std::max(maxTrackSeedSeparation,std::sqrt(m_maxClusterDirProjection)+additionalPadWidths);
+	const float largestAllowedDistanceForSearch = std::max(maxTrackSeedSeparation,m_maxClusterDirProjection+additionalPadWidths);
 
         Cluster *pBestCluster = nullptr;
         float bestClusterEnergy(0.f);
@@ -405,6 +406,7 @@ StatusCode ConeClusteringAlgorithm::FindHitsInSameLayer(unsigned int pseudoLayer
     const ClusterFitResultMap &clusterFitResultMap, ClusterVector &clusterVector)
 {
     const float maxTrackSeedSeparation = std::sqrt(m_maxTrackSeedSeparation2);
+    //const float maxConeApproachSeparation = std::sqrt(m_coneApproachMaxSeparation2);
 
     //keep a list of available hits with the most energetic available hit at the back
     std::list<unsigned> available_hits_in_layer;
@@ -432,11 +434,17 @@ StatusCode ConeClusteringAlgorithm::FindHitsInSameLayer(unsigned int pseudoLayer
 	        // this his is assured to be usable by the lines above and algorithm course
 	        CaloHit *pCaloHit = (*pCustomSortedCaloHitList)[*iter];		
 
+		const float pad_search_width = ((PandoraContentApi::GetGeometry(*this)->GetHitTypeGranularity(pCaloHit->GetHitType()) <= FINE) ?
+						(m_sameLayerPadWidthsFine * pCaloHit->GetCellLengthScale()) :
+						(m_sameLayerPadWidthsCoarse * pCaloHit->GetCellLengthScale()) );
+		/*
 		const float additionalPadWidths = ((PandoraContentApi::GetGeometry(*this)->GetHitTypeGranularity(pCaloHit->GetHitType()) <= FINE) ?
 						m_additionalPadWidthsFine * pCaloHit->GetCellLengthScale() : 
 						m_additionalPadWidthsCoarse * pCaloHit->GetCellLengthScale());
-		const float largestAllowedDistanceForSearch = std::max(maxTrackSeedSeparation,std::sqrt(m_maxClusterDirProjection)+additionalPadWidths);
-
+		*/
+		const float track_search_width = maxTrackSeedSeparation;
+		const float hit_search_width = pad_search_width;
+		
 
                 Cluster *pBestCluster = nullptr;
                 float bestClusterEnergy(0.f);
@@ -457,9 +465,9 @@ StatusCode ConeClusteringAlgorithm::FindHitsInSameLayer(unsigned int pseudoLayer
 		} else {
 		  KDTreeCube searchRegionTks = 
 		    build_3d_kd_search_region(pCaloHit,
-					      largestAllowedDistanceForSearch,
-					      largestAllowedDistanceForSearch,
-					      largestAllowedDistanceForSearch);
+					      track_search_width,
+					      track_search_width,
+					      track_search_width);
 		  std::vector<TrackKDNode> found_tracks;
 		  m_tracksKdTree.search(searchRegionTks,found_tracks);
 		  for( auto& track : found_tracks ) {
@@ -484,9 +492,9 @@ StatusCode ConeClusteringAlgorithm::FindHitsInSameLayer(unsigned int pseudoLayer
 		} else {
 		  KDTreeTesseract searchRegionHits = 
 		    build_4d_kd_search_region(pCaloHit,
-					      largestAllowedDistanceForSearch,
-					      largestAllowedDistanceForSearch,
-					      largestAllowedDistanceForSearch,
+					      hit_search_width,
+					      hit_search_width,
+					      hit_search_width,
 					      pseudoLayer);		
 		  std::vector<HitKDNode> found_hits;
 		  m_hitsKdTree.search(searchRegionHits,found_hits);
