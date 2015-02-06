@@ -9,11 +9,12 @@ std::pair<float,float> minmax(const float a, const float b){
 template<>
 KDTreeCube fill_and_bound_3d_kd_tree<pandora::Track>(pandora::Algorithm* const  /*caller*/,
 						     const std::unordered_set<pandora::Track*>& points,
-						     std::vector<KDTreeNodeInfoT<pandora::Track*,3> >& nodes) {
+						     std::vector<KDTreeNodeInfoT<pandora::Track*,3> >& nodes,
+						     bool passthru) {
   std::array<float,3> minpos{ {0.0f,0.0f,0.0f} }, maxpos{ {0.0f,0.0f,0.0f} };
   unsigned i = 0;
   for( pandora::Track* point : points ) {
-    if (!point->CanFormPfo()) continue;
+    if (!passthru && !point->CanFormPfo()) continue;
     const pandora::CartesianVector& pos = kdtree_type_adaptor<pandora::Track>::position(point);
     nodes.emplace_back(point, (float)pos.GetX(), (float)pos.GetY(), (float)pos.GetZ());
     if( i == 0 ) {
