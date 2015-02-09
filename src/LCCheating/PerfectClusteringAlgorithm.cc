@@ -178,25 +178,23 @@ void PerfectClusteringAlgorithm::CreateClusters(const MCParticleToHitListMap &mc
             parameters.m_caloHitList = *pCaloHitList;
             PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, parameters, pCluster));
 
+            PandoraContentApi::Cluster::Metadata metadata;
+
             switch (pMCParticle->GetParticleId())
             {
             case PHOTON:
-                pCluster->SetIsFixedPhotonFlag(true);
-                break;
-
             case E_PLUS:
             case E_MINUS:
-                pCluster->SetIsFixedElectronFlag(true);
-                break;
-
             case MU_PLUS:
             case MU_MINUS:
-                pCluster->SetIsFixedMuonFlag(true);
+                metadata.m_particleId = pMCParticle->GetParticleId();
                 break;
-
             default:
                 break;
             }
+
+            if (metadata.m_particleId.IsInitialized())
+                PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pCluster, metadata));
         }
         delete pCaloHitList;
     }

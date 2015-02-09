@@ -200,7 +200,11 @@ StatusCode PhotonReconstructionAlgorithm::Run()
                     if (acceptPhotonCandidate)
                     {
                         usedCluster = true;
-                        useOriginalCluster ? pCluster->SetIsFixedPhotonFlag(true) : pPeakCluster->SetIsFixedPhotonFlag(true);
+                        Cluster *&pRelevantCluster(useOriginalCluster ? pCluster : pPeakCluster);
+
+                        PandoraContentApi::Cluster::Metadata metadata;
+                        metadata.m_particleId = PHOTON;
+                        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pRelevantCluster, metadata));
                     }
                     else
                     {

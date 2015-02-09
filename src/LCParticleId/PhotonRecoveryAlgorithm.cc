@@ -131,7 +131,9 @@ void PhotonRecoveryAlgorithm::FindPhotonsIdentifiedAsHadrons(const ClusterList *
         // Tag the cluster as a fixed photon
         if (isPhoton)
         {
-            pCluster->SetIsFixedPhotonFlag(true);
+            PandoraContentApi::Cluster::Metadata metadata;
+            metadata.m_particleId = PHOTON;
+            PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pCluster, metadata));
         }
     }
 }
@@ -179,7 +181,11 @@ void PhotonRecoveryAlgorithm::PerformSoftPhotonId(const ClusterList *const pClus
         Cluster *pCluster = *iter;
 
         if (this->IsSoftPhoton(pCluster))
-            pCluster->SetIsFixedPhotonFlag(true);
+        {
+            PandoraContentApi::Cluster::Metadata metadata;
+            metadata.m_particleId = PHOTON;
+            PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pCluster, metadata));
+        }
     }
 }
 
