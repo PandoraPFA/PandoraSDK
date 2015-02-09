@@ -45,18 +45,22 @@ StatusCode FinalParticleIdAlgorithm::Run()
         const ParticleId *pParticleId(PandoraContentApi::GetPlugins(*this)->GetParticleId());
 
         // Run electron id, followed by muon id
+        PandoraContentApi::ParticleFlowObject::Metadata metadata;
+
         if (pParticleId->IsElectron(pCluster))
         {
-            pPfo->SetParticleId((charge < 0) ? E_MINUS : E_PLUS);
-            pPfo->SetMass(PdgTable::GetParticleMass(pPfo->GetParticleId()));
-            pPfo->SetEnergy(std::sqrt(pPfo->GetMass() * pPfo->GetMass() + pPfo->GetMomentum().GetMagnitudeSquared()));
+            metadata.m_particleId = (charge < 0) ? E_MINUS : E_PLUS;
+        }
+        else if (pParticleId->IsMuon(pCluster))
+        {
+            metadata.m_particleId = (charge < 0) ? MU_MINUS : MU_PLUS;
         }
 
-        if (pParticleId->IsMuon(pCluster))
+        if (metadata.m_particleId.IsInitialized())
         {
-            pPfo->SetParticleId((charge < 0) ? MU_MINUS : MU_PLUS);
-            pPfo->SetMass(PdgTable::GetParticleMass(pPfo->GetParticleId()));
-            pPfo->SetEnergy(std::sqrt(pPfo->GetMass() * pPfo->GetMass() + pPfo->GetMomentum().GetMagnitudeSquared()));
+            metadata.m_mass = PdgTable::GetParticleMass(metadata.m_particleId.Get());
+            metadata.m_energy = std::sqrt(metadata.m_mass.Get() * metadata.m_mass.Get() + pPfo->GetMomentum().GetMagnitudeSquared());
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pPfo, metadata));
         }
     }
 

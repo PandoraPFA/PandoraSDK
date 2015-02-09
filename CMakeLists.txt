@@ -61,9 +61,6 @@ ENDIF()
 INCLUDE_DIRECTORIES( ./include )
 INSTALL_DIRECTORY( ./include DESTINATION . FILES_MATCHING PATTERN "*.h" )
 
-ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
-ADD_DEFINITIONS( "-Wno-long-long" )
-
 AUX_SOURCE_DIRECTORY( ./src/ LCContent_SRCS )
 AUX_SOURCE_DIRECTORY( ./src/LCCheating LCContent_SRCS )
 AUX_SOURCE_DIRECTORY( ./src/LCClustering LCContent_SRCS )
@@ -79,7 +76,7 @@ AUX_SOURCE_DIRECTORY( ./src/LCTrackClusterAssociation LCContent_SRCS )
 AUX_SOURCE_DIRECTORY( ./src/LCUtility LCContent_SRCS )
 
 # require proper C++
-ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
+ADD_DEFINITIONS( "-Wall -ansi -pedantic -std=c++0x" )
 
 # need long long for int64 for now
 ADD_DEFINITIONS( "-Wno-long-long -Wno-sign-compare -fno-strict-aliasing" )

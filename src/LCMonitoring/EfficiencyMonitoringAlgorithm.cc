@@ -75,10 +75,10 @@ StatusCode EfficiencyMonitoringAlgorithm::Run()
     // Look for specific case of photon conversion to e+e-
     int isPhotonConversion(0);
 
-    if ((mcPDGCode == PHOTON) && (std::abs(recoPDGCode) == E_MINUS) && (pPfoList->size() == 2))
+    if ((mcPDGCode == PHOTON) && (std::abs(recoPDGCode) == E_MINUS) && (pfoVector.size() == 2))
     {
-        ParticleFlowObject *pPfo1(*(pPfoList->begin()));
-        ParticleFlowObject *pPfo2(*(pPfoList->rbegin()));
+        const ParticleFlowObject *const pPfo1(pfoVector.at(0));
+        const ParticleFlowObject *const pPfo2(pfoVector.at(1));
 
         if ((pPfo1->GetParticleId() == -(pPfo2->GetParticleId())) && (std::abs(pPfo1->GetParticleId()) == E_MINUS))
         {

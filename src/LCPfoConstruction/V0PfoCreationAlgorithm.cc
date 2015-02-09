@@ -54,9 +54,11 @@ StatusCode V0PfoCreationAlgorithm::Run()
             if (STATUS_CODE_SUCCESS == this->GetV0Mass(momentumAtStart1, momentumAtStart2, PdgTable::GetParticleMass(E_MINUS),
                 PdgTable::GetParticleMass(E_MINUS), energy, mass))
             {
-                pPfo->SetParticleId(PHOTON);
-                pPfo->SetEnergy(energy);
-                pPfo->SetMass(mass);
+                PandoraContentApi::ParticleFlowObject::Metadata metadata;
+                metadata.m_particleId = PHOTON;
+                metadata.m_mass = mass;
+                metadata.m_energy = energy;
+                PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pPfo, metadata));
             }
         }
 
@@ -65,9 +67,11 @@ StatusCode V0PfoCreationAlgorithm::Run()
             if (STATUS_CODE_SUCCESS == this->GetV0Mass(momentumAtStart1, momentumAtStart2, PdgTable::GetParticleMass(PI_MINUS),
                 PdgTable::GetParticleMass(PI_MINUS), energy, mass))
             {
-                pPfo->SetParticleId(K_SHORT);
-                pPfo->SetEnergy(energy);
-                pPfo->SetMass(mass);
+                PandoraContentApi::ParticleFlowObject::Metadata metadata;
+                metadata.m_particleId = K_SHORT;
+                metadata.m_mass = mass;
+                metadata.m_energy = energy;
+                PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pPfo, metadata));
             }
         }
 
@@ -76,9 +80,11 @@ StatusCode V0PfoCreationAlgorithm::Run()
             if (STATUS_CODE_SUCCESS == this->GetV0Mass(momentumAtStart1, momentumAtStart2, PdgTable::GetParticleMass(PROTON),
                 PdgTable::GetParticleMass(PI_MINUS), energy, mass))
             {
-                (pTrack1->GetParticleId() == PROTON) ? pPfo->SetParticleId(LAMBDA) : pPfo->SetParticleId(LAMBDA_BAR);
-                pPfo->SetEnergy(energy);
-                pPfo->SetMass(mass);
+                PandoraContentApi::ParticleFlowObject::Metadata metadata;
+                metadata.m_particleId = (pTrack1->GetParticleId() == PROTON) ? LAMBDA : LAMBDA_BAR;
+                metadata.m_mass = mass;
+                metadata.m_energy = energy;
+                PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pPfo, metadata));
             }
         }
 
@@ -87,9 +93,11 @@ StatusCode V0PfoCreationAlgorithm::Run()
             if (STATUS_CODE_SUCCESS == this->GetV0Mass(momentumAtStart1, momentumAtStart2, PdgTable::GetParticleMass(PI_MINUS),
                 PdgTable::GetParticleMass(PROTON), energy, mass))
             {
-                (pTrack2->GetParticleId() == PROTON) ? pPfo->SetParticleId(LAMBDA) : pPfo->SetParticleId(LAMBDA_BAR);
-                pPfo->SetEnergy(energy);
-                pPfo->SetMass(mass);
+                PandoraContentApi::ParticleFlowObject::Metadata metadata;
+                metadata.m_particleId = (pTrack2->GetParticleId() == PROTON) ? LAMBDA : LAMBDA_BAR;
+                metadata.m_mass = mass;
+                metadata.m_energy = energy;
+                PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pPfo, metadata));
             }
         }
 
