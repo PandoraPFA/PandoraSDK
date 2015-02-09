@@ -24,18 +24,66 @@ namespace pandora { class CaloHit; class Cluster; class MCParticle; class Partic
 class PandoraContentApi
 {
 public:
+    /* Object-metadata manipulation */
+
+    /**
+     *  @brief  CaloHitMetadata class
+     */
+    class CaloHitMetadata
+    {
+    public:
+        pandora::InputBool              m_isIsolated;           ///< The calo hit isolation flag
+        pandora::InputBool              m_isPossibleMip;        ///< The calo hit minimum ionising particle flag
+    };
+
+    /**
+     *  @brief  ClusterMetadata class
+     */
+    class ClusterMetadata
+    {
+    public:
+        pandora::InputInt               m_particleId;           ///< The cluster id (PDG code)
+    };
+
+    /**
+     *  @brief  ParticleFlowObjectMetadata class
+     */
+    class ParticleFlowObjectMetadata
+    {
+    public:
+        pandora::InputInt               m_particleId;           ///< The particle flow object id (PDG code)
+        pandora::InputInt               m_charge;               ///< The particle flow object charge
+        pandora::InputFloat             m_mass;                 ///< The particle flow object mass
+        pandora::InputFloat             m_energy;               ///< The particle flow object energy
+        pandora::InputCartesianVector   m_momentum;             ///< The particle flow object momentum
+    };
+
+    /**
+     *  @brief  Alter the metadata information stored in an object
+     * 
+     *  @param  algorithm the algorithm calling this function
+     *  @param  pObject address of the object to modify
+     *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
+     */
+    template <typename OBJECT, typename METADATA>
+    static pandora::StatusCode AlterMetadata(const pandora::Algorithm &algorithm, OBJECT *pObject, const METADATA &metadata);
+
+
     /* Object-creation functions */
 
     /**
      *  @brief  Object creation helper class
      * 
      *  @param  PARAMETERS the type of object parameters
+     *  @param  METADATA the type of object metadata
+     *  @param  OBJECT the type of object
      */
-    template <typename PARAMETERS, typename OBJECT>
+    template <typename PARAMETERS, typename METADATA, typename OBJECT>
     class ObjectCreationHelper
     {
     public:
         typedef PARAMETERS Parameters;
+        typedef METADATA Metadata;
         typedef OBJECT Object;
 
         /**
@@ -62,14 +110,9 @@ public:
     /**
      *  @brief  ParticleFlowObjectParameters class
      */
-    class ParticleFlowObjectParameters
+    class ParticleFlowObjectParameters : public ParticleFlowObjectMetadata
     {
     public:
-        pandora::InputInt               m_particleId;           ///< The particle flow object id (PDG code)
-        pandora::InputInt               m_charge;               ///< The particle flow object charge
-        pandora::InputFloat             m_mass;                 ///< The particle flow object mass
-        pandora::InputFloat             m_energy;               ///< The particle flow object energy
-        pandora::InputCartesianVector   m_momentum;             ///< The particle flow object momentum
         pandora::ClusterList            m_clusterList;          ///< The clusters in the particle flow object
         pandora::TrackList              m_trackList;            ///< The tracks in the particle flow object
         pandora::VertexList             m_vertexList;           ///< The vertices in the particle flow object
@@ -85,14 +128,14 @@ public:
         pandora::InputVertexType        m_vertexType;           ///< The vertex type
     };
 
-    typedef ObjectCreationHelper<ClusterParameters, pandora::Cluster> Cluster;
-    typedef ObjectCreationHelper<ParticleFlowObjectParameters, pandora::ParticleFlowObject> ParticleFlowObject;
-    typedef ObjectCreationHelper<VertexParameters, pandora::Vertex> Vertex;
-    typedef ObjectCreationHelper<PandoraApi::MCParticle::Parameters, pandora::MCParticle> MCParticle;
-    typedef ObjectCreationHelper<PandoraApi::Track::Parameters, pandora::Track> Track;
-    typedef ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters, pandora::CaloHit> CaloHit;
-    typedef ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters, pandora::CaloHit> RectangularCaloHit;
-    typedef ObjectCreationHelper<PandoraApi::PointingCaloHit::Parameters, pandora::CaloHit> PointingCaloHit;
+    typedef ObjectCreationHelper<ClusterParameters, ClusterMetadata, pandora::Cluster> Cluster;
+    typedef ObjectCreationHelper<ParticleFlowObjectParameters, ParticleFlowObjectMetadata, pandora::ParticleFlowObject> ParticleFlowObject;
+    typedef ObjectCreationHelper<VertexParameters, void, pandora::Vertex> Vertex;
+    typedef ObjectCreationHelper<PandoraApi::MCParticle::Parameters, void, pandora::MCParticle> MCParticle;
+    typedef ObjectCreationHelper<PandoraApi::Track::Parameters, void, pandora::Track> Track;
+    typedef ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters, CaloHitMetadata, pandora::CaloHit> CaloHit;
+    typedef ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters, CaloHitMetadata, pandora::CaloHit> RectangularCaloHit;
+    typedef ObjectCreationHelper<PandoraApi::PointingCaloHit::Parameters, CaloHitMetadata, pandora::CaloHit> PointingCaloHit;
 
 
     /* Accessors for plugins and global settings */

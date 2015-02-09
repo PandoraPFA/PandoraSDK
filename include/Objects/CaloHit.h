@@ -9,6 +9,7 @@
 #define PANDORA_CALO_HIT_H 1
 
 #include "Api/PandoraApi.h"
+#include "Api/PandoraContentApi.h"
 
 #include "Pandora/PandoraInternal.h"
 
@@ -210,20 +211,6 @@ public:
      */
     virtual void GetCellCorners(CartesianPointList &cartesianPointList) const = 0;
 
-    /**
-     *  @brief  Set the isolated hit flag
-     * 
-     *  @param  isolatedFlag the isolated hit flag
-     */
-    void SetIsolatedFlag(const bool isolatedFlag);
-
-    /**
-     *  @brief  Set the possible mip flag
-     * 
-     *  @param  possibleMipFlag the possible mip flag
-     */
-    void SetPossibleMipFlag(const bool possibleMipFlag);
-
 protected:
     /**
      *  @brief  Constructor
@@ -251,6 +238,13 @@ protected:
      *  @param  pseudoLayer the pseudo layer
      */
     StatusCode SetPseudoLayer(const unsigned int pseudoLayer);
+
+    /**
+     *  @brief  Alter the metadata information stored in a calo hit
+     * 
+     *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
+     */
+    StatusCode AlterMetadata(const PandoraContentApi::CaloHit::Metadata &metadata);
 
     /**
      *  @brief  Set the mc particles associated with the calo hit

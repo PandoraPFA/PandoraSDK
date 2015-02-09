@@ -130,7 +130,7 @@ bool CaloHitMetadata::AreCaloHitsAvailable(const CaloHitList &caloHitList) const
 
 StatusCode CaloHitMetadata::SetCaloHitAvailability(const CaloHitList &caloHitList, bool isAvailable)
 {
-    for (CaloHitList::iterator iter = caloHitList.begin(), iterEnd = caloHitList.end(); iter != iterEnd; ++iter)
+    for (CaloHitList::const_iterator iter = caloHitList.begin(), iterEnd = caloHitList.end(); iter != iterEnd; ++iter)
     {
         CaloHitUsageMap::iterator usageMapIter = m_caloHitUsageMap.find(*iter);
 

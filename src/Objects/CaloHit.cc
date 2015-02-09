@@ -14,20 +14,6 @@
 namespace pandora
 {
 
-void CaloHit::SetIsolatedFlag(const bool isolatedFlag)
-{
-    m_isIsolated = isolatedFlag;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void CaloHit::SetPossibleMipFlag(const bool possibleMipFlag)
-{
-    m_isPossibleMip = possibleMipFlag;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 CaloHit::CaloHit(const PandoraApi::CaloHitBaseParameters &parameters) :
     m_positionVector(parameters.m_positionVector.Get()),
     m_expectedDirection(parameters.m_expectedDirection.Get().GetUnitVector()),
@@ -98,6 +84,19 @@ StatusCode CaloHit::SetPseudoLayer(const unsigned int pseudoLayer)
 {
     if (!(m_pseudoLayer = pseudoLayer))
         return STATUS_CODE_NOT_INITIALIZED;
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode CaloHit::AlterMetadata(const PandoraContentApi::CaloHit::Metadata &metadata)
+{
+    if (metadata.m_isPossibleMip.IsInitialized())
+        m_isPossibleMip = metadata.m_isPossibleMip.Get();
+
+    if (metadata.m_isIsolated.IsInitialized())
+        m_isIsolated = metadata.m_isIsolated.Get();
 
     return STATUS_CODE_SUCCESS;
 }

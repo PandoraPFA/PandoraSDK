@@ -84,6 +84,13 @@ CaloHit *CaloHitManager::HitInstantiation(const PandoraApi::PointingCaloHit::Par
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode CaloHitManager::AlterMetadata(CaloHit *pCaloHit, const PandoraContentApi::CaloHit::Metadata &metadata) const
+{
+    return pCaloHit->AlterMetadata(metadata);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode CaloHitManager::CreateTemporaryListAndSetCurrent(const Algorithm *const pAlgorithm, const ClusterList &clusterList,
     std::string &temporaryListName)
 {
@@ -158,6 +165,16 @@ StatusCode CaloHitManager::RemoveAllMCParticleRelationships()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+bool CaloHitManager::IsCaloHitAvailable(CaloHit *const pCaloHit) const
+{
+    if (0 == m_nReclusteringProcesses)
+        return pCaloHit->m_isAvailable;
+
+    return m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->IsCaloHitAvailable(pCaloHit);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 bool CaloHitManager::AreCaloHitsAvailable(const CaloHitList &caloHitList) const
 {
     if (0 == m_nReclusteringProcesses)
@@ -175,11 +192,24 @@ bool CaloHitManager::AreCaloHitsAvailable(const CaloHitList &caloHitList) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode CaloHitManager::SetCaloHitAvailability(CaloHit *const pCaloHit, bool isAvailable)
+{
+    if (0 == m_nReclusteringProcesses)
+    {
+        pCaloHit->m_isAvailable = isAvailable;
+        return STATUS_CODE_SUCCESS;
+    }
+
+    return m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->SetCaloHitAvailability(pCaloHit, isAvailable);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode CaloHitManager::SetCaloHitAvailability(const CaloHitList &caloHitList, bool isAvailable)
 {
     if (0 == m_nReclusteringProcesses)
     {
-        for (CaloHitList::iterator iter = caloHitList.begin(), iterEnd = caloHitList.end(); iter != iterEnd; ++iter)
+        for (CaloHitList::const_iterator iter = caloHitList.begin(), iterEnd = caloHitList.end(); iter != iterEnd; ++iter)
         {
             (*iter)->m_isAvailable = isAvailable;
         }

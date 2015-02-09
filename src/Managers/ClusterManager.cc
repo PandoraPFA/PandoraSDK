@@ -61,6 +61,41 @@ StatusCode ClusterManager::CreateCluster(const PandoraContentApi::Cluster::Param
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode ClusterManager::AlterMetadata(Cluster *pCluster, const PandoraContentApi::Cluster::Metadata &metadata) const
+{
+    return pCluster->AlterMetadata(metadata);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ClusterManager::AddCaloHitToCluster(Cluster *pCluster, CaloHit *pCaloHit)
+{
+    return pCluster->AddCaloHit(pCaloHit);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ClusterManager::RemoveCaloHitFromCluster(Cluster *pCluster, CaloHit *pCaloHit)
+{
+    return pCluster->RemoveCaloHit(pCaloHit);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ClusterManager::AddIsolatedCaloHitToCluster(Cluster *pCluster, CaloHit *pCaloHit)
+{
+    return pCluster->AddIsolatedCaloHit(pCaloHit);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ClusterManager::RemoveIsolatedCaloHitFromCluster(Cluster *pCluster, CaloHit *pCaloHit)
+{
+    return pCluster->RemoveIsolatedCaloHit(pCaloHit);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode ClusterManager::MergeAndDeleteClusters(Cluster *pClusterToEnlarge, Cluster *pClusterToDelete)
 {
     if (pClusterToEnlarge == pClusterToDelete)

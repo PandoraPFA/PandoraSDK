@@ -28,6 +28,28 @@ ParticleFlowObject::ParticleFlowObject(const PandoraContentApi::ParticleFlowObje
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode ParticleFlowObject::AlterMetadata(const PandoraContentApi::ParticleFlowObject::Metadata &metadata)
+{
+    if (metadata.m_particleId.IsInitialized())
+        m_particleId = metadata.m_particleId.Get();
+
+    if (metadata.m_charge.IsInitialized())
+        m_charge = metadata.m_charge.Get();
+
+    if (metadata.m_mass.IsInitialized())
+        m_mass = metadata.m_mass.Get();
+
+    if (metadata.m_energy.IsInitialized())
+        m_energy = metadata.m_energy.Get();
+
+    if (metadata.m_momentum.IsInitialized())
+        m_momentum = metadata.m_momentum.Get();
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 TrackAddressList ParticleFlowObject::GetTrackAddressList() const
 {
     TrackAddressList trackAddressList;

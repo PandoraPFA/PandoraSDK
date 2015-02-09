@@ -178,22 +178,6 @@ protected:
     bool        m_canMakeNewObjects;            ///< Whether the manager is allowed to make new objects when requested by algorithms
 };
 
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template<typename T>
-inline StatusCode AlgorithmObjectManager<T>::DeleteObject(T *pT)
-{
-    return this->DeleteObject(pT, Manager<T>::m_currentListName);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template<typename T>
-inline StatusCode AlgorithmObjectManager<T>::DeleteObjects(const ObjectList &objectList)
-{
-    return this->DeleteObjects(objectList, Manager<T>::m_currentListName);
-}
-
 } // namespace pandora
 
 #endif // #ifndef PANDORA_ALGORITHM_OBJECT_MANAGER

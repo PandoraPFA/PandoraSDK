@@ -13,6 +13,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include <stdint.h>
@@ -147,14 +148,14 @@ inline bool PointerLessThan<T>::operator()(const T *lhs, const T *rhs) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-typedef std::set<CaloHit *> CaloHitList;
-typedef std::set<Cluster *> ClusterList;
-typedef std::set<DetectorGap *> DetectorGapList;
-typedef std::set<MCParticle *> MCParticleList;
-typedef std::set<ParticleFlowObject *> ParticleFlowObjectList;
-typedef std::set<ParticleFlowObject *> PfoList;
-typedef std::set<Track *> TrackList;
-typedef std::set<Vertex *> VertexList;
+typedef std::unordered_set<CaloHit *> CaloHitList;
+typedef std::unordered_set<Cluster *> ClusterList;
+typedef std::unordered_set<DetectorGap *> DetectorGapList;
+typedef std::unordered_set<MCParticle *> MCParticleList;
+typedef std::unordered_set<ParticleFlowObject *> ParticleFlowObjectList;
+typedef std::unordered_set<ParticleFlowObject *> PfoList;
+typedef std::unordered_set<Track *> TrackList;
+typedef std::unordered_set<Vertex *> VertexList;
 
 typedef std::vector<CaloHit *> CaloHitVector;
 typedef std::vector<Cluster *> ClusterVector;
