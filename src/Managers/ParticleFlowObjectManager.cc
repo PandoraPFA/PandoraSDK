@@ -25,6 +25,7 @@ ParticleFlowObjectManager::~ParticleFlowObjectManager()
 {
     (void) this->EraseAllContent();
 }
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode ParticleFlowObjectManager::CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &parameters,
@@ -59,6 +60,13 @@ StatusCode ParticleFlowObjectManager::CreateParticleFlowObject(const PandoraCont
         pPfo = NULL;
         return statusCodeException.GetStatusCode();
     }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ParticleFlowObjectManager::AlterMetadata(ParticleFlowObject *pPfo, const PandoraContentApi::ParticleFlowObject::Metadata &metadata) const
+{
+    return pPfo->AlterMetadata(metadata);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

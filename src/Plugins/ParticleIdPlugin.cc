@@ -27,7 +27,7 @@ bool ParticleId::IsEmShower(const Cluster *const pCluster) const
 
 bool ParticleId::IsPhoton(const Cluster *const pCluster) const
 {
-    if (pCluster->IsFixedPhoton())
+    if (PHOTON == pCluster->GetParticleIdFlag())
         return true;
 
     if (NULL == m_pPhotonPlugin)
@@ -40,7 +40,7 @@ bool ParticleId::IsPhoton(const Cluster *const pCluster) const
 
 bool ParticleId::IsElectron(const Cluster *const pCluster) const
 {
-    if (pCluster->IsFixedElectron())
+    if (E_MINUS == std::abs(pCluster->GetParticleIdFlag()))
         return true;
 
     if (NULL == m_pElectronPlugin)
@@ -53,7 +53,7 @@ bool ParticleId::IsElectron(const Cluster *const pCluster) const
 
 bool ParticleId::IsMuon(const Cluster *const pCluster) const
 {
-    if (pCluster->IsFixedMuon())
+    if (MU_MINUS == std::abs(pCluster->GetParticleIdFlag()))
         return true;
 
     if (NULL == m_pMuonPlugin)

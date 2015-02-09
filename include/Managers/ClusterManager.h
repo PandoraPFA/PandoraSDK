@@ -47,6 +47,14 @@ private:
     StatusCode CreateCluster(const PandoraContentApi::Cluster::Parameters &parameters, Cluster *&pCluster);
 
     /**
+     *  @brief  Alter the metadata information stored in a cluster
+     * 
+     *  @param  pCluster address of the cluster to modify
+     *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
+     */
+    StatusCode AlterMetadata(Cluster *pCluster, const PandoraContentApi::Cluster::Metadata &metadata) const;
+
+    /**
      *  @brief  Add a calo hit to a cluster
      *
      *  @param  pCluster address of the cluster to modify
@@ -120,34 +128,6 @@ private:
     friend class PandoraContentApiImpl;
     friend class PandoraImpl;
 };
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline StatusCode ClusterManager::AddCaloHitToCluster(Cluster *pCluster, CaloHit *pCaloHit)
-{
-    return pCluster->AddCaloHit(pCaloHit);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline StatusCode ClusterManager::RemoveCaloHitFromCluster(Cluster *pCluster, CaloHit *pCaloHit)
-{
-    return pCluster->RemoveCaloHit(pCaloHit);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline StatusCode ClusterManager::AddIsolatedCaloHitToCluster(Cluster *pCluster, CaloHit *pCaloHit)
-{
-    return pCluster->AddIsolatedCaloHit(pCaloHit);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline StatusCode ClusterManager::RemoveIsolatedCaloHitFromCluster(Cluster *pCluster, CaloHit *pCaloHit)
-{
-    return pCluster->RemoveIsolatedCaloHit(pCaloHit);
-}
 
 } // namespace pandora
 

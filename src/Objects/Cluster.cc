@@ -28,9 +28,7 @@ Cluster::Cluster(const PandoraContentApi::Cluster::Parameters &parameters) :
     m_hadronicEnergy(0),
     m_isolatedElectromagneticEnergy(0),
     m_isolatedHadronicEnergy(0),
-    m_isFixedPhoton(false),
-    m_isFixedElectron(false),
-    m_isFixedMuon(false),
+    m_particleId(UNKNOWN_PARTICLE_TYPE),
     m_pTrackSeed(parameters.m_pTrack.IsInitialized() ? parameters.m_pTrack.Get() : NULL),
     m_initialDirection(0.f, 0.f, 0.f),
     m_isDirectionUpToDate(false),
@@ -55,6 +53,19 @@ Cluster::Cluster(const PandoraContentApi::Cluster::Parameters &parameters) :
     {
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddIsolatedCaloHit(*iter));
     }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode Cluster::AlterMetadata(const PandoraContentApi::Cluster::Metadata &metadata)
+{
+    if (metadata.m_particleId.IsInitialized())
+    {
+        m_isPhotonFast.Reset();
+        m_particleId = metadata.m_particleId.Get();
+    }
+
+    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -365,9 +376,7 @@ StatusCode Cluster::ResetProperties()
     m_innerPseudoLayer.Reset();
     m_outerPseudoLayer.Reset();
 
-    m_isFixedPhoton = false;
-    m_isFixedElectron = false;
-    m_isFixedMuon = false;
+    m_particleId = UNKNOWN_PARTICLE_TYPE;
 
     this->ResetOutdatedProperties();
 

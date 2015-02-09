@@ -101,25 +101,11 @@ public:
     float GetIsolatedHadronicEnergy() const;
 
     /**
-     *  @brief  Whether the cluster has been flagged as a fixed photon cluster
+     *  @brief  Get the particle id flag
      * 
-     *  @return boolean
+     *  @return The particle id flag
      */
-    bool IsFixedPhoton() const;
-
-    /**
-     *  @brief  Whether the cluster has been flagged as a fixed electron cluster
-     * 
-     *  @return boolean
-     */
-    bool IsFixedElectron() const;
-
-    /**
-     *  @brief  Whether the cluster has been flagged as a fixed muon cluster
-     * 
-     *  @return boolean
-     */
-    bool IsFixedMuon() const;
+    int GetParticleIdFlag() const;
 
     /**
      *  @brief  Whether the cluster is track seeded
@@ -192,27 +178,6 @@ public:
      *  @return Address of the list of associated tracks
      */
     const TrackList &GetAssociatedTrackList() const;
-
-    /**
-     *  @brief  Set the is fixed photon flag for the cluster
-     * 
-     *  @param  isFixedPhotonFlag the is fixed photon flag
-     */
-    void SetIsFixedPhotonFlag(bool isFixedPhotonFlag);
-
-    /**
-     *  @brief  Set the is fixed electron flag for the cluster
-     * 
-     *  @param  isFixedElectronFlag the is fixed electron flag
-     */
-    void SetIsFixedElectronFlag(bool isFixedElectronFlag);
-
-    /**
-     *  @brief  Set the is fixed muon flag for the cluster
-     * 
-     *  @param  isFixedMuonFlag the is fixed muon flag
-     */
-    void SetIsFixedMuonFlag(bool isFixedMuonFlag);
 
     /**
      *  @brief  Whether the cluster is available to be added to a particle flow object
@@ -298,6 +263,13 @@ private:
      *  @brief  Destructor
      */
     ~Cluster();
+
+    /**
+     *  @brief  Alter the metadata information stored in a cluster
+     * 
+     *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
+     */
+    StatusCode AlterMetadata(const PandoraContentApi::Cluster::Metadata &metadata);
 
     /**
      *  @brief  Add a calo hit to the cluster
@@ -430,9 +402,7 @@ private:
     double                      m_isolatedElectromagneticEnergy;///< Sum of electromagnetic energy measures of isolated calo hits, units GeV
     double                      m_isolatedHadronicEnergy;       ///< Sum of hadronic energy measures of isolated calo hits, units GeV
 
-    bool                        m_isFixedPhoton;                ///< Whether the cluster has been flagged as a fixed photon cluster
-    bool                        m_isFixedElectron;              ///< Whether the cluster has been flagged as a fixed electron cluster
-    bool                        m_isFixedMuon;                  ///< Whether the cluster has been flagged as a fixed muon cluster
+    int                         m_particleId;                   ///< The particle id flag
 
     const Track                *m_pTrackSeed;                   ///< Address of the track with which the cluster is seeded
 
@@ -547,23 +517,9 @@ inline float Cluster::GetIsolatedHadronicEnergy() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline bool Cluster::IsFixedPhoton() const
+inline int Cluster::GetParticleIdFlag() const
 {
-    return m_isFixedPhoton;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool Cluster::IsFixedElectron() const
-{
-    return m_isFixedElectron;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool Cluster::IsFixedMuon() const
-{
-    return m_isFixedMuon;
+    return m_particleId;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -642,28 +598,6 @@ inline HitType Cluster::GetOuterLayerHitType() const
 inline const TrackList &Cluster::GetAssociatedTrackList() const
 {
     return m_associatedTrackList;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline void Cluster::SetIsFixedPhotonFlag(bool isFixedPhotonFlag)
-{
-    m_isPhotonFast.Reset();
-    m_isFixedPhoton = isFixedPhotonFlag;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline void Cluster::SetIsFixedElectronFlag(bool isFixedElectronFlag)
-{
-    m_isFixedElectron = isFixedElectronFlag;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline void Cluster::SetIsFixedMuonFlag(bool isFixedMuonFlag)
-{
-    m_isFixedMuon = isFixedMuonFlag;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

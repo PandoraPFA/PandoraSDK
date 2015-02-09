@@ -135,41 +135,6 @@ public:
      */
     unsigned int GetNDaughterPfos() const;
 
-    /**
-     *  @brief  Set the particle flow object id (PDG code)
-     * 
-     *  @param  particleId the particle flow object id
-     */
-    void SetParticleId(const int particleId);
-
-    /**
-     *  @brief  Set particle flow object charge
-     * 
-     *  @param  charge particle flow object charge
-     */
-    void SetCharge(const int charge);
-
-    /**
-     *  @brief  Set particle flow object mass
-     * 
-     *  @param  mass particle flow object mass
-     */
-    void SetMass(const float mass);
-
-    /**
-     *  @brief  Set the particle flow object energy
-     * 
-     *  @param  energy particle flow object energy
-     */
-    void SetEnergy(const float energy);
-
-    /**
-     *  @brief  Set particle flow object momentum vector
-     * 
-     *  @param  momentum the particle flow object momentum vector
-     */
-    void SetMomentum(const CartesianVector &momentum);
-
 private:
     /**
      *  @brief  Constructor
@@ -182,6 +147,13 @@ private:
      *  @brief  Destructor
      */
     ~ParticleFlowObject();
+
+    /**
+     *  @brief  Alter particle flow object metadata parameters
+     * 
+     *  @param  metaData the new particle flow object metadata (all fields now optional)
+     */
+    StatusCode AlterMetadata(const PandoraContentApi::ParticleFlowObject::Metadata &metadata);
 
     /**
      *  @brief  Add an object to the particle flow object
@@ -342,41 +314,6 @@ inline unsigned int ParticleFlowObject::GetNParentPfos() const
 inline unsigned int ParticleFlowObject::GetNDaughterPfos() const
 {
     return m_daughterPfoList.size();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline void ParticleFlowObject::SetParticleId(const int particleId)
-{
-    m_particleId = particleId;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline void ParticleFlowObject::SetCharge(const int charge)
-{
-    m_charge = charge;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline void ParticleFlowObject::SetMass(const float mass)
-{
-    m_mass = mass;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline void ParticleFlowObject::SetEnergy(const float energy)
-{
-    m_energy = energy;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline void ParticleFlowObject::SetMomentum(const CartesianVector &momentum)
-{
-    m_momentum = momentum;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

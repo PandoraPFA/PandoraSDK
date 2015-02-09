@@ -12,8 +12,16 @@
 #include "Pandora/Algorithm.h"
 #include "Pandora/Pandora.h"
 
-template <typename PARAMETERS, typename OBJECT>
-pandora::StatusCode PandoraContentApi::ObjectCreationHelper<PARAMETERS, OBJECT>::Create(const pandora::Algorithm &algorithm,
+template <typename OBJECT, typename METADATA>
+pandora::StatusCode PandoraContentApi::AlterMetadata(const pandora::Algorithm &algorithm, OBJECT *pObject, const METADATA &metadata)
+{
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->AlterMetadata(pObject, metadata);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename PARAMETERS, typename METADATA, typename OBJECT>
+pandora::StatusCode PandoraContentApi::ObjectCreationHelper<PARAMETERS, METADATA, OBJECT>::Create(const pandora::Algorithm &algorithm,
     const Parameters &parameters, Object *&pObject)
 {
     return algorithm.GetPandora().GetPandoraContentApiImpl()->CreateObject(parameters, pObject);
@@ -378,13 +386,17 @@ pandora::StatusCode PandoraContentApi::EndReclustering(const pandora::Algorithm 
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::Cluster::Parameters, pandora::Cluster>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::ParticleFlowObject::Parameters, pandora::ParticleFlowObject>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::Vertex::Parameters, pandora::Vertex>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraApi::MCParticle::Parameters, pandora::MCParticle>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraApi::Track::Parameters, pandora::Track>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters, pandora::CaloHit>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraApi::PointingCaloHit::Parameters, pandora::CaloHit>;
+template pandora::StatusCode PandoraContentApi::AlterMetadata<pandora::CaloHit, PandoraContentApi::CaloHit::Metadata>(const pandora::Algorithm &, pandora::CaloHit *, const PandoraContentApi::CaloHit::Metadata &);
+template pandora::StatusCode PandoraContentApi::AlterMetadata<pandora::Cluster, PandoraContentApi::Cluster::Metadata>(const pandora::Algorithm &, pandora::Cluster *, const PandoraContentApi::Cluster::Metadata &);
+template pandora::StatusCode PandoraContentApi::AlterMetadata<pandora::ParticleFlowObject, PandoraContentApi::ParticleFlowObject::Metadata>(const pandora::Algorithm &, pandora::ParticleFlowObject *, const PandoraContentApi::ParticleFlowObject::Metadata &);
+
+template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::Cluster::Parameters, PandoraContentApi::Cluster::Metadata, pandora::Cluster>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::ParticleFlowObject::Parameters, PandoraContentApi::ParticleFlowObject::Metadata, pandora::ParticleFlowObject>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::Vertex::Parameters, void, pandora::Vertex>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraApi::MCParticle::Parameters, void, pandora::MCParticle>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraApi::Track::Parameters, void, pandora::Track>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters, PandoraContentApi::CaloHit::Metadata, pandora::CaloHit>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraApi::PointingCaloHit::Parameters, PandoraContentApi::CaloHit::Metadata, pandora::CaloHit>;
 
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::CaloHitList>(const pandora::Algorithm &, const pandora::CaloHitList *&);
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::TrackList>(const pandora::Algorithm &, const pandora::TrackList *&);

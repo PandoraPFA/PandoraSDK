@@ -45,6 +45,14 @@ private:
     StatusCode CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &parameters, ParticleFlowObject *&pPfo);
 
     /**
+     *  @brief  Alter the metadata information stored in a particle flow object
+     * 
+     *  @param  pPfo address of the particle flow object to modify
+     *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
+     */
+    StatusCode AlterMetadata(ParticleFlowObject *pPfo, const PandoraContentApi::ParticleFlowObject::Metadata &metadata) const;
+
+    /**
      *  @brief  Add an object to a particle flow object
      *
      *  @param  pPfo address of the particle flow object to modify

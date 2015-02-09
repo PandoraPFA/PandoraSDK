@@ -9,6 +9,7 @@
 #define PANDORA_CALO_HIT_MANAGER_H 1
 
 #include "Api/PandoraApi.h"
+#include "Api/PandoraContentApi.h"
 
 #include "Managers/InputObjectManager.h"
 #include "Managers/Metadata.h"
@@ -57,6 +58,14 @@ private:
      */
     template <typename PARAMETERS>
     CaloHit *HitInstantiation(const PARAMETERS &parameters);
+
+    /**
+     *  @brief  Alter the metadata information stored in a calo hit
+     * 
+     *  @param  pCaloHit address of the calo hit to modify
+     *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
+     */
+    StatusCode AlterMetadata(CaloHit *pCaloHit, const PandoraContentApi::CaloHit::Metadata &metadata) const;
 
     using InputObjectManager<CaloHit>::CreateTemporaryListAndSetCurrent;
 
@@ -214,29 +223,6 @@ private:
     friend class PandoraContentApiImpl;
     friend class PandoraImpl;
 };
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool CaloHitManager::IsCaloHitAvailable(CaloHit *const pCaloHit) const
-{
-    if (0 == m_nReclusteringProcesses)
-        return pCaloHit->m_isAvailable;
-
-    return m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->IsCaloHitAvailable(pCaloHit);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline StatusCode CaloHitManager::SetCaloHitAvailability(CaloHit *const pCaloHit, bool isAvailable)
-{
-    if (0 == m_nReclusteringProcesses)
-    {
-        pCaloHit->m_isAvailable = isAvailable;
-        return STATUS_CODE_SUCCESS;
-    }
-
-    return m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->SetCaloHitAvailability(pCaloHit, isAvailable);
-}
 
 } // namespace pandora
 

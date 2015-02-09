@@ -32,6 +32,26 @@ namespace pandora
 {
 
 template <>
+StatusCode PandoraContentApiImpl::AlterMetadata(CaloHit *pCaloHit, const PandoraContentApi::CaloHit::Metadata &metadata) const
+{
+    return m_pPandora->m_pCaloHitManager->AlterMetadata(pCaloHit, metadata);
+}
+
+template <>
+StatusCode PandoraContentApiImpl::AlterMetadata(Cluster *pCluster, const PandoraContentApi::Cluster::Metadata &metadata) const
+{
+    return m_pPandora->m_pClusterManager->AlterMetadata(pCluster, metadata);
+}
+
+template <>
+StatusCode PandoraContentApiImpl::AlterMetadata(ParticleFlowObject *pPfo, const PandoraContentApi::ParticleFlowObject::Metadata &metadata) const
+{
+    return m_pPandora->m_pPfoManager->AlterMetadata(pPfo, metadata);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <>
 StatusCode PandoraContentApiImpl::CreateObject(const PandoraContentApi::Cluster::Parameters &parameters, Cluster *&pCluster) const
 {
     if (!m_pPandora->m_pCaloHitManager->AreCaloHitsAvailable(parameters.m_caloHitList))

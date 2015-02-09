@@ -42,9 +42,6 @@ ENDIF()
 INCLUDE_DIRECTORIES( ./include )
 INSTALL_DIRECTORY( ./include DESTINATION . FILES_MATCHING PATTERN "*.h" )
 
-ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
-ADD_DEFINITIONS( "-Wno-long-long" )
-
 AUX_SOURCE_DIRECTORY( ./src SDK_SRCS )
 AUX_SOURCE_DIRECTORY( ./src/Api SDK_SRCS )
 AUX_SOURCE_DIRECTORY( ./src/Helpers SDK_SRCS )
@@ -56,7 +53,7 @@ AUX_SOURCE_DIRECTORY( ./src/Plugins SDK_SRCS )
 AUX_SOURCE_DIRECTORY( ./src/Xml SDK_SRCS )
 
 # require proper C++
-ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
+ADD_DEFINITIONS( "-Wall -ansi -pedantic -std=c++0x" )
 
 # need long long for int64 for now
 ADD_DEFINITIONS( "-Wno-long-long -Wno-sign-compare -fno-strict-aliasing" )

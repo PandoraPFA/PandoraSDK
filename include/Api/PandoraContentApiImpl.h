@@ -25,6 +25,19 @@ class Pandora;
 class PandoraContentApiImpl
 {
 private:
+    /* Object-metadata manipulation */
+
+    /**
+     *  @brief  Alter the metadata information stored in an object
+     * 
+     *  @param  algorithm the algorithm calling this function
+     *  @param  pObject address of the object to modify
+     *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
+     */
+    template <typename OBJECT, typename METADATA>
+    StatusCode AlterMetadata(OBJECT *pObject, const METADATA &metadata) const;
+
+
     /* Object-creation functions */
 
     /**
