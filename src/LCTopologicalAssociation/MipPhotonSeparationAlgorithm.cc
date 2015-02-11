@@ -56,7 +56,7 @@ StatusCode MipPhotonSeparationAlgorithm::Run()
     // Examine fragmentation possibilities for each cluster
     for (ClusterVector::iterator iter = clusterVector.begin(), iterEnd = clusterVector.end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
         *iter = NULL;
 
         const TrackList trackList(pCluster->GetAssociatedTrackList());
@@ -65,7 +65,7 @@ StatusCode MipPhotonSeparationAlgorithm::Run()
             continue;
 
         // Decide whether to fragment cluster, simultaneously determining cluster shower start/end layers
-        Track *pTrack = *(trackList.begin());
+        const Track *const pTrack = *(trackList.begin());
         unsigned int showerStartLayer(std::numeric_limits<unsigned int>::max()), showerEndLayer(std::numeric_limits<unsigned int>::max());
 
         if (!this->ShouldFragmentCluster(pCluster, pTrack, showerStartLayer, showerEndLayer))
@@ -79,7 +79,7 @@ StatusCode MipPhotonSeparationAlgorithm::Run()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool MipPhotonSeparationAlgorithm::ShouldFragmentCluster(Cluster *const pCluster, Track *const pTrack, unsigned int &showerStartLayer,
+bool MipPhotonSeparationAlgorithm::ShouldFragmentCluster(const Cluster *const pCluster, const Track *const pTrack, unsigned int &showerStartLayer,
     unsigned int &showerEndLayer) const
 {
     const unsigned int firstPseudoLayer(PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp());
@@ -106,7 +106,7 @@ bool MipPhotonSeparationAlgorithm::ShouldFragmentCluster(Cluster *const pCluster
         {
             for (CaloHitList::const_iterator iter = hitListIter->second->begin(), iterEnd = hitListIter->second->end(); iter != iterEnd; ++iter)
             {
-                CaloHit *pCaloHit = *iter;
+                const CaloHit *const pCaloHit = *iter;
                 float distance(std::numeric_limits<float>::max());
 
                 if (STATUS_CODE_SUCCESS != this->GetDistanceToTrack(pCluster, pTrack, pCaloHit, distance))
@@ -217,7 +217,7 @@ bool MipPhotonSeparationAlgorithm::ShouldFragmentCluster(Cluster *const pCluster
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MipPhotonSeparationAlgorithm::PerformFragmentation(Cluster *const pOriginalCluster, Track *const pTrack, unsigned int showerStartLayer,
+StatusCode MipPhotonSeparationAlgorithm::PerformFragmentation(const Cluster *const pOriginalCluster, const Track *const pTrack, unsigned int showerStartLayer,
     unsigned int showerEndLayer) const
 {
     ClusterList clusterList;
@@ -228,8 +228,7 @@ StatusCode MipPhotonSeparationAlgorithm::PerformFragmentation(Cluster *const pOr
         fragmentClustersListName));
 
     // Make the cluster fragments
-    Cluster *pMipCluster = NULL, *pPhotonCluster = NULL;
-
+    const Cluster *pMipCluster = NULL, *pPhotonCluster = NULL;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->MakeClusterFragments(showerStartLayer, showerEndLayer, pOriginalCluster,
         pMipCluster, pPhotonCluster));
 
@@ -262,9 +261,9 @@ StatusCode MipPhotonSeparationAlgorithm::PerformFragmentation(Cluster *const pOr
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode MipPhotonSeparationAlgorithm::MakeClusterFragments(const unsigned int showerStartLayer, const unsigned int showerEndLayer,
-    Cluster *const pOriginalCluster, Cluster *&pMipCluster, Cluster *&pPhotonCluster) const
+    const Cluster *const pOriginalCluster, const Cluster *&pMipCluster, const Cluster *&pPhotonCluster) const
 {
-    Track *pTrack = *(pOriginalCluster->GetAssociatedTrackList().begin());
+    const Track *const pTrack = *(pOriginalCluster->GetAssociatedTrackList().begin());
     OrderedCaloHitList orderedCaloHitList(pOriginalCluster->GetOrderedCaloHitList());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, orderedCaloHitList.Add(pOriginalCluster->GetIsolatedCaloHitList()));
 
@@ -274,7 +273,7 @@ StatusCode MipPhotonSeparationAlgorithm::MakeClusterFragments(const unsigned int
 
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
-            CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
             float distance(0.f);
 
             PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_UNCHANGED, !=, this->GetDistanceToTrack(pOriginalCluster, 
@@ -312,7 +311,7 @@ StatusCode MipPhotonSeparationAlgorithm::MakeClusterFragments(const unsigned int
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MipPhotonSeparationAlgorithm::GetDistanceToTrack(Cluster *const pCluster, Track *const pTrack, CaloHit *const pCaloHit,
+StatusCode MipPhotonSeparationAlgorithm::GetDistanceToTrack(const Cluster *const pCluster, const Track *const pTrack, const CaloHit *const pCaloHit,
     float &distance) const
 {
     const CartesianVector &hitPosition(pCaloHit->GetPositionVector());

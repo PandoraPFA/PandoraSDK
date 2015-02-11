@@ -53,7 +53,7 @@ StatusCode ShowerMipMerging2Algorithm::Run()
     // Loop over all candidate parent clusters
     for (ClusterVector::const_iterator iterI = clusterVector.begin(); iterI != clusterVector.end(); ++iterI)
     {
-        Cluster *pParentCluster = *iterI;
+        const Cluster *const pParentCluster = *iterI;
 
         // Check to see if cluster has already been changed
         if (NULL == pParentCluster)
@@ -79,7 +79,7 @@ StatusCode ShowerMipMerging2Algorithm::Run()
         // Compare this successfully fitted cluster with all others
         for (ClusterVector::iterator iterJ = clusterVector.begin(); iterJ != clusterVector.end(); ++iterJ)
         {
-            Cluster *pDaughterCluster = *iterJ;
+            const Cluster *const pDaughterCluster = *iterJ;
 
             // Check to see if cluster has already been changed
             if ((NULL == pDaughterCluster) || (pParentCluster == pDaughterCluster))

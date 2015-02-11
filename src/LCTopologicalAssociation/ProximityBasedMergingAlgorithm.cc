@@ -66,7 +66,7 @@ StatusCode ProximityBasedMergingAlgorithm::Run()
     // Examine pairs of clusters to evaluate merging suitability. Begin by comparing clusters in highest layers with those in lowest layers.
     for (ClusterVector::reverse_iterator iterI = clusterVector.rbegin(), iterIEnd = clusterVector.rend(); iterI != iterIEnd; ++iterI)
     {
-        Cluster *pDaughterCluster = *iterI;
+        const Cluster *const pDaughterCluster = *iterI;
 
         // Check to see if cluster has already been changed
         if (NULL == pDaughterCluster)
@@ -82,13 +82,13 @@ StatusCode ProximityBasedMergingAlgorithm::Run()
         const unsigned int daughterOuterLayer(pDaughterCluster->GetOuterPseudoLayer());
         const float daughterHadronicEnergy(pDaughterCluster->GetHadronicEnergy());
 
-        Cluster *pBestParentCluster(NULL);
+        const Cluster *pBestParentCluster(NULL);
         float bestParentHadronicEnergy(0.);
         float minGenericDistance(m_maxGenericDistance);
 
         for (ClusterVector::const_iterator iterJ = clusterVector.begin(), iterJEnd = clusterVector.end(); iterJ != iterJEnd; ++iterJ)
         {
-            Cluster *pParentCluster = *iterJ;
+            const Cluster *const pParentCluster = *iterJ;
 
             // Check to see if cluster has already been changed
             if ((NULL == pParentCluster) || (pDaughterCluster == pParentCluster))

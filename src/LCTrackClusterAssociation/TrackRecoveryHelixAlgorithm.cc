@@ -58,7 +58,7 @@ StatusCode TrackRecoveryHelixAlgorithm::GetTrackAssociationInfoMap(TrackAssociat
     // Loop over all unassociated tracks in the current track list
     for (TrackList::const_iterator iterT = pTrackList->begin(), iterTEnd = pTrackList->end(); iterT != iterTEnd; ++iterT)
     {
-        Track *pTrack = *iterT;
+        const Track *const pTrack = *iterT;
 
         // Use only unassociated tracks that can be used to form a pfo
         if (pTrack->HasAssociatedCluster() || !pTrack->CanFormPfo())
@@ -74,7 +74,7 @@ StatusCode TrackRecoveryHelixAlgorithm::GetTrackAssociationInfoMap(TrackAssociat
 
         for (ClusterList::const_iterator iterC = pClusterList->begin(), iterCEnd = pClusterList->end(); iterC != iterCEnd; ++iterC)
         {
-            Cluster *pCluster = *iterC;
+            const Cluster *const pCluster = *iterC;
 
             if (!pCluster->GetAssociatedTrackList().empty() || (0 == pCluster->GetNCaloHits()) || pCluster->IsPhotonFast(this->GetPandora()))
                 continue;
@@ -148,8 +148,8 @@ StatusCode TrackRecoveryHelixAlgorithm::MakeTrackClusterAssociations(TrackAssoci
     {
         shouldContinue = false;
 
-        Track *pBestTrack(NULL);
-        Cluster *pBestCluster(NULL);
+        const Track *pBestTrack(NULL);
+        const Cluster *pBestCluster(NULL);
         float minEnergyDifference(std::numeric_limits<float>::max());
         float closestApproach(std::numeric_limits<float>::max());
 

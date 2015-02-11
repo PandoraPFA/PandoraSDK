@@ -46,7 +46,7 @@ StatusCode TrackClusterAssociationAlgorithm::Run()
     // Look to make new associations
     for (TrackVector::const_iterator trackIter = trackVector.begin(), trackIterEnd = trackVector.end(); trackIter != trackIterEnd; ++trackIter)
     {
-        Track *pTrack = *trackIter;
+        const Track *const pTrack = *trackIter;
 
         // Use only tracks that can be used to form a pfo
         if (!pTrack->CanFormPfo())
@@ -55,8 +55,8 @@ StatusCode TrackClusterAssociationAlgorithm::Run()
         if (!pTrack->GetDaughterTrackList().empty())
             continue;
 
-        Cluster *pBestCluster = NULL;
-        Cluster *pBestLowEnergyCluster = NULL;
+        const Cluster *pBestCluster = NULL;
+        const Cluster *pBestLowEnergyCluster = NULL;
 
         float minDistance(m_maxTrackClusterDistance);
         float minLowEnergyDistance(m_maxTrackClusterDistance);
@@ -68,7 +68,7 @@ StatusCode TrackClusterAssociationAlgorithm::Run()
         for (ClusterList::const_iterator clusterIter = pClusterList->begin(), clusterIterEnd = pClusterList->end();
             clusterIter != clusterIterEnd; ++clusterIter)
         {
-            Cluster *pCluster = *clusterIter;
+            const Cluster *const pCluster = *clusterIter;
 
             if (0 == pCluster->GetNCaloHits())
                 continue;
@@ -103,7 +103,7 @@ StatusCode TrackClusterAssociationAlgorithm::Run()
         }
 
         // Apply a final track-cluster association distance cut
-        Cluster *pMatchedCluster = NULL;
+        const Cluster *pMatchedCluster = NULL;
 
         if (NULL != pBestCluster)
         {

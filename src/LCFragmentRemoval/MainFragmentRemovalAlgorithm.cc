@@ -127,7 +127,7 @@ StatusCode MainFragmentRemovalAlgorithm::Run()
     while (shouldRecalculate)
     {
         shouldRecalculate = false;
-        Cluster *pBestParentCluster(NULL), *pBestDaughterCluster(NULL);
+        const Cluster *pBestParentCluster(NULL), *pBestDaughterCluster(NULL);
 
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetChargedClusterContactMap(isFirstPass, affectedClusters, chargedClusterContactMap));
 
@@ -163,8 +163,8 @@ StatusCode MainFragmentRemovalAlgorithm::GetChargedClusterContactMap(bool &isFir
 
     for (ClusterList::const_iterator iter = pClusterList->begin(), iterEnd = pClusterList->end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
-        const ParticleId *pParticleId(PandoraContentApi::GetPlugins(*this)->GetParticleId());
+        const Cluster *const pCluster = *iter;
+        const ParticleId *const pParticleId(PandoraContentApi::GetPlugins(*this)->GetParticleId());
 
         if (!pParticleId->IsMuon(pCluster) && !pParticleId->IsElectron(pCluster))
         {
@@ -175,7 +175,7 @@ StatusCode MainFragmentRemovalAlgorithm::GetChargedClusterContactMap(bool &isFir
     // Create cluster contacts
     for (ClusterList::const_iterator iterI = clusterList.begin(), iterIEnd = clusterList.end(); iterI != iterIEnd; ++iterI)
     {
-        Cluster *pDaughterCluster = *iterI;
+        const Cluster *const pDaughterCluster = *iterI;
 
         // Identify whether cluster contacts need to be recalculated
         if (!isFirstPass)
@@ -199,7 +199,7 @@ StatusCode MainFragmentRemovalAlgorithm::GetChargedClusterContactMap(bool &isFir
         // Calculate the cluster contact information
         for (ClusterList::const_iterator iterJ = clusterList.begin(), iterJEnd = clusterList.end(); iterJ != iterJEnd; ++iterJ)
         {
-            Cluster *pParentCluster = *iterJ;
+            const Cluster *const pParentCluster = *iterJ;
 
             if (pDaughterCluster == pParentCluster)
                 continue;
@@ -243,15 +243,15 @@ bool MainFragmentRemovalAlgorithm::PassesClusterContactCuts(const ChargedCluster
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MainFragmentRemovalAlgorithm::GetClusterMergingCandidates(const ChargedClusterContactMap &chargedClusterContactMap, Cluster *&pBestParentCluster,
-    Cluster *&pBestDaughterCluster)
+StatusCode MainFragmentRemovalAlgorithm::GetClusterMergingCandidates(const ChargedClusterContactMap &chargedClusterContactMap, const Cluster *&pBestParentCluster,
+    const Cluster *&pBestDaughterCluster)
 {
     float highestExcessEvidence(0.f);
     float highestEvidenceParentEnergy(0.);
 
     for (ChargedClusterContactMap::const_iterator iterI = chargedClusterContactMap.begin(), iterIEnd = chargedClusterContactMap.end(); iterI != iterIEnd; ++iterI)
     {
-        Cluster *pDaughterCluster = iterI->first;
+        const Cluster *const pDaughterCluster = iterI->first;
         float globalDeltaChi2(0.f);
 
         // Check to see if merging parent and daughter clusters would improve track-cluster compatibility
@@ -289,7 +289,7 @@ StatusCode MainFragmentRemovalAlgorithm::GetClusterMergingCandidates(const Charg
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool MainFragmentRemovalAlgorithm::PassesPreselection(Cluster *const pDaughterCluster, const ChargedClusterContactVector &chargedClusterContactVector,
+bool MainFragmentRemovalAlgorithm::PassesPreselection(const Cluster *const pDaughterCluster, const ChargedClusterContactVector &chargedClusterContactVector,
     float &globalDeltaChi2) const
 {
     bool passesPreselection(false);
@@ -394,7 +394,7 @@ float MainFragmentRemovalAlgorithm::GetTotalEvidenceForMerge(const ChargedCluste
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-float MainFragmentRemovalAlgorithm::GetRequiredEvidenceForMerge(Cluster *const pDaughterCluster, const ChargedClusterContact &chargedClusterContact,
+float MainFragmentRemovalAlgorithm::GetRequiredEvidenceForMerge(const Cluster *const pDaughterCluster, const ChargedClusterContact &chargedClusterContact,
     const unsigned int correctionLayer, const float globalDeltaChi2)
 {
     // Primary evidence requirement is obtained from change in chi2.
@@ -542,8 +542,8 @@ unsigned int MainFragmentRemovalAlgorithm::GetClusterCorrectionLayer(const Clust
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MainFragmentRemovalAlgorithm::GetAffectedClusters(const ChargedClusterContactMap &chargedClusterContactMap, Cluster *const pBestParentCluster,
-    Cluster *const pBestDaughterCluster, ClusterList &affectedClusters) const
+StatusCode MainFragmentRemovalAlgorithm::GetAffectedClusters(const ChargedClusterContactMap &chargedClusterContactMap, const Cluster *const pBestParentCluster,
+    const Cluster *const pBestDaughterCluster, ClusterList &affectedClusters) const
 {
     if (chargedClusterContactMap.end() == chargedClusterContactMap.find(pBestDaughterCluster))
         return STATUS_CODE_FAILURE;
@@ -578,7 +578,7 @@ StatusCode MainFragmentRemovalAlgorithm::GetAffectedClusters(const ChargedCluste
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-ChargedClusterContact::ChargedClusterContact(const Pandora &pandora, Cluster *const pDaughterCluster, Cluster *const pParentCluster,
+ChargedClusterContact::ChargedClusterContact(const Pandora &pandora, const Cluster *const pDaughterCluster, const Cluster *const pParentCluster,
         const Parameters &parameters) :
     ClusterContact(pandora, pDaughterCluster, pParentCluster, parameters),
     m_coneFraction2(FragmentRemovalHelper::GetFractionOfHitsInCone(pandora, pDaughterCluster, pParentCluster, parameters.m_coneCosineHalfAngle2)),
@@ -591,7 +591,7 @@ ChargedClusterContact::ChargedClusterContact(const Pandora &pandora, Cluster *co
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void ChargedClusterContact::ClusterHelixComparison(const Pandora &pandora, Cluster *const pDaughterCluster, Cluster *const pParentCluster,
+void ChargedClusterContact::ClusterHelixComparison(const Pandora &pandora, const Cluster *const pDaughterCluster, const Cluster *const pParentCluster,
     const Parameters &parameters)
 {
     // Configure range of layers in which daughter cluster will be compared to helix fits

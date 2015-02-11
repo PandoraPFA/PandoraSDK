@@ -36,8 +36,7 @@ StatusCode MuonPhotonSeparationAlgorithm::PerformFragmentation(Cluster *const pO
         fragmentClustersListName));
 
     // Make the cluster fragments
-    Cluster *pMipCluster = NULL, *pPhotonCluster = NULL;
-
+    const Cluster *pMipCluster = NULL, *pPhotonCluster = NULL;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->MakeClusterFragments(showerStartLayer, showerEndLayer, pOriginalCluster,
         pMipCluster, pPhotonCluster));
 
@@ -71,15 +70,15 @@ StatusCode MuonPhotonSeparationAlgorithm::PerformFragmentation(Cluster *const pO
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode MuonPhotonSeparationAlgorithm::MakeClusterFragments(const unsigned int showerStartLayer, const unsigned int showerEndLayer,
-    Cluster *const pOriginalCluster, Cluster *&pMipCluster, Cluster *&pPhotonCluster) const
+    const Cluster *const pOriginalCluster, const Cluster *&pMipCluster, const Cluster *&pPhotonCluster) const
 {
-    Track *pTrack = *(pOriginalCluster->GetAssociatedTrackList().begin());
+    const Track *const pTrack = *(pOriginalCluster->GetAssociatedTrackList().begin());
     OrderedCaloHitList orderedCaloHitList(pOriginalCluster->GetOrderedCaloHitList());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, orderedCaloHitList.Add(pOriginalCluster->GetIsolatedCaloHitList()));
 
     for (OrderedCaloHitList::const_iterator iter =  orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
     {
-        CaloHit *pClosestHit(NULL);
+        const CaloHit *pClosestHit(NULL);
         float closestDistance(std::numeric_limits<float>::max());
 
         const unsigned int iLayer = iter->first;
@@ -89,7 +88,7 @@ StatusCode MuonPhotonSeparationAlgorithm::MakeClusterFragments(const unsigned in
         {
             for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
             {
-                CaloHit *pCaloHit = *hitIter;
+                const CaloHit *const pCaloHit = *hitIter;
                 float distance(0.f);
 
                 PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_UNCHANGED, !=, this->GetDistanceToTrack(pOriginalCluster, 
@@ -106,7 +105,7 @@ StatusCode MuonPhotonSeparationAlgorithm::MakeClusterFragments(const unsigned in
         // Add hits to the relevant cluster fragment
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
-            CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
 
             const bool isHitOnMipPath((pClosestHit == pCaloHit) && (closestDistance < m_genericDistanceCut));
 

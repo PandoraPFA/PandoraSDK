@@ -58,7 +58,7 @@ StatusCode PfoCreationAlgorithm::CreateTrackBasedPfos() const
 
     for (TrackList::const_iterator iter = pTrackList->begin(), iterEnd = pTrackList->end(); iter != iterEnd; ++iter)
     {
-        Track *pTrack = *iter;
+        const Track *const pTrack = *iter;
         PandoraContentApi::ParticleFlowObject::Parameters pfoParameters;
 
         // Walk along list of associated daughter/sibling tracks and their cluster associations
@@ -68,7 +68,7 @@ StatusCode PfoCreationAlgorithm::CreateTrackBasedPfos() const
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetTrackBasedPfoParameters(pTrack, pfoParameters));
 
         // Create the pfo
-        ParticleFlowObject *pPfo(NULL);
+        const ParticleFlowObject *pPfo(NULL);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ParticleFlowObject::Create(*this, pfoParameters, pPfo));
     }
 
@@ -77,7 +77,7 @@ StatusCode PfoCreationAlgorithm::CreateTrackBasedPfos() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PfoCreationAlgorithm::PopulateTrackBasedPfo(Track *const pTrack, PfoParameters &pfoParameters, const bool readSiblingInfo) const
+StatusCode PfoCreationAlgorithm::PopulateTrackBasedPfo(const Track *const pTrack, PfoParameters &pfoParameters, const bool readSiblingInfo) const
 {
     // Add track to the pfo
     pfoParameters.m_trackList.insert(pTrack);
@@ -85,7 +85,7 @@ StatusCode PfoCreationAlgorithm::PopulateTrackBasedPfo(Track *const pTrack, PfoP
     // Add any cluster associated with this track to the pfo
     try
     {
-        Cluster *pAssociatedCluster(pTrack->GetAssociatedCluster());
+        const Cluster *const pAssociatedCluster(pTrack->GetAssociatedCluster());
         pfoParameters.m_clusterList.insert(pAssociatedCluster);
     }
     catch (StatusCodeException &)
@@ -116,7 +116,7 @@ StatusCode PfoCreationAlgorithm::PopulateTrackBasedPfo(Track *const pTrack, PfoP
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PfoCreationAlgorithm::SetTrackBasedPfoParameters(Track *const pTrack, PfoParameters &pfoParameters) const
+StatusCode PfoCreationAlgorithm::SetTrackBasedPfoParameters(const Track *const pTrack, PfoParameters &pfoParameters) const
 {
     const bool hasParent(!pTrack->GetParentTrackList().empty());
 
@@ -140,7 +140,7 @@ StatusCode PfoCreationAlgorithm::SetTrackBasedPfoParameters(Track *const pTrack,
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PfoCreationAlgorithm::SetSiblingTrackBasedPfoParameters(Track *const pTrack, PfoParameters &pfoParameters) const
+StatusCode PfoCreationAlgorithm::SetSiblingTrackBasedPfoParameters(const Track *const pTrack, PfoParameters &pfoParameters) const
 {
     int charge(0);
     float energy(0.f);
@@ -151,7 +151,7 @@ StatusCode PfoCreationAlgorithm::SetSiblingTrackBasedPfoParameters(Track *const 
 
     for (TrackList::const_iterator iter = fullSiblingTrackList.begin(), iterEnd = fullSiblingTrackList.end(); iter != iterEnd; ++iter)
     {
-        Track *pSiblingTrack = *iter;
+        const Track *const pSiblingTrack = *iter;
         charge += pSiblingTrack->GetCharge();
 
         if (!pSiblingTrack->CanFormPfo() && !pSiblingTrack->CanFormClusterlessPfo())
@@ -177,7 +177,7 @@ StatusCode PfoCreationAlgorithm::SetSiblingTrackBasedPfoParameters(Track *const 
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PfoCreationAlgorithm::SetDaughterTrackBasedPfoParameters(Track *const pTrack, PfoParameters &pfoParameters) const
+StatusCode PfoCreationAlgorithm::SetDaughterTrackBasedPfoParameters(const Track *const pTrack, PfoParameters &pfoParameters) const
 {
     int daughterCharge(0);
     float energy(0.f);
@@ -188,7 +188,7 @@ StatusCode PfoCreationAlgorithm::SetDaughterTrackBasedPfoParameters(Track *const
 
     for (TrackList::const_iterator iter = daughterTrackList.begin(), iterEnd = daughterTrackList.end(); iter != iterEnd; ++iter)
     {
-        Track *pDaughterTrack = *iter;
+        const Track *const pDaughterTrack = *iter;
 
         if (!pDaughterTrack->CanFormPfo() && !pDaughterTrack->CanFormClusterlessPfo())
             continue;
@@ -209,7 +209,7 @@ StatusCode PfoCreationAlgorithm::SetDaughterTrackBasedPfoParameters(Track *const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PfoCreationAlgorithm::SetSimpleTrackBasedPfoParameters(Track *const pTrack, PfoParameters &pfoParameters) const
+StatusCode PfoCreationAlgorithm::SetSimpleTrackBasedPfoParameters(const Track *const pTrack, PfoParameters &pfoParameters) const
 {
     pfoParameters.m_energy = pTrack->GetEnergyAtDca();
     pfoParameters.m_momentum = pTrack->GetMomentumAtDca();
@@ -230,7 +230,7 @@ StatusCode PfoCreationAlgorithm::CreateNeutralPfos() const
     // Examine clusters with no associated tracks to form neutral pfos
     for (ClusterList::const_iterator iter = pClusterList->begin(), iterEnd = pClusterList->end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
 
         if (!pCluster->GetAssociatedTrackList().empty())
             continue;
@@ -284,7 +284,7 @@ StatusCode PfoCreationAlgorithm::CreateNeutralPfos() const
         const CartesianVector momentum(positionVector.GetUnitVector() * clusterEnergy);
         pfoParameters.m_momentum = momentum;
 
-        ParticleFlowObject *pPfo(NULL);
+        const ParticleFlowObject *pPfo(NULL);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ParticleFlowObject::Create(*this, pfoParameters, pPfo));
     }
 

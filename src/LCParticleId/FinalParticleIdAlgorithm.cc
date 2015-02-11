@@ -23,7 +23,7 @@ StatusCode FinalParticleIdAlgorithm::Run()
     for (PfoList::const_iterator iter = pPfoList->begin(), iterEnd = pPfoList->end();
         iter != iterEnd; ++iter)
     {
-        ParticleFlowObject *pPfo = *iter;
+        const ParticleFlowObject *const pPfo = *iter;
 
         const TrackList &trackList(pPfo->GetTrackList());
         const ClusterList &clusterList(pPfo->GetClusterList());
@@ -41,8 +41,8 @@ StatusCode FinalParticleIdAlgorithm::Run()
         if ((std::abs(pPfo->GetParticleId()) == E_MINUS) || (std::abs(pPfo->GetParticleId()) == MU_MINUS))
             continue;
 
-        Cluster *pCluster = *(clusterList.begin());
-        const ParticleId *pParticleId(PandoraContentApi::GetPlugins(*this)->GetParticleId());
+        const Cluster *const pCluster = *(clusterList.begin());
+        const ParticleId *const pParticleId(PandoraContentApi::GetPlugins(*this)->GetParticleId());
 
         // Run electron id, followed by muon id
         PandoraContentApi::ParticleFlowObject::Metadata metadata;

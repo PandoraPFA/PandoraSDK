@@ -424,7 +424,7 @@ bool ClusterHelper::ContainsHitType(const Cluster *const pCluster, const HitType
     {
         for (CaloHitList::const_iterator hIter = iter->second->begin(), hIterEnd = iter->second->end(); hIter != hIterEnd; ++hIter)
         {
-            CaloHit *pCaloHit(*hIter);
+            const CaloHit *const pCaloHit(*hIter);
 
             if (hitType == pCaloHit->GetHitType())
                 return true;
@@ -444,7 +444,7 @@ bool ClusterHelper::ContainsHitInOuterSamplingLayer(const Cluster *const pCluste
     {
         for (CaloHitList::const_iterator hIter = iter->second->begin(), hIterEnd = iter->second->end(); hIter != hIterEnd; ++hIter)
         {
-            CaloHit *pCaloHit(*hIter);
+            const CaloHit *const pCaloHit(*hIter);
 
             if (pCaloHit->IsInOuterSamplingLayer())
                 return true;

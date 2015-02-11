@@ -34,7 +34,7 @@ public:
     bool operator()(const pandora::CaloHit *lhs, const pandora::CaloHit *rhs) const;
 };
 
-typedef std::set<pandora::CaloHit *, CustomHitOrder> CustomSortedCaloHitList;
+typedef std::set<const pandora::CaloHit *, CustomHitOrder> CustomSortedCaloHitList;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ private:
      */
     pandora::StatusCode SeedClustersWithTracks(pandora::ClusterVector &clusterVector) const;
 
-    typedef std::map<pandora::Cluster*, pandora::ClusterFitResult> ClusterFitResultMap;
+    typedef std::map<const pandora::Cluster*, const pandora::ClusterFitResult> ClusterFitResultMap;
 
     /**
      *  @brief  Update the properties of the current clusters, calculating their current directions and storing the fit results
@@ -78,7 +78,7 @@ private:
      *  @param  clusterVector vector containing addresses of current clusters
      *  @param  clusterFitResultMap to receive the populated cluster fit result map
      */
-    pandora::StatusCode GetCurrentClusterFitResults(pandora::ClusterVector &clusterVector, ClusterFitResultMap &clusterFitResultMap) const;
+    pandora::StatusCode GetCurrentClusterFitResults(const pandora::ClusterVector &clusterVector, ClusterFitResultMap &clusterFitResultMap) const;
 
     /**
      *  @brief  Match clusters to calo hits in previous pseudo layers
@@ -111,7 +111,7 @@ private:
      *  @param  clusterFitResultMap containing the current cluster fit results
      *  @param  genericDistance to receive the generic distance
      */
-    pandora::StatusCode GetGenericDistanceToHit(pandora::Cluster *const pCluster, pandora::CaloHit *const pCaloHit,
+    pandora::StatusCode GetGenericDistanceToHit(const pandora::Cluster *const pCluster, const pandora::CaloHit *const pCaloHit,
         const unsigned int searchLayer, const ClusterFitResultMap &clusterFitResultMap, float &genericDistance) const;
 
     /**
@@ -121,7 +121,7 @@ private:
      *  @param  pCaloHitList address of the cluster's constituent hit list
      *  @param  distance to receive the distance
      */
-    pandora::StatusCode GetDistanceToHitInSameLayer(pandora::CaloHit *const pCaloHit, const pandora::CaloHitList *const pCaloHitList,
+    pandora::StatusCode GetDistanceToHitInSameLayer(const pandora::CaloHit *const pCaloHit, const pandora::CaloHitList *const pCaloHitList,
         float &distance) const;
 
     /**
@@ -133,7 +133,7 @@ private:
      *  @param  clusterDirection
      *  @param  distance to receive the generic distance
      */
-    pandora::StatusCode GetConeApproachDistanceToHit(pandora::CaloHit *const pCaloHit, const pandora::CaloHitList *const pCaloHitList,
+    pandora::StatusCode GetConeApproachDistanceToHit(const pandora::CaloHit *const pCaloHit, const pandora::CaloHitList *const pCaloHitList,
         const pandora::CartesianVector &clusterDirection, float &distance) const;
 
     /**
@@ -145,7 +145,7 @@ private:
      *  @param  clusterDirection the cluster direction unit vector
      *  @param  distance to receive the distance
      */
-    pandora::StatusCode GetConeApproachDistanceToHit(pandora::CaloHit *const pCaloHit, const pandora::CartesianVector &clusterPosition,
+    pandora::StatusCode GetConeApproachDistanceToHit(const pandora::CaloHit *const pCaloHit, const pandora::CartesianVector &clusterPosition,
         const pandora::CartesianVector &clusterDirection, float &distance) const;
 
     /**
@@ -158,7 +158,7 @@ private:
      *  @param  the pseudolayer currently being examined
      *  @param  to receive the distance
      */
-    pandora::StatusCode GetDistanceToTrackSeed(pandora::Cluster *const pCluster, pandora::CaloHit *const pCaloHit,
+    pandora::StatusCode GetDistanceToTrackSeed(const pandora::Cluster *const pCluster, const pandora::CaloHit *const pCaloHit,
         unsigned int searchLayer, float &distance) const;
 
     /**
@@ -168,14 +168,14 @@ private:
      *  @param  pCaloHit address of the calo hit
      *  @param  distance to receive the distance
      */
-    pandora::StatusCode GetDistanceToTrackSeed(pandora::Cluster *const pCluster, pandora::CaloHit *const pCaloHit, float &distance) const;
+    pandora::StatusCode GetDistanceToTrackSeed(const pandora::Cluster *const pCluster, const pandora::CaloHit *const pCaloHit, float &distance) const;
 
     /**
      *  @brief  Remove any empty clusters at the end of the algorithm
      * 
      *  @param  clusterVector containing the addresses of all clusters created
      */
-    pandora::StatusCode RemoveEmptyClusters(pandora::ClusterVector &clusterVector) const;
+    pandora::StatusCode RemoveEmptyClusters(const pandora::ClusterVector &clusterVector) const;
 
     unsigned int    m_clusterSeedStrategy;          ///< Flag determining if and how clusters should be seeded with tracks
 

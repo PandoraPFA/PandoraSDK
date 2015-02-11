@@ -296,7 +296,7 @@ void LCShowerProfilePlugin::CalculateTransverseProfile(const Cluster *const pClu
 
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
-            CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
             const float cellLengthScale(pCaloHit->GetCellLengthScale());
 
             if (cellLengthScale < std::numeric_limits<float>::epsilon())

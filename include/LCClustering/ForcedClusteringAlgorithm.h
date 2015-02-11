@@ -58,21 +58,21 @@ private:
          *  @param  trackEnergy energy of track, measured at dca
          *  @param  trackDistance distance from calo hit to track
          */
-        TrackDistanceInfo(pandora::CaloHit *pCaloHit, pandora::Cluster *pCluster, float trackEnergy, float trackDistance);
+        TrackDistanceInfo(const pandora::CaloHit *const pCaloHit, const pandora::Cluster *const pCluster, float trackEnergy, float trackDistance);
 
         /**
          *  @brief  Get the address of the calo hit
          *
          *  @return The address of the calo hit
          */
-        pandora::CaloHit *GetCaloHit() const;
+        const pandora::CaloHit *GetCaloHit() const;
 
         /**
          *  @brief  Get the address of the cluster seeded by track
          *
          *  @return The address of the cluster seeded by track
          */
-        pandora::Cluster *GetCluster() const;
+        const pandora::Cluster *GetCluster() const;
 
         /**
          *  @brief  Get the energy of the track, measured at dca
@@ -89,10 +89,10 @@ private:
         float GetTrackDistance() const;
 
     private:
-        pandora::CaloHit   *m_pCaloHit;                                 ///< Address of calo hit
-        pandora::Cluster   *m_pCluster;                                 ///< Address of cluster seeded by track
-        float               m_trackEnergy;                              ///< Energy of track, measured at dca
-        float               m_trackDistance;                            ///< Distance from calo hit to track
+        const pandora::CaloHit     *m_pCaloHit;                                 ///< Address of calo hit
+        const pandora::Cluster     *m_pCluster;                                 ///< Address of cluster seeded by track
+        float                       m_trackEnergy;                              ///< Energy of track, measured at dca
+        float                       m_trackDistance;                            ///< Distance from calo hit to track
     };
 
     typedef std::vector<TrackDistanceInfo> TrackDistanceInfoVector;
@@ -105,12 +105,12 @@ private:
      */
     static bool SortByDistanceToTrack(const TrackDistanceInfo &lhs, const TrackDistanceInfo &rhs);
 
-    bool                    m_shouldRunStandardClusteringAlgorithm;     ///< Whether to run standard clustering algorithm to deal with remnants
-    std::string             m_standardClusteringAlgorithmName;          ///< The name of standard clustering algorithm to run
+    bool                            m_shouldRunStandardClusteringAlgorithm;     ///< Whether to run standard clustering algorithm to deal with remnants
+    std::string                     m_standardClusteringAlgorithmName;          ///< The name of standard clustering algorithm to run
         
-    bool                    m_shouldClusterIsolatedHits;                ///< Whether to directly include isolated hits in newly formed clusters
-    bool                    m_shouldAssociateIsolatedHits;              ///< Whether to associate isolated hits to newly formed clusters
-    std::string             m_isolatedHitAssociationAlgorithmName;      ///< The name of isolated hit association algorithm
+    bool                            m_shouldClusterIsolatedHits;                ///< Whether to directly include isolated hits in newly formed clusters
+    bool                            m_shouldAssociateIsolatedHits;              ///< Whether to associate isolated hits to newly formed clusters
+    std::string                     m_isolatedHitAssociationAlgorithmName;      ///< The name of isolated hit association algorithm
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -123,7 +123,7 @@ inline bool ForcedClusteringAlgorithm::SortByDistanceToTrack(const TrackDistance
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline ForcedClusteringAlgorithm::TrackDistanceInfo::TrackDistanceInfo(pandora::CaloHit *pCaloHit, pandora::Cluster *pCluster,
+inline ForcedClusteringAlgorithm::TrackDistanceInfo::TrackDistanceInfo(const pandora::CaloHit *const pCaloHit, const pandora::Cluster *const pCluster,
         float trackEnergy, float trackDistance) :
     m_pCaloHit(pCaloHit),
     m_pCluster(pCluster),
@@ -134,14 +134,14 @@ inline ForcedClusteringAlgorithm::TrackDistanceInfo::TrackDistanceInfo(pandora::
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline pandora::CaloHit *ForcedClusteringAlgorithm::TrackDistanceInfo::GetCaloHit() const
+inline const pandora::CaloHit *ForcedClusteringAlgorithm::TrackDistanceInfo::GetCaloHit() const
 {
     return m_pCaloHit;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline pandora::Cluster *ForcedClusteringAlgorithm::TrackDistanceInfo::GetCluster() const
+inline const pandora::Cluster *ForcedClusteringAlgorithm::TrackDistanceInfo::GetCluster() const
 {
     return m_pCluster;
 }

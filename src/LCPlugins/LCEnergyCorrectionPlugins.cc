@@ -43,7 +43,7 @@ LCEnergyCorrectionPlugins::NonLinearityCorrection::NonLinearityCorrection(const 
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode LCEnergyCorrectionPlugins::NonLinearityCorrection::MakeEnergyCorrections(const pandora::Cluster *const /*pCluster*/, float &correctedEnergy) const
+pandora::StatusCode LCEnergyCorrectionPlugins::NonLinearityCorrection::MakeEnergyCorrections(const pandora::Cluster *const /*const pCluster*/, float &correctedEnergy) const
 {
     const unsigned int nEnergyBins(m_energyCorrections.size());
 
@@ -119,7 +119,7 @@ StatusCode LCEnergyCorrectionPlugins::CleanCluster::MakeEnergyCorrections(const 
         for (CaloHitList::const_iterator hitIter = layerIter->second->begin(), hitIterEnd = layerIter->second->end();
             hitIter != hitIterEnd; ++hitIter)
         {
-            CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
 
             if (this->GetPandora().GetGeometry()->GetHitTypeGranularity((*hitIter)->GetHitType()) > FINE)
             {

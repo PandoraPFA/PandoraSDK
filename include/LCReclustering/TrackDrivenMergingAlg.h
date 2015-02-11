@@ -28,7 +28,7 @@ public:
      *  @param  pCluster address of the cluster associated with the specified cone fraction
      *  @param  clusterIndex the index of the cluster in the associated cluster vector (needed for tidying up in this algorithm)
      */
-    ClusterConeFraction(float coneFraction, pandora::Cluster *const pCluster, unsigned int clusterIndex);
+    ClusterConeFraction(float coneFraction, const pandora::Cluster *const pCluster, unsigned int clusterIndex);
 
     /**
      *  @brief  Operator < for determining cluster cone fraction ordering.
@@ -49,7 +49,7 @@ public:
      * 
      *  @return The address of the cluster
      */
-    pandora::Cluster *GetCluster() const;
+    const pandora::Cluster *GetCluster() const;
 
     /**
      *  @brief  Get the index of the cluster in the associated cluster vector
@@ -60,7 +60,7 @@ public:
 
 private:
     const float                 m_coneFraction;                     ///< The cone fraction
-    pandora::Cluster *const     m_pCluster;                         ///< The address of the cluster
+    const pandora::Cluster     *m_pCluster;                         ///< The address of the cluster
     const unsigned int          m_clusterIndex;                     ///< The index of the cluster in the associated cluster vector
 };
 
@@ -117,7 +117,7 @@ inline pandora::Algorithm *TrackDrivenMergingAlg::Factory::CreateAlgorithm() con
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline ClusterConeFraction::ClusterConeFraction(float coneFraction, pandora::Cluster *const pCluster, unsigned int clusterIndex) :
+inline ClusterConeFraction::ClusterConeFraction(float coneFraction, const pandora::Cluster *const pCluster, unsigned int clusterIndex) :
     m_coneFraction(coneFraction),
     m_pCluster(pCluster),
     m_clusterIndex(clusterIndex)
@@ -143,7 +143,7 @@ inline float ClusterConeFraction::GetConeFraction() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline pandora::Cluster *ClusterConeFraction::GetCluster() const
+inline const pandora::Cluster *ClusterConeFraction::GetCluster() const
 {
     return m_pCluster;
 }

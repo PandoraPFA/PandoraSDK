@@ -48,7 +48,7 @@ private:
      *  @param  pCaloHit address of the calo hit
      *  @param  mcParticleToHitListMap the mc particle to hit list map
      */
-    void SimpleMCParticleCollection(pandora::CaloHit *const pCaloHit, MCParticleToHitListMap &mcParticleToHitListMap) const;
+    void SimpleMCParticleCollection(const pandora::CaloHit *const pCaloHit, MCParticleToHitListMap &mcParticleToHitListMap) const;
 
     /**
      *  @brief  Full mc particle collection, using map of mc particles to hit weights; fragment calo hits where necessary
@@ -56,7 +56,7 @@ private:
      *  @param  pCaloHit address of the calo hit
      *  @param  mcParticleToHitListMap the mc particle to hit list map
      */
-    void FullMCParticleCollection(pandora::CaloHit *const pCaloHit, MCParticleToHitListMap &mcParticleToHitListMap) const;
+    void FullMCParticleCollection(const pandora::CaloHit *const pCaloHit, MCParticleToHitListMap &mcParticleToHitListMap) const;
 
     /**
      *  @brief  Add a calo hit to the mc particle to hit list map
@@ -65,7 +65,7 @@ private:
      *  @param  pMCParticle address of the mc particle
      *  @param  mcParticleToHitListMap the mc particle to hit list map
      */
-    void AddToHitListMap(pandora::CaloHit *const pCaloHitToAdd, const pandora::MCParticle *const pMCParticle, MCParticleToHitListMap &mcParticleToHitListMap) const;
+    void AddToHitListMap(const pandora::CaloHit *const pCaloHitToAdd, const pandora::MCParticle *const pMCParticle, MCParticleToHitListMap &mcParticleToHitListMap) const;
 
     /**
      *  @brief  Create clusters based on information in the mc particle to hit list map

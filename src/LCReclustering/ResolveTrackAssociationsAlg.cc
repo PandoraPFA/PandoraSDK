@@ -59,7 +59,7 @@ StatusCode ResolveTrackAssociationsAlg::Run()
 
     for (unsigned int i = 0; i < nClusters; ++i)
     {
-        Cluster *pParentCluster = clusterVector[i];
+        const Cluster *const pParentCluster = clusterVector[i];
 
         if (NULL == pParentCluster)
             continue;
@@ -90,7 +90,7 @@ StatusCode ResolveTrackAssociationsAlg::Run()
         // Look for potential daughter clusters to combine in the reclustering
         for (unsigned int j = 0; j < nClusters; ++j)
         {
-            Cluster *pDaughterCluster = clusterVector[j];
+            const Cluster *const pDaughterCluster = clusterVector[j];
 
             if ((NULL == pDaughterCluster) || (pParentCluster == pDaughterCluster) || (!pDaughterCluster->GetAssociatedTrackList().empty()))
                 continue;

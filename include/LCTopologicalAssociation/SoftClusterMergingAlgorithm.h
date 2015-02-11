@@ -44,7 +44,7 @@ private:
      * 
      *  @return boolean
      */
-    bool IsSoftCluster(pandora::Cluster *const pDaughterCluster) const;
+    bool IsSoftCluster(const pandora::Cluster *const pDaughterCluster) const;
 
     /**
      *  @brief  Whether a soft daughter candidate cluster can be merged with a parent a specified distance away
@@ -65,7 +65,7 @@ private:
      *  @param  clusterListToNameMap the cluster list to name map
      *  @param  listName to receive the list name
      */
-    pandora::StatusCode GetClusterListName(pandora::Cluster *const pCluster, const ClusterListToNameMap &clusterListToNameMap,
+    pandora::StatusCode GetClusterListName(const pandora::Cluster *const pCluster, const ClusterListToNameMap &clusterListToNameMap,
         std::string &listName) const;
 
     bool                    m_shouldUseCurrentClusterList;          ///< Whether to use clusters from the current list in the algorithm

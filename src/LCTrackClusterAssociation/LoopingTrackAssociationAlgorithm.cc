@@ -56,7 +56,7 @@ StatusCode LoopingTrackAssociationAlgorithm::Run()
     // Loop over all unassociated tracks in the current track list
     for (TrackVector::const_iterator iterT = trackVector.begin(), iterTEnd = trackVector.end(); iterT != iterTEnd; ++iterT)
     {
-        Track *pTrack = *iterT;
+        const Track *const pTrack = *iterT;
 
         // Use only unassociated tracks that can be used to form a pfo
         if (pTrack->HasAssociatedCluster() || !pTrack->CanFormPfo())
@@ -90,13 +90,13 @@ StatusCode LoopingTrackAssociationAlgorithm::Run()
         const float trackEnergy(pTrack->GetEnergyAtDca());
 
         // Identify best cluster to be associated with this track, using projection of track helix onto endcap
-        Cluster *pBestCluster(NULL);
+        const Cluster *pBestCluster(NULL);
         float minEnergyDifference(std::numeric_limits<float>::max());
         float smallestDeltaR(std::numeric_limits<float>::max());
 
         for (ClusterList::const_iterator iterC = pClusterList->begin(), iterCEnd = pClusterList->end(); iterC != iterCEnd; ++iterC)
         {
-            Cluster *pCluster = *iterC;
+            const Cluster *const pCluster = *iterC;
 
             if (!pCluster->GetAssociatedTrackList().empty())
                 continue;
@@ -221,7 +221,7 @@ StatusCode LoopingTrackAssociationAlgorithm::Run()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-float LoopingTrackAssociationAlgorithm::GetMeanDeltaR(Cluster *const pCluster, const float helixXCentre, const float helixYCentre,
+float LoopingTrackAssociationAlgorithm::GetMeanDeltaR(const Cluster *const pCluster, const float helixXCentre, const float helixYCentre,
     const float helixRadius) const
 {
     float deltaRSum(0.f);

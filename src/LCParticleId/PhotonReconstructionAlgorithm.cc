@@ -105,7 +105,7 @@ StatusCode PhotonReconstructionAlgorithm::Run()
 
     for (ClusterVector::iterator iter = clusterVector.begin(), iterEnd = clusterVector.end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
         *iter = NULL;
 
         bool usedCluster(false);
@@ -141,7 +141,7 @@ StatusCode PhotonReconstructionAlgorithm::Run()
                     if (showerPeak.GetPeakCaloHitList().size() < m_minPeakCaloHits)
                         continue;
 
-                    Cluster *pPeakCluster = NULL;
+                    const Cluster *pPeakCluster = NULL;
                     PandoraContentApi::Cluster::Parameters parameters;
                     parameters.m_caloHitList = showerPeak.GetPeakCaloHitList();
                     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, parameters, pPeakCluster));
@@ -200,7 +200,7 @@ StatusCode PhotonReconstructionAlgorithm::Run()
                     if (acceptPhotonCandidate)
                     {
                         usedCluster = true;
-                        Cluster *&pRelevantCluster(useOriginalCluster ? pCluster : pPeakCluster);
+                        const Cluster *const pRelevantCluster(useOriginalCluster ? pCluster : pPeakCluster);
 
                         PandoraContentApi::Cluster::Metadata metadata;
                         metadata.m_particleId = PHOTON;
@@ -244,7 +244,7 @@ float PhotonReconstructionAlgorithm::GetMinDistanceToTrack(const Cluster *const 
 
     for (TrackVector::const_iterator trackIter = trackVector.begin(), trackIterEnd = trackVector.end(); trackIter != trackIterEnd; ++trackIter)
     {
-        Track *pTrack = *trackIter;
+        const Track *const pTrack = *trackIter;
         float trackClusterDistance(std::numeric_limits<float>::max());
 
         if (STATUS_CODE_SUCCESS == ClusterHelper::GetTrackClusterDistance(pTrack, pPeakCluster, m_maxSearchLayer, m_parallelDistanceCut,
@@ -346,7 +346,7 @@ void PhotonReconstructionAlgorithm::NormalizeAndWriteHistograms()
     }
 
     TiXmlDocument xmlDocument;
-    TiXmlElement *pEnergyBinLowerEdgesElement = new TiXmlElement("EnergyBinLowerEdges");
+    TiXmlElement *const pEnergyBinLowerEdgesElement = new TiXmlElement("EnergyBinLowerEdges");
     pEnergyBinLowerEdgesElement->LinkEndChild(new TiXmlText(energyBinLowerEdgesString));
     xmlDocument.LinkEndChild(pEnergyBinLowerEdgesElement);
 

@@ -57,7 +57,7 @@ StatusCode ReclusterHelper::ExtractReclusterResults(const Pandora &pandora, cons
 
     for (ClusterList::const_iterator iter = pReclusterCandidatesList->begin(), iterEnd = pReclusterCandidatesList->end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
 
         const TrackList &trackList(pCluster->GetAssociatedTrackList());
         const unsigned int nTrackAssociations(trackList.size());

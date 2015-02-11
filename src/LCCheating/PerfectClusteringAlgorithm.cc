@@ -53,7 +53,7 @@ StatusCode PerfectClusteringAlgorithm::Run()
     {
         try
         {
-            CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
 
             if (!PandoraContentApi::IsAvailable(*this, pCaloHit))
                 continue;
@@ -85,9 +85,9 @@ StatusCode PerfectClusteringAlgorithm::Run()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PerfectClusteringAlgorithm::SimpleMCParticleCollection(CaloHit *const pCaloHit, MCParticleToHitListMap &mcParticleToHitListMap) const
+void PerfectClusteringAlgorithm::SimpleMCParticleCollection(const CaloHit *const pCaloHit, MCParticleToHitListMap &mcParticleToHitListMap) const
 {
-    const MCParticle *pMCParticle(MCParticleHelper::GetMainMCParticle(pCaloHit));
+    const MCParticle *const pMCParticle(MCParticleHelper::GetMainMCParticle(pCaloHit));
 
     if (!this->SelectMCParticlesForClustering(pMCParticle))
         return;
@@ -97,7 +97,7 @@ void PerfectClusteringAlgorithm::SimpleMCParticleCollection(CaloHit *const pCalo
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PerfectClusteringAlgorithm::FullMCParticleCollection(CaloHit *const pCaloHit, MCParticleToHitListMap &mcParticleToHitListMap) const
+void PerfectClusteringAlgorithm::FullMCParticleCollection(const CaloHit *const pCaloHit, MCParticleToHitListMap &mcParticleToHitListMap) const
 {
     const MCParticleWeightMap mcParticleWeightMap(pCaloHit->GetMCParticleWeightMap());
 
@@ -112,17 +112,17 @@ void PerfectClusteringAlgorithm::FullMCParticleCollection(CaloHit *const pCaloHi
     if (mcParticleWeightSum < std::numeric_limits<float>::epsilon())
         throw StatusCodeException(STATUS_CODE_FAILURE);
 
-    CaloHit *pLocalCaloHit = pCaloHit;
+    const CaloHit *pLocalCaloHit = pCaloHit;
 
     for (MCParticleWeightMap::const_iterator iter = mcParticleWeightMap.begin(), iterEnd = mcParticleWeightMap.end(); iter != iterEnd; ++iter)
     {
-        const MCParticle *pMCParticle(iter->first);
+        const MCParticle *const pMCParticle(iter->first);
         const float weight(iter->second);
 
         if (!this->SelectMCParticlesForClustering(pMCParticle))
             continue;
 
-        CaloHit *pCaloHitToAdd = pLocalCaloHit;
+        const CaloHit *pCaloHitToAdd = pLocalCaloHit;
 
         if (pCaloHitToAdd->GetWeight() < std::numeric_limits<float>::epsilon())
             throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -144,14 +144,14 @@ void PerfectClusteringAlgorithm::FullMCParticleCollection(CaloHit *const pCaloHi
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PerfectClusteringAlgorithm::AddToHitListMap(CaloHit *const pCaloHitToAdd, const MCParticle *const pMCParticle,
+void PerfectClusteringAlgorithm::AddToHitListMap(const CaloHit *const pCaloHitToAdd, const MCParticle *const pMCParticle,
     MCParticleToHitListMap &mcParticleToHitListMap) const
 {
     MCParticleToHitListMap::iterator iter(mcParticleToHitListMap.find(pMCParticle));
 
     if (mcParticleToHitListMap.end() == iter)
     {
-        CaloHitList *pCaloHitList = new CaloHitList();
+        CaloHitList *const pCaloHitList = new CaloHitList();
         pCaloHitList->insert(pCaloHitToAdd);
         (void) mcParticleToHitListMap.insert(MCParticleToHitListMap::value_type(pMCParticle, pCaloHitList));
     }
@@ -168,12 +168,12 @@ void PerfectClusteringAlgorithm::CreateClusters(const MCParticleToHitListMap &mc
     for (MCParticleToHitListMap::const_iterator iter = mcParticleToHitListMap.begin(), iterEnd = mcParticleToHitListMap.end(); 
          iter != iterEnd; ++iter)
     {
-        const MCParticle *pMCParticle = iter->first;
-        CaloHitList *pCaloHitList = iter->second;
+        const MCParticle *const pMCParticle = iter->first;
+        CaloHitList *const pCaloHitList = iter->second;
 
         if (!pCaloHitList->empty())
         {
-            Cluster *pCluster = NULL;
+            const Cluster *pCluster = NULL;
             PandoraContentApi::Cluster::Parameters parameters;
             parameters.m_caloHitList = *pCaloHitList;
             PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, parameters, pCluster));

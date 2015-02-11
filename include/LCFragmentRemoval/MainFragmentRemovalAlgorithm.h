@@ -45,8 +45,8 @@ public:
      *  @param  pParentCluster address of the parent candidate cluster
      *  @param  parameters the cluster contact parameters
      */
-    ChargedClusterContact(const pandora::Pandora &pandora, pandora::Cluster *const pDaughterCluster, pandora::Cluster *const pParentCluster,
-        const Parameters &parameters);
+    ChargedClusterContact(const pandora::Pandora &pandora, const pandora::Cluster *const pDaughterCluster,
+        const pandora::Cluster *const pParentCluster, const Parameters &parameters);
 
     /**
      *  @brief  Get the sum of energies of tracks associated with parent cluster
@@ -92,8 +92,8 @@ private:
      *  @param  pParentCluster address of the parent candidate cluster
      *  @param  parameters the cluster contact parameters
      */
-    void ClusterHelixComparison(const pandora::Pandora &pandora, pandora::Cluster *const pDaughterCluster, pandora::Cluster *const pParentCluster,
-        const Parameters &parameters);
+    void ClusterHelixComparison(const pandora::Pandora &pandora, const pandora::Cluster *const pDaughterCluster,
+        const pandora::Cluster *const pParentCluster, const Parameters &parameters);
 
     float               m_parentTrackEnergy;            ///< Sum of energies of tracks associated with parent cluster
     float               m_coneFraction2;                ///< Fraction of daughter hits that lie within specified cone 2 along parent direction
@@ -103,7 +103,7 @@ private:
 };
 
 typedef std::vector<ChargedClusterContact> ChargedClusterContactVector;
-typedef std::map<pandora::Cluster *, ChargedClusterContactVector> ChargedClusterContactMap;
+typedef std::map<const pandora::Cluster *, ChargedClusterContactVector> ChargedClusterContactMap;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -159,8 +159,8 @@ private:
      *  @param  pBestParentCluster to receive the address of the best parent cluster candidate
      *  @param  pBestDaughterCluster to receive the address of the best daughter cluster candidate
      */
-    pandora::StatusCode GetClusterMergingCandidates(const ChargedClusterContactMap &chargedClusterContactMap, pandora::Cluster *&pBestParentCluster,
-        pandora::Cluster *&pBestDaughterCluster);
+    pandora::StatusCode GetClusterMergingCandidates(const ChargedClusterContactMap &chargedClusterContactMap, const pandora::Cluster *&pBestParentCluster,
+        const pandora::Cluster *&pBestDaughterCluster);
 
     /**
      *  @brief  Whether the candidate parent and daughter clusters pass quick preselection for fragment removal merging
@@ -172,7 +172,7 @@ private:
      * 
      *  @return boolean
      */
-    bool PassesPreselection(pandora::Cluster *const pDaughterCluster, const ChargedClusterContactVector &chargedClusterContactVector,
+    bool PassesPreselection(const pandora::Cluster *const pDaughterCluster, const ChargedClusterContactVector &chargedClusterContactVector,
         float &globalDeltaChi2) const;
 
     /**
@@ -195,7 +195,7 @@ private:
      * 
      *  @return the required evidence
      */
-    float GetRequiredEvidenceForMerge(pandora::Cluster *const pDaughterCluster, const ChargedClusterContact &chargedClusterContact,
+    float GetRequiredEvidenceForMerge(const pandora::Cluster *const pDaughterCluster, const ChargedClusterContact &chargedClusterContact,
         const unsigned int correctionLayer, const float globalDeltaChi2);
 
     /**
@@ -217,8 +217,8 @@ private:
      *  @param  pBestDaughterCluster address of the daughter cluster to be merged
      *  @param  affectedClusters to receive the list of affected clusters
      */
-    pandora::StatusCode GetAffectedClusters(const ChargedClusterContactMap &chargedClusterContactMap, pandora::Cluster *const pBestParentCluster,
-        pandora::Cluster *const pBestDaughterCluster, pandora::ClusterList &affectedClusters) const;
+    pandora::StatusCode GetAffectedClusters(const ChargedClusterContactMap &chargedClusterContactMap, const pandora::Cluster *const pBestParentCluster,
+        const pandora::Cluster *const pBestDaughterCluster, pandora::ClusterList &affectedClusters) const;
 
     typedef ChargedClusterContact::Parameters ContactParameters;
     ContactParameters   m_contactParameters;                        ///< The charged cluster contact parameters

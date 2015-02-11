@@ -84,7 +84,7 @@ StatusCode SoftClusterMergingAlgorithm::Run()
     // Loop over soft daughter candidate clusters
     for (ClusterVector::iterator iterI = clusterVector.begin(), iterIEnd = clusterVector.end(); iterI != iterIEnd; ++iterI)
     {
-        Cluster *pDaughterCluster = *iterI;
+        const Cluster *const pDaughterCluster = *iterI;
 
         if (NULL == pDaughterCluster)
             continue;
@@ -92,7 +92,7 @@ StatusCode SoftClusterMergingAlgorithm::Run()
         if (!this->IsSoftCluster(pDaughterCluster))
             continue;
 
-        Cluster *pBestParentCluster(NULL);
+        const Cluster *pBestParentCluster(NULL);
         float bestParentClusterEnergy(0.);
         float closestDistance(std::numeric_limits<float>::max());
 
@@ -101,7 +101,7 @@ StatusCode SoftClusterMergingAlgorithm::Run()
         // Find best candidate parent cluster: that with closest distance between a pair of hits in the daughter and parent
         for (ClusterVector::iterator iterJ = clusterVector.begin(), iterJEnd = clusterVector.end(); iterJ != iterJEnd; ++iterJ)
         {
-            Cluster *pParentCluster = *iterJ;
+            const Cluster *const pParentCluster = *iterJ;
 
             if ((NULL == pParentCluster) || (pDaughterCluster == pParentCluster))
                 continue;
@@ -158,7 +158,7 @@ StatusCode SoftClusterMergingAlgorithm::Run()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool SoftClusterMergingAlgorithm::IsSoftCluster(Cluster *const pDaughterCluster) const
+bool SoftClusterMergingAlgorithm::IsSoftCluster(const Cluster *const pDaughterCluster) const
 {
     // Note the cuts applied here are order-dependent - use the order defined in original version of pandora
     const unsigned int nCaloHits(pDaughterCluster->GetNCaloHits());
@@ -220,7 +220,7 @@ bool SoftClusterMergingAlgorithm::CanMergeSoftCluster(const Cluster *const pDaug
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode SoftClusterMergingAlgorithm::GetClusterListName(Cluster *const pCluster, const ClusterListToNameMap &clusterListToNameMap,
+StatusCode SoftClusterMergingAlgorithm::GetClusterListName(const Cluster *const pCluster, const ClusterListToNameMap &clusterListToNameMap,
     std::string &listName) const
 {
     for (ClusterListToNameMap::const_iterator iter = clusterListToNameMap.begin(), iterEnd = clusterListToNameMap.end(); iter != iterEnd; ++iter)

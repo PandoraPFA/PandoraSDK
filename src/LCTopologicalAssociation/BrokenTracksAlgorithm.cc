@@ -53,7 +53,7 @@ StatusCode BrokenTracksAlgorithm::Run()
 
     for (ClusterVector::const_iterator iter = clusterVector.begin(), iterEnd = clusterVector.end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
 
         if (!ClusterHelper::CanMergeCluster(this->GetPandora(), pCluster, m_canMergeMinMipFraction, m_maxFitRms))
             continue;
@@ -83,7 +83,7 @@ StatusCode BrokenTracksAlgorithm::Run()
         if ((*iterI)->IsDefunct())
             continue;
 
-        Cluster *pParentCluster((*iterI)->GetCluster());
+        const Cluster *const pParentCluster((*iterI)->GetCluster());
         const ClusterFitResult &parentClusterFitResult((*iterI)->GetEndFitResult());
 
         const unsigned int parentOuterLayer(pParentCluster->GetOuterPseudoLayer());
@@ -99,7 +99,7 @@ StatusCode BrokenTracksAlgorithm::Run()
             if ((*iterJ)->IsDefunct())
                 continue;
 
-            Cluster *pDaughterCluster((*iterJ)->GetCluster());
+            const Cluster *const pDaughterCluster((*iterJ)->GetCluster());
             const ClusterFitResult &daughterClusterFitResult((*iterJ)->GetStartFitResult());
 
             if (pParentCluster == pDaughterCluster)

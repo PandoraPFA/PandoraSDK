@@ -49,7 +49,7 @@ StatusCode BackscatteredTracks2Algorithm::Run()
     // Loop over candidate daughter/parent cluster combinations
     for (ClusterVector::const_iterator iterI = clusterVector.begin(), iterIEnd = clusterVector.end(); iterI != iterIEnd; ++iterI)
     {
-        Cluster *pParentCluster = *iterI;
+        const Cluster *const pParentCluster = *iterI;
 
         // Check to see if cluster has already been changed
         if (NULL == pParentCluster)
@@ -76,7 +76,7 @@ StatusCode BackscatteredTracks2Algorithm::Run()
         // Find a compatible daughter cluster
         for (ClusterVector::iterator iterJ = clusterVector.begin(), iterJEnd = clusterVector.end(); iterJ != iterJEnd; ++iterJ)
         {
-            Cluster *pDaughterCluster = *iterJ;
+            const Cluster *const pDaughterCluster = *iterJ;
 
             // Check to see if cluster has already been changed
             if ((NULL == pDaughterCluster) || (pParentCluster == pDaughterCluster))

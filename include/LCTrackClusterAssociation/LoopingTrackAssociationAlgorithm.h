@@ -45,7 +45,7 @@ private:
      *  @param  helixYCentre y coordinate of helix centre
      *  @param  helixRadius radius of the helix
      */
-    float GetMeanDeltaR(pandora::Cluster *const pCluster, const float helixXCentre, const float helixYCentre, const float helixRadius) const;
+    float GetMeanDeltaR(const pandora::Cluster *const pCluster, const float helixXCentre, const float helixYCentre, const float helixRadius) const;
 
     float           m_maxTrackClusterDeltaZ;            ///< Max z separation between track calorimeter projection and cluster start
 

@@ -30,7 +30,7 @@ StatusCode ForceSplitTrackAssociationsAlg::Run()
     // Loop over clusters in the algorithm input list, looking for those with excess track associations
     for (ClusterList::const_iterator iter = pClusterList->begin(); iter != pClusterList->end();)
     {
-        Cluster *pOriginalCluster = *iter;
+        const Cluster *const pOriginalCluster = *iter;
         ++iter;
 
         const TrackList trackList(pOriginalCluster->GetAssociatedTrackList());
@@ -55,10 +55,10 @@ StatusCode ForceSplitTrackAssociationsAlg::Run()
         for (TrackList::const_iterator trackIter = trackList.begin(), trackIterEnd = trackList.end(); trackIter != trackIterEnd;
             ++trackIter)
         {
-            Track *pTrack = *trackIter;
+            const Track *const pTrack = *trackIter;
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::RemoveTrackClusterAssociation(*this, pTrack, pOriginalCluster));
 
-            Cluster *pCluster = NULL;
+            const Cluster *pCluster = NULL;
             PandoraContentApi::Cluster::Parameters parameters;
             parameters.m_pTrack = pTrack;
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, parameters, pCluster));
@@ -76,11 +76,11 @@ StatusCode ForceSplitTrackAssociationsAlg::Run()
             for (CaloHitList::const_iterator hitIter = listIter->second->begin(), hitIterEnd = listIter->second->end();
                 hitIter != hitIterEnd; ++hitIter)
             {
-                CaloHit *pCaloHit = *hitIter;
+                const CaloHit *const pCaloHit = *hitIter;
                 const CartesianVector &hitPosition(pCaloHit->GetPositionVector());
 
                 // Identify most suitable cluster for calo hit, using distance to helix fit as figure of merit
-                Cluster *pBestCluster = NULL;
+                const Cluster *pBestCluster = NULL;
                 float bestClusterEnergy(0.);
                 float minDistanceToTrack(std::numeric_limits<float>::max());
 
@@ -122,7 +122,7 @@ StatusCode ForceSplitTrackAssociationsAlg::Run()
         // Check for any "empty" clusters and create new track-cluster associations
         for (TrackToClusterMap::iterator mapIter = trackToClusterMap.begin(); mapIter != trackToClusterMap.end();)
         {
-            Cluster *pCluster = mapIter->second;
+            const Cluster *const pCluster = mapIter->second;
 
             if (0 == pCluster->GetNCaloHits())
             {

@@ -50,7 +50,7 @@ StatusCode BackscatteredTracksAlgorithm::Run()
     // Loop over candidate daughter/parent cluster combinations
     for (ClusterVector::iterator iterI = clusterVector.begin(), iterIEnd = clusterVector.end(); iterI != iterIEnd; ++iterI)
     {
-        Cluster *pDaughterCluster = *iterI;
+        const Cluster *const pDaughterCluster = *iterI;
 
         // Check to see if cluster has already been changed
         if (NULL == pDaughterCluster)
@@ -74,14 +74,14 @@ StatusCode BackscatteredTracksAlgorithm::Run()
         if (STATUS_CODE_SUCCESS != ClusterFitHelper::FitLayers(pDaughterCluster, daughterInnerLayer, daughterOuterFitLayer, daughterClusterFitResult))
             continue;
 
-        Cluster *pBestParentCluster(NULL);
+        const Cluster *pBestParentCluster(NULL);
         float bestParentClusterEnergy(0.);
         float minFitDistanceToClosestHit(m_maxFitDistanceToClosestHit);
 
         // Find the most plausible parent cluster, with the smallest distance to the projection of the daughter cluster fit
         for (ClusterVector::const_iterator iterJ = clusterVector.begin(), iterJEnd = clusterVector.end(); iterJ != iterJEnd; ++iterJ)
         {
-            Cluster *pParentCluster = *iterJ;
+            const Cluster *const pParentCluster = *iterJ;
 
             // Check to see if cluster has already been changed
             if ((NULL == pParentCluster) || (pParentCluster == pDaughterCluster))

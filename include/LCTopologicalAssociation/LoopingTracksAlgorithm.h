@@ -51,14 +51,14 @@ private:
          *  @param  pCluster the address of the cluster
          *  @param  clusterFitResult the cluster fit result
          */
-        ClusterFitRelation(pandora::Cluster *const pCluster, const pandora::ClusterFitResult &clusterFitResult);
+        ClusterFitRelation(const pandora::Cluster *const pCluster, const pandora::ClusterFitResult &clusterFitResult);
 
         /**
          *  @brief  Get the address of the cluster
          * 
          *  @return The address of the cluster
          */
-        pandora::Cluster *GetCluster() const;
+        const pandora::Cluster *GetCluster() const;
 
         /**
          *  @brief  Get the cluster fit result
@@ -90,7 +90,7 @@ private:
 
     private:
         bool                        m_isDefunct;            ///< Whether the cluster fit relation is defunct
-        pandora::Cluster           *m_pCluster;             ///< Address of the cluster
+        const pandora::Cluster     *m_pCluster;             ///< Address of the cluster
         pandora::ClusterFitResult   m_clusterFitResult;     ///< The cluster fit result
     };
 
@@ -145,7 +145,7 @@ inline pandora::Algorithm *LoopingTracksAlgorithm::Factory::CreateAlgorithm() co
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline LoopingTracksAlgorithm::ClusterFitRelation::ClusterFitRelation(pandora::Cluster *const pCluster, const pandora::ClusterFitResult &clusterFitResult) :
+inline LoopingTracksAlgorithm::ClusterFitRelation::ClusterFitRelation(const pandora::Cluster *const pCluster, const pandora::ClusterFitResult &clusterFitResult) :
     m_isDefunct(false),
     m_pCluster(pCluster),
     m_clusterFitResult(clusterFitResult)
@@ -154,7 +154,7 @@ inline LoopingTracksAlgorithm::ClusterFitRelation::ClusterFitRelation(pandora::C
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline pandora::Cluster *LoopingTracksAlgorithm::ClusterFitRelation::GetCluster() const
+inline const pandora::Cluster *LoopingTracksAlgorithm::ClusterFitRelation::GetCluster() const
 {
     if (m_isDefunct)
         throw pandora::StatusCodeException(pandora::STATUS_CODE_NOT_ALLOWED);

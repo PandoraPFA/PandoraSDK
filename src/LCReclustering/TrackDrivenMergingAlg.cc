@@ -52,7 +52,7 @@ StatusCode TrackDrivenMergingAlg::Run()
 
     for (unsigned int i = 0; i < nClusters; ++i)
     {
-        Cluster *pParentCluster = clusterVector[i];
+        const Cluster *const pParentCluster = clusterVector[i];
 
         if (NULL == pParentCluster)
             continue;
@@ -87,7 +87,7 @@ StatusCode TrackDrivenMergingAlg::Run()
 
         // Examine pairs of clusters to evaluate merging suitability.
         float highestConeFraction(0.);
-        Cluster *pBestDaughterCluster(NULL);
+        const Cluster *pBestDaughterCluster(NULL);
 
         const unsigned int MAX_INDEX(std::numeric_limits<unsigned int>::max());
         unsigned int bestDaughterClusterIndex(MAX_INDEX);
@@ -97,7 +97,7 @@ StatusCode TrackDrivenMergingAlg::Run()
 
         for (unsigned int j = 0; j < nClusters; ++j)
         {
-            Cluster *pDaughterCluster = clusterVector[j];
+            const Cluster *const pDaughterCluster = clusterVector[j];
 
             // Check to see if cluster has already been changed
             if ((NULL == pDaughterCluster) || (pParentCluster == pDaughterCluster))

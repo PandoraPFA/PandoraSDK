@@ -39,7 +39,8 @@ public:
      *  @param  pParentCluster address of the parent candidate cluster
      *  @param  parameters the cluster contact parameters
      */
-    NeutralClusterContact(const pandora::Pandora &pandora, pandora::Cluster *const pDaughterCluster, pandora::Cluster *const pParentCluster, const Parameters &parameters);
+    NeutralClusterContact(const pandora::Pandora &pandora, const pandora::Cluster *const pDaughterCluster, const pandora::Cluster *const pParentCluster,
+        const Parameters &parameters);
 
     /**
      *  @brief  Get the fraction of daughter hits that lie within specified cone 2 along parent direction
@@ -61,7 +62,7 @@ private:
 };
 
 typedef std::vector<NeutralClusterContact> NeutralClusterContactVector;
-typedef std::map<pandora::Cluster *, NeutralClusterContactVector> NeutralClusterContactMap;
+typedef std::map<const pandora::Cluster *, NeutralClusterContactVector> NeutralClusterContactMap;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -108,7 +109,7 @@ private:
      * 
      *  @return boolean
      */
-    bool IsPhotonLike(pandora::Cluster *const pDaughterCluster) const;
+    bool IsPhotonLike(const pandora::Cluster *const pDaughterCluster) const;
 
     /**
      *  @brief  Whether candidate parent and daughter clusters are sufficiently in contact to warrant further investigation
@@ -126,8 +127,8 @@ private:
      *  @param  pBestParentCluster to receive the address of the best parent cluster candidate
      *  @param  pBestDaughterCluster to receive the address of the best daughter cluster candidate
      */
-    pandora::StatusCode GetClusterMergingCandidates(const NeutralClusterContactMap &neutralClusterContactMap, pandora::Cluster *&pBestParentCluster,
-        pandora::Cluster *&pBestDaughterCluster) const;
+    pandora::StatusCode GetClusterMergingCandidates(const NeutralClusterContactMap &neutralClusterContactMap, const pandora::Cluster *&pBestParentCluster,
+        const pandora::Cluster *&pBestDaughterCluster) const;
 
     /**
      *  @brief  Get a measure of the evidence for merging the parent and daughter candidate clusters
@@ -146,8 +147,8 @@ private:
      *  @param  pBestDaughterCluster address of the daughter cluster to be merged
      *  @param  affectedClusters to receive the list of affected clusters
      */
-    pandora::StatusCode GetAffectedClusters(const NeutralClusterContactMap &neutralClusterContactMap, pandora::Cluster *const pBestParentCluster,
-        pandora::Cluster *const pBestDaughterCluster, pandora::ClusterList &affectedClusters) const;
+    pandora::StatusCode GetAffectedClusters(const NeutralClusterContactMap &neutralClusterContactMap, const pandora::Cluster *const pBestParentCluster,
+        const pandora::Cluster *const pBestDaughterCluster, pandora::ClusterList &affectedClusters) const;
 
     typedef NeutralClusterContact::Parameters ContactParameters;
     ContactParameters   m_contactParameters;                        ///< The neutral cluster contact parameters

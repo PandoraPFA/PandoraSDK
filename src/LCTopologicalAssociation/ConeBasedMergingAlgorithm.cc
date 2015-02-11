@@ -53,7 +53,7 @@ StatusCode ConeBasedMergingAlgorithm::Run()
     // Loop over daughter candidates and, for each, examine all possible parents
     for (ClusterVector::reverse_iterator iterI = daughterVector.rbegin(), iterIEnd = daughterVector.rend(); iterI != iterIEnd; ++iterI)
     {
-        Cluster *pDaughterCluster = *iterI;
+        const Cluster *const pDaughterCluster = *iterI;
 
         if (NULL == pDaughterCluster)
             continue;
@@ -61,7 +61,7 @@ StatusCode ConeBasedMergingAlgorithm::Run()
         if (!ClusterHelper::CanMergeCluster(this->GetPandora(), pDaughterCluster, m_canMergeMinMipFraction, m_canMergeMaxRms))
             continue;
 
-        Cluster *pBestParentCluster(NULL);
+        const Cluster *pBestParentCluster(NULL);
         float bestParentClusterEnergy(0.);
         float highestConeFraction(m_minConeFraction);
 
@@ -69,7 +69,7 @@ StatusCode ConeBasedMergingAlgorithm::Run()
 
         for (ClusterFitResultMap::const_iterator iterJ = parentFitResultMap.begin(), iterJEnd = parentFitResultMap.end(); iterJ != iterJEnd; ++iterJ)
         {
-            Cluster *pParentCluster = iterJ->first;
+            const Cluster *const pParentCluster = iterJ->first;
 
             if (pDaughterCluster == pParentCluster)
                 continue;
@@ -168,7 +168,7 @@ StatusCode ConeBasedMergingAlgorithm::PrepareClusters(ClusterVector &daughterVec
     // Perform a mip fit to all parent candidate clusters
     for (ClusterList::const_iterator iter = pClusterList->begin(), iterEnd = pClusterList->end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
 
         if (pCluster->GetNCaloHits() < m_minHitsInCluster)
             continue;
@@ -200,7 +200,7 @@ StatusCode ConeBasedMergingAlgorithm::PrepareClusters(ClusterVector &daughterVec
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-float ConeBasedMergingAlgorithm::GetFractionInCone(Cluster *const pParentCluster, const Cluster *const pDaughterCluster,
+float ConeBasedMergingAlgorithm::GetFractionInCone(const Cluster *const pParentCluster, const Cluster *const pDaughterCluster,
     const ClusterFitResult &parentMipFitResult) const
 {
     const unsigned int nDaughterCaloHits(pDaughterCluster->GetNCaloHits());

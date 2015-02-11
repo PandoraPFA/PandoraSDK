@@ -462,7 +462,7 @@ bool LCParticleIdPlugins::LCMuonId::IsMatch(const Cluster *const pCluster) const
         return false;
 
     // For now only try to identify "high" energy muons
-    Track *pTrack = *(trackList.begin());
+    const Track *const pTrack = *(trackList.begin());
 
     if (pTrack->GetEnergyAtDca() < m_minTrackEnergy)
         return false;
@@ -481,7 +481,7 @@ bool LCParticleIdPlugins::LCMuonId::IsMatch(const Cluster *const pCluster) const
     {
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
-            CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
 
             const unsigned int pseudoLayer(pCaloHit->GetPseudoLayer());
             const unsigned int layer(pCaloHit->GetLayer());

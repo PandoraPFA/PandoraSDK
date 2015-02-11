@@ -45,18 +45,18 @@ StatusCode ForcedClusteringAlgorithm::Run()
 
     for (TrackList::const_iterator iter = pTrackList->begin(), iterEnd = pTrackList->end(); iter != iterEnd; ++iter)
     {
-        Track *pTrack = *iter;
+        const Track *const pTrack = *iter;
         const Helix *const pHelix(pTrack->GetHelixFitAtCalorimeter());
         const float trackEnergy(pTrack->GetEnergyAtDca());
 
-        Cluster *pCluster = NULL;
+        const Cluster *pCluster = NULL;
         PandoraContentApi::Cluster::Parameters parameters;
         parameters.m_pTrack = pTrack;
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, parameters, pCluster));
 
         for (CaloHitList::const_iterator hitIter = pCaloHitList->begin(), hitIterEnd = pCaloHitList->end(); hitIter != hitIterEnd; ++hitIter)
         {
-            CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
 
             if ((m_shouldClusterIsolatedHits || !pCaloHit->IsIsolated()) && PandoraContentApi::IsAvailable(*this, pCaloHit))
             {
@@ -73,8 +73,8 @@ StatusCode ForcedClusteringAlgorithm::Run()
     // Work along ordered list of calo hits, adding to the clusters until each cluster energy matches associated track energy.
     for (TrackDistanceInfoVector::const_iterator iter = trackDistanceInfoVector.begin(), iterEnd = trackDistanceInfoVector.end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = iter->GetCluster();
-        CaloHit *pCaloHit = iter->GetCaloHit();
+        const Cluster *const pCluster = iter->GetCluster();
+        const CaloHit *const pCaloHit = iter->GetCaloHit();
         const float trackEnergy = iter->GetTrackEnergy();
 
         if ((pCluster->GetHadronicEnergy() < trackEnergy) && PandoraContentApi::IsAvailable(*this, pCaloHit))
@@ -101,7 +101,7 @@ StatusCode ForcedClusteringAlgorithm::Run()
 
         if (!remnantCaloHitList.empty())
         {
-            Cluster *pRemnantCluster = NULL;
+            const Cluster *pRemnantCluster = NULL;
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, remnantParameters, pRemnantCluster));
         }
     }
