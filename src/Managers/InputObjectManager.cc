@@ -89,7 +89,7 @@ StatusCode InputObjectManager<T>::AddObjectsToList(const std::string &listName, 
     if (Manager<T>::m_nameToListMap.end() == listIter)
         return STATUS_CODE_NOT_FOUND;
 
-    ObjectList *pSavedList = listIter->second;
+    ObjectList *const pSavedList = listIter->second;
 
     if (pSavedList == &objectList)
         return STATUS_CODE_INVALID_PARAMETER;
@@ -113,7 +113,7 @@ StatusCode InputObjectManager<T>::RemoveObjectsFromList(const std::string &listN
     if (Manager<T>::m_nameToListMap.end() == listIter)
         return STATUS_CODE_NOT_FOUND;
 
-    ObjectList *pSavedList = listIter->second;
+    ObjectList *const pSavedList = listIter->second;
 
     if (pSavedList == &objectList)
         return STATUS_CODE_INVALID_PARAMETER;

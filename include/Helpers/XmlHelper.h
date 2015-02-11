@@ -255,7 +255,7 @@ template <typename T>
 inline StatusCode XmlHelper::Read2DVectorOfValues(const TiXmlHandle &xmlHandle, const std::string &xmlElementName, const std::string &rowName,
     std::vector< std::vector<T> > &vector)
 {
-    TiXmlElement *pXmlElement = xmlHandle.FirstChild(xmlElementName).Element();
+    TiXmlElement *const pXmlElement = xmlHandle.FirstChild(xmlElementName).Element();
 
     if (NULL == pXmlElement)
         return STATUS_CODE_NOT_FOUND;

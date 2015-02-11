@@ -28,7 +28,7 @@ VertexManager::~VertexManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode VertexManager::CreateVertex(const PandoraContentApi::Vertex::Parameters &parameters, Vertex *&pVertex)
+StatusCode VertexManager::CreateVertex(const PandoraContentApi::Vertex::Parameters &parameters, const Vertex *&pVertex)
 {
     pVertex = NULL;
 
@@ -59,6 +59,40 @@ StatusCode VertexManager::CreateVertex(const PandoraContentApi::Vertex::Paramete
         pVertex = NULL;
         return statusCodeException.GetStatusCode();
     }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <>
+bool VertexManager::IsAvailable(const Vertex *const pVertex) const
+{
+    return pVertex->IsAvailable();
+}
+
+template <>
+bool VertexManager::IsAvailable(const VertexList *const pVertexList) const
+{
+    bool isAvailable(true);
+
+    for (VertexList::const_iterator iter = pVertexList->begin(), iterEnd = pVertexList->end(); iter != iterEnd; ++iter)
+        isAvailable &= this->IsAvailable(*iter);
+
+    return isAvailable;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <>
+void VertexManager::SetAvailability(const Vertex *const pVertex, bool isAvailable) const
+{
+    this->Modifiable(pVertex)->SetAvailability(isAvailable);
+}
+
+template <>
+void VertexManager::SetAvailability(const VertexList *const pVertexList, bool isAvailable) const
+{
+    for (VertexList::const_iterator iter = pVertexList->begin(), iterEnd = pVertexList->end(); iter != iterEnd; ++iter)
+        this->SetAvailability(*iter, isAvailable);
 }
 
 } // namespace pandora

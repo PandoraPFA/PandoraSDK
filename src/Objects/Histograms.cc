@@ -35,7 +35,7 @@ Histogram::Histogram(const unsigned int nBinsX, const float xLow, const float xH
 
 Histogram::Histogram(const TiXmlHandle *const pXmlHandle, const std::string &xmlElementName)
 {
-    TiXmlElement *pXmlElement(pXmlHandle->FirstChild(xmlElementName).Element());
+    TiXmlElement *const pXmlElement(pXmlHandle->FirstChild(xmlElementName).Element());
 
     if (NULL == pXmlElement)
     {
@@ -230,19 +230,19 @@ void Histogram::Scale(const float scaleFactor)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Histogram::WriteToXml(TiXmlDocument *pTiXmlDocument, const std::string &histogramXmlKey) const
+void Histogram::WriteToXml(TiXmlDocument *const pTiXmlDocument, const std::string &histogramXmlKey) const
 {
-    TiXmlElement *pHistogramElement = new TiXmlElement(histogramXmlKey);
+    TiXmlElement *const pHistogramElement = new TiXmlElement(histogramXmlKey);
 
-    TiXmlElement *pNBinsXElement = new TiXmlElement("NBinsX");
+    TiXmlElement *const pNBinsXElement = new TiXmlElement("NBinsX");
     pNBinsXElement->LinkEndChild(new TiXmlText(TypeToString(m_nBinsX)));
     pHistogramElement->LinkEndChild(pNBinsXElement);
 
-    TiXmlElement *pXLowElement = new TiXmlElement("XLow");
+    TiXmlElement *const pXLowElement = new TiXmlElement("XLow");
     pXLowElement->LinkEndChild(new TiXmlText(TypeToString(m_xLow)));
     pHistogramElement->LinkEndChild(pXLowElement);
 
-    TiXmlElement *pXHighElement = new TiXmlElement("XHigh");
+    TiXmlElement *const pXHighElement = new TiXmlElement("XHigh");
     pXHighElement->LinkEndChild(new TiXmlText(TypeToString(m_xHigh)));
     pHistogramElement->LinkEndChild(pXHighElement);
 
@@ -252,7 +252,7 @@ void Histogram::WriteToXml(TiXmlDocument *pTiXmlDocument, const std::string &his
         binContentsString += TypeToString(this->GetBinContent(binX)) + " ";
     }
 
-    TiXmlElement *pBinContentsElement = new TiXmlElement("BinContents");
+    TiXmlElement *const pBinContentsElement = new TiXmlElement("BinContents");
     pBinContentsElement->LinkEndChild(new TiXmlText(binContentsString));
     pHistogramElement->LinkEndChild(pBinContentsElement);
 
@@ -286,7 +286,7 @@ TwoDHistogram::TwoDHistogram(const unsigned int nBinsX, const float xLow, const 
 
 TwoDHistogram::TwoDHistogram(const TiXmlHandle *const pXmlHandle, const std::string &xmlElementName)
 {
-    TiXmlElement *pXmlElement(pXmlHandle->FirstChild(xmlElementName).Element());
+    TiXmlElement *const pXmlElement(pXmlHandle->FirstChild(xmlElementName).Element());
 
     if (NULL == pXmlElement)
     {
@@ -636,35 +636,35 @@ void TwoDHistogram::Scale(const float scaleFactor)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void TwoDHistogram::WriteToXml(TiXmlDocument *pTiXmlDocument, const std::string &histogramXmlKey) const
+void TwoDHistogram::WriteToXml(TiXmlDocument *const pTiXmlDocument, const std::string &histogramXmlKey) const
 {
-    TiXmlElement *pHistogramElement = new TiXmlElement(histogramXmlKey);
+    TiXmlElement *const pHistogramElement = new TiXmlElement(histogramXmlKey);
 
-    TiXmlElement *pNBinsXElement = new TiXmlElement("NBinsX");
+    TiXmlElement *const pNBinsXElement = new TiXmlElement("NBinsX");
     pNBinsXElement->LinkEndChild(new TiXmlText(TypeToString(m_nBinsX)));
     pHistogramElement->LinkEndChild(pNBinsXElement);
 
-    TiXmlElement *pXLowElement = new TiXmlElement("XLow");
+    TiXmlElement *const pXLowElement = new TiXmlElement("XLow");
     pXLowElement->LinkEndChild(new TiXmlText(TypeToString(m_xLow)));
     pHistogramElement->LinkEndChild(pXLowElement);
 
-    TiXmlElement *pXHighElement = new TiXmlElement("XHigh");
+    TiXmlElement *const pXHighElement = new TiXmlElement("XHigh");
     pXHighElement->LinkEndChild(new TiXmlText(TypeToString(m_xHigh)));
     pHistogramElement->LinkEndChild(pXHighElement);
 
-    TiXmlElement *pNBinsYElement = new TiXmlElement("NBinsY");
+    TiXmlElement *const pNBinsYElement = new TiXmlElement("NBinsY");
     pNBinsYElement->LinkEndChild(new TiXmlText(TypeToString(m_nBinsY)));
     pHistogramElement->LinkEndChild(pNBinsYElement);
 
-    TiXmlElement *pYLowElement = new TiXmlElement("YLow");
+    TiXmlElement *const pYLowElement = new TiXmlElement("YLow");
     pYLowElement->LinkEndChild(new TiXmlText(TypeToString(m_yLow)));
     pHistogramElement->LinkEndChild(pYLowElement);
 
-    TiXmlElement *pYHighElement = new TiXmlElement("YHigh");
+    TiXmlElement *const pYHighElement = new TiXmlElement("YHigh");
     pYHighElement->LinkEndChild(new TiXmlText(TypeToString(m_yHigh)));
     pHistogramElement->LinkEndChild(pYHighElement);
 
-    TiXmlElement *pBinContentsElement = new TiXmlElement("BinContents");
+    TiXmlElement *const pBinContentsElement = new TiXmlElement("BinContents");
 
     for (int binY = -1; binY <= m_nBinsY; ++binY)
     {
@@ -675,7 +675,7 @@ void TwoDHistogram::WriteToXml(TiXmlDocument *pTiXmlDocument, const std::string 
             binContentsString += TypeToString(this->GetBinContent(binX, binY)) + " ";
         }
 
-        TiXmlElement *pRowElement = new TiXmlElement("Row");
+        TiXmlElement *const pRowElement = new TiXmlElement("Row");
         pRowElement->LinkEndChild(new TiXmlText(binContentsString));
         pBinContentsElement->LinkEndChild(pRowElement);
     }

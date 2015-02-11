@@ -27,7 +27,7 @@ public:
 };
 
 typedef std::vector<CaloHitReplacement *> CaloHitReplacementList;
-typedef std::map<CaloHit *, bool> CaloHitUsageMap;
+typedef std::map<const CaloHit *, bool> CaloHitUsageMap;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -45,12 +45,31 @@ public:
      *  @param  caloHitListName name of the associated calo hit list
      *  @param  initialHitAvailability the initial availability of the calo hits
      */
-    CaloHitMetadata(CaloHitList *pCaloHitList, const std::string &caloHitListName, const bool initialHitAvailability);
+    CaloHitMetadata(CaloHitList *const pCaloHitList, const std::string &caloHitListName, const bool initialHitAvailability);
 
     /**
      *  @brief  Destructor
      */
     ~CaloHitMetadata();
+
+    /**
+     *  @brief  Is a calo hit, or a list of calo hits, available to add to a cluster
+     * 
+     *  @param  pT address of the object or object list
+     * 
+     *  @return boolean
+     */
+    template <typename T>
+    bool IsAvailable(const T *const pT) const;
+
+    /**
+     *  @brief  Set availability of a calo hit, or a list of calo hits, to be added to a cluster
+     * 
+     *  @param  pT the address of the object or object list
+     *  @param  isAvailable the availability
+     */
+    template <typename T>
+    StatusCode SetAvailability(const T *const pT, bool isAvailable);
 
     /**
      *  @brief  Update metadata to account for changes by daughter recluster processes
@@ -85,40 +104,6 @@ public:
      */
     const CaloHitReplacementList &GetCaloHitReplacementList() const;
 
-    /**
-     *  @brief  Is calo hit available to add to a cluster
-     * 
-     *  @param  pCaloHit address of the calo hit
-     * 
-     *  @return boolean
-     */
-    bool IsCaloHitAvailable(CaloHit *const pCaloHit) const;
-
-    /**
-     *  @brief  Are all calo hits in list available to add to a cluster
-     * 
-     *  @param  caloHitList the list of calo hits
-     * 
-     *  @return boolean
-     */
-    bool AreCaloHitsAvailable(const CaloHitList &caloHitList) const;
-
-    /**
-     *  @brief  Set availability of a calo hit to be added to a cluster
-     * 
-     *  @param  pCaloHit the address of the calo hit
-     *  @param  isAvailable the calo hit availability
-     */
-    StatusCode SetCaloHitAvailability(CaloHit *const pCaloHit, bool isAvailable);
-
-    /**
-     *  @brief  Set availability of all calo hits in list
-     * 
-     *  @param  caloHitList the list of calo hits
-     *  @param  isAvailable the calo hit availability
-     */
-    StatusCode SetCaloHitAvailability(const CaloHitList &caloHitList, bool isAvailable);
-
 private:
     CaloHitList                *m_pCaloHitList;                     ///< Address of the associated calo hit list
     std::string                 m_caloHitListName;                  ///< The name of the associated calo hit list
@@ -140,7 +125,7 @@ public:
      * 
      *  @param  pCaloHitList address of the initial calo hit list, copies of which will be used during reclustering
      */
-    ReclusterMetadata(CaloHitList *pCaloHitList);
+    ReclusterMetadata(CaloHitList *const pCaloHitList);
 
     /**
      *  @brief  Destructor
@@ -155,7 +140,7 @@ public:
      *  @param  reclusterListName the name of the reclustering option
      *  @param  initialHitAvailability the initial availability of the calo hits
      */
-    StatusCode CreateCaloHitMetadata(CaloHitList *pCaloHitList, const std::string &caloHitListName, const std::string &reclusterListName,
+    StatusCode CreateCaloHitMetadata(CaloHitList *const pCaloHitList, const std::string &caloHitListName, const std::string &reclusterListName,
         const bool initialHitAvailability);
 
     /**
@@ -203,32 +188,6 @@ inline const CaloHitUsageMap &CaloHitMetadata::GetCaloHitUsageMap() const
 inline const CaloHitReplacementList &CaloHitMetadata::GetCaloHitReplacementList() const
 {
     return m_caloHitReplacementList;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool CaloHitMetadata::IsCaloHitAvailable(CaloHit *const pCaloHit) const
-{
-    CaloHitUsageMap::const_iterator usageMapIter = m_caloHitUsageMap.find(pCaloHit);
-
-    if ((m_caloHitUsageMap.end()) == usageMapIter || !usageMapIter->second)
-        return false;
-
-    return true;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline StatusCode CaloHitMetadata::SetCaloHitAvailability(CaloHit *const pCaloHit, bool isAvailable)
-{
-    CaloHitUsageMap::iterator usageMapIter = m_caloHitUsageMap.find(pCaloHit);
-
-    if (m_caloHitUsageMap.end() == usageMapIter)
-        return STATUS_CODE_NOT_FOUND;
-
-    usageMapIter->second = isAvailable;
-
-    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -276,28 +276,28 @@ private:
      * 
      *  @param  pCaloHit the address of the calo hit
      */
-    StatusCode AddCaloHit(CaloHit *const pCaloHit);
+    StatusCode AddCaloHit(const CaloHit *const pCaloHit);
 
     /**
      *  @brief  Remove a calo hit from the cluster
      * 
      *  @param  pCaloHit the address of the calo hit
      */
-    StatusCode RemoveCaloHit(CaloHit *const pCaloHit);
+    StatusCode RemoveCaloHit(const CaloHit *const pCaloHit);
 
     /**
      *  @brief  Add an isolated calo hit to the cluster.
      * 
      *  @param  pCaloHit the address of the isolated calo hit
      */
-    StatusCode AddIsolatedCaloHit(CaloHit *const pCaloHit);
+    StatusCode AddIsolatedCaloHit(const CaloHit *const pCaloHit);
 
     /**
      *  @brief  Remove an isolated calo hit from the cluster
      * 
      *  @param  pCaloHit the address of the isolated calo hit
      */
-    StatusCode RemoveIsolatedCaloHit(CaloHit *const pCaloHit);
+    StatusCode RemoveIsolatedCaloHit(const CaloHit *const pCaloHit);
 
     /**
      *  @brief  Calculate result of a linear fit to all calo hits in the cluster
@@ -360,21 +360,21 @@ private:
      * 
      *  @param  pCluster the address of the second cluster
      */
-    StatusCode AddHitsFromSecondCluster(Cluster *const pCluster);
+    StatusCode AddHitsFromSecondCluster(const Cluster *const pCluster);
 
     /**
      *  @brief  Add an association between the cluster and a track
      * 
      *  @param  pTrack the address of the track with which the cluster is associated
      */
-    StatusCode AddTrackAssociation(Track *const pTrack);
+    StatusCode AddTrackAssociation(const Track *const pTrack);
 
     /**
      *  @brief  Remove an association between the cluster and a track
      * 
      *  @param  pTrack the address of the track with which the cluster is no longer associated
      */
-    StatusCode RemoveTrackAssociation(Track *const pTrack);
+    StatusCode RemoveTrackAssociation(const Track *const pTrack);
 
     /**
      *  @brief  Remove the track seed, changing the initial direction measurement.
@@ -435,7 +435,6 @@ private:
 
     bool                        m_isAvailable;                  ///< Whether the cluster is available to be added to a particle flow object
 
-    friend class PandoraContentApiImpl;
     friend class ClusterManager;
     friend class AlgorithmObjectManager<Cluster>;
 };
@@ -479,12 +478,7 @@ inline unsigned int Cluster::GetNPossibleMipHits() const
 
 inline float Cluster::GetMipFraction() const
 {
-    float mipFraction = 0;
-
-    if (0 != m_nCaloHits)
-        mipFraction = static_cast<float> (m_nPossibleMipHits) / static_cast<float> (m_nCaloHits);
-
-    return mipFraction;
+    return ((0 != m_nCaloHits) ? static_cast<float> (m_nPossibleMipHits) / static_cast<float> (m_nCaloHits) : 0);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -674,25 +668,6 @@ inline float Cluster::GetShowerProfileDiscrepancy(const Pandora &pandora) const
 
 inline Cluster::~Cluster()
 {
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline void Cluster::ResetOutdatedProperties()
-{
-    m_isFitUpToDate = false;
-    m_isDirectionUpToDate = false;
-    m_initialDirection.SetValues(0.f, 0.f, 0.f);
-    m_fitToAllHitsResult.Reset();
-    m_showerStartLayer.Reset();
-    m_isPhotonFast.Reset();
-    m_showerProfileStart.Reset();
-    m_showerProfileDiscrepancy.Reset();
-    m_correctedElectromagneticEnergy.Reset();
-    m_correctedHadronicEnergy.Reset();
-    m_trackComparisonEnergy.Reset();
-    m_innerLayerHitType.Reset();
-    m_outerLayerHitType.Reset();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

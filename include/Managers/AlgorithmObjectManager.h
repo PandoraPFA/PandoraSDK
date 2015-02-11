@@ -99,7 +99,7 @@ protected:
      * 
      *  @param  pCluster address of the object to delete
      */
-    virtual StatusCode DeleteObject(T *pT);
+    virtual StatusCode DeleteObject(const T *const pT);
 
     /**
      *  @brief  Delete an object from a specified list
@@ -107,7 +107,7 @@ protected:
      *  @param  pCluster address of the object to delete
      *  @param  listName the name of the list containing the object
      */
-    virtual StatusCode DeleteObject(T *pT, const std::string &listName);
+    virtual StatusCode DeleteObject(const T *const pT, const std::string &listName);
 
     /**
      *  @brief  Delete a list of objects from the current list

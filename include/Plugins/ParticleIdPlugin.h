@@ -96,7 +96,7 @@ private:
      *  @param  pluginName the name/label associated with the particle id plugin
      *  @param  particleIdPlugin pointer to a particle id plugin
      */
-    StatusCode RegisterPlugin(const std::string &pluginName, ParticleIdPlugin *pParticleIdPlugin);
+    StatusCode RegisterPlugin(const std::string &pluginName, ParticleIdPlugin *const pParticleIdPlugin);
 
     /**
      *  @brief  Initialize plugins

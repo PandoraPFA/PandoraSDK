@@ -213,7 +213,7 @@ private:
 typedef PandoraInputType<unsigned int> InputUInt;
 typedef PandoraInputType<int> InputInt;
 typedef PandoraInputType<float> InputFloat;
-typedef PandoraInputType<void *> InputAddress;
+typedef PandoraInputType<const void *> InputAddress;
 typedef PandoraInputType<bool> InputBool;
 typedef PandoraInputType<std::string> InputString;
 
@@ -225,7 +225,7 @@ typedef PandoraInputType<VertexType> InputVertexType;
 
 typedef PandoraInputType<CartesianVector> InputCartesianVector;
 typedef PandoraInputType<TrackState> InputTrackState;
-typedef PandoraInputType<Track *> InputTrackAddress;
+typedef PandoraInputType<const Track *> InputTrackAddress;
 
 typedef std::vector<const void *> CaloHitAddressList, TrackAddressList;
 typedef std::vector<CaloHitAddressList> ClusterAddressList;
@@ -362,7 +362,7 @@ inline bool PandoraInputType<T>::IsValid(const T &t) const
 }
 
 template <>
-inline bool PandoraInputType<void *>::IsValid(void *const &) const
+inline bool PandoraInputType<const void *>::IsValid(const void *const &) const
 {
     return true;
 }
@@ -423,7 +423,7 @@ inline bool PandoraInputType<TrackState>::IsValid(const TrackState &t) const
 }
 
 template <>
-inline bool PandoraInputType<Track *>::IsValid(Track *const &) const
+inline bool PandoraInputType<const Track *>::IsValid(const Track *const &) const
 {
     return true;
 }

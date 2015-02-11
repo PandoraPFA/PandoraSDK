@@ -408,7 +408,7 @@ StatusCode BinaryFileReader::ReadCaloHit(bool checkComponentId)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(layer));
     bool isInOuterSamplingLayer(false);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(isInOuterSamplingLayer));
-    void *pParentAddress(NULL);
+    const void *pParentAddress(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(pParentAddress));
 
     PandoraApi::RectangularCaloHit::Parameters rectangularParameters;
@@ -439,7 +439,7 @@ StatusCode BinaryFileReader::ReadCaloHit(bool checkComponentId)
         return STATUS_CODE_FAILURE;
     }
 
-    PandoraApi::CaloHitBaseParameters *pBaseParameters((RECTANGULAR == cellGeometry) ?
+    PandoraApi::CaloHitBaseParameters *const pBaseParameters((RECTANGULAR == cellGeometry) ?
         static_cast<PandoraApi::CaloHitBaseParameters*>(&rectangularParameters) :
         static_cast<PandoraApi::CaloHitBaseParameters*>(&pointingParameters));
 
@@ -517,7 +517,7 @@ StatusCode BinaryFileReader::ReadTrack(bool checkComponentId)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(canFormPfo));
     bool canFormClusterlessPfo(false);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(canFormClusterlessPfo));
-    void *pParentAddress(NULL);
+    const void *pParentAddress(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(pParentAddress));
 
     PandoraApi::Track::Parameters parameters;
@@ -569,7 +569,7 @@ StatusCode BinaryFileReader::ReadMCParticle(bool checkComponentId)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(particleId));
     MCParticleType mcParticleType(MC_3D);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(mcParticleType));
-    void *pParentAddress(NULL);
+    const void *pParentAddress(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(pParentAddress));
 
     PandoraApi::MCParticle::Parameters parameters;
@@ -603,9 +603,9 @@ StatusCode BinaryFileReader::ReadRelationship(bool checkComponentId)
 
     RelationshipId relationshipId(UNKNOWN_RELATIONSHIP);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(relationshipId));
-    void *address1(NULL);
+    const void *address1(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(address1));
-    void *address2(NULL);
+    const void *address2(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(address2));
     float weight(1.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(weight));

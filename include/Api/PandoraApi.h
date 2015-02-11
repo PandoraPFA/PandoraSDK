@@ -245,8 +245,8 @@ public:
      *  @param  pParentAddress address of parent mc particle in the user framework
      *  @param  pDaughterAddress address of daughter mc particle in the user framework
      */
-    static pandora::StatusCode SetMCParentDaughterRelationship(const pandora::Pandora &pandora, const void *pParentAddress,
-        const void *pDaughterAddress);
+    static pandora::StatusCode SetMCParentDaughterRelationship(const pandora::Pandora &pandora, const void *const pParentAddress,
+        const void *const pDaughterAddress);
 
     /**
      *  @brief  Set parent-daughter track relationship
@@ -255,8 +255,8 @@ public:
      *  @param  pParentAddress address of parent track in the user framework
      *  @param  pDaughterAddress address of daughter track in the user framework
      */
-    static pandora::StatusCode SetTrackParentDaughterRelationship(const pandora::Pandora &pandora, const void *pParentAddress,
-        const void *pDaughterAddress);
+    static pandora::StatusCode SetTrackParentDaughterRelationship(const pandora::Pandora &pandora, const void *const pParentAddress,
+        const void *const pDaughterAddress);
 
     /**
      *  @brief  Set sibling track relationship
@@ -265,8 +265,8 @@ public:
      *  @param  pFirstSiblingAddress address of first sibling track in the user framework
      *  @param  pSecondSiblingAddress address of second sibling track in the user framework
      */
-    static pandora::StatusCode SetTrackSiblingRelationship(const pandora::Pandora &pandora, const void *pFirstSiblingAddress,
-        const void *pSecondSiblingAddress);
+    static pandora::StatusCode SetTrackSiblingRelationship(const pandora::Pandora &pandora, const void *const pFirstSiblingAddress,
+        const void *const pSecondSiblingAddress);
 
     /**
      *  @brief  Set calo hit to mc particle relationship
@@ -276,8 +276,8 @@ public:
      *  @param  pMCParticleParentAddress address of mc particle in the user framework
      *  @param  mcParticleWeight weighting to assign to the mc particle
      */
-    static pandora::StatusCode SetCaloHitToMCParticleRelationship(const pandora::Pandora &pandora, const void *pCaloHitParentAddress,
-        const void *pMCParticleParentAddress, const float mcParticleWeight = 1);
+    static pandora::StatusCode SetCaloHitToMCParticleRelationship(const pandora::Pandora &pandora, const void *const pCaloHitParentAddress,
+        const void *const pMCParticleParentAddress, const float mcParticleWeight = 1);
 
     /**
      *  @brief  Set track to mc particle relationship
@@ -287,8 +287,8 @@ public:
      *  @param  pMCParticleParentAddress address of mc particle in the user framework
      *  @param  mcParticleWeight weighting to assign to the mc particle
      */
-    static pandora::StatusCode SetTrackToMCParticleRelationship(const pandora::Pandora &pandora, const void *pTrackParentAddress,
-        const void *pMCParticleParentAddress, const float mcParticleWeight = 1);
+    static pandora::StatusCode SetTrackToMCParticleRelationship(const pandora::Pandora &pandora, const void *const pTrackParentAddress,
+        const void *const pMCParticleParentAddress, const float mcParticleWeight = 1);
 
     /**
      *  @brief  Get the current pfo list
@@ -323,7 +323,7 @@ public:
      *  @param  pandora the pandora instance to register the bfield calculator with
      *  @param  pBFieldPlugin address of the bfield plugin (will pass ownership to pandora)
      */
-    static pandora::StatusCode SetBFieldPlugin(const pandora::Pandora &pandora, pandora::BFieldPlugin *pBFieldPlugin);
+    static pandora::StatusCode SetBFieldPlugin(const pandora::Pandora &pandora, pandora::BFieldPlugin *const pBFieldPlugin);
 
     /**
      *  @brief  Set the pseudo layer plugin used by pandora
@@ -331,7 +331,7 @@ public:
      *  @param  pandora the pandora instance to register the pseudo layer calculator with
      *  @param  pPseudoLayerPlugin address of the pseudo layer plugin (will pass ownership to pandora)
      */
-    static pandora::StatusCode SetPseudoLayerPlugin(const pandora::Pandora &pandora, pandora::PseudoLayerPlugin *pPseudoLayerPlugin);
+    static pandora::StatusCode SetPseudoLayerPlugin(const pandora::Pandora &pandora, pandora::PseudoLayerPlugin *const pPseudoLayerPlugin);
 
     /**
      *  @brief  Set the shower profile plugin used by pandora
@@ -339,7 +339,7 @@ public:
      *  @param  pandora the pandora instance to register the shower profile calculator with
      *  @param  pPseudoLayerPlugin address of the pseudo layer plugin (will pass ownership to pandora)
      */
-    static pandora::StatusCode SetShowerProfilePlugin(const pandora::Pandora &pandora, pandora::ShowerProfilePlugin *pShowerProfilePlugin);
+    static pandora::StatusCode SetShowerProfilePlugin(const pandora::Pandora &pandora, pandora::ShowerProfilePlugin *const pShowerProfilePlugin);
 
     /**
      *  @brief  Register an energy correction plugin
@@ -350,7 +350,7 @@ public:
      *  @param  pEnergyCorrectionPlugin address of the energy correction plugin (will pass ownership to pandora)
      */
     static pandora::StatusCode RegisterEnergyCorrectionPlugin(const pandora::Pandora &pandora, const std::string &name,
-        const pandora::EnergyCorrectionType energyCorrectionType, pandora::EnergyCorrectionPlugin *pEnergyCorrectionPlugin);
+        const pandora::EnergyCorrectionType energyCorrectionType, pandora::EnergyCorrectionPlugin *const pEnergyCorrectionPlugin);
 
     /**
      *  @brief  Register a particle id plugin
@@ -360,7 +360,7 @@ public:
      *  @param  pParticleIdPlugin address of the particle id plugin (will pass ownership to pandora)
      */
     static pandora::StatusCode RegisterParticleIdPlugin(const pandora::Pandora &pandora, const std::string &name,
-        pandora::ParticleIdPlugin *pParticleIdPlugin);
+        pandora::ParticleIdPlugin *const pParticleIdPlugin);
 
     /**
      *  @brief  Reset pandora to process another event

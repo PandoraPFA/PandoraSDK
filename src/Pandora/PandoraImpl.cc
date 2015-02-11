@@ -109,7 +109,7 @@ StatusCode PandoraImpl::ResetEvent() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-PandoraImpl::PandoraImpl(Pandora *pPandora) :
+PandoraImpl::PandoraImpl(Pandora *const pPandora) :
     m_pPandora(pPandora)
 {
 }

@@ -38,7 +38,7 @@ CaloHitManager::~CaloHitManager()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename PARAMETERS>
-StatusCode CaloHitManager::CreateCaloHit(const PARAMETERS &parameters, CaloHit *&pCaloHit)
+StatusCode CaloHitManager::CreateCaloHit(const PARAMETERS &parameters, const CaloHit *&pCaloHit)
 {
     pCaloHit = NULL;
 
@@ -50,7 +50,7 @@ StatusCode CaloHitManager::CreateCaloHit(const PARAMETERS &parameters, CaloHit *
             throw StatusCodeException(STATUS_CODE_FAILURE);
 
         const unsigned int pseudoLayer(m_pPandora->GetPlugins()->GetPseudoLayerPlugin()->GetPseudoLayer(pCaloHit->GetPositionVector()));
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pCaloHit->SetPseudoLayer(pseudoLayer));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pCaloHit)->SetPseudoLayer(pseudoLayer));
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
 
@@ -84,9 +84,64 @@ CaloHit *CaloHitManager::HitInstantiation(const PandoraApi::PointingCaloHit::Par
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHitManager::AlterMetadata(CaloHit *pCaloHit, const PandoraContentApi::CaloHit::Metadata &metadata) const
+StatusCode CaloHitManager::AlterMetadata(const CaloHit *const pCaloHit, const PandoraContentApi::CaloHit::Metadata &metadata) const
 {
-    return pCaloHit->AlterMetadata(metadata);
+    return this->Modifiable(pCaloHit)->AlterMetadata(metadata);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <>
+bool CaloHitManager::IsAvailable(const CaloHit *const pCaloHit) const
+{
+    if (0 == m_nReclusteringProcesses)
+        return pCaloHit->IsAvailable();
+
+    return m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->IsAvailable(pCaloHit);
+}
+
+template <>
+bool CaloHitManager::IsAvailable(const CaloHitList *const pCaloHitList) const
+{
+    if (0 == m_nReclusteringProcesses)
+    {
+        bool isAvailable(true);
+
+        for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
+            isAvailable &= this->IsAvailable(*iter);
+
+        return isAvailable;
+    }
+
+    return m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->IsAvailable(pCaloHitList);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <>
+StatusCode CaloHitManager::SetAvailability(const CaloHit *const pCaloHit, bool isAvailable)
+{
+    if (0 == m_nReclusteringProcesses)
+    {
+        this->Modifiable(pCaloHit)->SetAvailability(isAvailable);
+        return STATUS_CODE_SUCCESS;
+    }
+
+    return m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->SetAvailability(pCaloHit, isAvailable);
+}
+
+template <>
+StatusCode CaloHitManager::SetAvailability(const CaloHitList *const pCaloHitList, bool isAvailable)
+{
+    if (0 == m_nReclusteringProcesses)
+    {
+        for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
+            this->Modifiable(*iter)->SetAvailability(isAvailable);
+
+        return STATUS_CODE_SUCCESS;
+    }
+
+    return m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->SetAvailability(pCaloHitList, isAvailable);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -101,7 +156,7 @@ StatusCode CaloHitManager::CreateTemporaryListAndSetCurrent(const Algorithm *con
 
     for (ClusterList::const_iterator iter = clusterList.begin(), iterEnd = clusterList.end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
         pCluster->GetOrderedCaloHitList().GetCaloHitList(caloHitList);
         caloHitList.insert(pCluster->GetIsolatedCaloHitList().begin(), pCluster->GetIsolatedCaloHitList().end());
     }
@@ -142,7 +197,7 @@ StatusCode CaloHitManager::MatchCaloHitsToMCPfoTargets(const UidToMCParticleWeig
         if (caloHitToPfoTargetsMap.end() == pfoTargetIter)
             continue;
 
-        (*iter)->SetMCParticleWeightMap(pfoTargetIter->second);
+        this->Modifiable(*iter)->SetMCParticleWeightMap(pfoTargetIter->second);
     }
 
     return STATUS_CODE_SUCCESS;
@@ -158,70 +213,14 @@ StatusCode CaloHitManager::RemoveAllMCParticleRelationships()
         return STATUS_CODE_FAILURE;
 
     for (CaloHitList::const_iterator iter = inputIter->second->begin(), iterEnd = inputIter->second->end(); iter != iterEnd; ++iter)
-        (*iter)->RemoveMCParticles();
+        this->Modifiable(*iter)->RemoveMCParticles();
 
     return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool CaloHitManager::IsCaloHitAvailable(CaloHit *const pCaloHit) const
-{
-    if (0 == m_nReclusteringProcesses)
-        return pCaloHit->m_isAvailable;
-
-    return m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->IsCaloHitAvailable(pCaloHit);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-bool CaloHitManager::AreCaloHitsAvailable(const CaloHitList &caloHitList) const
-{
-    if (0 == m_nReclusteringProcesses)
-    {
-        for (CaloHitList::const_iterator iter = caloHitList.begin(), iterEnd = caloHitList.end(); iter != iterEnd; ++iter)
-        {
-            if (!(*iter)->m_isAvailable)
-                return false;
-        }
-        return true;
-    }
-
-    return m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->AreCaloHitsAvailable(caloHitList);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode CaloHitManager::SetCaloHitAvailability(CaloHit *const pCaloHit, bool isAvailable)
-{
-    if (0 == m_nReclusteringProcesses)
-    {
-        pCaloHit->m_isAvailable = isAvailable;
-        return STATUS_CODE_SUCCESS;
-    }
-
-    return m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->SetCaloHitAvailability(pCaloHit, isAvailable);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode CaloHitManager::SetCaloHitAvailability(const CaloHitList &caloHitList, bool isAvailable)
-{
-    if (0 == m_nReclusteringProcesses)
-    {
-        for (CaloHitList::const_iterator iter = caloHitList.begin(), iterEnd = caloHitList.end(); iter != iterEnd; ++iter)
-        {
-            (*iter)->m_isAvailable = isAvailable;
-        }
-        return STATUS_CODE_SUCCESS;
-    }
-
-    return m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->SetCaloHitAvailability(caloHitList, isAvailable);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode CaloHitManager::FragmentCaloHit(CaloHit *pOriginalCaloHit, const float fraction1, CaloHit *&pDaughterCaloHit1, CaloHit *&pDaughterCaloHit2)
+StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit, const float fraction1, const CaloHit *&pDaughterCaloHit1, const CaloHit *&pDaughterCaloHit2)
 {
     pDaughterCaloHit1 = NULL; pDaughterCaloHit2 = NULL;
 
@@ -230,7 +229,7 @@ StatusCode CaloHitManager::FragmentCaloHit(CaloHit *pOriginalCaloHit, const floa
 
     if (RECTANGULAR == pOriginalCaloHit->GetCellGeometry())
     {
-        RectangularCaloHit *pOriginalRectangularCaloHit = dynamic_cast<RectangularCaloHit *>(pOriginalCaloHit);
+        const RectangularCaloHit *const pOriginalRectangularCaloHit = dynamic_cast<const RectangularCaloHit *>(pOriginalCaloHit);
 
         if (NULL == pOriginalRectangularCaloHit)
             return STATUS_CODE_FAILURE;
@@ -240,7 +239,7 @@ StatusCode CaloHitManager::FragmentCaloHit(CaloHit *pOriginalCaloHit, const floa
     }
     else if (POINTING == pOriginalCaloHit->GetCellGeometry())
     {
-        PointingCaloHit *pOriginalPointingCaloHit = dynamic_cast<PointingCaloHit *>(pOriginalCaloHit);
+        const PointingCaloHit *const pOriginalPointingCaloHit = dynamic_cast<const PointingCaloHit *>(pOriginalCaloHit);
 
         if (NULL == pOriginalPointingCaloHit)
             return STATUS_CODE_FAILURE;
@@ -270,7 +269,7 @@ StatusCode CaloHitManager::FragmentCaloHit(CaloHit *pOriginalCaloHit, const floa
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHitManager::MergeCaloHitFragments(CaloHit *pFragmentCaloHit1, CaloHit *pFragmentCaloHit2, CaloHit *&pMergedCaloHit)
+StatusCode CaloHitManager::MergeCaloHitFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2, const CaloHit *&pMergedCaloHit)
 {
     pMergedCaloHit = NULL;
 
@@ -281,7 +280,7 @@ StatusCode CaloHitManager::MergeCaloHitFragments(CaloHit *pFragmentCaloHit1, Cal
 
     if ((RECTANGULAR == pFragmentCaloHit1->GetCellGeometry()) && (RECTANGULAR == pFragmentCaloHit2->GetCellGeometry()))
     {
-        RectangularCaloHit *pOriginalRectangularCaloHit = dynamic_cast<RectangularCaloHit *>(pFragmentCaloHit1);
+        const RectangularCaloHit *const pOriginalRectangularCaloHit = dynamic_cast<const RectangularCaloHit *>(pFragmentCaloHit1);
 
         if (NULL == pOriginalRectangularCaloHit)
             return STATUS_CODE_FAILURE;
@@ -290,7 +289,7 @@ StatusCode CaloHitManager::MergeCaloHitFragments(CaloHit *pFragmentCaloHit1, Cal
     }
     else if ((POINTING == pFragmentCaloHit1->GetCellGeometry()) && (POINTING == pFragmentCaloHit2->GetCellGeometry()))
     {
-        PointingCaloHit *pOriginalPointingCaloHit = dynamic_cast<PointingCaloHit *>(pFragmentCaloHit1);
+        const PointingCaloHit *const pOriginalPointingCaloHit = dynamic_cast<const PointingCaloHit *>(pFragmentCaloHit1);
 
         if (NULL == pOriginalPointingCaloHit)
             return STATUS_CODE_FAILURE;
@@ -319,12 +318,12 @@ StatusCode CaloHitManager::MergeCaloHitFragments(CaloHit *pFragmentCaloHit1, Cal
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool CaloHitManager::CanFragmentCaloHit(CaloHit *pOriginalCaloHit, const float fraction1) const
+bool CaloHitManager::CanFragmentCaloHit(const CaloHit *const pOriginalCaloHit, const float fraction1) const
 {
     if ((fraction1 < std::numeric_limits<float>::epsilon()) || (fraction1 > 1.f))
         return false;
 
-    if (!this->IsCaloHitAvailable(pOriginalCaloHit))
+    if (!this->IsAvailable(pOriginalCaloHit))
         return false;
 
     NameToListMap::const_iterator iter = m_nameToListMap.find(m_currentListName);
@@ -340,7 +339,7 @@ bool CaloHitManager::CanFragmentCaloHit(CaloHit *pOriginalCaloHit, const float f
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool CaloHitManager::CanMergeCaloHitFragments(CaloHit *pFragmentCaloHit1, CaloHit *pFragmentCaloHit2) const
+bool CaloHitManager::CanMergeCaloHitFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2) const
 {
     if (pFragmentCaloHit1->GetWeight() < std::numeric_limits<float>::epsilon())
         return false;
@@ -348,7 +347,7 @@ bool CaloHitManager::CanMergeCaloHitFragments(CaloHit *pFragmentCaloHit1, CaloHi
     if (pFragmentCaloHit1->GetParentCaloHitAddress() != pFragmentCaloHit2->GetParentCaloHitAddress())
         return false;
 
-    if (!this->IsCaloHitAvailable(pFragmentCaloHit1) || !this->IsCaloHitAvailable(pFragmentCaloHit2))
+    if (!this->IsAvailable(pFragmentCaloHit1) || !this->IsAvailable(pFragmentCaloHit2))
         return false;
 
     NameToListMap::const_iterator iter = m_nameToListMap.find(m_currentListName);
@@ -369,7 +368,7 @@ StatusCode CaloHitManager::InitializeReclustering(const Algorithm *const pAlgori
 {
     std::string caloHitListName;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateTemporaryListAndSetCurrent(pAlgorithm, clusterList, caloHitListName));
-    CaloHitList *pCaloHitList = m_nameToListMap[caloHitListName];
+    CaloHitList *const pCaloHitList = m_nameToListMap[caloHitListName];
 
     m_pCurrentReclusterMetadata = new ReclusterMetadata(pCaloHitList);
     m_reclusterMetadataList.push_back(m_pCurrentReclusterMetadata);
@@ -394,7 +393,7 @@ StatusCode CaloHitManager::PrepareForClustering(const Algorithm *const pAlgorith
     std::string caloHitListName;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, InputObjectManager<CaloHit>::CreateTemporaryListAndSetCurrent(pAlgorithm, caloHitList,
         caloHitListName));
-    CaloHitList *pCaloHitList = m_nameToListMap[caloHitListName];
+    CaloHitList *const pCaloHitList = m_nameToListMap[caloHitListName];
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCurrentReclusterMetadata->CreateCaloHitMetadata(pCaloHitList, caloHitListName,
         newReclusterListName, true));
@@ -404,7 +403,7 @@ StatusCode CaloHitManager::PrepareForClustering(const Algorithm *const pAlgorith
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHitManager::EndReclustering(const Algorithm *const /*pAlgorithm*/, const std::string &selectedReclusterListName)
+StatusCode CaloHitManager::EndReclustering(const Algorithm *const /*const pAlgorithm*/, const std::string &selectedReclusterListName)
 {
     if (0 == m_nReclusteringProcesses)
         return STATUS_CODE_SUCCESS;
@@ -419,7 +418,7 @@ StatusCode CaloHitManager::EndReclustering(const Algorithm *const /*pAlgorithm*/
     if (--m_nReclusteringProcesses > 0)
     {
         m_pCurrentReclusterMetadata = m_reclusterMetadataList.back();
-        CaloHitMetadata *pCurrentCaloHitMetaData = m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata();
+        CaloHitMetadata *const pCurrentCaloHitMetaData = m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata();
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pCurrentCaloHitMetaData->Update(*pSelectedCaloHitMetaData));
     }
     else
@@ -449,7 +448,7 @@ StatusCode CaloHitManager::Update(const CaloHitMetadata &caloHitMetadata)
 
     for (CaloHitUsageMap::const_iterator iter = caloHitUsageMap.begin(), iterEnd = caloHitUsageMap.end(); iter != iterEnd; ++iter)
     {
-        iter->first->m_isAvailable = iter->second;
+        this->Modifiable(iter->first)->SetAvailability(iter->second);
     }
 
     return STATUS_CODE_SUCCESS;
@@ -476,7 +475,7 @@ StatusCode CaloHitManager::Update(const CaloHitReplacement &caloHitReplacement)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHitManager::Update(CaloHitList *pCaloHitList, const CaloHitReplacement &caloHitReplacement)
+StatusCode CaloHitManager::Update(CaloHitList *const pCaloHitList, const CaloHitReplacement &caloHitReplacement)
 {
     if (caloHitReplacement.m_newCaloHits.empty() || caloHitReplacement.m_oldCaloHits.empty())
         return STATUS_CODE_NOT_INITIALIZED;
@@ -516,7 +515,7 @@ StatusCode CaloHitManager::Update(CaloHitList *pCaloHitList, const CaloHitReplac
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template StatusCode CaloHitManager::CreateCaloHit<PandoraApi::RectangularCaloHit::Parameters>(const PandoraApi::RectangularCaloHit::Parameters &, CaloHit *&);
-template StatusCode CaloHitManager::CreateCaloHit<PandoraApi::PointingCaloHit::Parameters>(const PandoraApi::PointingCaloHit::Parameters &, CaloHit *&);
+template StatusCode CaloHitManager::CreateCaloHit<PandoraApi::RectangularCaloHit::Parameters>(const PandoraApi::RectangularCaloHit::Parameters &, const CaloHit *&);
+template StatusCode CaloHitManager::CreateCaloHit<PandoraApi::PointingCaloHit::Parameters>(const PandoraApi::PointingCaloHit::Parameters &, const CaloHit *&);
 
 } // namespace pandora

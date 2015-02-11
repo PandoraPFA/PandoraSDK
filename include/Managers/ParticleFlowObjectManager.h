@@ -42,7 +42,7 @@ private:
      *  @param  parameters the particle flow object parameters
      *  @param  pPfo to receive the address of the particle flow object created
      */
-    StatusCode CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &parameters, ParticleFlowObject *&pPfo);
+    StatusCode CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &parameters, const ParticleFlowObject *&pPfo);
 
     /**
      *  @brief  Alter the metadata information stored in a particle flow object
@@ -50,7 +50,7 @@ private:
      *  @param  pPfo address of the particle flow object to modify
      *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
      */
-    StatusCode AlterMetadata(ParticleFlowObject *pPfo, const PandoraContentApi::ParticleFlowObject::Metadata &metadata) const;
+    StatusCode AlterMetadata(const ParticleFlowObject *const pPfo, const PandoraContentApi::ParticleFlowObject::Metadata &metadata) const;
 
     /**
      *  @brief  Add an object to a particle flow object
@@ -59,7 +59,7 @@ private:
      *  @param  pT address of the object to add
      */
     template <typename T>
-    StatusCode AddToPfo(ParticleFlowObject *pPfo, T *pT) const;
+    StatusCode AddToPfo(const ParticleFlowObject *const pPfo, const T *const pT) const;
 
     /**
      *  @brief  Remove an object from a particle flow object
@@ -68,7 +68,7 @@ private:
      *  @param  pT address of the object to remove
      */
     template <typename T>
-    StatusCode RemoveFromPfo(ParticleFlowObject *pPfo, T *pT) const;
+    StatusCode RemoveFromPfo(const ParticleFlowObject *const pPfo, const T *const pT) const;
 
     /**
      *  @brief  Add a parent-daughter particle flow object relationship
@@ -76,7 +76,7 @@ private:
      *  @param  pParentPfo address of parent particle flow object
      *  @param  pDaughterPfo address of daughter particle flow object
      */
-    StatusCode SetParentDaughterAssociation(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const;
+    StatusCode SetParentDaughterAssociation(const ParticleFlowObject *const pParentPfo, const ParticleFlowObject *const pDaughterPfo) const;
 
     /**
      *  @brief  Remove a parent-daughter particle flow object relationship
@@ -84,7 +84,7 @@ private:
      *  @param  pParentPfo address of parent particle flow object
      *  @param  pDaughterPfo address of daughter particle flow object
      */
-    StatusCode RemoveParentDaughterAssociation(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const;
+    StatusCode RemoveParentDaughterAssociation(const ParticleFlowObject *const pParentPfo, const ParticleFlowObject *const pDaughterPfo) const;
 
     friend class PandoraApiImpl;
     friend class PandoraContentApiImpl;

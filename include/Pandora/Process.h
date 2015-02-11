@@ -69,7 +69,7 @@ protected:
      *  @param  pPandora address of the pandora object that will run the process
      *  @param  type the process type
      */
-    StatusCode RegisterDetails(const Pandora *pPandora, const std::string &type);
+    StatusCode RegisterDetails(const Pandora *const pPandora, const std::string &type);
 
     const Pandora          *m_pPandora;             ///< The pandora object that will run the process
     std::string             m_type;                 ///< The process type
@@ -115,7 +115,7 @@ inline Process::~Process()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline StatusCode Process::RegisterDetails(const Pandora *pPandora, const std::string &type)
+inline StatusCode Process::RegisterDetails(const Pandora *const pPandora, const std::string &type)
 {
     if ((NULL == pPandora) || (type.empty()))
         return STATUS_CODE_FAILURE;

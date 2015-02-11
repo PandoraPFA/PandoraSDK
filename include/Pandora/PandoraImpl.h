@@ -79,7 +79,7 @@ private:
      * 
      *  @param  pPandora address of the pandora object to interface
      */
-    PandoraImpl(Pandora *pPandora);
+    PandoraImpl(Pandora *const pPandora);
 
     Pandora                *m_pPandora;             ///< The pandora object to provide an interface to
 

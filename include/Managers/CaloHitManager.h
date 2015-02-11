@@ -47,7 +47,7 @@ private:
      *  @param  pCaloHit to receive the address of the calo hit
      */
     template <typename PARAMETERS>
-    StatusCode CreateCaloHit(const PARAMETERS &parameters, CaloHit *&pCaloHit);
+    StatusCode CreateCaloHit(const PARAMETERS &parameters, const CaloHit *&pCaloHit);
 
     /**
      *  @brief  Perform the actual calo hit instantiation
@@ -65,7 +65,26 @@ private:
      *  @param  pCaloHit address of the calo hit to modify
      *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
      */
-    StatusCode AlterMetadata(CaloHit *pCaloHit, const PandoraContentApi::CaloHit::Metadata &metadata) const;
+    StatusCode AlterMetadata(const CaloHit *const pCaloHit, const PandoraContentApi::CaloHit::Metadata &metadata) const;
+
+    /**
+     *  @brief  Is a calo hit, or a list of calo hits, available to add to a cluster
+     * 
+     *  @param  pT address of the object or object list
+     * 
+     *  @return boolean
+     */
+    template <typename T>
+    bool IsAvailable(const T *const pT) const;
+
+    /**
+     *  @brief  Set availability of a calo hit, or a list of calo hits, to be added to a cluster
+     * 
+     *  @param  pT the address of the object or object list
+     *  @param  isAvailable the availability
+     */
+    template <typename T>
+    StatusCode SetAvailability(const T *const pT, bool isAvailable);
 
     using InputObjectManager<CaloHit>::CreateTemporaryListAndSetCurrent;
 
@@ -96,40 +115,6 @@ private:
     StatusCode RemoveAllMCParticleRelationships();
 
     /**
-     *  @brief  Is calo hit available to add to a cluster
-     * 
-     *  @param  pCaloHit address of the calo hit
-     * 
-     *  @return boolean
-     */
-    bool IsCaloHitAvailable(CaloHit *const pCaloHit) const;
-
-    /**
-     *  @brief  Are all calo hits in list available to add to a cluster
-     * 
-     *  @param  caloHitList the list of calo hits
-     * 
-     *  @return boolean
-     */
-    bool AreCaloHitsAvailable(const CaloHitList &caloHitList) const;
-
-    /**
-     *  @brief  Set availability of a calo hit to be added to a cluster
-     * 
-     *  @param  pCaloHit the address of the calo hit
-     *  @param  isAvailable the calo hit availability
-     */
-    StatusCode SetCaloHitAvailability(CaloHit *const pCaloHit, bool isAvailable);
-
-    /**
-     *  @brief  Set availability of all calo hits in list
-     * 
-     *  @param  caloHitList the list of calo hits
-     *  @param  isAvailable the calo hit availability
-     */
-    StatusCode SetCaloHitAvailability(const CaloHitList &caloHitList, bool isAvailable);
-
-    /**
      *  @brief  Fragment a calo hit into two daughter calo hits, with a specified energy division
      *
      *  @param  pOriginalCaloHit address of the original calo hit, which will be deleted
@@ -137,7 +122,8 @@ private:
      *  @param  pDaughterCaloHit1 to receive the address of daughter fragment 1
      *  @param  pDaughterCaloHit2 to receive the address of daughter fragment 2
      */
-    StatusCode FragmentCaloHit(CaloHit *pOriginalCaloHit, const float fraction1, CaloHit *&pDaughterCaloHit1, CaloHit *&pDaughterCaloHit2);
+    StatusCode FragmentCaloHit(const CaloHit *const pOriginalCaloHit, const float fraction1, const CaloHit *&pDaughterCaloHit1,
+        const CaloHit *&pDaughterCaloHit2);
 
     /**
      *  @brief  Merge two calo hit fragments, originally from the same parent hit, to form a new calo hit
@@ -146,7 +132,7 @@ private:
      *  @param  pFragmentCaloHit2 address of calo hit fragment 2, which will be deleted
      *  @param  pMergedCaloHit to receive the address of the merged calo hit
      */
-    StatusCode MergeCaloHitFragments(CaloHit *pFragmentCaloHit1, CaloHit *pFragmentCaloHit2, CaloHit *&pMergedCaloHit);
+    StatusCode MergeCaloHitFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2, const CaloHit *&pMergedCaloHit);
 
     /**
      *  @brief  Whether a calo hit can be fragmented into two daughter calo hits with the specified energy division
@@ -156,7 +142,7 @@ private:
      * 
      *  @return boolean
      */
-    bool CanFragmentCaloHit(CaloHit *pOriginalCaloHit, const float fraction1) const;
+    bool CanFragmentCaloHit(const CaloHit *const pOriginalCaloHit, const float fraction1) const;
 
     /**
      *  @brief  Whether two candidate calo hit fragments can be merged
@@ -166,7 +152,7 @@ private:
      * 
      *  @return boolean
      */
-    bool CanMergeCaloHitFragments(CaloHit *pFragmentCaloHit1, CaloHit *pFragmentCaloHit2) const;
+    bool CanMergeCaloHitFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2) const;
 
     /**
      *  @brief  Initialize reclustering operations, preparing lists and metadata accordingly
@@ -175,7 +161,8 @@ private:
      *  @param  clusterList the input cluster list
      *  @param  originalReclusterListName the list name/key for the original recluster candidates
      */
-    StatusCode InitializeReclustering(const Algorithm *const pAlgorithm, const ClusterList &clusterList, const std::string &originalReclusterListName);
+    StatusCode InitializeReclustering(const Algorithm *const pAlgorithm, const ClusterList &clusterList,
+        const std::string &originalReclusterListName);
 
     /**
      *  @brief  Prepare metadata to allow for construction of new recluster candidates
@@ -213,7 +200,7 @@ private:
      *  @param  pCaloHitList address of the calo hit list
      *  @param  caloHitReplacement the calo hit replacement
      */
-    StatusCode Update(CaloHitList *pCaloHitList, const CaloHitReplacement &caloHitReplacement);
+    StatusCode Update(CaloHitList *const pCaloHitList, const CaloHitReplacement &caloHitReplacement);
 
     unsigned int                    m_nReclusteringProcesses;           ///< The number of reclustering algorithms currently in operation
     ReclusterMetadata              *m_pCurrentReclusterMetadata;        ///< Address of the current recluster metadata

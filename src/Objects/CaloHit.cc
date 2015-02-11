@@ -42,7 +42,7 @@ CaloHit::CaloHit(const PandoraApi::CaloHitBaseParameters &parameters) :
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-CaloHit::CaloHit(CaloHit *pCaloHit, const float weight) :
+CaloHit::CaloHit(const CaloHit *const pCaloHit, const float weight) :
     m_positionVector(pCaloHit->m_positionVector),
     m_expectedDirection(pCaloHit->m_expectedDirection),
     m_cellNormalVector(pCaloHit->m_cellNormalVector),
@@ -129,11 +129,11 @@ RectangularCaloHit::RectangularCaloHit(const PandoraApi::RectangularCaloHit::Par
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-RectangularCaloHit::RectangularCaloHit(RectangularCaloHit *pCaloHit, const float weight) :
+RectangularCaloHit::RectangularCaloHit(const RectangularCaloHit *const pCaloHit, const float weight) :
     CaloHit(pCaloHit, weight),
-    m_cellSizeU(pCaloHit->m_cellSizeU),
-    m_cellSizeV(pCaloHit->m_cellSizeV),
-    m_cellLengthScale(pCaloHit->m_cellLengthScale)
+    m_cellSizeU(pCaloHit->GetCellSizeU()),
+    m_cellSizeV(pCaloHit->GetCellSizeV()),
+    m_cellLengthScale(pCaloHit->GetCellLengthScale())
 {
 }
 
@@ -176,11 +176,11 @@ PointingCaloHit::PointingCaloHit(const PandoraApi::PointingCaloHit::Parameters &
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-PointingCaloHit::PointingCaloHit(PointingCaloHit *pCaloHit, const float weight) :
+PointingCaloHit::PointingCaloHit(const PointingCaloHit *const pCaloHit, const float weight) :
     CaloHit(pCaloHit, weight),
-    m_cellSizeEta(pCaloHit->m_cellSizeEta),
-    m_cellSizePhi(pCaloHit->m_cellSizePhi),
-    m_cellLengthScale(pCaloHit->m_cellLengthScale)
+    m_cellSizeEta(pCaloHit->GetCellSizeEta()),
+    m_cellSizePhi(pCaloHit->GetCellSizePhi()),
+    m_cellLengthScale(pCaloHit->GetCellLengthScale())
 {
 }
 

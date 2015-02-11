@@ -149,7 +149,7 @@ public:
      * 
      *  @return the address of the cluster
      */
-    Cluster *GetAssociatedCluster() const;
+    const Cluster *GetAssociatedCluster() const;
 
     /**
      *  @brief  Get address of the mc particle associated with the track
@@ -231,35 +231,35 @@ private:
      * 
      *  @param  pCluster the address of the associated cluster
      */
-    StatusCode SetAssociatedCluster(Cluster *const pCluster);
+    StatusCode SetAssociatedCluster(const Cluster *const pCluster);
 
     /**
      *  @brief  Remove the association with a cluster
      *
      *  @param  pCluster the address of the cluster with which the track is no longer associated
      */
-    StatusCode RemoveAssociatedCluster(Cluster *const pCluster);
+    StatusCode RemoveAssociatedCluster(const Cluster *const pCluster);
 
     /**
      *  @brief  Add a parent track to the parent track list
      * 
      *  @param  pTrack the address of the parent track
      */
-    StatusCode AddParent(Track *const pTrack);
+    StatusCode AddParent(const Track *const pTrack);
 
     /**
      *  @brief  Add a daughter track to the daughter track list
      * 
      *  @param  pTrack the address of the daughter track
      */
-    StatusCode AddDaughter(Track *const pTrack);
+    StatusCode AddDaughter(const Track *const pTrack);
 
     /**
      *  @brief  Add a sibling track to the sibling track list
      * 
      *  @param  pTrack the address of the sibling track
      */
-    StatusCode AddSibling(Track *const pTrack);
+    StatusCode AddSibling(const Track *const pTrack);
 
     /**
      *  @brief  Set availability of track to be added to a particle flow object
@@ -291,7 +291,7 @@ private:
 
     const Helix            *m_pHelixFitAtCalorimeter;   ///< Helix fit to the calorimeter track state
 
-    Cluster                *m_pAssociatedCluster;       ///< The address of an associated cluster
+    const Cluster          *m_pAssociatedCluster;       ///< The address of an associated cluster
     MCParticleWeightMap     m_mcParticleWeightMap;      ///< The mc particle weight map
     const void             *m_pParentAddress;           ///< The address of the parent track in the user framework
 
@@ -301,7 +301,6 @@ private:
 
     bool                    m_isAvailable;              ///< Whether the track is available to be added to a particle flow object
 
-    friend class PandoraContentApiImpl;
     friend class TrackManager;
     friend class InputObjectManager<Track>;
 };
@@ -435,7 +434,7 @@ inline bool Track::HasAssociatedCluster() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline Cluster *Track::GetAssociatedCluster() const
+inline const Cluster *Track::GetAssociatedCluster() const
 {
     if (NULL == m_pAssociatedCluster)
         throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);

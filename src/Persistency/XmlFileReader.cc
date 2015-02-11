@@ -410,7 +410,7 @@ StatusCode XmlFileReader::ReadCaloHit()
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Layer", layer));
     bool isInOuterSamplingLayer(false);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "IsInOuterSamplingLayer", isInOuterSamplingLayer));
-    void *pParentAddress(NULL);
+    const void *pParentAddress(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "ParentCaloHitAddress", pParentAddress));
 
     PandoraApi::RectangularCaloHit::Parameters rectangularParameters;
@@ -441,7 +441,7 @@ StatusCode XmlFileReader::ReadCaloHit()
         return STATUS_CODE_FAILURE;
     }
 
-    PandoraApi::CaloHitBaseParameters *pBaseParameters((RECTANGULAR == cellGeometry) ?
+    PandoraApi::CaloHitBaseParameters *const pBaseParameters((RECTANGULAR == cellGeometry) ?
         static_cast<PandoraApi::CaloHitBaseParameters*>(&rectangularParameters) :
         static_cast<PandoraApi::CaloHitBaseParameters*>(&pointingParameters));
 
@@ -512,7 +512,7 @@ StatusCode XmlFileReader::ReadTrack()
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "CanFormPfo", canFormPfo));
     bool canFormClusterlessPfo(false);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "CanFormClusterlessPfo", canFormClusterlessPfo));
-    void *pParentAddress(NULL);
+    const void *pParentAddress(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "ParentTrackAddress", pParentAddress));
 
     PandoraApi::Track::Parameters parameters;
@@ -558,7 +558,7 @@ StatusCode XmlFileReader::ReadMCParticle()
     unsigned int mcParticleTypeInput(0);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "MCParticleType", mcParticleTypeInput));
     const MCParticleType mcParticleType(static_cast<MCParticleType>(mcParticleTypeInput));
-    void *pParentAddress(NULL);
+    const void *pParentAddress(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Uid", pParentAddress));
 
     PandoraApi::MCParticle::Parameters parameters;
@@ -586,9 +586,9 @@ StatusCode XmlFileReader::ReadRelationship()
     unsigned int relationshipIdInput(0);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "RelationshipId", relationshipIdInput));
     const RelationshipId relationshipId(static_cast<RelationshipId>(relationshipIdInput));
-    void *address1(NULL);
+    const void *address1(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Address1", address1));
-    void *address2(NULL);
+    const void *address2(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Address2", address2));
     float weight(1.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Weight", weight));

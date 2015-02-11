@@ -148,49 +148,40 @@ private:
      * 
      *  @param  mcParticle the daughter particle
      */
-    StatusCode AddDaughter(MCParticle *pMCParticle);
+    StatusCode AddDaughter(const MCParticle *const pMCParticle);
 
     /**
      *  @brief  Add parent particle
      * 
      *  @param  mcParticle the parent particle
      */
-    StatusCode AddParent(MCParticle *pMCParticle);
+    StatusCode AddParent(const MCParticle *const pMCParticle);
 
     /**
      *  @brief  Remove daughter particle
      * 
      *  @param  mcParticle the daughter particle
      */
-    StatusCode RemoveDaughter(MCParticle *pMCParticle);
+    StatusCode RemoveDaughter(const MCParticle *const pMCParticle);
 
     /**
      *  @brief  Remove parent particle
      * 
      *  @param  mcParticle the parent particle
      */
-    StatusCode RemoveParent(MCParticle *pMCParticle);
+    StatusCode RemoveParent(const MCParticle *const pMCParticle);
 
     /**
      *  @brief  Set pfo target particle
      * 
      *  @param  mcParticle the pfo target particle
      */
-    StatusCode SetPfoTarget(MCParticle *pMCParticle);
+    StatusCode SetPfoTarget(const MCParticle *const pMCParticle);
 
     /**
      *  @brief  Remove pfo target particle
      */
     StatusCode RemovePfoTarget();
-
-    /**
-     *  @brief  Set pfo target for a mc tree
-     * 
-     *  @param  mcParticle particle in the mc tree
-     *  @param  onlyDaughters if "true" go through daughters only, if false
-     *          go through parents as well
-     */
-    StatusCode SetPfoTargetInTree(MCParticle *pMCParticle, bool onlyDaughters = false);
 
     const Uid               m_uid;                      ///< Unique identifier for the mc particle
 
@@ -204,7 +195,7 @@ private:
     const int               m_particleId;               ///< The PDG code of the mc particle
     const MCParticleType    m_mcParticleType;           ///< The type of the mc particle, e.g. vertex, 2D-projection, etc.
 
-    MCParticle             *m_pPfoTarget;               ///< The address of the pfo target
+    const MCParticle       *m_pPfoTarget;               ///< The address of the pfo target
     MCParticleList          m_daughterList;             ///< The list of mc daughter particles
     MCParticleList          m_parentList;               ///< The list of mc parent particles
 
@@ -248,75 +239,6 @@ inline const MCParticle *MCParticle::GetPfoTarget() const
 inline Uid MCParticle::GetUid() const
 {
    return m_uid;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline StatusCode MCParticle::AddDaughter(MCParticle *pMCParticle)
-{
-    if (!m_daughterList.insert(pMCParticle).second)
-        return STATUS_CODE_ALREADY_PRESENT;
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline StatusCode MCParticle::AddParent(MCParticle *pMCParticle)
-{
-    if (!m_parentList.insert(pMCParticle).second)
-        return STATUS_CODE_ALREADY_PRESENT;
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline StatusCode MCParticle::RemoveDaughter(MCParticle *pMCParticle)
-{
-    MCParticleList::iterator iter = m_daughterList.find(pMCParticle);
-
-    if (m_daughterList.end() == iter)
-        return STATUS_CODE_NOT_FOUND;
-
-    m_daughterList.erase(iter);
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline StatusCode MCParticle::RemoveParent(MCParticle *pMCParticle)
-{
-    MCParticleList::iterator iter = m_parentList.find(pMCParticle);
-
-    if (m_parentList.end() == iter)
-        return STATUS_CODE_NOT_FOUND;
-
-    m_parentList.erase(iter);
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline StatusCode MCParticle::SetPfoTarget(MCParticle *pMCParticle)
-{
-    if (NULL == pMCParticle)
-        return STATUS_CODE_FAILURE;
-
-    m_pPfoTarget = pMCParticle;
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline StatusCode MCParticle::RemovePfoTarget()
-{
-    m_pPfoTarget = NULL;
-
-    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

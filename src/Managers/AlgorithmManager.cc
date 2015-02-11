@@ -87,7 +87,7 @@ StatusCode AlgorithmManager::InitializeAlgorithms(const TiXmlHandle *const pXmlH
 
 StatusCode AlgorithmManager::CreateAlgorithm(TiXmlElement *const pXmlElement, std::string &algorithmName)
 {
-    const char *pAttribute(pXmlElement->Attribute("type"));
+    const char *const pAttribute(pXmlElement->Attribute("type"));
 
     if (NULL == pAttribute)
     {
@@ -134,7 +134,7 @@ StatusCode AlgorithmManager::CreateAlgorithm(TiXmlElement *const pXmlElement, st
 
 StatusCode AlgorithmManager::CreateAlgorithmTool(TiXmlElement *const pXmlElement, AlgorithmTool *&pAlgorithmTool)
 {
-    const char *pAttribute(pXmlElement->Attribute("type"));
+    const char *const pAttribute(pXmlElement->Attribute("type"));
 
     if (NULL == pAttribute)
     {
@@ -169,7 +169,7 @@ StatusCode AlgorithmManager::FindSpecificAlgorithmInstance(TiXmlElement *const p
 {
     try
     {
-        const char *pAttribute(pXmlElement->Attribute("instance"));
+        const char *const pAttribute(pXmlElement->Attribute("instance"));
 
         if (NULL == pAttribute)
             return STATUS_CODE_NOT_FOUND;

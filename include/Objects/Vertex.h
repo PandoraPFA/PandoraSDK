@@ -70,7 +70,6 @@ private:
     VertexType              m_vertexType;               ///< The vertex type
     bool                    m_isAvailable;              ///< Whether the track is available to be added to a particle flow object
 
-    friend class PandoraContentApiImpl;
     friend class AlgorithmObjectManager<Vertex>;
     friend class VertexManager;
 };

@@ -113,7 +113,7 @@ private:
 template<typename T>
 inline StatusCode BinaryFileReader::ReadVariable(T &t)
 {
-    char *pMemBlock = new char[sizeof(T)];
+    char *const pMemBlock = new char[sizeof(T)];
     m_fileStream.read(pMemBlock, sizeof(T));
 
     t = *(reinterpret_cast<T*>(pMemBlock));
@@ -131,7 +131,7 @@ inline StatusCode BinaryFileReader::ReadVariable(std::string &t)
     unsigned int stringSize;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(stringSize));
 
-    char *pMemBlock = new char[stringSize];
+    char *const pMemBlock = new char[stringSize];
     m_fileStream.read(pMemBlock, stringSize);
 
     t = std::string(pMemBlock, stringSize);

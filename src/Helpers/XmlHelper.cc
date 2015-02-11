@@ -27,7 +27,7 @@ StatusCode XmlHelper::ProcessAlgorithm(const Algorithm &algorithm, const TiXmlHa
 
         try
         {
-            const char *pAttribute(pXmlElement->Attribute("description"));
+            const char *const pAttribute(pXmlElement->Attribute("description"));
 
             if (NULL == pAttribute)
                 return STATUS_CODE_NOT_FOUND;
@@ -80,7 +80,7 @@ StatusCode XmlHelper::ProcessAlgorithmTool(const Algorithm &algorithm, const TiX
 
         try
         {
-            const char *pAttribute(pXmlElement->Attribute("description"));
+            const char *const pAttribute(pXmlElement->Attribute("description"));
 
             if (NULL == pAttribute)
                 return STATUS_CODE_NOT_FOUND;
