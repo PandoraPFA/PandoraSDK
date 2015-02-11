@@ -80,7 +80,7 @@ StatusCode TrackPreparationAlgorithm::CreatePfoTrackList(const TrackList &inputT
 
     for (TrackList::const_iterator iter = inputTrackList.begin(), iterEnd = inputTrackList.end(); iter != iterEnd; ++iter)
     {
-        Track *pTrack = *iter;
+        const Track *const pTrack = *iter;
 
         if (!pTrack->GetParentTrackList().empty())
             continue;

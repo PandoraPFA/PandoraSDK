@@ -224,7 +224,7 @@ StatusCode DumpPfosMonitoringAlgorithm::Run()
     // First loop over pfos to make collections and save track mc pfo list
     for (PfoList::const_iterator pfoIter = pPfoList->begin(); pfoIter != pPfoList->end(); ++pfoIter)
     {
-        ParticleFlowObject *pPfo = *pfoIter;
+        const ParticleFlowObject *const pPfo = *pfoIter;
         totalPfoEnergy += pPfo->GetEnergy();
 
         const int pfoPid(pPfo->GetParticleId());
@@ -240,9 +240,9 @@ StatusCode DumpPfosMonitoringAlgorithm::Run()
         {
             try
             {
-                const Track *pTrack = *trackIter;
+                const Track *const pTrack = *trackIter;
 
-                const MCParticle *pMCParticle(pTrack->GetMainMCParticle());
+                const MCParticle *const pMCParticle(pTrack->GetMainMCParticle());
                 m_trackMcPfoTargets.insert(pMCParticle);
 
                 const TrackList &daughterTracks(pTrack->GetDaughterTrackList());
@@ -403,7 +403,7 @@ void DumpPfosMonitoringAlgorithm::DumpChargedPfo(const ParticleFlowObject *const
 
     for (TrackList::const_iterator trackIter = trackList.begin(); trackIter != trackList.end(); ++trackIter)
     {
-        Track *pTrack = *trackIter;
+        const Track *const pTrack = *trackIter;
         TrackErrorTypes trackStatus = TRACK_STATUS_OK;
 
         TrackToErrorTypeMap::const_iterator it = m_trackToErrorTypeMap.find(pTrack);
@@ -416,7 +416,7 @@ void DumpPfosMonitoringAlgorithm::DumpChargedPfo(const ParticleFlowObject *const
 
         float clusterEnergy(0.f);
         float clusterTime(0.f);
-        Cluster *pCluster(NULL);
+        const Cluster *pCluster(NULL);
 
         if (pTrack->HasAssociatedCluster())
         {
@@ -430,7 +430,7 @@ void DumpPfosMonitoringAlgorithm::DumpChargedPfo(const ParticleFlowObject *const
 
         try
         {
-            const MCParticle *pMCParticle(pTrack->GetMainMCParticle());
+            const MCParticle *const pMCParticle(pTrack->GetMainMCParticle());
             mcId = pMCParticle->GetParticleId();
             mcEnergy = pMCParticle->GetEnergy();
         }
@@ -573,7 +573,7 @@ void DumpPfosMonitoringAlgorithm::DumpNeutralOrPhotonPfo(const ParticleFlowObjec
 
     for (ClusterList::const_iterator clusterIter = clusterList.begin(); clusterIter != clusterList.end(); ++clusterIter)
     {
-        Cluster *pCluster = *clusterIter;
+        const Cluster *const pCluster = *clusterIter;
         const float clusterEnergy(pCluster->GetHadronicEnergy());
         const float clusterTime = this->ClusterTime(pCluster);
 
@@ -733,9 +733,9 @@ void DumpPfosMonitoringAlgorithm::ClusterEnergyFractions(const Cluster *const pC
         {
             try
             {
-                CaloHit *pCaloHit = *hitIter;
-                const MCParticle *pMCParticle(MCParticleHelper::GetMainMCParticle(pCaloHit));
-                const MCParticle *pMCPfoTarget(pMCParticle->GetPfoTarget());
+                const CaloHit *const pCaloHit = *hitIter;
+                const MCParticle *const pMCParticle(MCParticleHelper::GetMainMCParticle(pCaloHit));
+                const MCParticle *const pMCPfoTarget(pMCParticle->GetPfoTarget());
 
                 totEnergy += pCaloHit->GetHadronicEnergy();
                 MCParticleToFloatMap::iterator it = mcParticleContributions.find(pMCPfoTarget);
@@ -808,10 +808,10 @@ float DumpPfosMonitoringAlgorithm::ClusterTime(const Cluster *const pCluster) co
     {
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
-            CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
 
             sumEnergy += pCaloHit->GetHadronicEnergy();
-            sumTimeEnergy += pCaloHit->GetHadronicEnergy()*pCaloHit->GetTime();
+            sumTimeEnergy += pCaloHit->GetHadronicEnergy() * pCaloHit->GetTime();
         }
     }
 

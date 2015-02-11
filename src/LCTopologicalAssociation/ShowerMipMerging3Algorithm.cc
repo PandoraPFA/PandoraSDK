@@ -45,7 +45,7 @@ StatusCode ShowerMipMerging3Algorithm::Run()
     // Loop over possible mip-stub daughter clusters
     for (ClusterVector::iterator iterI = clusterVector.begin(), iterIEnd = clusterVector.end(); iterI != iterIEnd; ++iterI)
     {
-        Cluster *pDaughterCluster = *iterI;
+        const Cluster *const pDaughterCluster = *iterI;
 
         // Check to see if cluster has already been changed
         if (NULL == pDaughterCluster)
@@ -68,7 +68,7 @@ StatusCode ShowerMipMerging3Algorithm::Run()
         if (daughterClusterFitResult.GetChi2() > m_maxFitChi2)
             continue;
 
-        Cluster *pBestParentCluster(NULL);
+        const Cluster *pBestParentCluster(NULL);
         float bestParentClusterEnergy(0.);
         float minFitDistanceToClosestHit(m_maxFitDistanceToClosestHit);
 
@@ -77,7 +77,7 @@ StatusCode ShowerMipMerging3Algorithm::Run()
         // Find the closest plausible parent cluster, with the smallest cluster approach distance
         for (ClusterVector::const_iterator iterJ = clusterVector.begin(), iterJEnd = clusterVector.end(); iterJ != iterJEnd; ++iterJ)
         {
-            Cluster *pParentCluster = *iterJ;
+            const Cluster *const pParentCluster = *iterJ;
 
             // Check to see if cluster has already been changed
             if ((NULL == pParentCluster) || (pParentCluster == pDaughterCluster))

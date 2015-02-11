@@ -66,7 +66,7 @@ StatusCode IsolatedHitMergingAlgorithm::Run()
     // FIRST PART - find "small" clusters, below threshold number of calo hits, delete them and associate hits with other clusters
     for (ClusterVector::iterator iterI = clusterVector.begin(), iterIEnd = clusterVector.end(); iterI != iterIEnd; ++iterI)
     {
-        Cluster *pClusterToDelete = *iterI;
+        const Cluster *const pClusterToDelete = *iterI;
 
         if (NULL == pClusterToDelete)
             continue;
@@ -88,16 +88,16 @@ StatusCode IsolatedHitMergingAlgorithm::Run()
         // Redistribute hits that used to be in cluster I amongst other clusters
         for (CaloHitList::const_iterator hitIter = caloHitList.begin(), hitIterEnd = caloHitList.end(); hitIter != hitIterEnd; ++hitIter)
         {
-            CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
 
-            Cluster *pBestHostCluster(NULL);
+            const Cluster *pBestHostCluster(NULL);
             float bestHostClusterEnergy(0.);
             float minDistance(m_maxRecombinationDistance);
 
             // Find the most appropriate cluster for this newly-available hit
             for (ClusterVector::const_iterator iterJ = clusterVector.begin(), iterJEnd = clusterVector.end(); iterJ != iterJEnd; ++iterJ)
             {
-                Cluster *pNewHostCluster = *iterJ;
+                const Cluster *const pNewHostCluster = *iterJ;
 
                 if (NULL == pNewHostCluster)
                     continue;
@@ -131,19 +131,19 @@ StatusCode IsolatedHitMergingAlgorithm::Run()
 
     for (CaloHitList::const_iterator hitIterI = pCaloHitList->begin(); hitIterI != pCaloHitList->end(); ++hitIterI)
     {
-        CaloHit *pCaloHit = *hitIterI;
+        const CaloHit *const pCaloHit = *hitIterI;
 
         if (!pCaloHit->IsIsolated() || !PandoraContentApi::IsAvailable(*this, pCaloHit))
             continue;
 
-        Cluster *pBestHostCluster(NULL);
+        const Cluster *pBestHostCluster(NULL);
         float bestHostClusterEnergy(0.);
         float minDistance(m_maxRecombinationDistance);
 
         // Find most appropriate cluster for this isolated hit
         for (ClusterVector::const_iterator iterJ = clusterVector.begin(), iterJEnd = clusterVector.end(); iterJ != iterJEnd; ++iterJ)
         {
-            Cluster *pCluster = *iterJ;
+            const Cluster *const pCluster = *iterJ;
 
             if (NULL == pCluster)
                 continue;

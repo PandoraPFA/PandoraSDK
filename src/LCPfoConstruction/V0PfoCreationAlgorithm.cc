@@ -29,21 +29,21 @@ StatusCode V0PfoCreationAlgorithm::Run()
 
     for (PfoList::const_iterator iter = pPfoList->begin(), iterEnd = pPfoList->end(); iter != iterEnd; ++iter)
     {
-        ParticleFlowObject *pPfo = *iter;
+        const ParticleFlowObject *const pPfo = *iter;
 
         const TrackList &trackList(pPfo->GetTrackList());
 
         if (trackList.size() != 2)
             continue;
 
-        const Track *pTrack1 = *(trackList.begin());
+        const Track *const pTrack1 = *(trackList.begin());
 
         const TrackList &siblingTrackList(pTrack1->GetSiblingTrackList());
 
         if (siblingTrackList.size() != 1)
             continue;
 
-        const Track *pTrack2 = *(siblingTrackList.begin());
+        const Track *const pTrack2 = *(siblingTrackList.begin());
 
         float energy(0.f), mass(0.f);
         const CartesianVector &momentumAtStart1(pTrack1->GetTrackStateAtStart().GetMomentum());
@@ -108,8 +108,8 @@ StatusCode V0PfoCreationAlgorithm::Run()
 
             try
             {
-                const MCParticle *pMCParticle1(pTrack1->GetMainMCParticle());
-                const MCParticle *pMCParticle2(pTrack2->GetMainMCParticle());
+                const MCParticle *const pMCParticle1(pTrack1->GetMainMCParticle());
+                const MCParticle *const pMCParticle2(pTrack2->GetMainMCParticle());
 
                 const int ipdg1 = pMCParticle1->GetParticleId();
                 std::cout << " Track 1 : " << " ipdg = " << ipdg1 << " E = " << pMCParticle1->GetEnergy() << std::endl;
@@ -163,7 +163,7 @@ StatusCode V0PfoCreationAlgorithm::Run()
 
             if (pTrack1->HasAssociatedCluster())
             {
-                Cluster *pCluster1(pTrack1->GetAssociatedCluster());
+                const Cluster *const pCluster1(pTrack1->GetAssociatedCluster());
                 isElectron1 = PandoraContentApi::GetPlugins(*this)->GetParticleId()->IsElectron(pCluster1);
             }
 
@@ -171,7 +171,7 @@ StatusCode V0PfoCreationAlgorithm::Run()
 
             if (pTrack2->HasAssociatedCluster())
             {
-                Cluster *pCluster2(pTrack2->GetAssociatedCluster());
+                const Cluster *const pCluster2(pTrack2->GetAssociatedCluster());
                 isElectron2 = PandoraContentApi::GetPlugins(*this)->GetParticleId()->IsElectron(pCluster2);
             }
 

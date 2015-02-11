@@ -57,7 +57,7 @@ StatusCode TrackDrivenAssociationAlg::Run()
 
     for (unsigned int i = 0; i < nClusters; ++i)
     {
-        Cluster *pParentCluster = clusterVector[i];
+        const Cluster *const pParentCluster = clusterVector[i];
 
         if (NULL == pParentCluster)
             continue;
@@ -90,7 +90,7 @@ StatusCode TrackDrivenAssociationAlg::Run()
         // Look for clusters in the nearby region with an excess of energy compared to the track
         for (unsigned int j = 0; j < nClusters; ++j)
         {
-            Cluster *pDaughterCluster = clusterVector[j];
+            const Cluster *const pDaughterCluster = clusterVector[j];
 
             if ((NULL == pDaughterCluster) || (pParentCluster == pDaughterCluster))
                 continue;

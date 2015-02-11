@@ -35,8 +35,8 @@ StatusCode CheatingTrackToClusterMatching::Run()
     {
         try
         {
-            Track *const pTrack = *iter;
-            const MCParticle *pMCParticle(pTrack->GetMainMCParticle());
+            const Track *const pTrack = *iter;
+            const MCParticle *const pMCParticle(pTrack->GetMainMCParticle());
 
             TracksPerMCParticle::iterator itTracksPerMCParticle(tracksPerMCParticle.find(pMCParticle));
 
@@ -66,7 +66,7 @@ StatusCode CheatingTrackToClusterMatching::Run()
     {
         try
         {
-            Cluster *const pCluster = *iter;
+            const Cluster *const pCluster = *iter;
             const MCParticle *const pMCParticle(MCParticleHelper::GetMainMCParticle(pCluster));
 
             ClustersPerMCParticle::iterator itClustersPerMCParticle(clustersPerMCParticle.find(pMCParticle));
@@ -92,7 +92,7 @@ StatusCode CheatingTrackToClusterMatching::Run()
     // Make the track to cluster associations
     for (TracksPerMCParticle::const_iterator iter = tracksPerMCParticle.begin(), iterEnd = tracksPerMCParticle.end(); iter != iterEnd; ++iter)
     {
-        const MCParticle *pMCParticle = iter->first;
+        const MCParticle *const pMCParticle = iter->first;
         const TrackList &trackList = iter->second;
 
         ClustersPerMCParticle::const_iterator itClustersPerMCParticle(clustersPerMCParticle.find(pMCParticle));
@@ -108,7 +108,7 @@ StatusCode CheatingTrackToClusterMatching::Run()
         for (TrackList::const_iterator itTrack = trackList.begin(), itTrackEnd = trackList.end(); itTrack != itTrackEnd; ++itTrack)
         {
             // If the mc particle is associated with multiple clusters, can only associate to highest energy cluster (clusters should be merged)
-            Cluster *pHighestEnergyCluster = NULL;
+            const Cluster *pHighestEnergyCluster = NULL;
             float highestEnergy(-std::numeric_limits<float>::max());
 
             for (ClusterList::const_iterator itCluster = clusterList.begin(), itClusterEnd = clusterList.end(); itCluster != itClusterEnd; ++itCluster)

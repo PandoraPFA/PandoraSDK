@@ -44,7 +44,7 @@ private:
      * 
      *  @return boolean
      */
-    bool IsBeamHaloMuonInertia(pandora::Cluster *pCluster) const;
+    bool IsBeamHaloMuonInertia(const pandora::Cluster *const pCluster) const;
 
     /**
      *  @brief  Whether a cluster is a candidate beam halo muon
@@ -53,7 +53,7 @@ private:
      * 
      *  @return boolean
      */
-    bool IsBeamHaloMuon(pandora::Cluster *pCluster) const;
+    bool IsBeamHaloMuon(const pandora::Cluster *const pCluster) const;
 
     bool            m_monitoring;                                   ///< Whether to display monitoring information
     bool            m_displayRetainedClusters;                      ///< Whether to display monitoring information concerning selected clusters

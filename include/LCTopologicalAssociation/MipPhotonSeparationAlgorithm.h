@@ -47,7 +47,7 @@ protected:
      * 
      *  @return boolean
      */
-    virtual bool ShouldFragmentCluster(pandora::Cluster *const pCluster, pandora::Track *const pTrack,
+    virtual bool ShouldFragmentCluster(const pandora::Cluster *const pCluster, const pandora::Track *const pTrack,
         unsigned int &showerStartLayer, unsigned int &showerEndLayer) const;
 
     /**
@@ -58,7 +58,7 @@ protected:
      *  @param  showerStartLayer the shower start layer
      *  @param  showerEndLayer the shower end layer
      */
-    virtual pandora::StatusCode PerformFragmentation(pandora::Cluster *const pOriginalCluster, pandora::Track *const pTrack,
+    virtual pandora::StatusCode PerformFragmentation(const pandora::Cluster *const pOriginalCluster, const pandora::Track *const pTrack,
         unsigned int showerStartLayer, unsigned int showerEndLayer) const;
 
     /**
@@ -71,7 +71,7 @@ protected:
      *  @param  pPhotonCluster to receive the address of the photon-like cluster fragment
      */
     virtual pandora::StatusCode MakeClusterFragments(const unsigned int showerStartLayer, const unsigned int showerEndLayer,
-        pandora::Cluster *const pOriginalCluster, pandora::Cluster *&pMipCluster, pandora::Cluster *&pPhotonCluster) const;
+        const pandora::Cluster *const pOriginalCluster, const pandora::Cluster *&pMipCluster, const pandora::Cluster *&pPhotonCluster) const;
 
     /**
      *  @brief  Get the distance between a calo hit and the track seed (projected) position at the calorimeter surface
@@ -81,8 +81,8 @@ protected:
      *  @param  pCaloHit address of the calo hit
      *  @param  distance to receive the distance
      */
-    virtual pandora::StatusCode GetDistanceToTrack(pandora::Cluster *const pCluster, pandora::Track *const pTrack,
-        pandora::CaloHit *const pCaloHit, float &distance) const;
+    virtual pandora::StatusCode GetDistanceToTrack(const pandora::Cluster *const pCluster, const pandora::Track *const pTrack,
+        const pandora::CaloHit *const pCaloHit, float &distance) const;
 
     std::string     m_trackClusterAssociationAlgName;///< The name of the track-cluster association algorithm to run
 

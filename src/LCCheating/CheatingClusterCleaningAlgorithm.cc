@@ -25,7 +25,7 @@ StatusCode CheatingClusterCleaningAlgorithm::Run()
     {
         try
         {
-            Cluster *pCluster = *itCluster;
+            const Cluster *const pCluster = *itCluster;
             const MCParticle *const pMainMCParticle(MCParticleHelper::GetMainMCParticle(pCluster));
 
             // Remove all calo hits that do not correspond to the cluster main mc particle
@@ -37,8 +37,8 @@ StatusCode CheatingClusterCleaningAlgorithm::Run()
                 {
                     try
                     {
-                        CaloHit *pCaloHit = *hitIter;
-                        const MCParticle *pMCParticle(MCParticleHelper::GetMainMCParticle(pCaloHit));
+                        const CaloHit *const pCaloHit = *hitIter;
+                        const MCParticle *const pMCParticle(MCParticleHelper::GetMainMCParticle(pCaloHit));
 
                         if (pMainMCParticle != pMCParticle)
                         {
@@ -58,8 +58,8 @@ StatusCode CheatingClusterCleaningAlgorithm::Run()
             {
                 try
                 {
-                    CaloHit *pCaloHit = *hitIter;
-                    const MCParticle *pMCParticle(MCParticleHelper::GetMainMCParticle(pCaloHit));
+                    const CaloHit *const pCaloHit = *hitIter;
+                    const MCParticle *const pMCParticle(MCParticleHelper::GetMainMCParticle(pCaloHit));
 
                     if (pMainMCParticle != pMCParticle)
                     {

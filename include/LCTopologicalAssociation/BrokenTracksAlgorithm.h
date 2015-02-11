@@ -52,14 +52,14 @@ private:
          *  @param  startFitResult the cluster start fit result
          *  @param  endFitResult the cluster end fit result
          */
-        ClusterFitRelation(pandora::Cluster *const pCluster, const pandora::ClusterFitResult &startFitResult, const pandora::ClusterFitResult &endFitResult);
+        ClusterFitRelation(const pandora::Cluster *const pCluster, const pandora::ClusterFitResult &startFitResult, const pandora::ClusterFitResult &endFitResult);
 
         /**
          *  @brief  Get the address of the cluster
          * 
          *  @return The address of the cluster
          */
-        pandora::Cluster *GetCluster() const;
+        const pandora::Cluster *GetCluster() const;
 
         /**
          *  @brief  Get the cluster start fit result
@@ -105,7 +105,7 @@ private:
 
     private:
         bool                        m_isDefunct;            ///< Whether the cluster fit relation is defunct
-        pandora::Cluster           *m_pCluster;             ///< Address of the cluster
+        const pandora::Cluster     *m_pCluster;             ///< Address of the cluster
         pandora::ClusterFitResult   m_startFitResult;       ///< The cluster start fit result
         pandora::ClusterFitResult   m_endFitResult;         ///< The cluster end fit result
     };
@@ -147,7 +147,7 @@ inline pandora::Algorithm *BrokenTracksAlgorithm::Factory::CreateAlgorithm() con
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline BrokenTracksAlgorithm::ClusterFitRelation::ClusterFitRelation(pandora::Cluster *const pCluster, const pandora::ClusterFitResult &startFitResult,
+inline BrokenTracksAlgorithm::ClusterFitRelation::ClusterFitRelation(const pandora::Cluster *const pCluster, const pandora::ClusterFitResult &startFitResult,
         const pandora::ClusterFitResult &endFitResult) :
     m_isDefunct(false),
     m_pCluster(pCluster),
@@ -158,7 +158,7 @@ inline BrokenTracksAlgorithm::ClusterFitRelation::ClusterFitRelation(pandora::Cl
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline pandora::Cluster *BrokenTracksAlgorithm::ClusterFitRelation::GetCluster() const
+inline const pandora::Cluster *BrokenTracksAlgorithm::ClusterFitRelation::GetCluster() const
 {
     if (m_isDefunct)
         throw pandora::StatusCodeException(pandora::STATUS_CODE_NOT_ALLOWED);

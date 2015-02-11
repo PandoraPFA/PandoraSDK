@@ -56,7 +56,7 @@ StatusCode LoopingTracksAlgorithm::Run()
 
     for (ClusterVector::const_iterator iter = clusterVector.begin(), iterEnd = clusterVector.end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
 
         if (!ClusterHelper::CanMergeCluster(this->GetPandora(), pCluster, m_canMergeMinMipFraction, m_canMergeMaxRms))
             continue;
@@ -77,7 +77,7 @@ StatusCode LoopingTracksAlgorithm::Run()
         if ((*iterI)->IsDefunct())
             continue;
 
-        Cluster *pParentCluster((*iterI)->GetCluster());
+        const Cluster *const pParentCluster((*iterI)->GetCluster());
         const ClusterFitResult &parentClusterFitResult((*iterI)->GetClusterFitResult());
 
         const unsigned int parentOuterLayer(pParentCluster->GetOuterPseudoLayer());
@@ -93,7 +93,7 @@ StatusCode LoopingTracksAlgorithm::Run()
             if ((*iterJ)->IsDefunct())
                 continue;
 
-            Cluster *pDaughterCluster((*iterJ)->GetCluster());
+            const Cluster *const pDaughterCluster((*iterJ)->GetCluster());
             const ClusterFitResult &daughterClusterFitResult((*iterJ)->GetClusterFitResult());
 
             // Apply loose cuts to examine suitability of merging clusters before proceeding
@@ -208,11 +208,11 @@ float LoopingTracksAlgorithm::GetClosestDistanceBetweenOuterLayerHits(const Clus
 
     for (CaloHitList::const_iterator iterI = pCaloHitListI->begin(), iterIEnd = pCaloHitListI->end(); iterI != iterIEnd; ++iterI)
     {
-        CaloHit *pCaloHitI = *iterI;
+        const CaloHit *const pCaloHitI = *iterI;
 
         for (CaloHitList::const_iterator iterJ = pCaloHitListJ->begin(), iterJEnd = pCaloHitListJ->end(); iterJ != iterJEnd; ++iterJ)
         {
-            CaloHit *pCaloHitJ = *iterJ;
+            const CaloHit *const pCaloHitJ = *iterJ;
 
             const float distance((pCaloHitI->GetPositionVector() - pCaloHitJ->GetPositionVector()).GetMagnitude());
 

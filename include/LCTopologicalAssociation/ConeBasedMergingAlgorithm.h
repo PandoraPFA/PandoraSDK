@@ -41,7 +41,7 @@ private:
     pandora::StatusCode Run();
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
 
-    typedef std::map<pandora::Cluster *, pandora::ClusterFitResult> ClusterFitResultMap;
+    typedef std::map<const pandora::Cluster *, const pandora::ClusterFitResult> ClusterFitResultMap;
 
     /**
      *  @brief  Prepare clusters for the cone based merging algorithm, applying pre-selection cuts and performing a mip fit
@@ -62,7 +62,7 @@ private:
      * 
      *  @return the fraction of the daughter cluster hits contained in the cone
      */
-    float GetFractionInCone(pandora::Cluster *const pParentCluster, const pandora::Cluster *const pDaughterCluster,
+    float GetFractionInCone(const pandora::Cluster *const pParentCluster, const pandora::Cluster *const pDaughterCluster,
         const pandora::ClusterFitResult &parentMipFitResult) const;
 
     std::string     m_trackClusterAssociationAlgName;   ///< The name of the track-cluster association algorithm to run

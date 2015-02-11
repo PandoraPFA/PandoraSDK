@@ -59,7 +59,7 @@ StatusCode MuonClusterAssociationAlgorithm::Run()
     // Loop over muon cluster list, looking for muon clusters containing sufficient hits
     for (ClusterVector::iterator iterI = muonClusterVector.begin(), iterIEnd = muonClusterVector.end(); iterI != iterIEnd; ++iterI)
     {
-        Cluster *pMuonCluster = *iterI;
+        const Cluster *const pMuonCluster = *iterI;
 
         if (NULL == pMuonCluster)
             continue;
@@ -67,7 +67,7 @@ StatusCode MuonClusterAssociationAlgorithm::Run()
         if (pMuonCluster->GetNCaloHits() < m_minHitsInMuonCluster)
             continue;
 
-        Cluster *pBestHadron(NULL), *pBestLeavingTrack(NULL), *pBestNonLeavingTrack(NULL);
+        const Cluster *pBestHadron(NULL), *pBestLeavingTrack(NULL), *pBestNonLeavingTrack(NULL);
         float bestDCosHadron(m_dCosCut), bestDCosLeavingTrack(m_dCosCut), bestDCosNonLeavingTrack(m_dCosCut);
         float bestEnergyHadron(0.), bestEnergyLeavingTrack(0.), bestEnergyNonLeavingTrack(0.);
 
@@ -92,7 +92,7 @@ StatusCode MuonClusterAssociationAlgorithm::Run()
         // For each muon cluster, examine suitable clusters in the input cluster list, looking for merging possibilities
         for (ClusterList::const_iterator iterJ = pInputClusterList->begin(), iterJEnd = pInputClusterList->end(); iterJ != iterJEnd; ++iterJ)
         {
-            Cluster *pCluster = *iterJ;
+            const Cluster *const pCluster = *iterJ;
 
             // Apply basic threshold cuts to cluster candidate
             const float clusterEnergy(pCluster->GetHadronicEnergy());
@@ -168,7 +168,7 @@ StatusCode MuonClusterAssociationAlgorithm::Run()
         }
 
         // Select best merging candidate from those identified above
-        Cluster *pBestInputCluster(NULL);
+        const Cluster *pBestInputCluster(NULL);
 
         if (NULL != pBestLeavingTrack)
         {

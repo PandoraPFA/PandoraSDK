@@ -53,7 +53,7 @@ StatusCode SplitMergedClustersAlg::Run()
     // Examine each cluster in the input list
     for (ClusterVector::iterator iter = clusterVector.begin(), iterEnd = clusterVector.end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
 
         // Check compatibility of cluster with its associated tracks
         const TrackList &trackList(pCluster->GetAssociatedTrackList());

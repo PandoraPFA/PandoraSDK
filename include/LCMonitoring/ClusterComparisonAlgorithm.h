@@ -62,8 +62,8 @@ private:
      */
     void CompareClusters(const pandora::ClusterList &clusterList1, const pandora::ClusterList &clusterList2) const;
 
-    typedef std::map<pandora::Cluster*, pandora::CaloHitList> ClusterToHitListMap;
-    typedef std::map<pandora::CaloHit*, pandora::Cluster*> HitToClusterMap;
+    typedef std::map<const pandora::Cluster*, pandora::CaloHitList> ClusterToHitListMap;
+    typedef std::map<const pandora::CaloHit*, const pandora::Cluster*> HitToClusterMap;
 
     /**
      *  @brief  Populate maps (from cluster to calo hit list and from calo hit to cluster) for a provided cluster list

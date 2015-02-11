@@ -44,7 +44,7 @@ StatusCode ShowerMipMergingAlgorithm::Run()
     ClusterVector clusterVector;
     for (ClusterList::const_iterator iter = pClusterList->begin(), iterEnd = pClusterList->end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
 
         if (pCluster->GetNCaloHits() < m_minHitsInCluster)
             continue;
@@ -60,7 +60,7 @@ StatusCode ShowerMipMergingAlgorithm::Run()
     // Loop over all candidate parent clusters
     for (ClusterVector::const_iterator iterI = clusterVector.begin(); iterI != clusterVector.end(); ++iterI)
     {
-        Cluster *pParentCluster = *iterI;
+        const Cluster *const pParentCluster = *iterI;
 
         // Check to see if cluster has already been changed
         if (NULL == pParentCluster)
@@ -91,7 +91,7 @@ StatusCode ShowerMipMergingAlgorithm::Run()
         // Compare this mip candidate cluster with all other clusters
         for (ClusterVector::iterator iterJ = clusterVector.begin(); iterJ != clusterVector.end(); ++iterJ)
         {
-            Cluster *pDaughterCluster = *iterJ;
+            const Cluster *const pDaughterCluster = *iterJ;
 
             // Check to see if cluster has already been changed
             if ((NULL == pDaughterCluster) || (pParentCluster == pDaughterCluster))

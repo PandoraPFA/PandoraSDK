@@ -47,7 +47,7 @@ StatusCode TrackRecoveryInteractionsAlgorithm::Run()
     // Loop over all unassociated tracks in the current track list
     for (TrackVector::const_iterator iterT = trackVector.begin(), iterTEnd = trackVector.end(); iterT != iterTEnd; ++iterT)
     {
-        Track *pTrack = *iterT;
+        const Track *const pTrack = *iterT;
 
         // Use only unassociated tracks that can be used to form a pfo
         if (pTrack->HasAssociatedCluster() || !pTrack->CanFormPfo())
@@ -57,13 +57,13 @@ StatusCode TrackRecoveryInteractionsAlgorithm::Run()
             continue;
 
         // Identify best cluster to be associated with this track, based on energy consistency and proximity
-        Cluster *pBestCluster(NULL);
+        const Cluster *pBestCluster(NULL);
         float minEnergyDifference(std::numeric_limits<float>::max());
         float smallestTrackClusterDistance(std::numeric_limits<float>::max());
 
         for (ClusterList::const_iterator iterC = pClusterList->begin(), iterCEnd = pClusterList->end(); iterC != iterCEnd; ++iterC)
         {
-            Cluster *pCluster = *iterC;
+            const Cluster *const pCluster = *iterC;
 
             if (!pCluster->GetAssociatedTrackList().empty() || (0 == pCluster->GetNCaloHits()))
                 continue;

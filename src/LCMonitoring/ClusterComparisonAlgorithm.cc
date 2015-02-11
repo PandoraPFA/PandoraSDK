@@ -101,7 +101,7 @@ void ClusterComparisonAlgorithm::CompareClusters(const ClusterList &clusterList1
 
     for (ClusterToHitListMap::const_iterator iter = clusterToHitListMap1.begin(), iterEnd = clusterToHitListMap1.end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster1 = iter->first;
+        const Cluster *const pCluster1 = iter->first;
         const CaloHitList &caloHitList1 = iter->second;
 
         // Collect all clusters in list 2 associated (via hits) with the current cluster in list 1
@@ -150,7 +150,7 @@ void ClusterComparisonAlgorithm::PopulateMaps(const pandora::ClusterList &cluste
 {
     for (ClusterList::const_iterator iter = clusterList.begin(), iterEnd = clusterList.end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
 
         CaloHitList caloHitList;
         pCluster->GetOrderedCaloHitList().GetCaloHitList(caloHitList);

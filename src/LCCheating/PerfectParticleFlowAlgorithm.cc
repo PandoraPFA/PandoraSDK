@@ -41,7 +41,7 @@ StatusCode PerfectParticleFlowAlgorithm::Run()
     {
         try
         {
-            const MCParticle *pPfoTarget = *iterMC;
+            const MCParticle *const pPfoTarget = *iterMC;
             PfoParameters pfoParameters;
 
             this->CaloHitCollection(pPfoTarget, pfoParameters);
@@ -52,7 +52,7 @@ StatusCode PerfectParticleFlowAlgorithm::Run()
             this->SetPfoParametersFromClusters(pPfoTarget, nTracksUsed, pfoParameters);
             this->PfoParameterDebugInformation(pPfoTarget, nTracksUsed, pfoParameters);
 
-            ParticleFlowObject *pPfo = NULL;
+            const ParticleFlowObject *pPfo = NULL;
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ParticleFlowObject::Create(*this, pfoParameters, pPfo));
         }
         catch (StatusCodeException &)
@@ -82,14 +82,14 @@ void PerfectParticleFlowAlgorithm::CaloHitCollection(const MCParticle *const pPf
     const CaloHitList *pCaloHitList = NULL;
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pCaloHitList));
 
-    Cluster *pCluster = NULL;
-    CaloHitList localCaloHitList(pCaloHitList->begin(), pCaloHitList->end());
+    const Cluster *pCluster = NULL;
+    const CaloHitList localCaloHitList(pCaloHitList->begin(), pCaloHitList->end());
 
     for (CaloHitList::const_iterator iter = localCaloHitList.begin(), iterEnd = localCaloHitList.end(); iter != iterEnd; ++iter)
     {
         try
         {
-            CaloHit *pCaloHit = *iter;
+            const CaloHit *const pCaloHit = *iter;
 
             if (!PandoraContentApi::IsAvailable(*this, pCaloHit))
                 continue;
@@ -128,10 +128,10 @@ void PerfectParticleFlowAlgorithm::CaloHitCollection(const MCParticle *const pPf
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PerfectParticleFlowAlgorithm::SimpleCaloHitCollection(const MCParticle *const pPfoTarget, CaloHit *pCaloHit, CaloHitList &caloHitList) const
+void PerfectParticleFlowAlgorithm::SimpleCaloHitCollection(const MCParticle *const pPfoTarget, const CaloHit *const pCaloHit, CaloHitList &caloHitList) const
 {
-    const MCParticle *pHitMCParticle(MCParticleHelper::GetMainMCParticle(pCaloHit));
-    const MCParticle *pHitPfoTarget(pHitMCParticle->GetPfoTarget());
+    const MCParticle *const pHitMCParticle(MCParticleHelper::GetMainMCParticle(pCaloHit));
+    const MCParticle *const pHitPfoTarget(pHitMCParticle->GetPfoTarget());
 
     if (pHitPfoTarget != pPfoTarget)
         return;
@@ -141,7 +141,7 @@ void PerfectParticleFlowAlgorithm::SimpleCaloHitCollection(const MCParticle *con
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PerfectParticleFlowAlgorithm::FullCaloHitCollection(const MCParticle *const pPfoTarget, CaloHit *pCaloHit, CaloHitList &caloHitList) const
+void PerfectParticleFlowAlgorithm::FullCaloHitCollection(const MCParticle *const pPfoTarget, const CaloHit *const pCaloHit, CaloHitList &caloHitList) const
 {
     const MCParticleWeightMap mcParticleWeightMap(pCaloHit->GetMCParticleWeightMap());
 
@@ -156,18 +156,18 @@ void PerfectParticleFlowAlgorithm::FullCaloHitCollection(const MCParticle *const
     if (mcParticleWeightSum < std::numeric_limits<float>::epsilon())
         throw StatusCodeException(STATUS_CODE_FAILURE);
 
-    CaloHit *pLocalCaloHit = pCaloHit;
+    const CaloHit *pLocalCaloHit = pCaloHit;
 
     for (MCParticleWeightMap::const_iterator wtIter = mcParticleWeightMap.begin(), wtIterEnd = mcParticleWeightMap.end(); wtIter != wtIterEnd; ++wtIter)
     {
-        const MCParticle *pHitMCParticle(wtIter->first);
-        const MCParticle *pHitPfoTarget(pHitMCParticle->GetPfoTarget());
+        const MCParticle *const pHitMCParticle(wtIter->first);
+        const MCParticle *const pHitPfoTarget(pHitMCParticle->GetPfoTarget());
         const float weight(wtIter->second);
 
         if (pHitPfoTarget != pPfoTarget)
             continue;
 
-        CaloHit *pCaloHitToAdd = pLocalCaloHit;
+        const CaloHit *pCaloHitToAdd = pLocalCaloHit;
 
         if (pCaloHitToAdd->GetWeight() < std::numeric_limits<float>::epsilon())
             throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -198,9 +198,9 @@ void PerfectParticleFlowAlgorithm::TrackCollection(const MCParticle *const pPfoT
     {
         try
         {
-            Track *pTrack = *iter;
-            const MCParticle *pTrkMCParticle(pTrack->GetMainMCParticle());
-            const MCParticle *pTrkPfoTarget(pTrkMCParticle->GetPfoTarget());
+            const Track *const pTrack = *iter;
+            const MCParticle *const pTrkMCParticle(pTrack->GetMainMCParticle());
+            const MCParticle *const pTrkPfoTarget(pTrkMCParticle->GetPfoTarget());
 
             if (pTrkPfoTarget != pPfoTarget)
                 continue;
@@ -225,7 +225,7 @@ void PerfectParticleFlowAlgorithm::SetPfoParametersFromTracks(const MCParticle *
 
         for (TrackList::const_iterator iter = pfoParameters.m_trackList.begin(), iterEnd = pfoParameters.m_trackList.end(); iter != iterEnd; ++iter)
         {
-            Track *pTrack = *iter;
+            const Track *const pTrack = *iter;
 
             if (!pTrack->CanFormPfo() && !pTrack->CanFormClusterlessPfo())
             {
@@ -265,7 +265,7 @@ void PerfectParticleFlowAlgorithm::SetPfoParametersFromTracks(const MCParticle *
 
 void PerfectParticleFlowAlgorithm::SetPfoParametersFromClusters(const MCParticle *const pPfoTarget, const int nTracksUsed, PfoParameters &pfoParameters) const
 {
-    Cluster *pCluster = NULL;
+    const Cluster *pCluster = NULL;
 
     if (!pfoParameters.m_clusterList.empty())
     {

@@ -41,7 +41,7 @@ public:
      *  @param  pParentCluster address of the parent candidate cluster
      *  @param  parameters the cluster contact parameters
      */
-    ClusterContact(const pandora::Pandora &pandora, pandora::Cluster *const pDaughterCluster, pandora::Cluster *const pParentCluster,
+    ClusterContact(const pandora::Pandora &pandora, const pandora::Cluster *const pDaughterCluster, const pandora::Cluster *const pParentCluster,
         const Parameters &parameters);
 
     /**
@@ -49,14 +49,14 @@ public:
      * 
      *  @return The address of the daughter candidate cluster
      */
-    pandora::Cluster *GetDaughterCluster() const;
+    const pandora::Cluster *GetDaughterCluster() const;
 
     /**
      *  @brief  Get the address of the parent candidate cluster
      * 
      *  @return The address of the parent candidate cluster
      */
-    pandora::Cluster *GetParentCluster() const;
+    const pandora::Cluster *GetParentCluster() const;
 
     /**
      *  @brief  Get the number of contact layers for parent and daughter clusters two clusters
@@ -109,21 +109,21 @@ protected:
      *  @param  pParentCluster address of the parent candidate cluster
      *  @param  parameters the cluster contact parameters
      */
-    void HitDistanceComparison(pandora::Cluster *const pDaughterCluster, pandora::Cluster *const pParentCluster, const Parameters &parameters);
+    void HitDistanceComparison(const pandora::Cluster *const pDaughterCluster, const pandora::Cluster *const pParentCluster, const Parameters &parameters);
 
-    pandora::Cluster   *m_pDaughterCluster;         ///< Address of the daughter candidate cluster
-    pandora::Cluster   *m_pParentCluster;           ///< Address of the parent candidate cluster
+    const pandora::Cluster     *m_pDaughterCluster;         ///< Address of the daughter candidate cluster
+    const pandora::Cluster     *m_pParentCluster;           ///< Address of the parent candidate cluster
 
-    unsigned int        m_nContactLayers;           ///< The number of contact layers for parent and daughter clusters
-    float               m_contactFraction;          ///< The ratio of the number of contact layers to the number of overlap layers
-    float               m_coneFraction1;            ///< Fraction of daughter hits that lie within specified cone 1 along parent direction
-    float               m_closeHitFraction1;        ///< Fraction of daughter hits that lie within sepcified distance 1 of parent cluster
-    float               m_closeHitFraction2;        ///< Fraction of daughter hits that lie within sepcified distance 2 of parent cluster
-    float               m_distanceToClosestHit;     ///< Distance between closest hits in parent and daughter clusters, units mm
+    unsigned int                m_nContactLayers;           ///< The number of contact layers for parent and daughter clusters
+    float                       m_contactFraction;          ///< The ratio of the number of contact layers to the number of overlap layers
+    float                       m_coneFraction1;            ///< Fraction of daughter hits that lie within specified cone 1 along parent direction
+    float                       m_closeHitFraction1;        ///< Fraction of daughter hits that lie within sepcified distance 1 of parent cluster
+    float                       m_closeHitFraction2;        ///< Fraction of daughter hits that lie within sepcified distance 2 of parent cluster
+    float                       m_distanceToClosestHit;     ///< Distance between closest hits in parent and daughter clusters, units mm
 };
 
 typedef std::vector<ClusterContact> ClusterContactVector;
-typedef std::map<pandora::Cluster *, ClusterContactVector> ClusterContactMap;
+typedef std::map<const pandora::Cluster *, ClusterContactVector> ClusterContactMap;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -156,7 +156,7 @@ public:
      * 
      *  @return The fraction of calo hits in the cone
      */
-    static float GetFractionOfHitsInCone(const pandora::Pandora &pandora, const pandora::Cluster *const pClusterI, pandora::Cluster *const pClusterJ,
+    static float GetFractionOfHitsInCone(const pandora::Pandora &pandora, const pandora::Cluster *const pClusterI, const pandora::Cluster *const pClusterJ,
         const float coneCosineHalfAngle);
 
     /**
@@ -228,14 +228,14 @@ public:
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline pandora::Cluster *ClusterContact::GetDaughterCluster() const
+inline const pandora::Cluster *ClusterContact::GetDaughterCluster() const
 {
     return m_pDaughterCluster;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline pandora::Cluster *ClusterContact::GetParentCluster() const
+inline const pandora::Cluster *ClusterContact::GetParentCluster() const
 {
     return m_pParentCluster;
 }

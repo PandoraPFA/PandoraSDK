@@ -37,7 +37,7 @@ private:
     pandora::StatusCode Run();
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
 
-    typedef std::map<const pandora::MCParticle*, pandora::Cluster*> MCParticleToClusterMap;
+    typedef std::map<const pandora::MCParticle*, const pandora::Cluster*> MCParticleToClusterMap;
 
     bool    m_shouldMergeChargedClusters;   ///< Whether to merge charged clusters sharing same mc particle (otherwise use only highest E charged cluster)
 };

@@ -56,7 +56,7 @@ private:
      *  @param  pCaloHit address of the calo hit to consider
      *  @param  caloHitList to receive selected calo hits
      */
-    void SimpleCaloHitCollection(const pandora::MCParticle *const pPfoTarget, pandora::CaloHit *pCaloHit, pandora::CaloHitList &caloHitList) const;
+    void SimpleCaloHitCollection(const pandora::MCParticle *const pPfoTarget, const pandora::CaloHit *const pCaloHit, pandora::CaloHitList &caloHitList) const;
 
     /**
      *  @brief  Full collection of calo hits, using map of mc particles to hit weights; fragment calo hits where necessary
@@ -65,7 +65,7 @@ private:
      *  @param  pCaloHit address of the calo hit to consider
      *  @param  caloHitList to receive selected calo hits, which may include a list of fragments of the original input hit
      */
-    void FullCaloHitCollection(const pandora::MCParticle *const pPfoTarget, pandora::CaloHit *pCaloHit, pandora::CaloHitList &caloHitList) const;
+    void FullCaloHitCollection(const pandora::MCParticle *const pPfoTarget, const pandora::CaloHit *const pCaloHit, pandora::CaloHitList &caloHitList) const;
 
     /**
      *  @brief  Collection of tracks, using only tracks for which pfo target is the main mc particle

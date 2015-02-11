@@ -33,7 +33,7 @@ StatusCode BeamHaloMuonRemovalAlgorithm::Run()
 
     for (ClusterList::const_iterator iter = pClusterList->begin(); iter != pClusterList->end();)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
         iter++;
 
         if (this->IsBeamHaloMuon(pCluster))
@@ -47,7 +47,7 @@ StatusCode BeamHaloMuonRemovalAlgorithm::Run()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool BeamHaloMuonRemovalAlgorithm::IsBeamHaloMuonInertia(pandora::Cluster * pCluster) const
+bool BeamHaloMuonRemovalAlgorithm::IsBeamHaloMuonInertia(const pandora::Cluster *const pCluster) const
 {
     if (!pCluster->GetAssociatedTrackList().empty())
         return false;
@@ -62,7 +62,7 @@ bool BeamHaloMuonRemovalAlgorithm::IsBeamHaloMuonInertia(pandora::Cluster * pClu
     {
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
-            const CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
 
             if (pCaloHit->GetHitType() != MUON)
             {
@@ -104,7 +104,7 @@ bool BeamHaloMuonRemovalAlgorithm::IsBeamHaloMuonInertia(pandora::Cluster * pClu
     {
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
-            const CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
 
             if (pCaloHit->GetHitType() != MUON)
             {
@@ -134,7 +134,7 @@ bool BeamHaloMuonRemovalAlgorithm::IsBeamHaloMuonInertia(pandora::Cluster * pClu
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool BeamHaloMuonRemovalAlgorithm::IsBeamHaloMuon(pandora::Cluster * pCluster) const
+bool BeamHaloMuonRemovalAlgorithm::IsBeamHaloMuon(const pandora::Cluster *const pCluster) const
 {
     if (!pCluster->GetAssociatedTrackList().empty())
         return false;
@@ -153,7 +153,7 @@ bool BeamHaloMuonRemovalAlgorithm::IsBeamHaloMuon(pandora::Cluster * pCluster) c
     {
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
-            const CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
 
             if (pCaloHit->GetHitType() != MUON)
             {
@@ -209,7 +209,7 @@ bool BeamHaloMuonRemovalAlgorithm::IsBeamHaloMuon(pandora::Cluster * pCluster) c
     {
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
-            const CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
 
             if (pCaloHit->GetHitType() != pandora::MUON)
             {

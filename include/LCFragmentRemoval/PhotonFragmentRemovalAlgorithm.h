@@ -56,7 +56,7 @@ private:
      * 
      *  @return boolean
      */
-    bool IsPhotonLike(pandora::Cluster *const pDaughterCluster) const;
+    bool IsPhotonLike(const pandora::Cluster *const pDaughterCluster) const;
 
     /**
      *  @brief  Whether candidate parent and daughter clusters are sufficiently in contact to warrant further investigation
@@ -74,8 +74,8 @@ private:
      *  @param  pBestParentCluster to receive the address of the best parent cluster candidate
      *  @param  pBestDaughterCluster to receive the address of the best daughter cluster candidate
      */
-    pandora::StatusCode GetClusterMergingCandidates(const ClusterContactMap &clusterContactMap, pandora::Cluster *&pBestParentCluster,
-        pandora::Cluster *&pBestDaughterCluster) const;
+    pandora::StatusCode GetClusterMergingCandidates(const ClusterContactMap &clusterContactMap, const pandora::Cluster *&pBestParentCluster,
+        const pandora::Cluster *&pBestDaughterCluster) const;
 
     /**
      *  @brief  Get a measure of the evidence for merging the parent and daughter candidate clusters
@@ -94,8 +94,8 @@ private:
      *  @param  pBestDaughterCluster address of the daughter cluster to be merged
      *  @param  affectedClusters to receive the list of affected clusters
      */
-    pandora::StatusCode GetAffectedClusters(const ClusterContactMap &clusterContactMap, pandora::Cluster *const pBestParentCluster,
-        pandora::Cluster *const pBestDaughterCluster, pandora::ClusterList &affectedClusters) const;
+    pandora::StatusCode GetAffectedClusters(const ClusterContactMap &clusterContactMap, const pandora::Cluster *const pBestParentCluster,
+        const pandora::Cluster *const pBestDaughterCluster, pandora::ClusterList &affectedClusters) const;
 
     typedef ClusterContact::Parameters ContactParameters;
     ContactParameters   m_contactParameters;                        ///< The cluster contact parameters

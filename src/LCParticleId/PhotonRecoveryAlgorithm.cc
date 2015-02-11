@@ -64,7 +64,7 @@ void PhotonRecoveryAlgorithm::FindPhotonsIdentifiedAsHadrons(const ClusterList *
 {
     for (ClusterList::const_iterator iter = pClusterList->begin(), iterEnd = pClusterList->end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
 
         // Consider only plausible photon candidates, currently identified as hadrons
         if (!pCluster->GetAssociatedTrackList().empty())
@@ -178,7 +178,7 @@ void PhotonRecoveryAlgorithm::PerformSoftPhotonId(const ClusterList *const pClus
 {
     for (ClusterList::const_iterator iter = pClusterList->begin(), iterEnd = pClusterList->end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
 
         if (this->IsSoftPhoton(pCluster))
         {
@@ -191,7 +191,7 @@ void PhotonRecoveryAlgorithm::PerformSoftPhotonId(const ClusterList *const pClus
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool PhotonRecoveryAlgorithm::IsSoftPhoton(Cluster *const pCluster) const
+bool PhotonRecoveryAlgorithm::IsSoftPhoton(const Cluster *const pCluster) const
 {
     const unsigned int nCaloHits(pCluster->GetNCaloHits());
 

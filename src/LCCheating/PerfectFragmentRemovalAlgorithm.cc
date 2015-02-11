@@ -34,7 +34,7 @@ StatusCode PerfectFragmentRemovalAlgorithm::Run()
 
     for (ClusterList::const_iterator iter = pClusterList->begin(), iterEnd = pClusterList->end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
 
         if (!pCluster->GetAssociatedTrackList().empty())
         {
@@ -56,7 +56,7 @@ StatusCode PerfectFragmentRemovalAlgorithm::Run()
     {
         try
         {
-            Cluster *pCluster = *iter;
+            const Cluster *const pCluster = *iter;
 
             if (NULL == pCluster)
                 continue;
@@ -71,7 +71,7 @@ StatusCode PerfectFragmentRemovalAlgorithm::Run()
             }
             else if (m_shouldMergeChargedClusters)
             {
-                Cluster *pMainChargedCluster = itMCParticle->second;
+                const Cluster *const pMainChargedCluster = itMCParticle->second;
                 PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::MergeAndDeleteClusters(*this, pMainChargedCluster, pCluster));
                 *iter = NULL;
             }
@@ -86,7 +86,7 @@ StatusCode PerfectFragmentRemovalAlgorithm::Run()
     {
         try
         {
-            Cluster *pCluster = *iter;
+            const Cluster *const pCluster = *iter;
 
             if (NULL == pCluster)
                 continue;
@@ -97,7 +97,7 @@ StatusCode PerfectFragmentRemovalAlgorithm::Run()
 
             if (itMCParticle != mcParticleToClusterMap.end())
             {
-                Cluster *pMainChargedCluster = itMCParticle->second;
+                const Cluster *const pMainChargedCluster = itMCParticle->second;
                 PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::MergeAndDeleteClusters(*this, pMainChargedCluster, pCluster));
                 *iter = NULL;
             }

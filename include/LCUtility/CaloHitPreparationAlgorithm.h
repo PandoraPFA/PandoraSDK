@@ -42,7 +42,7 @@ private:
      *  @param  pCaloHit the calo hit
      *  @param  pOrderedCaloHitList the ordered calo hit list
      */
-    void CalculateCaloHitProperties(pandora::CaloHit *const pCaloHit, const pandora::OrderedCaloHitList &orderedCaloHitList) const;
+    void CalculateCaloHitProperties(const pandora::CaloHit *const pCaloHit, const pandora::OrderedCaloHitList &orderedCaloHitList) const;
 
     /**
      *  @brief  Count number of "nearby" hits using the isolation scheme

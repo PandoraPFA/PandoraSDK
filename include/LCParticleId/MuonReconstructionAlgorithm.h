@@ -74,7 +74,7 @@ private:
      */
     pandora::StatusCode TidyLists() const;
 
-    typedef std::pair<pandora::CaloHit *, float> TrackDistanceInfo;
+    typedef std::pair<const pandora::CaloHit *, float> TrackDistanceInfo;
     typedef std::vector<TrackDistanceInfo> TrackDistanceInfoVector;
 
     /**

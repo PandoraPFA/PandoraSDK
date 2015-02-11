@@ -68,7 +68,7 @@ private:
      * 
      *  @return boolean
      */
-    bool IsSoftPhoton(pandora::Cluster *const pCluster) const;
+    bool IsSoftPhoton(const pandora::Cluster *const pCluster) const;
 
     std::string     m_trackClusterAssociationAlgName;   ///< The name of the track-cluster association algorithm to run
 

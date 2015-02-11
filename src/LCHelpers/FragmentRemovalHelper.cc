@@ -62,7 +62,7 @@ float FragmentRemovalHelper::GetFractionOfCloseHits(const Cluster *const pCluste
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-float FragmentRemovalHelper::GetFractionOfHitsInCone(const Pandora &pandora, const Cluster *const pClusterI, Cluster *const pClusterJ,
+float FragmentRemovalHelper::GetFractionOfHitsInCone(const Pandora &pandora, const Cluster *const pClusterI, const Cluster *const pClusterJ,
     const float coneCosineHalfAngle)
 {
     CartesianVector coneApex(0.f, 0.f, 0.f), coneDirection(0.f, 0.f, 0.f);
@@ -310,7 +310,7 @@ StatusCode FragmentRemovalHelper::GetClusterContactDetails(const Cluster *const 
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-ClusterContact::ClusterContact(const Pandora &pandora, Cluster *const pDaughterCluster, Cluster *const pParentCluster, const Parameters &parameters) :
+ClusterContact::ClusterContact(const Pandora &pandora, const Cluster *const pDaughterCluster, const Cluster *const pParentCluster, const Parameters &parameters) :
     m_pDaughterCluster(pDaughterCluster),
     m_pParentCluster(pParentCluster),
     m_nContactLayers(0),
@@ -328,7 +328,7 @@ ClusterContact::ClusterContact(const Pandora &pandora, Cluster *const pDaughterC
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void ClusterContact::HitDistanceComparison(Cluster *const pDaughterCluster, Cluster *const pParentCluster, const Parameters &parameters)
+void ClusterContact::HitDistanceComparison(const Cluster *const pDaughterCluster, const Cluster *const pParentCluster, const Parameters &parameters)
 {
     const float closeHitDistance1Squared(parameters.m_closeHitDistance1 * parameters.m_closeHitDistance1);
     const float closeHitDistance2Squared(parameters.m_closeHitDistance2 * parameters.m_closeHitDistance2);

@@ -40,7 +40,7 @@ private:
         unsigned int showerStartLayer, unsigned int showerEndLayer) const;
 
     pandora::StatusCode MakeClusterFragments(const unsigned int showerStartLayer, const unsigned int showerEndLayer,
-        pandora::Cluster *const pOriginalCluster, pandora::Cluster *&pMipCluster, pandora::Cluster *&pPhotonCluster) const;
+        const pandora::Cluster *const pOriginalCluster, const pandora::Cluster *&pMipCluster, const pandora::Cluster *&pPhotonCluster) const;
 
     float           m_highEnergyMuonCut;            ///< Cut for muon to be considered high energy
     unsigned int    m_nTransitionLayers;            ///< Number of transition layers, treated more flexibly, between shower and mip-region

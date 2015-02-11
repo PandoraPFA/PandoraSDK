@@ -48,7 +48,7 @@ StatusCode MergeSplitPhotonsAlgorithm::Run()
     // Loop over photon candidate clusters
     for (ClusterVector::iterator iterI = clusterVector.begin(), iterIEnd = clusterVector.end(); iterI != iterIEnd; ++iterI)
     {
-        Cluster *pParentCluster = *iterI;
+        const Cluster *const pParentCluster = *iterI;
 
         if (NULL == pParentCluster)
             continue;
@@ -65,7 +65,7 @@ StatusCode MergeSplitPhotonsAlgorithm::Run()
         // Find daughter photon candidate clusters
         for (ClusterVector::iterator iterJ = iterI + 1, iterJEnd = clusterVector.end(); iterJ != iterJEnd; ++iterJ)
         {
-            Cluster *pDaughterCluster = *iterJ;
+            const Cluster *const pDaughterCluster = *iterJ;
 
             if (NULL == pDaughterCluster)
                 continue;
@@ -108,7 +108,7 @@ StatusCode MergeSplitPhotonsAlgorithm::Run()
                 parameters.m_caloHitList.insert(pParentCluster->GetIsolatedCaloHitList().begin(), pParentCluster->GetIsolatedCaloHitList().end());
                 parameters.m_caloHitList.insert(pDaughterCluster->GetIsolatedCaloHitList().begin(), pDaughterCluster->GetIsolatedCaloHitList().end());
 
-                Cluster *pMergedCluster = NULL;
+                const Cluster *pMergedCluster = NULL;
                 PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, parameters, pMergedCluster));
 
                 // Look for peaks in cluster transverse shower profile

@@ -53,7 +53,7 @@ StatusCode ExitingTrackAlg::Run()
     // Examine each cluster in the input list
     for (ClusterVector::iterator iter = clusterVector.begin(), iterEnd = clusterVector.end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
 
         // Apply pre-selection: should reclustering operations be performed?
         const TrackList &trackList(pCluster->GetAssociatedTrackList());

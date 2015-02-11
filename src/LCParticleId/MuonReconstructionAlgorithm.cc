@@ -76,7 +76,7 @@ StatusCode MuonReconstructionAlgorithm::AssociateMuonTracks(const ClusterList *c
 
     for (ClusterList::const_iterator iter = pMuonClusterList->begin(), iterEnd = pMuonClusterList->end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
 
         // Simple cuts on cluster properties
         if (pCluster->GetNCaloHits() > m_maxClusterCaloHits)
@@ -99,13 +99,13 @@ StatusCode MuonReconstructionAlgorithm::AssociateMuonTracks(const ClusterList *c
         const bool isPositiveZ(clusterInnerCentroid.GetZ() > 0.f);
 
         // Loop over all non-associated tracks in the current track list to find bestTrack
-        Track *pBestTrack(NULL);
+        const Track *pBestTrack(NULL);
         float bestTrackEnergy(0.f);
         float bestDistanceToTrack(m_maxDistanceToTrack);
 
         for (TrackList::const_iterator iterT = pTrackList->begin(), iterTEnd = pTrackList->end(); iterT != iterTEnd; ++iterT)
         {
-            Track *pTrack = *iterT;
+            const Track *const pTrack = *iterT;
 
             // Simple cuts on track properties
             if (pTrack->HasAssociatedCluster() || !pTrack->CanFormPfo())
@@ -247,7 +247,7 @@ StatusCode MuonReconstructionAlgorithm::AddCaloHits(const ClusterList *const pMu
 
     for (ClusterList::const_iterator clusterIter = pMuonClusterList->begin(), clusterIterEnd = pMuonClusterList->end(); clusterIter != clusterIterEnd; ++clusterIter)
     {
-        Cluster *pCluster = *clusterIter;
+        const Cluster *const pCluster = *clusterIter;
 
         // Check track associations
         const TrackList &trackList(pCluster->GetAssociatedTrackList());
@@ -255,7 +255,7 @@ StatusCode MuonReconstructionAlgorithm::AddCaloHits(const ClusterList *const pMu
         if (trackList.size() != m_nExpectedTracksPerCluster)
             continue;
 
-        Track *pTrack = *(trackList.begin());
+        const Track *const pTrack = *(trackList.begin());
         const Helix *const pHelix(pTrack->GetHelixFitAtCalorimeter());
 
         for (OrderedCaloHitList::const_iterator layerIter = orderedCaloHitList.begin(), layerIterEnd = orderedCaloHitList.end(); layerIter != layerIterEnd; ++layerIter)
@@ -265,7 +265,7 @@ StatusCode MuonReconstructionAlgorithm::AddCaloHits(const ClusterList *const pMu
 
             for (CaloHitList::const_iterator hitIter = layerIter->second->begin(), hitIterEnd = layerIter->second->end(); hitIter != hitIterEnd; ++hitIter)
             {
-                CaloHit *pCaloHit = *hitIter;
+                const CaloHit *const pCaloHit = *hitIter;
 
                 if ((!m_shouldClusterIsolatedHits && pCaloHit->IsIsolated()) || !PandoraContentApi::IsAvailable(*this, pCaloHit))
                     continue;
@@ -341,7 +341,7 @@ StatusCode MuonReconstructionAlgorithm::CreateMuonPfos(const ClusterList *const 
     {
         PandoraContentApi::ParticleFlowObject::Parameters pfoParameters;
 
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
         pfoParameters.m_clusterList.insert(pCluster);
 
         // Consider associated tracks
@@ -350,7 +350,7 @@ StatusCode MuonReconstructionAlgorithm::CreateMuonPfos(const ClusterList *const 
         if (trackList.size() != m_nExpectedTracksPerCluster)
             continue;
 
-        Track *pTrack = *(trackList.begin());
+        const Track *const pTrack = *(trackList.begin());
         pfoParameters.m_trackList.insert(pTrack);
 
         // Examine track relationships
@@ -373,7 +373,7 @@ StatusCode MuonReconstructionAlgorithm::CreateMuonPfos(const ClusterList *const 
         pfoParameters.m_mass = PdgTable::GetParticleMass(pfoParameters.m_particleId.Get());
         pfoParameters.m_energy = std::sqrt(pfoParameters.m_mass.Get() * pfoParameters.m_mass.Get() + pfoParameters.m_momentum.Get().GetMagnitudeSquared());
 
-        ParticleFlowObject *pPfo(NULL);
+        const ParticleFlowObject *pPfo(NULL);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ParticleFlowObject::Create(*this, pfoParameters, pPfo));
     }
 
@@ -452,7 +452,7 @@ StatusCode MuonReconstructionAlgorithm::GetPfoComponents(TrackList &pfoTrackList
 
     for (PfoList::const_iterator iter = pPfoList->begin(), iterEnd = pPfoList->end(); iter != iterEnd; ++iter)
     {
-        ParticleFlowObject *pPfo = *iter;
+        const ParticleFlowObject *const pPfo = *iter;
         const int particleId(pPfo->GetParticleId());
 
         if ((particleId != MU_MINUS) && (particleId != MU_PLUS))
@@ -464,7 +464,7 @@ StatusCode MuonReconstructionAlgorithm::GetPfoComponents(TrackList &pfoTrackList
 
     for (ClusterList::const_iterator iter = pfoClusterList.begin(), iterEnd = pfoClusterList.end(); iter != iterEnd; ++iter)
     {
-        Cluster *pCluster = *iter;
+        const Cluster *const pCluster = *iter;
         pCluster->GetOrderedCaloHitList().GetCaloHitList(pfoCaloHitList);
         pfoCaloHitList.insert(pCluster->GetIsolatedCaloHitList().begin(), pCluster->GetIsolatedCaloHitList().end());
     }

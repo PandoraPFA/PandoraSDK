@@ -233,14 +233,11 @@ private:
      */
     float ClusterTime(const pandora::Cluster *const pCluster) const;
 
-    typedef std::set<const pandora::MCParticle*> MCParticleList;
-    typedef std::vector<pandora::ParticleFlowObject*> ParticleFlowObjectVector;
-
     typedef std::map<const pandora::MCParticle*, float> MCParticleToFloatMap;
     typedef std::map<const pandora::MCParticle*, const pandora::Track*> MCParticleToTrackMap;
     typedef std::map<const pandora::Track*, TrackErrorTypes> TrackToErrorTypeMap;
 
-    MCParticleList          m_trackMcPfoTargets;                        ///< 
+    pandora::MCParticleList m_trackMcPfoTargets;                        ///< 
     MCParticleToTrackMap    m_mcParticleToTrackMap;                     ///< 
     TrackToErrorTypeMap     m_trackToErrorTypeMap;                      ///< 
 
@@ -305,14 +302,14 @@ private:
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline void DumpPfosMonitoringAlgorithm::DumpPhotonPfo(const pandora::ParticleFlowObject *pPfo)
+inline void DumpPfosMonitoringAlgorithm::DumpPhotonPfo(const pandora::ParticleFlowObject *const pPfo)
 {
     return this->DumpNeutralOrPhotonPfo(pPfo, true);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline void DumpPfosMonitoringAlgorithm::DumpNeutralPfo(const pandora::ParticleFlowObject *pPfo)
+inline void DumpPfosMonitoringAlgorithm::DumpNeutralPfo(const pandora::ParticleFlowObject *const pPfo)
 {
     return this->DumpNeutralOrPhotonPfo(pPfo, false);
 }

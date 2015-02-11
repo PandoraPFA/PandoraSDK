@@ -58,7 +58,7 @@ StatusCode CLICPfoSelectionAlgorithm::Run()
 
     for (PfoList::const_iterator iter = pPfoList->begin(); iter != pPfoList->end();)
     {
-        ParticleFlowObject *pPfo = *iter;
+        const ParticleFlowObject *const pPfo = *iter;
         iter++;
 
         const CartesianVector &pfoMomentum(pPfo->GetMomentum());
@@ -142,7 +142,7 @@ StatusCode CLICPfoSelectionAlgorithm::Run()
             for (ClusterList::const_iterator clusterIter = pfoClusterList.begin(), clusterIterEnd = pfoClusterList.end();
                 clusterIter != clusterIterEnd; ++clusterIter)
             {
-                Cluster *pCluster = *clusterIter;
+                const Cluster *const pCluster = *clusterIter;
 
                 float meanTime(0.f);
                 float meanTimeECal(0.f);
@@ -262,7 +262,7 @@ void CLICPfoSelectionAlgorithm::GetClusterTimes(const Cluster *const pCluster, f
     {
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
-            CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
 
             sumEnergy += pCaloHit->GetHadronicEnergy();
             sumTimeEnergy += pCaloHit->GetHadronicEnergy() * pCaloHit->GetTime();
@@ -271,13 +271,13 @@ void CLICPfoSelectionAlgorithm::GetClusterTimes(const Cluster *const pCluster, f
             {
                 nECalHits++;
                 sumEnergyECal += pCaloHit->GetHadronicEnergy();
-                sumTimeEnergyECal += pCaloHit->GetHadronicEnergy()*pCaloHit->GetTime();
+                sumTimeEnergyECal += pCaloHit->GetHadronicEnergy() * pCaloHit->GetTime();
             }
             else if (pCaloHit->GetHitRegion() == ENDCAP)
             {
                 nHCalEndCapHits++;
                 sumEnergyHCalEndCap += pCaloHit->GetHadronicEnergy();
-                sumTimeEnergyHCalEndCap += pCaloHit->GetHadronicEnergy()*pCaloHit->GetTime();
+                sumTimeEnergyHCalEndCap += pCaloHit->GetHadronicEnergy() * pCaloHit->GetTime();
             }
         }
     }
