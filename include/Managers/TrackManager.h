@@ -42,7 +42,26 @@ private:
      *  @param  parameters the track parameters
      *  @param  pTrack to receive the address of the track
      */
-    StatusCode CreateTrack(const PandoraApi::Track::Parameters &parameters, Track *&pTrack);
+    StatusCode CreateTrack(const PandoraApi::Track::Parameters &parameters, const Track *&pTrack);
+
+    /**
+     *  @brief  Is a track, or a list of tracks, available to add to a particle flow object
+     * 
+     *  @param  pT address of the object or object list
+     * 
+     *  @return boolean
+     */
+    template <typename T>
+    bool IsAvailable(const T *const pT) const;
+
+    /**
+     *  @brief  Set availability of a track, or a list of tracks, to be added to a particle flow object
+     * 
+     *  @param  pT the address of the object or object list
+     *  @param  isAvailable the availability
+     */
+    template <typename T>
+    void SetAvailability(const T *const pT, bool isAvailable) const;
 
     /**
      *  @brief  Erase all track manager content
@@ -93,6 +112,22 @@ private:
     StatusCode AddSiblingAssociations() const;
 
     /**
+     *  @brief  Set the cluster associated with a track
+     * 
+     *  @param  pTrack the address of the relevant track
+     *  @param  pCluster the address of the associated cluster
+     */
+    StatusCode SetAssociatedCluster(const Track *const pTrack, const Cluster *const pCluster) const;
+
+    /**
+     *  @brief  Remove the association of a track with a cluster
+     *
+     *  @param  pTrack the address of the relevant track
+     *  @param  pCluster the address of the cluster with which the track is no longer associated
+     */
+    StatusCode RemoveAssociatedCluster(const Track *const pTrack, const Cluster *const pCluster) const;
+
+    /**
      *  @brief  Remove all track to cluster associations
      */
     StatusCode RemoveAllClusterAssociations() const;
@@ -118,9 +153,10 @@ private:
      *  @param  clusterList the input cluster list
      *  @param  originalReclusterListName the list name/key for the original recluster candidates
      */
-    StatusCode InitializeReclustering(const Algorithm *const pAlgorithm, const TrackList &trackList, const std::string &originalReclusterListName);
+    StatusCode InitializeReclustering(const Algorithm *const pAlgorithm, const TrackList &trackList,
+        const std::string &originalReclusterListName);
 
-    typedef std::map<Uid, Track *> UidToTrackMap;
+    typedef std::map<Uid, const Track *> UidToTrackMap;
     typedef std::multimap<Uid, Uid> TrackRelationMap;
 
     UidToTrackMap                   m_uidToTrackMap;                    ///< The uid to track map

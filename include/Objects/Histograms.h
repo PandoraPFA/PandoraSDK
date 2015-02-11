@@ -184,7 +184,7 @@ public:
      *  @param  pTiXmlDocument address of the xml document
      *  @param  xmlElementName the xml element name for the histogram
      */
-    void WriteToXml(TiXmlDocument *pTiXmlDocument, const std::string &xmlElementName) const;
+    void WriteToXml(TiXmlDocument *const pTiXmlDocument, const std::string &xmlElementName) const;
 
 private:
     typedef std::map<int, float> HistogramMap;
@@ -450,7 +450,7 @@ public:
      *  @param  pTiXmlDocument address of the xml document
      *  @param  xmlElementName the xml element name for the histogram
      */
-    void WriteToXml(TiXmlDocument *pTiXmlDocument, const std::string &xmlElementName) const;
+    void WriteToXml(TiXmlDocument *const pTiXmlDocument, const std::string &xmlElementName) const;
 
 private:
     typedef std::map<int, float> HistogramMap;

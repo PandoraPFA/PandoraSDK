@@ -35,7 +35,7 @@ MCManager::~MCManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MCManager::CreateMCParticle(const PandoraApi::MCParticle::Parameters &parameters, MCParticle *&pMCParticle)
+StatusCode MCManager::CreateMCParticle(const PandoraApi::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle)
 {
     pMCParticle = NULL;
 
@@ -151,7 +151,7 @@ StatusCode MCManager::SelectPfoTargets()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MCManager::ApplyPfoSelectionRules(MCParticle *const pMCParticle, MCParticleList &mcPfoList) const
+StatusCode MCManager::ApplyPfoSelectionRules(const MCParticle *const pMCParticle, MCParticleList &mcPfoList) const
 {
     const float selectionRadius(m_pPandora->GetSettings()->GetMCPfoSelectionRadius());
     const float selectionMomentum(m_pPandora->GetSettings()->GetMCPfoSelectionMomentum());
@@ -166,15 +166,40 @@ StatusCode MCManager::ApplyPfoSelectionRules(MCParticle *const pMCParticle, MCPa
         (pMCParticle->GetMomentum().GetMagnitude() > selectionMomentum) &&
         !((particleId == PROTON || particleId == NEUTRON) && (pMCParticle->GetEnergy() < selectionEnergyCutOffProtonsNeutrons)))
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pMCParticle->SetPfoTargetInTree(pMCParticle, true));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTargetInTree(pMCParticle, pMCParticle, true));
         mcPfoList.insert(pMCParticle);
     }
     else
     {
-        for(MCParticleList::iterator iter = pMCParticle->m_daughterList.begin(), iterEnd = pMCParticle->m_daughterList.end();
+        for(MCParticleList::const_iterator iter = pMCParticle->m_daughterList.begin(), iterEnd = pMCParticle->m_daughterList.end();
             iter != iterEnd; ++iter)
         {
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ApplyPfoSelectionRules(*iter, mcPfoList));
+        }
+    }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode MCManager::SetPfoTargetInTree(const MCParticle *const pMCParticle, const MCParticle *const pPfoTarget, bool onlyDaughters) const
+{
+    if (pMCParticle->IsPfoTargetSet())
+        return STATUS_CODE_SUCCESS;
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pMCParticle)->SetPfoTarget(pPfoTarget));
+
+    for (MCParticleList::const_iterator iter = pMCParticle->GetDaughterList().begin(), iterEnd = pMCParticle->GetDaughterList().end(); iter != iterEnd; ++iter)
+    {
+       PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTargetInTree(*iter, pPfoTarget));
+    }
+
+    if (!onlyDaughters)
+    {
+        for (MCParticleList::const_iterator iter = pMCParticle->GetParentList().begin(), iterEnd = pMCParticle->GetParentList().end(); iter != iterEnd; ++iter)
+        {
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTargetInTree(*iter, pPfoTarget));
         }
     }
 
@@ -194,8 +219,8 @@ StatusCode MCManager::AddMCParticleRelationships() const
         if ((m_uidToMCParticleMap.end() == parentIter) || (m_uidToMCParticleMap.end() == daughterIter))
             continue;
 
-        const StatusCode firstStatusCode(parentIter->second->AddDaughter(daughterIter->second));
-        const StatusCode secondStatusCode(daughterIter->second->AddParent(parentIter->second));
+        const StatusCode firstStatusCode(this->Modifiable(parentIter->second)->AddDaughter(daughterIter->second));
+        const StatusCode secondStatusCode(this->Modifiable(daughterIter->second)->AddParent(parentIter->second));
 
         if (firstStatusCode != secondStatusCode)
             return STATUS_CODE_FAILURE;
@@ -229,23 +254,25 @@ StatusCode MCManager::RemoveAllMCParticleRelationships()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MCManager::RemoveMCParticleRelationships(MCParticle *const pMCParticle) const
+StatusCode MCManager::RemoveMCParticleRelationships(const MCParticle *const pMCParticle) const
 {
-    MCParticleList &parentList(pMCParticle->m_parentList);
+    const MCParticleList parentList(pMCParticle->GetParentList());
 
     for (MCParticleList::const_iterator iter = parentList.begin(), iterEnd = parentList.end(); iter != iterEnd; ++iter)
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, (*iter)->RemoveDaughter(pMCParticle));
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(*iter)->RemoveDaughter(pMCParticle));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pMCParticle)->RemoveParent(*iter));
+    }
 
-    MCParticleList &daughterList(pMCParticle->m_daughterList);
+    const MCParticleList daughterList(pMCParticle->GetDaughterList());
 
     for (MCParticleList::const_iterator iter = daughterList.begin(), iterEnd = daughterList.end(); iter != iterEnd; ++iter)
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, (*iter)->RemoveParent(pMCParticle));
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(*iter)->RemoveParent(pMCParticle));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pMCParticle)->RemoveDaughter(*iter));
+    }
 
-    pMCParticle->RemovePfoTarget();
-    parentList.clear();
-    daughterList.clear();
-
-    return STATUS_CODE_SUCCESS;
+    return this->Modifiable(pMCParticle)->RemovePfoTarget();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -307,7 +334,7 @@ StatusCode MCManager::CreateUidToPfoTargetsMap(UidToMCParticleWeightMap &uidToMC
             if (m_uidToMCParticleMap.end() == mcParticleIter)
                 continue;
 
-            MCParticle *pMCParticle = NULL;
+            const MCParticle *pMCParticle = NULL;
 
             if (!shouldCollapseMCParticlesToPfoTarget)
             {

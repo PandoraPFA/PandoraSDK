@@ -161,7 +161,7 @@ private:
      *  @param  pT address of the object to add
      */
     template <typename T>
-    StatusCode AddToPfo(T *pT);
+    StatusCode AddToPfo(const T *const pT);
 
     /**
      *  @brief  Remove an object from the particle flow object
@@ -169,35 +169,35 @@ private:
      *  @param  pT address of the object to remove
      */
     template <typename T>
-    StatusCode RemoveFromPfo(T *pT);
+    StatusCode RemoveFromPfo(const T *const pT);
 
     /**
      *  @brief  Add a parent pfo to the parent pfo list
      * 
      *  @param  pPfo the address of the parent pfo
      */
-    StatusCode AddParent(ParticleFlowObject *const pPfo);
+    StatusCode AddParent(const ParticleFlowObject *const pPfo);
 
     /**
      *  @brief  Add a daughter pfo to the daughter pfo list
      * 
      *  @param  pPfo the address of the daughter pfo
      */
-    StatusCode AddDaughter(ParticleFlowObject *const pPfo);
+    StatusCode AddDaughter(const ParticleFlowObject *const pPfo);
 
     /**
      *  @brief  Remove a parent pfo from the parent pfo list
      * 
      *  @param  pPfo the address of the parent pfo
      */
-    StatusCode RemoveParent(ParticleFlowObject *const pPfo);
+    StatusCode RemoveParent(const ParticleFlowObject *const pPfo);
 
     /**
      *  @brief  Remove a daughter pfo from the daughter pfo list
      * 
      *  @param  pPfo the address of the daughter pfo
      */
-    StatusCode RemoveDaughter(ParticleFlowObject *const pPfo);
+    StatusCode RemoveDaughter(const ParticleFlowObject *const pPfo);
 
     int                     m_particleId;               ///< The particle flow object id (PDG code)
     int                     m_charge;                   ///< The particle flow object charge

@@ -69,7 +69,7 @@ EnergyCorrections::~EnergyCorrections()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode EnergyCorrections::RegisterPlugin(const std::string &name, const EnergyCorrectionType energyCorrectionType,
-    EnergyCorrectionPlugin *pEnergyCorrectionPlugin)
+    EnergyCorrectionPlugin *const pEnergyCorrectionPlugin)
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pEnergyCorrectionPlugin->RegisterDetails(m_pPandora, name));
 
@@ -88,7 +88,7 @@ StatusCode EnergyCorrections::InitializePlugins(const TiXmlHandle *const pXmlHan
     for (EnergyCorrectionPluginMap::const_iterator iter = m_hadEnergyCorrectionPluginMap.begin(),
         iterEnd = m_hadEnergyCorrectionPluginMap.end(); iter != iterEnd; ++iter)
     {
-        TiXmlElement *pXmlElement(pXmlHandle->FirstChild(iter->first).Element());
+        TiXmlElement *const pXmlElement(pXmlHandle->FirstChild(iter->first).Element());
 
         if (NULL != pXmlElement)
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, iter->second->ReadSettings(TiXmlHandle(pXmlElement)));
@@ -99,7 +99,7 @@ StatusCode EnergyCorrections::InitializePlugins(const TiXmlHandle *const pXmlHan
     for (EnergyCorrectionPluginMap::const_iterator iter = m_emEnergyCorrectionPluginMap.begin(),
         iterEnd = m_emEnergyCorrectionPluginMap.end(); iter != iterEnd; ++iter)
     {
-        TiXmlElement *pXmlElement(pXmlHandle->FirstChild(iter->first).Element());
+        TiXmlElement *const pXmlElement(pXmlHandle->FirstChild(iter->first).Element());
 
         if (NULL != pXmlElement)
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, iter->second->ReadSettings(TiXmlHandle(pXmlElement)));

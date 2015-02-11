@@ -113,7 +113,7 @@ private:
     AlgorithmToolList               m_algorithmToolList;                ///< The algorithm tool list
     AlgorithmToolFactoryMap         m_algorithmToolFactoryMap;          ///< The algorithm tool factory map
 
-    const Pandora *const            m_pPandora;                        ///< The pandora object that will run the algorithms
+    const Pandora *const            m_pPandora;                         ///< The pandora instance that will run the algorithms
 
     friend class PandoraApiImpl;
     friend class PandoraContentApiImpl;

@@ -91,7 +91,7 @@ ParticleId::~ParticleId()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleId::RegisterPlugin(const std::string &name, ParticleIdPlugin *pParticleIdPlugin)
+StatusCode ParticleId::RegisterPlugin(const std::string &name, ParticleIdPlugin *const pParticleIdPlugin)
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pParticleIdPlugin->RegisterDetails(m_pPandora, name));
 

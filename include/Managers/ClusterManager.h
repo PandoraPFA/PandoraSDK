@@ -44,7 +44,7 @@ private:
      *  @param  parameters the cluster parameters
      *  @param  pCluster to receive the address of the cluster created
      */
-    StatusCode CreateCluster(const PandoraContentApi::Cluster::Parameters &parameters, Cluster *&pCluster);
+    StatusCode CreateCluster(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster);
 
     /**
      *  @brief  Alter the metadata information stored in a cluster
@@ -52,7 +52,26 @@ private:
      *  @param  pCluster address of the cluster to modify
      *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
      */
-    StatusCode AlterMetadata(Cluster *pCluster, const PandoraContentApi::Cluster::Metadata &metadata) const;
+    StatusCode AlterMetadata(const Cluster *const pCluster, const PandoraContentApi::Cluster::Metadata &metadata) const;
+
+    /**
+     *  @brief  Is a cluster, or a list of clusters, available to add to a particle flow object
+     * 
+     *  @param  pT address of the object or object list
+     * 
+     *  @return boolean
+     */
+    template <typename T>
+    bool IsAvailable(const T *const pT) const;
+
+    /**
+     *  @brief  Set availability of a cluster, or a list of clusters, to be added to a particle flow object
+     * 
+     *  @param  pT the address of the object or object list
+     *  @param  isAvailable the availability
+     */
+    template <typename T>
+    void SetAvailability(const T *const pT, bool isAvailable) const;
 
     /**
      *  @brief  Add a calo hit to a cluster
@@ -60,7 +79,7 @@ private:
      *  @param  pCluster address of the cluster to modify
      *  @param  pCaloHit address of the hit to add
      */
-    StatusCode AddCaloHitToCluster(Cluster *pCluster, CaloHit *pCaloHit);
+    StatusCode AddToCluster(const Cluster *const pCluster, const CaloHit *const pCaloHit);
 
     /**
      *  @brief  Remove a calo hit from a cluster
@@ -68,7 +87,7 @@ private:
      *  @param  pCluster address of the cluster to modify
      *  @param  pCaloHit address of the hit to remove
      */
-    StatusCode RemoveCaloHitFromCluster(Cluster *pCluster, CaloHit *pCaloHit);
+    StatusCode RemoveFromCluster(const Cluster *const pCluster, const CaloHit *const pCaloHit);
 
     /**
      *  @brief  Add an isolated calo hit to a cluster. This is not counted as a regular calo hit: it contributes only
@@ -77,7 +96,7 @@ private:
      *  @param  pCluster address of the cluster to modify
      *  @param  pCaloHit address of the hit to add
      */
-    StatusCode AddIsolatedCaloHitToCluster(Cluster *pCluster, CaloHit *pCaloHit);
+    StatusCode AddIsolatedToCluster(const Cluster *const pCluster, const CaloHit *const pCaloHit);
 
     /**
      *  @brief  Remove an isolated calo hit from a cluster
@@ -85,7 +104,7 @@ private:
      *  @param  pCluster address of the cluster to modify
      *  @param  pCaloHit address of the hit to remove
      */
-    StatusCode RemoveIsolatedCaloHitFromCluster(Cluster *pCluster, CaloHit *pCaloHit);
+    StatusCode RemoveIsolatedFromCluster(const Cluster *const pCluster, const CaloHit *const pCaloHit);
 
     /**
      *  @brief  Merge two clusters in the current list, enlarging one cluster and deleting the second
@@ -93,7 +112,7 @@ private:
      *  @param  pClusterToEnlarge address of the cluster to enlarge
      *  @param  pClusterToDelete address of the cluster to delete
      */
-    StatusCode MergeAndDeleteClusters(Cluster *pClusterToEnlarge, Cluster *pClusterToDelete);
+    StatusCode MergeAndDeleteClusters(const Cluster *const pClusterToEnlarge, const Cluster *const pClusterToDelete);
 
     /**
      *  @brief  Merge two clusters from two specified lists, enlarging one cluster and deleting the second
@@ -103,8 +122,24 @@ private:
      *  @param  enlargeListName name of the list containing the cluster to enlarge
      *  @param  deleteListName name of the list containing the cluster to delete
      */
-    StatusCode MergeAndDeleteClusters(Cluster *pClusterToEnlarge, Cluster *pClusterToDelete, const std::string &enlargeListName,
+    StatusCode MergeAndDeleteClusters(const Cluster *const pClusterToEnlarge, const Cluster *const pClusterToDelete, const std::string &enlargeListName,
         const std::string &deleteListName);
+
+    /**
+     *  @brief  Add an association between a cluster and a track
+     * 
+     *  @param  pCluster the address of the relevant cluster
+     *  @param  pTrack the address of the track with which the cluster is associated
+     */
+    StatusCode AddTrackAssociation(const Cluster *const pCluster, const Track *const pTrack) const;
+
+    /**
+     *  @brief  Remove an association between a cluster and a track
+     * 
+     *  @param  pCluster the address of the relevant cluster
+     *  @param  pTrack the address of the track with which the cluster is no longer associated
+     */
+    StatusCode RemoveTrackAssociation(const Cluster *const pCluster, const Track *const pTrack) const;
 
     /**
      *  @brief  Remove all cluster to track associations

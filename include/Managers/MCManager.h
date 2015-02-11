@@ -42,7 +42,7 @@ private:
      *  @param  parameters the mc particle parameters
      *  @param  pMCParticle address of the mc particle
      */
-    StatusCode CreateMCParticle(const PandoraApi::MCParticle::Parameters &parameters, MCParticle *&pMCParticle);
+    StatusCode CreateMCParticle(const PandoraApi::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle);
 
     /**
      *  @brief  Erase all mc manager content
@@ -85,13 +85,22 @@ private:
      */
     StatusCode SelectPfoTargets();
 
-   /**
-    *  @brief  Apply mc pfo selection rules 
-    *
-    *  @params mcRootParticle address of the mc root particle
-    *  @params mcPfoList reference to list with all MCPFOs which have been selected so far
-    */
-    StatusCode ApplyPfoSelectionRules(MCParticle *const mcRootParticle, MCParticleList &mcPfoList) const;
+    /**
+     *  @brief  Apply mc pfo selection rules 
+     *
+     *  @param  mcRootParticle address of the mc root particle
+     *  @param  mcPfoList reference to list with all MCPFOs which have been selected so far
+     */
+    StatusCode ApplyPfoSelectionRules(const MCParticle *const mcRootParticle, MCParticleList &mcPfoList) const;
+
+    /**
+     *  @brief  Set pfo target for a mc tree
+     * 
+     *  @param  pMCParticle address of a particle in the mc tree
+     *  @param  pPfoTarget address of the pfo target
+     *  @param  onlyDaughters if "true" go through daughters only, if false go through parents as well
+     */
+    StatusCode SetPfoTargetInTree(const MCParticle *const pMCParticle, const MCParticle *const pPfoTarget, bool onlyDaughters = false) const;
 
    /**
      *  @brief  Create a map relating calo hit uid to mc pfo target
@@ -122,7 +131,7 @@ private:
      * 
      *  @param  pMCParticle address of the mc particle
      */
-    StatusCode RemoveMCParticleRelationships(MCParticle *const pMCParticle) const;
+    StatusCode RemoveMCParticleRelationships(const MCParticle *const pMCParticle) const;
 
     typedef std::map<Uid, float> UidToWeightMap;
     typedef std::map<Uid, UidToWeightMap> ObjectRelationMap;

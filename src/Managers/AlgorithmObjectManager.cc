@@ -92,7 +92,7 @@ StatusCode AlgorithmObjectManager<T>::SaveObjects(const std::string &targetListN
 
 template<typename T>
 StatusCode AlgorithmObjectManager<T>::MoveObjectsBetweenLists(const std::string &targetListName, const std::string &sourceListName,
-    const ObjectList *pObjectSubset)
+    const ObjectList *const pObjectSubset)
 {
     if (Manager<T>::NULL_LIST_NAME == targetListName)
         return STATUS_CODE_NOT_ALLOWED;
@@ -160,7 +160,7 @@ StatusCode AlgorithmObjectManager<T>::TemporarilyReplaceCurrentList(const std::s
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<typename T>
-StatusCode AlgorithmObjectManager<T>::DeleteObject(T *pT)
+StatusCode AlgorithmObjectManager<T>::DeleteObject(const T *const pT)
 {
     return this->DeleteObject(pT, Manager<T>::m_currentListName);
 }
@@ -168,7 +168,7 @@ StatusCode AlgorithmObjectManager<T>::DeleteObject(T *pT)
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<typename T>
-StatusCode AlgorithmObjectManager<T>::DeleteObject(T *pT, const std::string &listName)
+StatusCode AlgorithmObjectManager<T>::DeleteObject(const T *const pT, const std::string &listName)
 {
     typename Manager<T>::NameToListMap::iterator listIter = Manager<T>::m_nameToListMap.find(listName);
 

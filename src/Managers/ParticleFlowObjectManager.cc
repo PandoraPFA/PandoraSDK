@@ -29,7 +29,7 @@ ParticleFlowObjectManager::~ParticleFlowObjectManager()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode ParticleFlowObjectManager::CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &parameters,
-    ParticleFlowObject *&pPfo)
+    const ParticleFlowObject *&pPfo)
 {
     pPfo = NULL;
 
@@ -64,46 +64,46 @@ StatusCode ParticleFlowObjectManager::CreateParticleFlowObject(const PandoraCont
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObjectManager::AlterMetadata(ParticleFlowObject *pPfo, const PandoraContentApi::ParticleFlowObject::Metadata &metadata) const
+StatusCode ParticleFlowObjectManager::AlterMetadata(const ParticleFlowObject *const pPfo, const PandoraContentApi::ParticleFlowObject::Metadata &metadata) const
 {
-    return pPfo->AlterMetadata(metadata);
+    return this->Modifiable(pPfo)->AlterMetadata(metadata);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-StatusCode ParticleFlowObjectManager::AddToPfo(ParticleFlowObject *pPfo, T *pT) const
+StatusCode ParticleFlowObjectManager::AddToPfo(const ParticleFlowObject *const pPfo, const T *const pT) const
 {
-    return pPfo->AddToPfo(pT);
+    return this->Modifiable(pPfo)->AddToPfo(pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
-StatusCode ParticleFlowObjectManager::RemoveFromPfo(ParticleFlowObject *pPfo, T *pT) const
+StatusCode ParticleFlowObjectManager::RemoveFromPfo(const ParticleFlowObject *const pPfo, const T *const pT) const
 {
-    return pPfo->RemoveFromPfo(pT);
+    return this->Modifiable(pPfo)->RemoveFromPfo(pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObjectManager::SetParentDaughterAssociation(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const
+StatusCode ParticleFlowObjectManager::SetParentDaughterAssociation(const ParticleFlowObject *const pParentPfo, const ParticleFlowObject *const pDaughterPfo) const
 {
     if (pParentPfo == pDaughterPfo)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pParentPfo->AddDaughter(pDaughterPfo));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pDaughterPfo->AddParent(pParentPfo));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pParentPfo)->AddDaughter(pDaughterPfo));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pDaughterPfo)->AddParent(pParentPfo));
 
     return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObjectManager::RemoveParentDaughterAssociation(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const
+StatusCode ParticleFlowObjectManager::RemoveParentDaughterAssociation(const ParticleFlowObject *const pParentPfo, const ParticleFlowObject *const pDaughterPfo) const
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pParentPfo->RemoveDaughter(pDaughterPfo));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pDaughterPfo->RemoveParent(pParentPfo));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pParentPfo)->RemoveDaughter(pDaughterPfo));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pDaughterPfo)->RemoveParent(pParentPfo));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -111,12 +111,12 @@ StatusCode ParticleFlowObjectManager::RemoveParentDaughterAssociation(ParticleFl
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template StatusCode ParticleFlowObjectManager::AddToPfo<Cluster>(ParticleFlowObject *, Cluster *) const;
-template StatusCode ParticleFlowObjectManager::AddToPfo<Track>(ParticleFlowObject *, Track *) const;
-template StatusCode ParticleFlowObjectManager::AddToPfo<Vertex>(ParticleFlowObject *, Vertex *) const;
+template StatusCode ParticleFlowObjectManager::AddToPfo<Cluster>(const ParticleFlowObject *, const Cluster *) const;
+template StatusCode ParticleFlowObjectManager::AddToPfo<Track>(const ParticleFlowObject *, const Track *) const;
+template StatusCode ParticleFlowObjectManager::AddToPfo<Vertex>(const ParticleFlowObject *, const Vertex *) const;
 
-template StatusCode ParticleFlowObjectManager::RemoveFromPfo<Cluster>(ParticleFlowObject *, Cluster *) const;
-template StatusCode ParticleFlowObjectManager::RemoveFromPfo<Track>(ParticleFlowObject *, Track *) const;
-template StatusCode ParticleFlowObjectManager::RemoveFromPfo<Vertex>(ParticleFlowObject *, Vertex *) const;
+template StatusCode ParticleFlowObjectManager::RemoveFromPfo<Cluster>(const ParticleFlowObject *, const Cluster *) const;
+template StatusCode ParticleFlowObjectManager::RemoveFromPfo<Track>(const ParticleFlowObject *, const Track *) const;
+template StatusCode ParticleFlowObjectManager::RemoveFromPfo<Vertex>(const ParticleFlowObject *, const Vertex *) const;
 
 } //  namespace pandora

@@ -95,7 +95,7 @@ void Track::RemoveMCParticles()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Track::SetAssociatedCluster(Cluster *const pCluster)
+StatusCode Track::SetAssociatedCluster(const Cluster *const pCluster)
 {
     if (NULL == pCluster)
         return STATUS_CODE_INVALID_PARAMETER;
@@ -110,7 +110,7 @@ StatusCode Track::SetAssociatedCluster(Cluster *const pCluster)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Track::RemoveAssociatedCluster(Cluster *const pCluster)
+StatusCode Track::RemoveAssociatedCluster(const Cluster *const pCluster)
 {
     if (pCluster != m_pAssociatedCluster)
         return STATUS_CODE_NOT_FOUND;
@@ -122,7 +122,7 @@ StatusCode Track::RemoveAssociatedCluster(Cluster *const pCluster)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Track::AddParent(Track *const pTrack)
+StatusCode Track::AddParent(const Track *const pTrack)
 {
     if (NULL == pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
@@ -135,7 +135,7 @@ StatusCode Track::AddParent(Track *const pTrack)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Track::AddDaughter(Track *const pTrack)
+StatusCode Track::AddDaughter(const Track *const pTrack)
 {
     if (NULL == pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
@@ -148,7 +148,7 @@ StatusCode Track::AddDaughter(Track *const pTrack)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Track::AddSibling(Track *const pTrack)
+StatusCode Track::AddSibling(const Track *const pTrack)
 {
     if (NULL == pTrack)
         return STATUS_CODE_INVALID_PARAMETER;

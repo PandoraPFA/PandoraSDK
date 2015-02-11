@@ -110,7 +110,7 @@ const ParticleId *PluginManager::GetParticleId() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PluginManager::SetBFieldPlugin(BFieldPlugin *pBFieldPlugin)
+StatusCode PluginManager::SetBFieldPlugin(BFieldPlugin *const pBFieldPlugin)
 {
     if (NULL != m_pBFieldPlugin)
         return STATUS_CODE_ALREADY_INITIALIZED;
@@ -121,7 +121,7 @@ StatusCode PluginManager::SetBFieldPlugin(BFieldPlugin *pBFieldPlugin)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PluginManager::SetPseudoLayerPlugin(PseudoLayerPlugin *pPseudoLayerPlugin)
+StatusCode PluginManager::SetPseudoLayerPlugin(PseudoLayerPlugin *const pPseudoLayerPlugin)
 {
     if (NULL != m_pPseudoLayerPlugin)
         return STATUS_CODE_ALREADY_INITIALIZED;
@@ -132,7 +132,7 @@ StatusCode PluginManager::SetPseudoLayerPlugin(PseudoLayerPlugin *pPseudoLayerPl
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PluginManager::SetShowerProfilePlugin(ShowerProfilePlugin *pShowerProfilePlugin)
+StatusCode PluginManager::SetShowerProfilePlugin(ShowerProfilePlugin *const pShowerProfilePlugin)
 {
     if (NULL != m_pShowerProfilePlugin)
         return STATUS_CODE_ALREADY_INITIALIZED;
@@ -148,7 +148,7 @@ StatusCode PluginManager::InitializePlugins(const TiXmlHandle *const pXmlHandle)
     if (NULL != m_pBFieldPlugin)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBFieldPlugin->RegisterDetails(m_pPandora, "BFieldPlugin"));
-        TiXmlElement *pBFieldXmlElement(pXmlHandle->FirstChild("BFieldPlugin").Element());
+        TiXmlElement *const pBFieldXmlElement(pXmlHandle->FirstChild("BFieldPlugin").Element());
 
         if (NULL != pBFieldXmlElement)
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBFieldPlugin->ReadSettings(TiXmlHandle(pBFieldXmlElement)));
@@ -159,7 +159,7 @@ StatusCode PluginManager::InitializePlugins(const TiXmlHandle *const pXmlHandle)
     if (NULL != m_pPseudoLayerPlugin)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPseudoLayerPlugin->RegisterDetails(m_pPandora, "PseudoLayerPlugin"));
-        TiXmlElement *pPseudoLayerXmlElement(pXmlHandle->FirstChild("PseudoLayerPlugin").Element());
+        TiXmlElement *const pPseudoLayerXmlElement(pXmlHandle->FirstChild("PseudoLayerPlugin").Element());
 
         if (NULL != pPseudoLayerXmlElement)
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPseudoLayerPlugin->ReadSettings(TiXmlHandle(pPseudoLayerXmlElement)));
@@ -170,7 +170,7 @@ StatusCode PluginManager::InitializePlugins(const TiXmlHandle *const pXmlHandle)
     if (NULL != m_pShowerProfilePlugin)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pShowerProfilePlugin->RegisterDetails(m_pPandora, "ShowerProfilePlugin"));
-        TiXmlElement *pShowerProfileXmlElement(pXmlHandle->FirstChild("ShowerProfilePlugin").Element());
+        TiXmlElement *const pShowerProfileXmlElement(pXmlHandle->FirstChild("ShowerProfilePlugin").Element());
 
         if (NULL != pShowerProfileXmlElement)
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pShowerProfilePlugin->ReadSettings(TiXmlHandle(pShowerProfileXmlElement)));

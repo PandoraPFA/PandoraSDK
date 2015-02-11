@@ -225,7 +225,7 @@ protected:
      *  @param  pCaloHit address of the calo hit to copy
      *  @param  weight the weight to apply to energy depositions
      */
-    CaloHit(CaloHit *pCaloHit, const float weight);
+    CaloHit(const CaloHit *const pCaloHit, const float weight);
 
     /**
      *  @brief  Destructor
@@ -258,6 +258,20 @@ protected:
      */
     void RemoveMCParticles();
 
+    /**
+     *  @brief  Whether the calo hit is available to be added to a cluster (access this function via PandoraContentAPI)
+     * 
+     *  @return boolean
+     */
+    bool IsAvailable() const;
+
+    /**
+     *  @brief  Set availability of calo hit to be added to a cluster
+     * 
+     *  @param  isAvailable the calo hit availability
+     */
+    void SetAvailability(bool isAvailable);
+
     const CartesianVector   m_positionVector;           ///< Position vector of center of calorimeter cell, units mm
     const CartesianVector   m_expectedDirection;        ///< Unit vector in direction of expected hit propagation
     const CartesianVector   m_cellNormalVector;         ///< Unit normal to the sampling layer, pointing outwards from the origin
@@ -289,7 +303,6 @@ protected:
     MCParticleWeightMap     m_mcParticleWeightMap;      ///< The mc particle weight map
     const void             *m_pParentAddress;           ///< The address of the parent calo hit in the user framework
 
-    friend class CaloHitHelper;
     friend class CaloHitMetadata;
     friend class CaloHitManager;
     friend class InputObjectManager<CaloHit>;
@@ -335,7 +348,7 @@ private:
      *  @param  pCaloHit address of the calo hit to copy
      *  @param  weight the weight to apply to energy depositions
      */
-    RectangularCaloHit(RectangularCaloHit *pCaloHit, const float weight = 1.f);
+    RectangularCaloHit(const RectangularCaloHit *const pCaloHit, const float weight = 1.f);
 
     const float             m_cellSizeU;                ///< Dimension of cell (up in ENDCAP, along beam in BARREL), units mm
     const float             m_cellSizeV;                ///< Dimension of cell (perpendicular to u and thickness), units mm
@@ -384,7 +397,7 @@ private:
      *  @param  pCaloHit address of the calo hit to copy
      *  @param  weight the weight to apply to energy depositions
      */
-    PointingCaloHit(PointingCaloHit *pCaloHit, const float weight = 1.f);
+    PointingCaloHit(const PointingCaloHit *const pCaloHit, const float weight = 1.f);
 
     /**
      *  @brief  Calculate the typical length scale of cell, measured at cell mid-point, units mm
@@ -568,6 +581,20 @@ inline const MCParticleWeightMap &CaloHit::GetMCParticleWeightMap() const
 inline const void *CaloHit::GetParentCaloHitAddress() const
 {
     return m_pParentAddress;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline bool CaloHit::IsAvailable() const
+{
+    return m_isAvailable;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline void CaloHit::SetAvailability(bool isAvailable)
+{
+    m_isAvailable = isAvailable;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

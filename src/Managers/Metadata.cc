@@ -11,7 +11,7 @@
 namespace pandora
 {
 
-CaloHitMetadata::CaloHitMetadata(CaloHitList *pCaloHitList, const std::string &caloHitListName, const bool initialHitAvailability) :
+CaloHitMetadata::CaloHitMetadata(CaloHitList *const pCaloHitList, const std::string &caloHitListName, const bool initialHitAvailability) :
     m_pCaloHitList(pCaloHitList),
     m_caloHitListName(caloHitListName)
 {
@@ -33,6 +33,64 @@ CaloHitMetadata::~CaloHitMetadata()
 
         delete *iter;
     }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <>
+bool CaloHitMetadata::IsAvailable(const CaloHit *const pCaloHit) const
+{
+    CaloHitUsageMap::const_iterator usageMapIter = m_caloHitUsageMap.find(pCaloHit);
+
+    if ((m_caloHitUsageMap.end()) == usageMapIter || !usageMapIter->second)
+        return false;
+
+    return true;
+}
+
+template <>
+bool CaloHitMetadata::IsAvailable(const CaloHitList *const pCaloHitList) const
+{
+    for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
+    {
+        CaloHitUsageMap::const_iterator usageMapIter = m_caloHitUsageMap.find(*iter);
+
+        if ((m_caloHitUsageMap.end()) == usageMapIter || !usageMapIter->second)
+            return false;
+    }
+
+    return true;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <>
+StatusCode CaloHitMetadata::SetAvailability(const CaloHit *const pCaloHit, bool isAvailable)
+{
+    CaloHitUsageMap::iterator usageMapIter = m_caloHitUsageMap.find(pCaloHit);
+
+    if (m_caloHitUsageMap.end() == usageMapIter)
+        return STATUS_CODE_NOT_FOUND;
+
+    usageMapIter->second = isAvailable;
+
+    return STATUS_CODE_SUCCESS;
+}
+
+template <>
+StatusCode CaloHitMetadata::SetAvailability(const CaloHitList *const pCaloHitList, bool isAvailable)
+{
+    for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
+    {
+        CaloHitUsageMap::iterator usageMapIter = m_caloHitUsageMap.find(*iter);
+
+        if (m_caloHitUsageMap.end() == usageMapIter)
+            return STATUS_CODE_NOT_FOUND;
+
+        usageMapIter->second = isAvailable;
+    }
+
+    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -112,41 +170,9 @@ void CaloHitMetadata::Clear()
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-
-bool CaloHitMetadata::AreCaloHitsAvailable(const CaloHitList &caloHitList) const
-{
-    for (CaloHitList::const_iterator iter = caloHitList.begin(), iterEnd = caloHitList.end(); iter != iterEnd; ++iter)
-    {
-        CaloHitUsageMap::const_iterator usageMapIter = m_caloHitUsageMap.find(*iter);
-
-        if ((m_caloHitUsageMap.end()) == usageMapIter || !usageMapIter->second)
-            return false;
-    }
-
-    return true;
-}
-
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHitMetadata::SetCaloHitAvailability(const CaloHitList &caloHitList, bool isAvailable)
-{
-    for (CaloHitList::const_iterator iter = caloHitList.begin(), iterEnd = caloHitList.end(); iter != iterEnd; ++iter)
-    {
-        CaloHitUsageMap::iterator usageMapIter = m_caloHitUsageMap.find(*iter);
-
-        if (m_caloHitUsageMap.end() == usageMapIter)
-            return STATUS_CODE_NOT_FOUND;
-
-        usageMapIter->second = isAvailable;
-    }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-ReclusterMetadata::ReclusterMetadata(CaloHitList *pCaloHitList) :
+ReclusterMetadata::ReclusterMetadata(CaloHitList *const pCaloHitList) :
     m_pCurrentCaloHitMetadata(NULL),
     m_caloHitList(*pCaloHitList)
 {
@@ -164,7 +190,7 @@ ReclusterMetadata::~ReclusterMetadata()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ReclusterMetadata::CreateCaloHitMetadata(CaloHitList *pCaloHitList, const std::string &caloHitListName,
+StatusCode ReclusterMetadata::CreateCaloHitMetadata(CaloHitList *const pCaloHitList, const std::string &caloHitListName,
     const std::string &reclusterListName, const bool initialHitAvailability)
 {
     m_pCurrentCaloHitMetadata = new CaloHitMetadata(pCaloHitList, caloHitListName, initialHitAvailability);

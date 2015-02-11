@@ -34,25 +34,69 @@ MCParticle::~MCParticle()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MCParticle::SetPfoTargetInTree(MCParticle *pMCParticle, bool onlyDaughters)
+StatusCode MCParticle::AddDaughter(const MCParticle *const pMCParticle)
 {
-    if (this->IsPfoTargetSet())
-        return STATUS_CODE_SUCCESS;
+    if (!m_daughterList.insert(pMCParticle).second)
+        return STATUS_CODE_ALREADY_PRESENT;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTarget(pMCParticle));
+    return STATUS_CODE_SUCCESS;
+}
 
-    for (MCParticleList::iterator iter = m_daughterList.begin(), iterEnd = m_daughterList.end(); iter != iterEnd; ++iter)
-    {
-       PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, (*iter)->SetPfoTargetInTree(pMCParticle));
-    }
+//------------------------------------------------------------------------------------------------------------------------------------------
 
-    if(!onlyDaughters)
-    {
-        for (MCParticleList::iterator iter = m_parentList.begin(), iterEnd = m_parentList.end(); iter != iterEnd; ++iter)
-        {
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, (*iter)->SetPfoTargetInTree(pMCParticle));
-        }
-    }
+StatusCode MCParticle::AddParent(const MCParticle *const pMCParticle)
+{
+    if (!m_parentList.insert(pMCParticle).second)
+        return STATUS_CODE_ALREADY_PRESENT;
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode MCParticle::RemoveDaughter(const MCParticle *const pMCParticle)
+{
+    MCParticleList::iterator iter = m_daughterList.find(pMCParticle);
+
+    if (m_daughterList.end() == iter)
+        return STATUS_CODE_NOT_FOUND;
+
+    m_daughterList.erase(iter);
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode MCParticle::RemoveParent(const MCParticle *const pMCParticle)
+{
+    MCParticleList::iterator iter = m_parentList.find(pMCParticle);
+
+    if (m_parentList.end() == iter)
+        return STATUS_CODE_NOT_FOUND;
+
+    m_parentList.erase(iter);
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode MCParticle::SetPfoTarget(const MCParticle *const pMCParticle)
+{
+    if (NULL == pMCParticle)
+        return STATUS_CODE_FAILURE;
+
+    m_pPfoTarget = pMCParticle;
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode MCParticle::RemovePfoTarget()
+{
+    m_pPfoTarget = NULL;
 
     return STATUS_CODE_SUCCESS;
 }

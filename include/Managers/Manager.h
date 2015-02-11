@@ -39,7 +39,7 @@ public:
     virtual ~Manager();
 
 protected:
-    typedef std::unordered_set<T*> ObjectList;
+    typedef std::unordered_set<const T *> ObjectList;
 
     /**
      *  @brief  Get a list
@@ -140,6 +140,15 @@ protected:
      *  @brief  Create initial lists
      */
     virtual StatusCode CreateInitialLists();
+
+    /**
+     *  @brief  Access a modifiable object, when provided with address to const object
+     * 
+     *  @param  pT the address of the const object
+     * 
+     *  @return address of the modifiable object
+     */
+    virtual T *Modifiable(const T *const pT) const;
 
     /**
      *  @brief  AlgorithmInfo class

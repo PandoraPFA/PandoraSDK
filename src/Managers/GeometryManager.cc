@@ -71,7 +71,7 @@ Granularity GeometryManager::GetHitTypeGranularity(const HitType hitType) const
 
 StatusCode GeometryManager::CreateSubDetector(const PandoraApi::Geometry::SubDetector::Parameters &inputParameters)
 {
-    SubDetector *pSubDetector = NULL;
+    const SubDetector *pSubDetector = NULL;
 
     try
     {
@@ -97,7 +97,7 @@ StatusCode GeometryManager::CreateSubDetector(const PandoraApi::Geometry::SubDet
 
 StatusCode GeometryManager::CreateBoxGap(const PandoraApi::Geometry::BoxGap::Parameters &gapParameters)
 {
-    DetectorGap *pDetectorGap = NULL;
+    const DetectorGap *pDetectorGap = NULL;
 
     try
     {
@@ -122,9 +122,10 @@ StatusCode GeometryManager::CreateBoxGap(const PandoraApi::Geometry::BoxGap::Par
 
 StatusCode GeometryManager::CreateConcentricGap(const PandoraApi::Geometry::ConcentricGap::Parameters &gapParameters)
 {
+    const DetectorGap *pDetectorGap = NULL;
+
     try
     {
-        DetectorGap *pDetectorGap = NULL;
         pDetectorGap = new ConcentricGap(gapParameters);
 
         if (NULL == pDetectorGap)
@@ -136,6 +137,8 @@ StatusCode GeometryManager::CreateConcentricGap(const PandoraApi::Geometry::Conc
     catch (StatusCodeException &statusCodeException)
     {
         std::cout << "Failed to create concentric gap: " << statusCodeException.ToString() << std::endl;
+        delete pDetectorGap;
+        pDetectorGap = NULL;
         return statusCodeException.GetStatusCode();
     }
 }

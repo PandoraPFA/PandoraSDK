@@ -75,7 +75,7 @@ private:
      *  @param  energyCorrectionPlugin pointer to an energy correction plugin
      */
     StatusCode RegisterPlugin(const std::string &pluginName, const EnergyCorrectionType energyCorrectionType,
-        EnergyCorrectionPlugin *pEnergyCorrectionPlugin);
+        EnergyCorrectionPlugin *const pEnergyCorrectionPlugin);
 
     /**
      *  @brief  Initialize plugins

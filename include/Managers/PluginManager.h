@@ -84,21 +84,21 @@ private:
      * 
      *  @param  pBFieldPlugin address of the bfield plugin
      */
-    StatusCode SetBFieldPlugin(BFieldPlugin *pBFieldPlugin);
+    StatusCode SetBFieldPlugin(BFieldPlugin *const pBFieldPlugin);
 
     /**
      *  @brief  Set the pseudo layer plugin
      * 
      *  @param  pPseudoLayerPlugin address of the pseudo layer plugin
      */
-    StatusCode SetPseudoLayerPlugin(PseudoLayerPlugin *pPseudoLayerPlugin);
+    StatusCode SetPseudoLayerPlugin(PseudoLayerPlugin *const pPseudoLayerPlugin);
 
     /**
      *  @brief  Set the shower profile plugin
      * 
      *  @param  pPseudoLayerPlugin address of the shower profile plugin
      */
-    StatusCode SetShowerProfilePlugin(ShowerProfilePlugin *pShowerProfilePlugin);
+    StatusCode SetShowerProfilePlugin(ShowerProfilePlugin *const pShowerProfilePlugin);
 
     /**
      *  @brief  Initialize plugins

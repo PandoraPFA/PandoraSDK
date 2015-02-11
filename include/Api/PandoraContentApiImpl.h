@@ -35,7 +35,7 @@ private:
      *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
      */
     template <typename OBJECT, typename METADATA>
-    StatusCode AlterMetadata(OBJECT *pObject, const METADATA &metadata) const;
+    StatusCode AlterMetadata(const OBJECT *const pObject, const METADATA &metadata) const;
 
 
     /* Object-creation functions */
@@ -47,23 +47,7 @@ private:
      *  @param  pObject to receive the address of the object created
      */
     template <typename PARAMETERS, typename OBJECT>
-    StatusCode CreateObject(const PARAMETERS &parameters, OBJECT *&pObject) const;
-
-    /**
-     *  @brief  Create a particle flow object
-     * 
-     *  @param  pfoParameters the particle flow object parameters
-     *  @param  pPfo to receive the address of the particle flow object created
-     */
-    StatusCode CreateParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &pfoParameters, ParticleFlowObject *&pPfo) const;
-
-    /**
-     *  @brief  Create a vertex
-     * 
-     *  @param  vertexPosition the vertex position
-     *  @param  pVertex to receive the address of the vertex created
-     */
-    StatusCode CreateVertex(const CartesianVector &vertexPosition, Vertex *&pVertex) const;
+    StatusCode CreateObject(const PARAMETERS &parameters, const OBJECT *&pObject) const;
 
 
     /* Accessors for plugins and global settings */
@@ -266,7 +250,7 @@ private:
      *  @return boolean
      */
     template <typename T>
-    bool IsAvailable(T *pT) const;
+    bool IsAvailable(const T *const pT) const;
 
 
     /* Object-related functions: algorithm objects only (Clusters, Pfos, Vertices) */
@@ -277,7 +261,7 @@ private:
      *  @param  pT address of the object, or a list of objects, to delete
      */
     template <typename T>
-    StatusCode Delete(T *pT) const;
+    StatusCode Delete(const T *const pT) const;
 
     /**
      *  @brief  Delete an object from a specified list
@@ -285,7 +269,7 @@ private:
      *  @param  pT address of the object, or a list of objects, to delete
      *  @param  listName name of the list containing the object     */
     template <typename T>
-    StatusCode Delete(T *pT, const std::string &listName) const;
+    StatusCode Delete(const T *const pT, const std::string &listName) const;
 
 
     /* CaloHit-related functions */
@@ -297,7 +281,7 @@ private:
      *  @param  pT address of the calo hit, or list of calo hits, to add
      */
     template <typename T>
-    StatusCode AddToCluster(Cluster *pCluster, T *pT) const;
+    StatusCode AddToCluster(const Cluster *const pCluster, const T *const pT) const;
 
     /**
      *  @brief  Remove a calo hit from a cluster. Note this function will not remove the final calo hit from a cluster, and
@@ -306,7 +290,7 @@ private:
      *  @param  pCluster address of the cluster to modify
      *  @param  pCaloHit address of the hit to remove
      */
-    StatusCode RemoveFromCluster(Cluster *pCluster, CaloHit *pCaloHit) const;
+    StatusCode RemoveFromCluster(const Cluster *const pCluster, const CaloHit *const pCaloHit) const;
 
     /**
      *  @brief  Add an isolated calo hit, or a list of isolated calo hits, to a cluster. An isolated calo hit is not counted as a
@@ -316,7 +300,7 @@ private:
      *  @param  pT address of the isolated calo hit, or list of isolated calo hits, to add
      */
     template <typename T>
-    StatusCode AddIsolatedToCluster(Cluster *pCluster, T *pT) const;
+    StatusCode AddIsolatedToCluster(const Cluster *const pCluster, const T *const pT) const;
 
     /**
      *  @brief  Remove an isolated calo hit from a cluster. Note this function will not remove the final calo hit from a cluster, and
@@ -325,7 +309,7 @@ private:
      *  @param  pCluster address of the cluster to modify
      *  @param  pCaloHit address of the isolated hit to remove
      */
-    StatusCode RemoveIsolatedFromCluster(Cluster *pCluster, CaloHit *pCaloHit) const;
+    StatusCode RemoveIsolatedFromCluster(const Cluster *const pCluster, const CaloHit *const pCaloHit) const;
 
     /**
      *  @brief  Fragment a calo hit into two daughter calo hits, with a specified energy division
@@ -335,7 +319,7 @@ private:
      *  @param  pDaughterCaloHit1 to receive the address of daughter fragment 1
      *  @param  pDaughterCaloHit2 to receive the address of daughter fragment 2
      */
-    StatusCode Fragment(CaloHit *pOriginalCaloHit, const float fraction1, CaloHit *&pDaughterCaloHit1, CaloHit *&pDaughterCaloHit2) const;
+    StatusCode Fragment(const CaloHit *const pOriginalCaloHit, const float fraction1, const CaloHit *&pDaughterCaloHit1, const CaloHit *&pDaughterCaloHit2) const;
 
     /**
      *  @brief  Merge two calo hit fragments, originally from the same parent hit, to form a new calo hit
@@ -344,7 +328,7 @@ private:
      *  @param  pFragmentCaloHit2 address of calo hit fragment 2, which will be deleted
      *  @param  pMergedCaloHit to receive the address of the merged calo hit
      */
-    StatusCode MergeFragments(CaloHit *pFragmentCaloHit1, CaloHit *pFragmentCaloHit2, CaloHit *&pMergedCaloHit) const;
+    StatusCode MergeFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2, const CaloHit *&pMergedCaloHit) const;
 
 
     /* Track-related functions */
@@ -355,7 +339,7 @@ private:
      *  @param  pTrack address of the track
      *  @param  pCluster address of the cluster
      */
-    StatusCode AddTrackClusterAssociation(Track *const pTrack, Cluster *const pCluster) const;
+    StatusCode AddTrackClusterAssociation(const Track *const pTrack, const Cluster *const pCluster) const;
 
     /**
      *  @brief  Remove an association between a track and a cluster
@@ -363,7 +347,7 @@ private:
      *  @param  pTrack address of the track
      *  @param  pCluster address of the cluster
      */
-    StatusCode RemoveTrackClusterAssociation(Track *const pTrack, Cluster *const pCluster) const;
+    StatusCode RemoveTrackClusterAssociation(const Track *const pTrack, const Cluster *const pCluster) const;
 
     /**
      *  @brief  Remove all track-cluster associations from objects in the current track and cluster lists
@@ -397,7 +381,7 @@ private:
      *  @param  pClusterToEnlarge address of the cluster to enlarge
      *  @param  pClusterToDelete address of the cluster to delete
      */
-    StatusCode MergeAndDeleteClusters(Cluster *pClusterToEnlarge, Cluster *pClusterToDelete) const;
+    StatusCode MergeAndDeleteClusters(const Cluster *const pClusterToEnlarge, const Cluster *const pClusterToDelete) const;
 
     /**
      *  @brief  Merge two clusters from two specified lists, enlarging one cluster and deleting the second
@@ -407,7 +391,7 @@ private:
      *  @param  enlargeListName name of the list containing the cluster to enlarge
      *  @param  deleteListName name of the list containing the cluster to delete
      */
-    StatusCode MergeAndDeleteClusters(Cluster *pClusterToEnlarge, Cluster *pClusterToDelete, const std::string &enlargeListName,
+    StatusCode MergeAndDeleteClusters(const Cluster *const pClusterToEnlarge, const Cluster *const pClusterToDelete, const std::string &enlargeListName,
         const std::string &deleteListName) const;
 
 
@@ -420,7 +404,7 @@ private:
      *  @param  pCluster address of the cluster to add
      */
     template <typename T>
-    StatusCode AddToPfo(ParticleFlowObject *pPfo, T *pT) const;
+    StatusCode AddToPfo(const ParticleFlowObject *const pPfo, const T *const pT) const;
 
     /**
      *  @brief  Remove a cluster from a particle flow object. Note this function will not remove the final object (track or cluster)
@@ -430,7 +414,7 @@ private:
      *  @param  pCluster address of the cluster to remove
      */
     template <typename T>
-    StatusCode RemoveFromPfo(ParticleFlowObject *pPfo, T *pT) const;
+    StatusCode RemoveFromPfo(const ParticleFlowObject *const pPfo, const T *const pT) const;
 
     /**
      *  @brief  Set parent-daughter particle flow object relationship
@@ -438,7 +422,7 @@ private:
      *  @param  pParentPfo address of parent particle flow object
      *  @param  pDaughterPfo address of daughter particle flow object
      */
-    StatusCode SetPfoParentDaughterRelationship(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const;
+    StatusCode SetPfoParentDaughterRelationship(const ParticleFlowObject *const pParentPfo, const ParticleFlowObject *const pDaughterPfo) const;
 
     /**
      *  @brief  Remove parent-daughter particle flow object relationship
@@ -446,7 +430,7 @@ private:
      *  @param  pParentPfo address of parent particle flow object
      *  @param  pDaughterPfo address of daughter particle flow object
      */
-    StatusCode RemovePfoParentDaughterRelationship(ParticleFlowObject *pParentPfo, ParticleFlowObject *pDaughterPfo) const;
+    StatusCode RemovePfoParentDaughterRelationship(const ParticleFlowObject *const pParentPfo, const ParticleFlowObject *const pDaughterPfo) const;
 
 
     /* Reclustering functions */
@@ -493,12 +477,13 @@ private:
      */
     StatusCode EndReclustering(const Algorithm &algorithm, const std::string &selectedClusterListName) const;
 
+private:
     /**
      *  @brief  Constructor
      * 
      *  @param  pPandora address of the pandora object to interface
      */
-    PandoraContentApiImpl(Pandora *pPandora);
+    PandoraContentApiImpl(Pandora *const pPandora);
 
     /**
      *  @brief  Whether a proposed addition to a cluster is allowed
@@ -508,7 +493,7 @@ private:
      * 
      *  @return boolean
      */
-    bool IsAddToClusterAllowed(Cluster *pCluster, CaloHit *pCaloHit) const;
+    bool IsAddToClusterAllowed(const Cluster *const pCluster, const CaloHit *const pCaloHit) const;
 
     /**
      *  @brief  Prepare an object, or a list of objects, for deletion
@@ -516,7 +501,7 @@ private:
      *  @param  pT address of the object, or list of objects, to prepare for deletion
      */
     template <typename T>
-    StatusCode PrepareForDeletion(T *const pT) const;
+    StatusCode PrepareForDeletion(const T *const pT) const;
 
     /**
      *  @brief  Prepare an object, or a list of objects, (formed as recluster candidates) for deletion

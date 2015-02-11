@@ -206,7 +206,7 @@ StatusCode BinaryFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
 
     if (RECTANGULAR == cellGeometry)
     {
-        const RectangularCaloHit *pRectangularCaloHit = dynamic_cast<const RectangularCaloHit *>(pCaloHit);
+        const RectangularCaloHit *const pRectangularCaloHit = dynamic_cast<const RectangularCaloHit *>(pCaloHit);
 
         if (NULL == pRectangularCaloHit)
             return STATUS_CODE_FAILURE;
@@ -216,7 +216,7 @@ StatusCode BinaryFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
     }
     else if (POINTING == cellGeometry)
     {
-        const PointingCaloHit *pPointingCaloHit = dynamic_cast<const PointingCaloHit *>(pCaloHit);
+        const PointingCaloHit *const pPointingCaloHit = dynamic_cast<const PointingCaloHit *>(pCaloHit);
 
         if (NULL == pPointingCaloHit)
             return STATUS_CODE_FAILURE;

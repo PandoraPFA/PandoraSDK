@@ -153,13 +153,13 @@ bool OrderedCaloHitList::operator= (const OrderedCaloHitList &rhs)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode OrderedCaloHitList::Add(CaloHit *const pCaloHit, const unsigned int pseudoLayer)
+StatusCode OrderedCaloHitList::Add(const CaloHit *const pCaloHit, const unsigned int pseudoLayer)
 {
     TheList::iterator iter = m_theList.find(pseudoLayer);
 
     if (m_theList.end() == iter)
     {
-        CaloHitList *pCaloHitList = new CaloHitList;
+        CaloHitList *const pCaloHitList = new CaloHitList;
 
         if (!pCaloHitList->insert(pCaloHit).second)
         {
@@ -184,7 +184,7 @@ StatusCode OrderedCaloHitList::Add(CaloHit *const pCaloHit, const unsigned int p
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode OrderedCaloHitList::Remove(CaloHit *const pCaloHit, const unsigned int pseudoLayer)
+StatusCode OrderedCaloHitList::Remove(const CaloHit *const pCaloHit, const unsigned int pseudoLayer)
 {
     TheList::iterator listIter = m_theList.find(pseudoLayer);
 

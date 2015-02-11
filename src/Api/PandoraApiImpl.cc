@@ -30,28 +30,28 @@ namespace pandora
 template <>
 StatusCode PandoraApiImpl::CreateObject(const PandoraApi::MCParticle::Parameters &parameters) const
 {
-    MCParticle *pMCParticle(NULL);
+    const MCParticle *pMCParticle(NULL);
     return m_pPandora->m_pMCManager->CreateMCParticle(parameters, pMCParticle);
 }
 
 template <>
 StatusCode PandoraApiImpl::CreateObject(const PandoraApi::Track::Parameters &parameters) const
 {
-    Track *pTrack(NULL);
+    const Track *pTrack(NULL);
     return m_pPandora->m_pTrackManager->CreateTrack(parameters, pTrack);
 }
 
 template <>
 StatusCode PandoraApiImpl::CreateObject(const PandoraApi::RectangularCaloHit::Parameters &parameters) const
 {
-    CaloHit *pCaloHit(NULL);
+    const CaloHit *pCaloHit(NULL);
     return m_pPandora->m_pCaloHitManager->CreateCaloHit(parameters, pCaloHit);
 }
 
 template <>
 StatusCode PandoraApiImpl::CreateObject(const PandoraApi::PointingCaloHit::Parameters &parameters) const
 {
-    CaloHit *pCaloHit(NULL);
+    const CaloHit *pCaloHit(NULL);
     return m_pPandora->m_pCaloHitManager->CreateCaloHit(parameters, pCaloHit);
 }
 
@@ -103,28 +103,28 @@ StatusCode PandoraApiImpl::RegisterAlgorithmToolFactory(const std::string &algor
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::SetMCParentDaughterRelationship(const void *pParentAddress, const void *pDaughterAddress) const
+StatusCode PandoraApiImpl::SetMCParentDaughterRelationship(const void *const pParentAddress, const void *const pDaughterAddress) const
 {
     return m_pPandora->m_pMCManager->SetMCParentDaughterRelationship(pParentAddress, pDaughterAddress);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::SetTrackParentDaughterRelationship(const void *pParentAddress, const void *pDaughterAddress) const
+StatusCode PandoraApiImpl::SetTrackParentDaughterRelationship(const void *const pParentAddress, const void *const pDaughterAddress) const
 {
     return m_pPandora->m_pTrackManager->SetTrackParentDaughterRelationship(pParentAddress, pDaughterAddress);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::SetTrackSiblingRelationship(const void *pFirstSiblingAddress, const void *pSecondSiblingAddress) const
+StatusCode PandoraApiImpl::SetTrackSiblingRelationship(const void *const pFirstSiblingAddress, const void *const pSecondSiblingAddress) const
 {
     return m_pPandora->m_pTrackManager->SetTrackSiblingRelationship(pFirstSiblingAddress, pSecondSiblingAddress);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::SetCaloHitToMCParticleRelationship(const void *pCaloHitParentAddress, const void *pMCParticleParentAddress,
+StatusCode PandoraApiImpl::SetCaloHitToMCParticleRelationship(const void *const pCaloHitParentAddress, const void *const pMCParticleParentAddress,
     const float mcParticleWeight) const
 {
     return m_pPandora->m_pMCManager->SetCaloHitToMCParticleRelationship(pCaloHitParentAddress, pMCParticleParentAddress, mcParticleWeight);
@@ -132,7 +132,7 @@ StatusCode PandoraApiImpl::SetCaloHitToMCParticleRelationship(const void *pCaloH
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::SetTrackToMCParticleRelationship(const void *pTrackParentAddress, const void *pMCParticleParentAddress,
+StatusCode PandoraApiImpl::SetTrackToMCParticleRelationship(const void *const pTrackParentAddress, const void *const pMCParticleParentAddress,
     const float mcParticleWeight) const
 {
     return m_pPandora->m_pMCManager->SetTrackToMCParticleRelationship(pTrackParentAddress, pMCParticleParentAddress, mcParticleWeight);
@@ -161,21 +161,21 @@ StatusCode PandoraApiImpl::SetHitTypeGranularity(const HitType hitType, const Gr
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::SetBFieldPlugin(BFieldPlugin *pBFieldPlugin) const
+StatusCode PandoraApiImpl::SetBFieldPlugin(BFieldPlugin *const pBFieldPlugin) const
 {
     return m_pPandora->m_pPluginManager->SetBFieldPlugin(pBFieldPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::SetPseudoLayerPlugin(PseudoLayerPlugin *pPseudoLayerPlugin) const
+StatusCode PandoraApiImpl::SetPseudoLayerPlugin(PseudoLayerPlugin *const pPseudoLayerPlugin) const
 {
     return m_pPandora->m_pPluginManager->SetPseudoLayerPlugin(pPseudoLayerPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::SetShowerProfilePlugin(ShowerProfilePlugin *pShowerProfilePlugin) const
+StatusCode PandoraApiImpl::SetShowerProfilePlugin(ShowerProfilePlugin *const pShowerProfilePlugin) const
 {
     return m_pPandora->m_pPluginManager->SetShowerProfilePlugin(pShowerProfilePlugin);
 }
@@ -183,14 +183,14 @@ StatusCode PandoraApiImpl::SetShowerProfilePlugin(ShowerProfilePlugin *pShowerPr
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode PandoraApiImpl::RegisterEnergyCorrectionPlugin(const std::string &name, const EnergyCorrectionType energyCorrectionType,
-    EnergyCorrectionPlugin *pEnergyCorrectionPlugin) const
+    EnergyCorrectionPlugin *const pEnergyCorrectionPlugin) const
 {
     return m_pPandora->m_pPluginManager->m_pEnergyCorrections->RegisterPlugin(name, energyCorrectionType, pEnergyCorrectionPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::RegisterParticleIdPlugin(const std::string &name, ParticleIdPlugin *pParticleIdPlugin) const
+StatusCode PandoraApiImpl::RegisterParticleIdPlugin(const std::string &name, ParticleIdPlugin *const pParticleIdPlugin) const
 {
     return m_pPandora->m_pPluginManager->m_pParticleId->RegisterPlugin(name, pParticleIdPlugin);
 }
@@ -204,7 +204,7 @@ StatusCode PandoraApiImpl::ResetEvent() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-PandoraApiImpl::PandoraApiImpl(Pandora *pPandora) :
+PandoraApiImpl::PandoraApiImpl(Pandora *const pPandora) :
     m_pPandora(pPandora)
 {
 }

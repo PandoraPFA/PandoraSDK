@@ -49,7 +49,7 @@ const MCParticle *MCParticleHelper::GetMainMCParticle(const Cluster *const pClus
     {
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
-            CaloHit *pCaloHit = *hitIter;
+            const CaloHit *const pCaloHit = *hitIter;
             const MCParticleWeightMap &hitMCParticleWeightMap(pCaloHit->GetMCParticleWeightMap());
 
             for (MCParticleWeightMap::const_iterator weightIter = hitMCParticleWeightMap.begin(), weightIterEnd = hitMCParticleWeightMap.end();

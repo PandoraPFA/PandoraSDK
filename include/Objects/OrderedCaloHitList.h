@@ -78,14 +78,14 @@ public:
      * 
      *  @param  pCaloHit the address of the calo hit
      */
-    StatusCode Add(CaloHit *const pCaloHit);
+    StatusCode Add(const CaloHit *const pCaloHit);
 
     /**
      *  @brief  Remove a calo hit from the ordered calo hit list
      * 
      *  @param  pCaloHit the address of the calo hit
      */
-    StatusCode Remove(CaloHit *const pCaloHit);
+    StatusCode Remove(const CaloHit *const pCaloHit);
 
     /**
      *  @brief  Get calo hits in specified pseudo layer
@@ -171,7 +171,7 @@ private:
      *  @param  pCaloHit the address of the calo hit
      *  @param  pseudoLayer the pesudo layer
      */
-    StatusCode Add(CaloHit *const pCaloHit, const unsigned int pseudoLayer);
+    StatusCode Add(const CaloHit *const pCaloHit, const unsigned int pseudoLayer);
 
     /**
      *  @brief  Remove a calo hit from a specified pseudo layer
@@ -179,7 +179,7 @@ private:
      *  @param  pCaloHit the address of the calo hit
      *  @param  pseudoLayer the pesudo layer
      */
-    StatusCode Remove(CaloHit *const pCaloHit, const unsigned int pseudoLayer);
+    StatusCode Remove(const CaloHit *const pCaloHit, const unsigned int pseudoLayer);
 
     TheList     m_theList;      ///< The ordered calo hit list
 };
@@ -234,14 +234,14 @@ inline bool OrderedCaloHitList::empty() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline StatusCode OrderedCaloHitList::Add(CaloHit *const pCaloHit)
+inline StatusCode OrderedCaloHitList::Add(const CaloHit *const pCaloHit)
 {
     return this->Add(pCaloHit, pCaloHit->GetPseudoLayer());
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline StatusCode OrderedCaloHitList::Remove(CaloHit *const pCaloHit)
+inline StatusCode OrderedCaloHitList::Remove(const CaloHit *const pCaloHit)
 {
     return this->Remove(pCaloHit, pCaloHit->GetPseudoLayer());
 }

@@ -42,7 +42,26 @@ private:
      *  @param  parameters the vertex parameters
      *  @param  pVertex to receive the address of the vertex created
      */
-    StatusCode CreateVertex(const PandoraContentApi::Vertex::Parameters &parameters, Vertex *&pVertex);
+    StatusCode CreateVertex(const PandoraContentApi::Vertex::Parameters &parameters, const Vertex *&pVertex);
+
+    /**
+     *  @brief  Is a vertex, or a list of vertices, available to add to a particle flow object
+     * 
+     *  @param  pT address of the object or object list
+     * 
+     *  @return boolean
+     */
+    template <typename T>
+    bool IsAvailable(const T *const pT) const;
+
+    /**
+     *  @brief  Set availability of a vertex, or a list of vertices, to be added to a particle flow object
+     * 
+     *  @param  pT the address of the object or object list
+     *  @param  isAvailable the availability
+     */
+    template <typename T>
+    void SetAvailability(const T *const pT, bool isAvailable) const;
 
     friend class PandoraContentApiImpl;
     friend class PandoraImpl;

@@ -70,7 +70,7 @@ StatusCode Cluster::AlterMetadata(const PandoraContentApi::Cluster::Metadata &me
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Cluster::AddCaloHit(CaloHit *const pCaloHit)
+StatusCode Cluster::AddCaloHit(const CaloHit *const pCaloHit)
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_orderedCaloHitList.Add(pCaloHit));
 
@@ -115,7 +115,7 @@ StatusCode Cluster::AddCaloHit(CaloHit *const pCaloHit)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Cluster::RemoveCaloHit(CaloHit *const pCaloHit)
+StatusCode Cluster::RemoveCaloHit(const CaloHit *const pCaloHit)
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_orderedCaloHitList.Remove(pCaloHit));
 
@@ -162,7 +162,7 @@ StatusCode Cluster::RemoveCaloHit(CaloHit *const pCaloHit)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Cluster::AddIsolatedCaloHit(CaloHit *const pCaloHit)
+StatusCode Cluster::AddIsolatedCaloHit(const CaloHit *const pCaloHit)
 {
     if (!m_isolatedCaloHitList.insert(pCaloHit).second)
         return STATUS_CODE_ALREADY_PRESENT;
@@ -180,7 +180,7 @@ StatusCode Cluster::AddIsolatedCaloHit(CaloHit *const pCaloHit)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Cluster::RemoveIsolatedCaloHit(CaloHit *const pCaloHit)
+StatusCode Cluster::RemoveIsolatedCaloHit(const CaloHit *const pCaloHit)
 {
     CaloHitList::iterator iter = m_isolatedCaloHitList.find(pCaloHit);
 
@@ -245,7 +245,7 @@ void Cluster::CalculateInitialDirection() const
     }
     
     CartesianVector initialDirection(0.f, 0.f, 0.f);
-    CaloHitList *pCaloHitList(m_orderedCaloHitList.begin()->second);
+    CaloHitList *const pCaloHitList(m_orderedCaloHitList.begin()->second);
 
     for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
         initialDirection += (*iter)->GetExpectedDirection();
@@ -295,8 +295,8 @@ void Cluster::CalculateLayerHitType(const unsigned int pseudoLayer, InputHitType
 
 void Cluster::PerformEnergyCorrections(const Pandora &pandora) const
 {
-    const EnergyCorrections *pEnergyCorrections(pandora.GetPlugins()->GetEnergyCorrections());
-    const ParticleId *pParticleId(pandora.GetPlugins()->GetParticleId());
+    const EnergyCorrections *const pEnergyCorrections(pandora.GetPlugins()->GetEnergyCorrections());
+    const ParticleId *const pParticleId(pandora.GetPlugins()->GetParticleId());
 
     float correctedElectromagneticEnergy(0.f), correctedHadronicEnergy(0.f), trackComparisonEnergy(0.f);
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pEnergyCorrections->MakeEnergyCorrections(this, correctedElectromagneticEnergy,
@@ -332,7 +332,7 @@ void Cluster::CalculateFastPhotonFlag(const Pandora &pandora) const
 
 void Cluster::CalculateShowerStartLayer(const Pandora &pandora) const
 {
-    const ShowerProfilePlugin *pShowerProfilePlugin(pandora.GetPlugins()->GetShowerProfilePlugin());
+    const ShowerProfilePlugin *const pShowerProfilePlugin(pandora.GetPlugins()->GetShowerProfilePlugin());
 
     unsigned int showerStartLayer(std::numeric_limits<unsigned int>::max());
     pShowerProfilePlugin->CalculateShowerStartLayer(this, showerStartLayer);
@@ -345,7 +345,7 @@ void Cluster::CalculateShowerStartLayer(const Pandora &pandora) const
 
 void Cluster::CalculateShowerProfile(const Pandora &pandora) const
 {
-    const ShowerProfilePlugin *pShowerProfilePlugin(pandora.GetPlugins()->GetShowerProfilePlugin());
+    const ShowerProfilePlugin *const pShowerProfilePlugin(pandora.GetPlugins()->GetShowerProfilePlugin());
 
     float showerProfileStart(std::numeric_limits<float>::max()), showerProfileDiscrepancy(std::numeric_limits<float>::max());
     pShowerProfilePlugin->CalculateLongitudinalProfile(this, showerProfileStart, showerProfileDiscrepancy);
@@ -385,7 +385,26 @@ StatusCode Cluster::ResetProperties()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Cluster::AddHitsFromSecondCluster(Cluster *const pCluster)
+void Cluster::ResetOutdatedProperties()
+{
+    m_isFitUpToDate = false;
+    m_isDirectionUpToDate = false;
+    m_initialDirection.SetValues(0.f, 0.f, 0.f);
+    m_fitToAllHitsResult.Reset();
+    m_showerStartLayer.Reset();
+    m_isPhotonFast.Reset();
+    m_showerProfileStart.Reset();
+    m_showerProfileDiscrepancy.Reset();
+    m_correctedElectromagneticEnergy.Reset();
+    m_correctedHadronicEnergy.Reset();
+    m_trackComparisonEnergy.Reset();
+    m_innerLayerHitType.Reset();
+    m_outerLayerHitType.Reset();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
 {
     if (this == pCluster)
         return STATUS_CODE_NOT_ALLOWED;
@@ -416,15 +435,15 @@ StatusCode Cluster::AddHitsFromSecondCluster(Cluster *const pCluster)
 
         if ((m_orderedCaloHitList.end() != currentIter) && (currentIter->second->size() > 1))
         {
-            m_sumXByPseudoLayer[pseudoLayer] += pCluster->m_sumXByPseudoLayer[pseudoLayer];
-            m_sumYByPseudoLayer[pseudoLayer] += pCluster->m_sumYByPseudoLayer[pseudoLayer];
-            m_sumZByPseudoLayer[pseudoLayer] += pCluster->m_sumZByPseudoLayer[pseudoLayer];
+            m_sumXByPseudoLayer[pseudoLayer] += pCluster->m_sumXByPseudoLayer.at(pseudoLayer);
+            m_sumYByPseudoLayer[pseudoLayer] += pCluster->m_sumYByPseudoLayer.at(pseudoLayer);
+            m_sumZByPseudoLayer[pseudoLayer] += pCluster->m_sumZByPseudoLayer.at(pseudoLayer);
         }
         else
         {
-            m_sumXByPseudoLayer[pseudoLayer] = pCluster->m_sumXByPseudoLayer[pseudoLayer];
-            m_sumYByPseudoLayer[pseudoLayer] = pCluster->m_sumYByPseudoLayer[pseudoLayer];
-            m_sumZByPseudoLayer[pseudoLayer] = pCluster->m_sumZByPseudoLayer[pseudoLayer];
+            m_sumXByPseudoLayer[pseudoLayer] = pCluster->m_sumXByPseudoLayer.at(pseudoLayer);
+            m_sumYByPseudoLayer[pseudoLayer] = pCluster->m_sumYByPseudoLayer.at(pseudoLayer);
+            m_sumZByPseudoLayer[pseudoLayer] = pCluster->m_sumZByPseudoLayer.at(pseudoLayer);
         }
     }
 
@@ -436,7 +455,7 @@ StatusCode Cluster::AddHitsFromSecondCluster(Cluster *const pCluster)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Cluster::AddTrackAssociation(Track *const pTrack)
+StatusCode Cluster::AddTrackAssociation(const Track *const pTrack)
 {
     if (NULL == pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
@@ -449,7 +468,7 @@ StatusCode Cluster::AddTrackAssociation(Track *const pTrack)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Cluster::RemoveTrackAssociation(Track *const pTrack)
+StatusCode Cluster::RemoveTrackAssociation(const Track *const pTrack)
 {
     TrackList::iterator iter = m_associatedTrackList.find(pTrack);
 

@@ -252,6 +252,15 @@ StatusCode Manager<T>::CreateInitialLists()
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
+
+template<typename T>
+T *Manager<T>::Modifiable(const T *const pT) const
+{
+    // Consider alternatives here. Idea: expose algorithms only to pointers to const objects, non-const functions accessible only via APIs.
+    return const_cast<T*>(pT);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template class Manager<CaloHit>;

@@ -66,7 +66,7 @@ private:
 template<typename T>
 inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const T &t)
 {
-    TiXmlElement *pTiXmlElement = new TiXmlElement(xmlKey);
+    TiXmlElement *const pTiXmlElement = new TiXmlElement(xmlKey);
     pTiXmlElement->LinkEndChild(new TiXmlText(TypeToString(t)));
     m_pCurrentXmlElement->LinkEndChild(pTiXmlElement);
 
