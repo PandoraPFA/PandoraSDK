@@ -39,7 +39,7 @@ public:
     virtual ~Manager();
 
 protected:
-    typedef std::unordered_set<const T *> ObjectList;
+    typedef std::MANAGED_CONTAINER<const T *> ObjectList;
 
     /**
      *  @brief  Get a list
