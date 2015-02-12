@@ -36,7 +36,7 @@ public:
 private:
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
 
-    pandora::StatusCode PerformFragmentation(pandora::Cluster *const pOriginalCluster, pandora::Track *const pTrack,
+    pandora::StatusCode PerformFragmentation(const pandora::Cluster *const pOriginalCluster, const pandora::Track *const pTrack,
         unsigned int showerStartLayer, unsigned int showerEndLayer) const;
 
     pandora::StatusCode MakeClusterFragments(const unsigned int showerStartLayer, const unsigned int showerEndLayer,

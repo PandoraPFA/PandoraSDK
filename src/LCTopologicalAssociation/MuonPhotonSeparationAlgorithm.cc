@@ -25,7 +25,7 @@ MuonPhotonSeparationAlgorithm::MuonPhotonSeparationAlgorithm() :
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MuonPhotonSeparationAlgorithm::PerformFragmentation(Cluster *const pOriginalCluster, Track *const pTrack, unsigned int showerStartLayer,
+StatusCode MuonPhotonSeparationAlgorithm::PerformFragmentation(const Cluster *const pOriginalCluster, const Track *const pTrack, unsigned int showerStartLayer,
     unsigned int showerEndLayer) const
 {
     ClusterList clusterList;
