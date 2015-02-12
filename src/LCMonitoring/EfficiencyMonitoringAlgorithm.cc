@@ -77,6 +77,7 @@ StatusCode EfficiencyMonitoringAlgorithm::Run()
 
     if ((mcPDGCode == PHOTON) && (std::abs(recoPDGCode) == E_MINUS) && (pfoVector.size() == 2))
     {
+
         const ParticleFlowObject *const pPfo1(pfoVector.at(0));
         const ParticleFlowObject *const pPfo2(pfoVector.at(1));
 
