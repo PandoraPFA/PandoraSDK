@@ -16,10 +16,10 @@
 #include <vector>
 
 #if __cplusplus > 199711L
-#include <unordered_set>
-#define MANAGED_CONTAINER unordered_set
+    #include <unordered_set>
+    #define MANAGED_CONTAINER unordered_set
 #else
-#define MANAGED_CONTAINER set
+    #define MANAGED_CONTAINER set
 #endif
 
 #include <stdint.h>
