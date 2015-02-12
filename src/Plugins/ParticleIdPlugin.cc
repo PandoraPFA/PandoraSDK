@@ -12,6 +12,8 @@
 
 #include "Plugins/ParticleIdPlugin.h"
 
+#include <cstdlib>
+
 namespace pandora
 {
 
