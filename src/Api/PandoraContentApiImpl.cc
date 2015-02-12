@@ -764,7 +764,7 @@ StatusCode PandoraContentApiImpl::RemoveAllMCParticleRelationships() const
 
 StatusCode PandoraContentApiImpl::MergeAndDeleteClusters(const Cluster *const pClusterToEnlarge, const Cluster *const pClusterToDelete) const
 {
-    if ((pClusterToEnlarge == pClusterToDelete) || !pClusterToDelete->IsAvailable())
+    if ((pClusterToEnlarge == pClusterToDelete) || !m_pPandora->m_pClusterManager->IsAvailable(pClusterToDelete))
         return STATUS_CODE_NOT_ALLOWED;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pTrackManager->RemoveClusterAssociations(pClusterToDelete->GetAssociatedTrackList()));
@@ -778,7 +778,7 @@ StatusCode PandoraContentApiImpl::MergeAndDeleteClusters(const Cluster *const pC
 StatusCode PandoraContentApiImpl::MergeAndDeleteClusters(const Cluster *const pClusterToEnlarge, const Cluster *const pClusterToDelete, const std::string &enlargeListName,
     const std::string &deleteListName) const
 {
-    if ((pClusterToEnlarge == pClusterToDelete) || !pClusterToDelete->IsAvailable())
+    if ((pClusterToEnlarge == pClusterToDelete) || !m_pPandora->m_pClusterManager->IsAvailable(pClusterToDelete))
         return STATUS_CODE_NOT_ALLOWED;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pTrackManager->RemoveClusterAssociations(pClusterToDelete->GetAssociatedTrackList()));
@@ -793,7 +793,7 @@ StatusCode PandoraContentApiImpl::MergeAndDeleteClusters(const Cluster *const pC
 template <>
 StatusCode PandoraContentApiImpl::AddToPfo(const ParticleFlowObject *const pPfo, const Cluster *const pCluster) const
 {
-    if (m_pPandora->m_pClusterManager->IsAvailable(pCluster))
+    if (!m_pPandora->m_pClusterManager->IsAvailable(pCluster))
         return STATUS_CODE_NOT_ALLOWED;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->AddToPfo(pPfo, pCluster));
@@ -804,7 +804,7 @@ StatusCode PandoraContentApiImpl::AddToPfo(const ParticleFlowObject *const pPfo,
 template <>
 StatusCode PandoraContentApiImpl::AddToPfo(const ParticleFlowObject *const pPfo, const Track *const pTrack) const
 {
-    if (m_pPandora->m_pTrackManager->IsAvailable(pTrack))
+    if (!m_pPandora->m_pTrackManager->IsAvailable(pTrack))
         return STATUS_CODE_NOT_ALLOWED;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->AddToPfo(pPfo, pTrack));
@@ -815,7 +815,7 @@ StatusCode PandoraContentApiImpl::AddToPfo(const ParticleFlowObject *const pPfo,
 template <>
 StatusCode PandoraContentApiImpl::AddToPfo(const ParticleFlowObject *const pPfo, const Vertex *const pVertex) const
 {
-    if (m_pPandora->m_pVertexManager->IsAvailable(pVertex))
+    if (!m_pPandora->m_pVertexManager->IsAvailable(pVertex))
         return STATUS_CODE_NOT_ALLOWED;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->AddToPfo(pPfo, pVertex));
@@ -908,7 +908,7 @@ bool PandoraContentApiImpl::IsAddToClusterAllowed(const Cluster *const pCluster,
 template <>
 StatusCode PandoraContentApiImpl::PrepareForDeletion(const Cluster *const pCluster) const
 {
-    if (!pCluster->IsAvailable())
+    if (!m_pPandora->m_pClusterManager->IsAvailable(pCluster))
         return STATUS_CODE_NOT_ALLOWED;
 
     CaloHitList caloHitList;
@@ -933,7 +933,7 @@ StatusCode PandoraContentApiImpl::PrepareForDeletion(const ClusterList *const pC
     {
         const Cluster *const pCluster = *iter;
 
-        if (!pCluster->IsAvailable())
+        if (!m_pPandora->m_pClusterManager->IsAvailable(pCluster))
             return STATUS_CODE_NOT_ALLOWED;
 
         pCluster->GetOrderedCaloHitList().GetCaloHitList(caloHitList);
@@ -978,7 +978,7 @@ StatusCode PandoraContentApiImpl::PrepareForDeletion(const PfoList *const pPfoLi
 template <>
 StatusCode PandoraContentApiImpl::PrepareForDeletion(const Vertex *const pVertex) const
 {
-    if (!pVertex->IsAvailable())
+    if (!m_pPandora->m_pVertexManager->IsAvailable(pVertex))
         return STATUS_CODE_NOT_ALLOWED;
 
     return STATUS_CODE_SUCCESS;
@@ -1003,7 +1003,7 @@ StatusCode PandoraContentApiImpl::PrepareForReclusteringDeletion(const ClusterLi
     {
         const Cluster *const pCluster = *iter;
 
-        if (!pCluster->IsAvailable())
+        if (!m_pPandora->m_pClusterManager->IsAvailable(pCluster))
             return STATUS_CODE_NOT_ALLOWED;
 
         trackList.insert(pCluster->GetAssociatedTrackList().begin(), pCluster->GetAssociatedTrackList().end());
