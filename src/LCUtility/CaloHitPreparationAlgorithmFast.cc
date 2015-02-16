@@ -8,7 +8,7 @@
 
 #include "Pandora/AlgorithmHeaders.h"
 
-#include "LCUtility/CaloHitPreparationAlgorithm.h"
+#include "LCUtility/CaloHitPreparationAlgorithmFast.h"
 
 #include "LCUtility/KDTreeLinkerAlgoT.h"
 
@@ -151,7 +151,7 @@ void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(CaloHit *pCaloHit, 
     const float positionMagnitudeSquared(positionVector.GetMagnitudeSquared());
     const float isolationCutDistanceSquared((PandoraContentApi::GetGeometry(*this)->GetHitTypeGranularity(pCaloHit->GetHitType()) <= FINE) ?
         m_isolationCutDistanceFine2 : m_isolationCutDistanceCoarse2);
-    const float isolationCutDistance = std::sqrt(isolationCutDistanceSquared);
+    const float isolationCaloHitMaxSeparation = std::sqrt(m_isolationCaloHitMaxSeparation2);
 
     unsigned int nearbyHitsFound = 0;
 
@@ -159,9 +159,9 @@ void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(CaloHit *pCaloHit, 
     CaloHitList nearby_hits;
     KDTreeTesseract searchRegionHits = 
       build_4d_kd_search_region(pCaloHit,
-				isolationCutDistance,
-				isolationCutDistance,
-				isolationCutDistance,
+				isolationCaloHitMaxSeparation,
+				isolationCaloHitMaxSeparation,
+				isolationCaloHitMaxSeparation,
 				searchLayer);
     std::vector<HitKDNode4D> found;
     m_hitsKdTree4D->search(searchRegionHits,found);

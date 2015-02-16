@@ -78,6 +78,7 @@
 #include "LCTrackClusterAssociation/TrackRecoveryInteractionsAlgorithm.h"
 
 #include "LCUtility/CaloHitPreparationAlgorithm.h"
+#include "LCUtility/CaloHitPreparationAlgorithmFast.h"
 #include "LCUtility/ClusterPreparationAlgorithm.h"
 #include "LCUtility/EventPreparationAlgorithm.h"
 #include "LCUtility/PfoPreparationAlgorithm.h"
@@ -145,6 +146,7 @@ public:
         d("TrackRecoveryInteractions",              lc_content::TrackRecoveryInteractionsAlgorithm::Factory)                    \
         d("TrackClusterAssociation",                lc_content::TrackClusterAssociationAlgorithm::Factory)                      \
         d("CaloHitPreparation",                     lc_content::CaloHitPreparationAlgorithm::Factory)                           \
+	d("CaloHitPreparationFast",                 lc_content_fast::CaloHitPreparationAlgorithm::Factory)                      \
         d("ClusterPreparation",                     lc_content::ClusterPreparationAlgorithm::Factory)                           \
         d("EventPreparation",                       lc_content::EventPreparationAlgorithm::Factory)                             \
         d("PfoPreparation",                         lc_content::PfoPreparationAlgorithm::Factory)                               \
