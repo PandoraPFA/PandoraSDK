@@ -93,15 +93,19 @@ StatusCode Cluster::AddCaloHit(const CaloHit *const pCaloHit)
 
     if ((m_orderedCaloHitList.end() != iter) && (iter->second->size() > 1))
     {
-        m_sumXByPseudoLayer[pseudoLayer] += x;
-        m_sumYByPseudoLayer[pseudoLayer] += y;
-        m_sumZByPseudoLayer[pseudoLayer] += z;
+        SimplePoint &mypoint = m_sumXYZByPseudoLayer[pseudoLayer];
+        mypoint.m_xyzPositionSums[0] += x;
+        mypoint.m_xyzPositionSums[1] += y;
+        mypoint.m_xyzPositionSums[2] += z;
+        ++mypoint.m_nHits;
     }
     else
     {
-        m_sumXByPseudoLayer[pseudoLayer] = x;
-        m_sumYByPseudoLayer[pseudoLayer] = y;
-        m_sumZByPseudoLayer[pseudoLayer] = z;
+        SimplePoint &mypoint = m_sumXYZByPseudoLayer[pseudoLayer];
+        mypoint.m_xyzPositionSums[0] = x;
+        mypoint.m_xyzPositionSums[1] = y;
+        mypoint.m_xyzPositionSums[2] = z;
+        mypoint.m_nHits = 1;
     }
 
     if (!m_innerPseudoLayer.IsInitialized() || (pseudoLayer < m_innerPseudoLayer.Get()))
@@ -140,15 +144,15 @@ StatusCode Cluster::RemoveCaloHit(const CaloHit *const pCaloHit)
 
     if (m_orderedCaloHitList.end() != m_orderedCaloHitList.find(pseudoLayer))
     {
-        m_sumXByPseudoLayer[pseudoLayer] -= x;
-        m_sumYByPseudoLayer[pseudoLayer] -= y;
-        m_sumZByPseudoLayer[pseudoLayer] -= z;
+        SimplePoint &mypoint = m_sumXYZByPseudoLayer[pseudoLayer];
+        mypoint.m_xyzPositionSums[0] -= x;
+        mypoint.m_xyzPositionSums[1] -= y;
+        mypoint.m_xyzPositionSums[2] -= z;
+        --mypoint.m_nHits;
     }
     else
     {
-        m_sumXByPseudoLayer.erase(pseudoLayer);
-        m_sumYByPseudoLayer.erase(pseudoLayer);
-        m_sumZByPseudoLayer.erase(pseudoLayer);
+        m_sumXYZByPseudoLayer.erase(pseudoLayer);
     }
 
     if (pseudoLayer <= m_innerPseudoLayer.Get())
@@ -204,25 +208,19 @@ StatusCode Cluster::RemoveIsolatedCaloHit(const CaloHit *const pCaloHit)
 
 const CartesianVector Cluster::GetCentroid(const unsigned int pseudoLayer) const
 {
-    OrderedCaloHitList::const_iterator iter = m_orderedCaloHitList.find(pseudoLayer);
+    PointByPseudoLayerMap::const_iterator pointValueIter = m_sumXYZByPseudoLayer.find(pseudoLayer);
 
-    if (m_orderedCaloHitList.end() == iter)
-        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
-
-    const float nHitsInLayer(static_cast<float>(iter->second->size()));
-
-    if (0 == nHitsInLayer)
+    if (m_sumXYZByPseudoLayer.end() == pointValueIter)
         throw StatusCodeException(STATUS_CODE_FAILURE);
 
-    ValueByPseudoLayerMap::const_iterator xValueIter = m_sumXByPseudoLayer.find(pseudoLayer);
-    ValueByPseudoLayerMap::const_iterator yValueIter = m_sumYByPseudoLayer.find(pseudoLayer);
-    ValueByPseudoLayerMap::const_iterator zValueIter = m_sumZByPseudoLayer.find(pseudoLayer);
+    const SimplePoint &mypoint = pointValueIter->second;
 
-    if ((m_sumXByPseudoLayer.end() == xValueIter) || (m_sumYByPseudoLayer.end() == yValueIter) || (m_sumZByPseudoLayer.end() == zValueIter))
+    if (0 == mypoint.m_nHits)
         throw StatusCodeException(STATUS_CODE_FAILURE);
 
-    return CartesianVector(static_cast<float>(xValueIter->second / nHitsInLayer), static_cast<float>(yValueIter->second / nHitsInLayer),
-        static_cast<float>(zValueIter->second / nHitsInLayer));
+    return CartesianVector(static_cast<float>(mypoint.m_xyzPositionSums[0] / static_cast<float>(mypoint.m_nHits)),
+        static_cast<float>(mypoint.m_xyzPositionSums[1] / static_cast<float>(mypoint.m_nHits)),
+        static_cast<float>(mypoint.m_xyzPositionSums[2] / static_cast<float>(mypoint.m_nHits)));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -366,9 +364,7 @@ StatusCode Cluster::ResetProperties()
     m_nCaloHits = 0;
     m_nPossibleMipHits = 0;
 
-    m_sumXByPseudoLayer.clear();
-    m_sumYByPseudoLayer.clear();
-    m_sumZByPseudoLayer.clear();
+    m_sumXYZByPseudoLayer.clear();
 
     m_electromagneticEnergy = 0;
     m_hadronicEnergy = 0;
@@ -433,17 +429,22 @@ StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
         const unsigned int pseudoLayer(iter->first);
         OrderedCaloHitList::const_iterator currentIter = m_orderedCaloHitList.find(pseudoLayer);
 
+        SimplePoint &mypoint = m_sumXYZByPseudoLayer[pseudoLayer];
+        const SimplePoint &theirpoint = pCluster->m_sumXYZByPseudoLayer.at(pseudoLayer);
+
         if ((m_orderedCaloHitList.end() != currentIter) && (currentIter->second->size() > 1))
         {
-            m_sumXByPseudoLayer[pseudoLayer] += pCluster->m_sumXByPseudoLayer.at(pseudoLayer);
-            m_sumYByPseudoLayer[pseudoLayer] += pCluster->m_sumYByPseudoLayer.at(pseudoLayer);
-            m_sumZByPseudoLayer[pseudoLayer] += pCluster->m_sumZByPseudoLayer.at(pseudoLayer);
+            mypoint.m_xyzPositionSums[0] += theirpoint.m_xyzPositionSums[0];
+            mypoint.m_xyzPositionSums[1] += theirpoint.m_xyzPositionSums[1];
+            mypoint.m_xyzPositionSums[2] += theirpoint.m_xyzPositionSums[2];
+            mypoint.m_nHits += theirpoint.m_nHits;
         }
         else
         {
-            m_sumXByPseudoLayer[pseudoLayer] = pCluster->m_sumXByPseudoLayer.at(pseudoLayer);
-            m_sumYByPseudoLayer[pseudoLayer] = pCluster->m_sumYByPseudoLayer.at(pseudoLayer);
-            m_sumZByPseudoLayer[pseudoLayer] = pCluster->m_sumZByPseudoLayer.at(pseudoLayer);
+            mypoint.m_xyzPositionSums[0] = theirpoint.m_xyzPositionSums[0];
+            mypoint.m_xyzPositionSums[1] = theirpoint.m_xyzPositionSums[1];
+            mypoint.m_xyzPositionSums[2] = theirpoint.m_xyzPositionSums[2];
+            mypoint.m_nHits = theirpoint.m_nHits;
         }
     }
 

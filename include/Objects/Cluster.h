@@ -388,7 +388,17 @@ private:
      */
     void SetAvailability(bool isAvailable);
 
-    typedef std::map<unsigned int, double> ValueByPseudoLayerMap;///< The value by pseudo layer typedef
+    /**
+     *  @brief  SimplePoint class
+     */
+    class SimplePoint
+    {
+    public:
+        double                  m_xyzPositionSums[3];           ///< The sum of the x, y and z hit positions in the pseudo layer
+        unsigned int            m_nHits;                        ///< The number of hits in the pseudo layer
+    };
+
+    typedef std::map<unsigned int, SimplePoint> PointByPseudoLayerMap;///< The point by pseudo layer typedef
     typedef std::map<HitType, float> HitTypeToEnergyMap;        ///< The hit type to energy map typedef
 
     OrderedCaloHitList          m_orderedCaloHitList;           ///< The ordered calo hit list
@@ -406,9 +416,7 @@ private:
 
     const Track                *m_pTrackSeed;                   ///< Address of the track with which the cluster is seeded
 
-    ValueByPseudoLayerMap       m_sumXByPseudoLayer;            ///< The sum of the x coordinates of the calo hits, stored by pseudo layer
-    ValueByPseudoLayerMap       m_sumYByPseudoLayer;            ///< The sum of the y coordinates of the calo hits, stored by pseudo layer
-    ValueByPseudoLayerMap       m_sumZByPseudoLayer;            ///< The sum of the z coordinates of the calo hits, stored by pseudo layer
+    PointByPseudoLayerMap       m_sumXYZByPseudoLayer;          ///< Construct to allow rapid calculation of centroid in each pseudolayer
 
     InputUInt                   m_innerPseudoLayer;             ///< The innermost pseudo layer in the cluster
     InputUInt                   m_outerPseudoLayer;             ///< The outermost pseudo layer in the cluster
