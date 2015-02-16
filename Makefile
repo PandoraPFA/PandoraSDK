@@ -35,6 +35,7 @@ endif
 SOURCES  = $(wildcard $(PROJECT_DIR)/src/*.cc)
 SOURCES += $(wildcard $(PROJECT_DIR)/src/LCCheating/*.cc)
 SOURCES += $(wildcard $(PROJECT_DIR)/src/LCClustering/*.cc)
+SOURCES += $(wildcard $(PROJECT_DIR)/src/LCContentFast/*.cc)
 SOURCES += $(wildcard $(PROJECT_DIR)/src/LCFragmentRemoval/*.cc)
 SOURCES += $(wildcard $(PROJECT_DIR)/src/LCHelpers/*.cc)
 SOURCES += $(wildcard $(PROJECT_DIR)/src/LCMonitoring/*.cc)

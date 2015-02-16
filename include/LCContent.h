@@ -1,5 +1,5 @@
 /**
- *  @file   LCContent/include/FineGranularityContent.h
+ *  @file   LCContent/include/LCContent.h
  * 
  *  @brief  Header file detailing content for use with particle flow reconstruction at an e+e- linear collider
  * 
