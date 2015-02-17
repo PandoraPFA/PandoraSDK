@@ -8,9 +8,9 @@
 
 #include "LCContentFast/KDTreeLinkerToolsT.h"
 
-std::pair<float,float> minmax(const float a, const float b)
+std::pair<float, float> minmax(const float a, const float b)
 {
-    return ( b < a ? std::pair<float, float>(b, a) : std::pair<float, float>(a, b));
+    return ((b < a) ? std::pair<float, float>(b, a) : std::pair<float, float>(a, b));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -57,7 +57,7 @@ KDTreeCube fill_and_bound_3d_kd_tree<const pandora::Track>(const pandora::Algori
 KDTreeTesseract fill_and_bound_4d_kd_tree(const pandora::Algorithm *const caller, const pandora::CaloHitList &points,
     std::vector<KDTreeNodeInfoT<const pandora::CaloHit*, 4> > &nodes, bool passthru)
 {
-    std::array<float,4> minpos{ {0.0f,0.0f,0.0f, 0.0f} }, maxpos{ {0.0f,0.0f,0.0f,0.0f} };
+    std::array<float, 4> minpos{ {0.f, 0.f, 0.f, 0.f} }, maxpos{ {0.f, 0.f, 0.f, 0.f} };
 
     unsigned i = 0;
 

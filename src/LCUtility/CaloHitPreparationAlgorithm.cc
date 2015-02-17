@@ -78,7 +78,7 @@ void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(const CaloHit *cons
         if (orderedCaloHitList.end() == adjacentPseudoLayerIter)
             continue;
 
-        CaloHitList *const pCaloHitList = adjacentPseudoLayerIter->second;
+        const CaloHitList *const pCaloHitList = adjacentPseudoLayerIter->second;
 
         // IsIsolated flag
         if (isIsolated && (isolationMinLayer <= iPseudoLayer) && (isolationMaxLayer >= iPseudoLayer))
