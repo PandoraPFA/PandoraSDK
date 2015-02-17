@@ -90,6 +90,7 @@ private:
     unsigned int    m_isolationNLayers;                 ///< Number of adjacent layers to use in isolation calculation
     float           m_isolationCutDistanceFine2;        ///< Fine granularity isolation cut distance, units mm (used squared)
     float           m_isolationCutDistanceCoarse2;      ///< Coarse granularity isolation cut distance, units mm (used squared)
+    float           m_isolationSearchSafetyFactor;      ///< Safety factor, applied to isolation cut distance, to define kd-tree search region
     unsigned int    m_isolationMaxNearbyHits;           ///< Max number of "nearby" hits for a hit to be considered isolated
 
     float           m_mipLikeMipCut;                    ///< Mip equivalent energy cut for hit to be flagged as possible mip
