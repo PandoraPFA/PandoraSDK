@@ -150,7 +150,7 @@ void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(const CaloHit *cons
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-  unsigned int CaloHitPreparationAlgorithm::IsolationCountNearbyHits(unsigned int searchLayer, const CaloHit *const pCaloHit)
+unsigned int CaloHitPreparationAlgorithm::IsolationCountNearbyHits(unsigned int searchLayer, const CaloHit *const pCaloHit)
 {
     const CartesianVector &positionVector(pCaloHit->GetPositionVector());
     const float positionMagnitudeSquared(positionVector.GetMagnitudeSquared());
