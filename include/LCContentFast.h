@@ -10,6 +10,7 @@
 
 #include "LCContentFast/CaloHitPreparationAlgorithmFast.h"
 #include "LCContentFast/ConeClusteringAlgorithmFast.h"
+#include "LCContentFast/SoftClusterMergingAlgorithmFast.h"
 
 /**
  *  @brief  LCContentFast class
@@ -19,7 +20,8 @@ class LCContentFast
 public:
     #define LC_ALGORITHM_FAST_LIST(d)                                                                                           \
         d("CaloHitPreparationFast",                 lc_content_fast::CaloHitPreparationAlgorithm::Factory)                      \
-        d("ConeClusteringFast",                     lc_content_fast::ConeClusteringAlgorithm::Factory)
+        d("ConeClusteringFast",                     lc_content_fast::ConeClusteringAlgorithm::Factory)                          \
+        d("SoftClusterMergingFast",                 lc_content_fast::SoftClusterMergingAlgorithm::Factory)
 
     /**
      *  @brief  Register all the linear collider algorithms with pandora

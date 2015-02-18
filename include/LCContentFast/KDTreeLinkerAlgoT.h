@@ -486,13 +486,13 @@ inline void KDTreeLinkerAlgo<DATA, DIM>::clear()
 template <typename DATA, unsigned DIM>
 inline KDTreeNodeT<DATA, DIM> *KDTreeLinkerAlgo<DATA, DIM>::getNextNode()
 {
-  ++nodePoolPos_;
+    ++nodePoolPos_;
 
-  // The tree size is exactly 2 * nbrElts - 1 and this is the total allocated memory.
-  // If we have used more than that....there is a big problem.
-  //assert(nodePoolPos_ < nodePoolSize_);
+    // The tree size is exactly 2 * nbrElts - 1 and this is the total allocated memory.
+    // If we have used more than that....there is a big problem.
+    //assert(nodePoolPos_ < nodePoolSize_);
 
-  return &(nodePool_[nodePoolPos_]);
+    return &(nodePool_[nodePoolPos_]);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -502,7 +502,7 @@ inline KDTreeNodeT<DATA, DIM> *KDTreeLinkerAlgo<DATA, DIM>::recBuild(int low, in
 {
     const int portionSize = high - low;
 
-    // By construction, portionSize > 0 can't happend.
+    // By construction, portionSize > 0 can't happen.
     //assert(portionSize > 0);
 
     if (portionSize == 1)

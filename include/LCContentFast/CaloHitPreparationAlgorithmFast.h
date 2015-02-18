@@ -40,7 +40,7 @@ public:
     CaloHitPreparationAlgorithm();
 
     /**
-     * @brief destructor
+     * @brief Destructor
      */
     ~CaloHitPreparationAlgorithm();
 
