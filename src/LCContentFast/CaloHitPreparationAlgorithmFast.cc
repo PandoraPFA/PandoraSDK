@@ -167,7 +167,7 @@ unsigned int CaloHitPreparationAlgorithm::IsolationCountNearbyHits(unsigned int 
     std::vector<HitKDNode4D> found;
     m_hitsKdTree4D->search(searchRegionHits, found);
 
-    for (auto hit : found)
+    for (const auto &hit : found)
     {
         nearby_hits.insert(hit.data);
     }
@@ -208,7 +208,7 @@ unsigned int CaloHitPreparationAlgorithm::MipCountNearbyHits(unsigned int search
     std::vector<HitKDNode4D> found;
     m_hitsKdTree4D->search(searchRegionHits, found);
 
-    for (auto hit : found)
+    for (const auto &hit : found)
     {
         nearby_hits.insert(hit.data);
     }
