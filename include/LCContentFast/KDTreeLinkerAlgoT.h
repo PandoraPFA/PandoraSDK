@@ -12,6 +12,9 @@
 
 #include <vector>
 
+namespace lc_content_fast
+{
+
 /**
  *  @brief  Class that implements the KDTree partition of 2D space and a closest point search algorithm
  */
@@ -540,5 +543,7 @@ inline KDTreeNodeT<DATA, DIM> *KDTreeLinkerAlgo<DATA, DIM>::recBuild(int low, in
         return node;
     }
 }
+
+} // namespace lc_content_fast
 
 #endif // KD_TREE_LINKER_ALGO_TEMPLATED_H

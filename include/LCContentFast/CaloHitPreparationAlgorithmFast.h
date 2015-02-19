@@ -10,11 +10,13 @@
 
 #include "Pandora/Algorithm.h"
 
+namespace lc_content_fast
+{
+
 template<typename, unsigned int> class KDTreeLinkerAlgo;
 template<typename, unsigned int> class KDTreeNodeInfoT;
 
-namespace lc_content_fast
-{
+//------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
  *  @brief  CaloHitPreparationAlgorithm class

@@ -8,6 +8,9 @@
 
 #include "LCContentFast/KDTreeLinkerToolsT.h"
 
+namespace lc_content_fast
+{
+
 std::pair<float, float> minmax(const float a, const float b)
 {
     return ((b < a) ? std::pair<float, float>(b, a) : std::pair<float, float>(a, b));
@@ -120,3 +123,5 @@ KDTreeTesseract build_4d_kd_search_region(const pandora::CaloHit *const point, c
 
     return KDTreeTesseract(x_side.first, x_side.second, y_side.first, y_side.second, z_side.first, z_side.second, layer_side.first, layer_side.second);
 }
+
+} // namespace lc_content_fast

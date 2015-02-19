@@ -20,6 +20,9 @@ namespace pandora { class Algorithm; }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+namespace lc_content_fast
+{
+
 /**
  *  @brief  Box structure used to define 2D field. It's used in KDTree building step to divide the detector space (ECAL, HCAL...) and
  *          in searching step to create a bounding box around the demanded point (Track collision point, PS projection...).
@@ -368,5 +371,7 @@ KDTreeCube fill_and_bound_3d_kd_tree(const pandora::Algorithm *const caller, con
 
     return KDTreeCube(minpos[0], maxpos[0], minpos[1], maxpos[1], minpos[2], maxpos[2]);
 }
+
+} // namespace lc_content_fast
 
 #endif // KD_TREE_LINKER_TOOLS_TEMPLATED_H
