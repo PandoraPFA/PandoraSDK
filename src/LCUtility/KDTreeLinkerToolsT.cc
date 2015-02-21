@@ -97,3 +97,18 @@ KDTreeTesseract build_4d_kd_search_region( pandora::CaloHit* point,
 			 z_side.first,z_side.second,
 			 layer_side.first,layer_side.second);
 }
+
+KDTreeTesseract build_4d_kd_search_region( const pandora::CartesianVector& pos,
+					   float x_span,
+					   float y_span,
+					   float z_span,
+					   float search_layer){
+  auto x_side = minmax(pos.GetX()+x_span,pos.GetX()-x_span);
+  auto y_side = minmax(pos.GetY()+y_span,pos.GetY()-y_span);
+  auto z_side = minmax(pos.GetZ()+z_span,pos.GetZ()-z_span);
+  auto layer_side = minmax(search_layer+0.5,search_layer-0.5);
+  return KDTreeTesseract(x_side.first,x_side.second,
+			 y_side.first,y_side.second,
+			 z_side.first,z_side.second,
+			 layer_side.first,layer_side.second);
+}

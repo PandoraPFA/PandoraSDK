@@ -191,5 +191,11 @@ KDTreeTesseract build_4d_kd_search_region( pandora::CaloHit* point,
 					   float z_span,
 					   float search_layer);
 
+KDTreeTesseract build_4d_kd_search_region( const pandora::CartesianVector& point,
+					   float x_span,
+					   float y_span,
+					   float z_span,
+					   float search_layer);
+
 
 #endif
