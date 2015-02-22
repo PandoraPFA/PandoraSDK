@@ -114,8 +114,14 @@ KDTreeCube build_3d_kd_search_region(const pandora::CaloHit *const point, const 
 KDTreeTesseract build_4d_kd_search_region(const pandora::CaloHit *const point, const float x_span, const float y_span, const float z_span,
     const float search_layer)
 {
-    const pandora::CartesianVector &pos = point->GetPositionVector();
+    return build_4d_kd_search_region(point->GetPositionVector(), x_span, y_span, z_span, search_layer);
+}
 
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+KDTreeTesseract build_4d_kd_search_region(const pandora::CartesianVector &pos, const float x_span, const float y_span, const float z_span,
+    const float search_layer)
+{
     const auto x_side = minmax(pos.GetX() + x_span, pos.GetX() - x_span);
     const auto y_side = minmax(pos.GetY() + y_span, pos.GetY() - y_span);
     const auto z_side = minmax(pos.GetZ() + z_span, pos.GetZ() - z_span);

@@ -10,7 +10,9 @@
 
 #include "LCContentFast/CaloHitPreparationAlgorithmFast.h"
 #include "LCContentFast/ConeClusteringAlgorithmFast.h"
+#include "LCContentFast/MainFragmentRemovalAlgorithmFast.h"
 #include "LCContentFast/SoftClusterMergingAlgorithmFast.h"
+#include "LCContentFast/TrackClusterAssociationAlgorithmFast.h"
 
 /**
  *  @brief  LCContentFast class
@@ -21,7 +23,9 @@ public:
     #define LC_ALGORITHM_FAST_LIST(d)                                                                                           \
         d("CaloHitPreparationFast",                 lc_content_fast::CaloHitPreparationAlgorithm::Factory)                      \
         d("ConeClusteringFast",                     lc_content_fast::ConeClusteringAlgorithm::Factory)                          \
-        d("SoftClusterMergingFast",                 lc_content_fast::SoftClusterMergingAlgorithm::Factory)
+        d("MainFragmentRemovalFast",                lc_content_fast::MainFragmentRemovalAlgorithm::Factory)                     \
+        d("SoftClusterMergingFast",                 lc_content_fast::SoftClusterMergingAlgorithm::Factory)                      \
+        d("TrackClusterAssociationFast",            lc_content_fast::TrackClusterAssociationAlgorithm::Factory)
 
     /**
      *  @brief  Register all the linear collider algorithms with pandora

@@ -12,7 +12,6 @@
 
 #include <unordered_map>
 
-
 namespace lc_content_fast
 {
 
@@ -28,9 +27,6 @@ class QuickUnion;
 class SoftClusterMergingAlgorithm : public pandora::Algorithm
 {
 public:
-    typedef KDTreeLinkerAlgo<const pandora::CaloHit*, 3> HitKDTree3D;
-    typedef KDTreeNodeInfoT<const pandora::CaloHit*, 3> HitKDNode3D;
-
     /**
      *  @brief  Factory class for instantiating algorithm
      */
@@ -51,11 +47,13 @@ public:
     ~SoftClusterMergingAlgorithm();
 
 private:
-    pandora::StatusCode Run();
-
+    typedef KDTreeLinkerAlgo<const pandora::CaloHit*, 3> HitKDTree3D;
+    typedef KDTreeNodeInfoT<const pandora::CaloHit*, 3> HitKDNode3D;
     typedef std::unordered_map<const pandora::ClusterList *, std::string> ClusterListToNameMap;
     typedef std::unordered_map<const pandora::CaloHit*, int> HitToClusterMap;
     typedef std::unordered_multimap<const pandora::CaloHit*, const pandora::CaloHit*> HitsToHitsCacheMap;
+
+    pandora::StatusCode Run();
 
     /**
      *  @brief  Get the input clusters
