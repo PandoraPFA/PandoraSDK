@@ -209,6 +209,19 @@ KDTreeCube build_3d_kd_search_region(const pandora::CaloHit *const point, const 
  */
 KDTreeTesseract build_4d_kd_search_region(const pandora::CaloHit *const point, const float x_span, const float y_span, const float z_span, const float search_layer);
 
+/**
+ *  @brief  build_4d_kd_search_region
+ * 
+ *  @param  pos
+ *  @param  x_span
+ *  @param  y_span
+ *  @param  z_span
+ *  @param  search_layer
+ * 
+ *  @return KDTreeTesseract
+ */
+KDTreeTesseract build_4d_kd_search_region(const pandora::CartesianVector &pos, const float x_span, const float y_span, const float z_span, const float search_layer);
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
