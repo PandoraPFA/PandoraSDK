@@ -24,6 +24,7 @@ namespace pandora
 Cluster::Cluster(const PandoraContentApi::Cluster::Parameters &parameters) :
     m_nCaloHits(0),
     m_nPossibleMipHits(0),
+    m_nCaloHitsInOuterLayer(0),
     m_electromagneticEnergy(0),
     m_hadronicEnergy(0),
     m_isolatedElectromagneticEnergy(0),
@@ -76,10 +77,13 @@ StatusCode Cluster::AddCaloHit(const CaloHit *const pCaloHit)
 
     this->ResetOutdatedProperties();
 
-    m_nCaloHits++;
+    ++m_nCaloHits;
 
     if (pCaloHit->IsPossibleMip())
-        m_nPossibleMipHits++;
+        ++m_nPossibleMipHits;
+
+    if (pCaloHit->IsInOuterSamplingLayer()) 
+        ++m_nCaloHitsInOuterLayer;
 
     const float x(pCaloHit->GetPositionVector().GetX());
     const float y(pCaloHit->GetPositionVector().GetY());
@@ -128,10 +132,13 @@ StatusCode Cluster::RemoveCaloHit(const CaloHit *const pCaloHit)
 
     this->ResetOutdatedProperties();
 
-    m_nCaloHits--;
+    --m_nCaloHits;
 
     if (pCaloHit->IsPossibleMip())
-        m_nPossibleMipHits--;
+        --m_nPossibleMipHits;
+
+    if (pCaloHit->IsInOuterSamplingLayer())
+        --m_nCaloHitsInOuterLayer;
 
     const float x(pCaloHit->GetPositionVector().GetX());
     const float y(pCaloHit->GetPositionVector().GetY());
@@ -363,6 +370,7 @@ StatusCode Cluster::ResetProperties()
 
     m_nCaloHits = 0;
     m_nPossibleMipHits = 0;
+    m_nCaloHitsInOuterLayer = 0;
 
     m_sumXYZByPseudoLayer.clear();
 
@@ -419,6 +427,7 @@ StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
 
     m_nCaloHits += pCluster->GetNCaloHits();
     m_nPossibleMipHits += pCluster->GetNPossibleMipHits();
+    m_nCaloHitsInOuterLayer += pCluster->GetNHitsInOuterLayer();
 
     m_electromagneticEnergy += pCluster->GetElectromagneticEnergy();
     m_hadronicEnergy += pCluster->GetHadronicEnergy();
