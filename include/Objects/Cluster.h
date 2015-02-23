@@ -73,6 +73,13 @@ public:
     float GetMipFraction() const;
 
     /**
+     *  @brief  Get the number of hits in the outer sampling layers
+     * 
+     *  @return The number of hits in this cluster in the outermost sampling layer
+     */
+    unsigned int GetNHitsInOuterLayer() const;
+
+    /**
      *  @brief  Get the sum of electromagnetic energy measures of all constituent calo hits, units GeV
      * 
      *  @return The electromagnetic energy measure
@@ -406,6 +413,7 @@ private:
 
     unsigned int                m_nCaloHits;                    ///< The number of calo hits
     unsigned int                m_nPossibleMipHits;             ///< The number of calo hits that have been flagged as possible mip hits
+    unsigned int                m_nCaloHitsInOuterLayer;        ///< Keep track of the number of calo hits in the outermost layers
 
     double                      m_electromagneticEnergy;        ///< The sum of electromagnetic energy measures of constituent calo hits, units GeV
     double                      m_hadronicEnergy;               ///< The sum of hadronic energy measures of constituent calo hits, units GeV
@@ -487,6 +495,13 @@ inline unsigned int Cluster::GetNPossibleMipHits() const
 inline float Cluster::GetMipFraction() const
 {
     return ((0 != m_nCaloHits) ? static_cast<float> (m_nPossibleMipHits) / static_cast<float> (m_nCaloHits) : 0);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline unsigned int Cluster::GetNHitsInOuterLayer() const
+{
+    return m_nCaloHitsInOuterLayer;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
