@@ -104,12 +104,12 @@ void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(CaloHit *pCaloHit, 
         if (orderedCaloHitList.end() == adjacentPseudoLayerIter)
             continue;
 
-        //CaloHitList *pCaloHitList = adjacentPseudoLayerIter->second;
+        CaloHitList *pCaloHitList = adjacentPseudoLayerIter->second;
 
         // IsIsolated flag
         if (isIsolated && (isolationMinLayer <= iPseudoLayer) && (isolationMaxLayer >= iPseudoLayer))
         {
-	    isolationNearbyHits += this->IsolationCountNearbyHits(iPseudoLayer,pCaloHit);
+	    isolationNearbyHits += this->IsolationCountNearbyHits(pCaloHit, pCaloHitList);
             isIsolated = isolationNearbyHits < m_isolationMaxNearbyHits;
         }
 
@@ -145,31 +145,16 @@ void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(CaloHit *pCaloHit, 
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-  unsigned int CaloHitPreparationAlgorithm::IsolationCountNearbyHits(unsigned int searchLayer, CaloHit *pCaloHit)
+unsigned int CaloHitPreparationAlgorithm::IsolationCountNearbyHits(const CaloHit *const pCaloHit, const CaloHitList *const pCaloHitList) const
 {
     const CartesianVector &positionVector(pCaloHit->GetPositionVector());
     const float positionMagnitudeSquared(positionVector.GetMagnitudeSquared());
     const float isolationCutDistanceSquared((PandoraContentApi::GetGeometry(*this)->GetHitTypeGranularity(pCaloHit->GetHitType()) <= FINE) ?
         m_isolationCutDistanceFine2 : m_isolationCutDistanceCoarse2);
-    const float isolationCaloHitMaxSeparation = std::sqrt(m_isolationCaloHitMaxSeparation2);
 
     unsigned int nearbyHitsFound = 0;
 
-    // construct the kd tree search
-    CaloHitList nearby_hits;
-    KDTreeTesseract searchRegionHits = 
-      build_4d_kd_search_region(pCaloHit,
-				isolationCaloHitMaxSeparation,
-				isolationCaloHitMaxSeparation,
-				isolationCaloHitMaxSeparation,
-				searchLayer);
-    std::vector<HitKDNode4D> found;
-    m_hitsKdTree4D->search(searchRegionHits,found);
-    for( auto hit : found ) {
-      nearby_hits.insert(hit.data);
-    }
-
-    for (CaloHitList::const_iterator iter = nearby_hits.begin(), iterEnd = nearby_hits.end(); iter != iterEnd; ++iter)
+    for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
     {
         if (pCaloHit == *iter)
             continue;
@@ -200,7 +185,6 @@ unsigned int CaloHitPreparationAlgorithm::MipCountNearbyHits(unsigned int search
     const float caloHitMaxSeparation = std::sqrt(m_caloHitMaxSeparation2);
     
     // construct the kd tree search
-    CaloHitList nearby_hits;
     KDTreeTesseract searchRegionHits = 
       build_4d_kd_search_region(pCaloHit,
 				caloHitMaxSeparation,
@@ -209,16 +193,14 @@ unsigned int CaloHitPreparationAlgorithm::MipCountNearbyHits(unsigned int search
 				searchLayer);
     std::vector<HitKDNode4D> found;
     m_hitsKdTree4D->search(searchRegionHits,found);
-    for( auto hit : found ) {
-      nearby_hits.insert(hit.data);
-    }
 
-    for (CaloHitList::const_iterator iter = nearby_hits.begin(), iterEnd = nearby_hits.end(); iter != iterEnd; ++iter)
-    {
-        if (pCaloHit == *iter)
+    for (auto iter = found.begin(), iterEnd = found.end(); iter != iterEnd; ++iter)
+    {        
+        CaloHit* nearby_hit = iter->data;
+        if (pCaloHit == nearby_hit)
             continue;
 
-        const CartesianVector positionDifference(positionVector - (*iter)->GetPositionVector());
+        const CartesianVector positionDifference(positionVector - nearby_hit->GetPositionVector());
 
         if (positionDifference.GetMagnitudeSquared() > m_caloHitMaxSeparation2)
             continue;

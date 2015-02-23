@@ -14,6 +14,7 @@
 #include "LCHelpers/ReclusterHelper.h"
 
 #include <cstdlib>
+#include <memory>
 
 using namespace pandora;
 
@@ -134,33 +135,62 @@ StatusCode MainFragmentRemovalAlgorithm::Run()
     ClusterList affectedClusters;
     ChargedClusterContactMap chargedClusterContactMap;
 
-    // setup fast search utilities
-    HitKDTree hits_kdtree;
-    std::vector<HitKDNode> hit_nodes;
-    CaloHitList hit_list;
-    HitsToClustersMap hits_to_clusters;
+    // setup fast search utilities    
     ClusterToClusterMap clusters_to_clusters;
     ClusterToNeighbourClustersMap neighbours_cache;
+
+    // need to so some of the searching with vectors (hash table too slow)
+    HitKDTreeByIndex hits_kdtree_byindex;
+    std::vector<HitKDNodeByIndex> hit_nodes_by_index;
+    std::vector<CaloHit*> hits_by_index;
+    std::vector<Cluster*> hits_to_clusters_by_hit_index;
+
+    //save local kd-trees of each cluster that we will update over time
+    // this will hopefully speed up ContactMap calculation
+    ClusterToKDTreeMap clusters_to_hit_tree;    
 
     // get the *starting* cluster list 
     const ClusterList *pClusterList = nullptr;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pClusterList));
-    neighbours_cache.rehash(pClusterList->size());
+    neighbours_cache.reserve(pClusterList->size());
+    clusters_to_clusters.reserve(pClusterList->size());
 
     for( auto clusterIter = pClusterList->begin(); clusterIter != pClusterList->end(); ++clusterIter ) {
       clusters_to_clusters.emplace(*clusterIter,*clusterIter);
+      const auto& tree = clusters_to_hit_tree.emplace(*clusterIter,std::unique_ptr<HitKDTree>(new HitKDTree())).first->second;
+      std::array<float,3> minpos{ {0.0f,0.0f,0.0f} }, maxpos{ {0.0f,0.0f,0.0f} };
+      std::vector<HitKDNode> nodes_for_local_tree;
       CaloHitList temp;      
       (*clusterIter)->GetOrderedCaloHitList().GetCaloHitList(temp);
+      unsigned nhits = 0;
       for( auto* hit : temp ) {
-	hits_to_clusters.emplace(hit,*clusterIter);
-	hit_list.insert(hit);
+	const CartesianVector& pos = hit->GetPositionVector();
+	nodes_for_local_tree.emplace_back(hit,pos.GetX(),pos.GetY(),pos.GetZ());
+	if( nhits == 0 ) {
+	  minpos[0] = pos.GetX(); minpos[1] = pos.GetY(); minpos[2] = pos.GetZ();
+	  maxpos[0] = pos.GetX(); maxpos[1] = pos.GetY(); maxpos[2] = pos.GetZ();
+	} else {
+	  minpos[0] = std::min((float)pos.GetX(),minpos[0]);
+	  minpos[1] = std::min((float)pos.GetY(),minpos[1]);
+	  minpos[2] = std::min((float)pos.GetZ(),minpos[2]);
+	  maxpos[0] = std::max((float)pos.GetX(),maxpos[0]);
+	  maxpos[1] = std::max((float)pos.GetY(),maxpos[1]);
+	  maxpos[2] = std::max((float)pos.GetZ(),maxpos[2]);
+	}
+	hits_by_index.emplace_back(hit);
+	hits_to_clusters_by_hit_index.emplace_back(*clusterIter);	
+	++nhits;
       }
+      KDTreeCube clusterBoundingBox(minpos[0],maxpos[0],
+				    minpos[1],maxpos[1],
+				    minpos[2],maxpos[2]);
+      tree->build(nodes_for_local_tree,clusterBoundingBox);
     }
-    KDTreeCube hitsBoundingRegion = 
-      fill_and_bound_3d_kd_tree(hit_list,hit_nodes);
-    hit_list.clear();
-    hits_kdtree.build(hit_nodes,hitsBoundingRegion);
-    hit_nodes.clear();
+    KDTreeCube hitsByIndexBoundingRegion =
+      fill_and_bound_3d_kd_tree_by_index(hits_by_index,hit_nodes_by_index);
+    hits_kdtree_byindex.build(hit_nodes_by_index,hitsByIndexBoundingRegion);
+    hit_nodes_by_index.clear();    
+    
     // now we build the neighbours cache so that we can efficiently search in the inner loop
     for( auto clusterIter = pClusterList->begin(); clusterIter != pClusterList->end(); ++clusterIter ) {
       CaloHitList hits;
@@ -171,11 +201,10 @@ StatusCode MainFragmentRemovalAlgorithm::Run()
 							       m_minimalSearchRadius,
 							       m_minimalSearchRadius,
 							       m_minimalSearchRadius );
-	std::vector<HitKDNode> found_hits;
-	hits_kdtree.search(hitSearchRegion,found_hits);
-	for( auto& found_hit : found_hits ) {
-	  auto hit_base_cluster = hits_to_clusters.find(found_hit.data);	  
-	  auto* pNeighbour = hit_base_cluster->second;
+	std::vector<HitKDNodeByIndex> found_hits;
+	hits_kdtree_byindex.search(hitSearchRegion,found_hits);
+	for( auto& found_hit : found_hits ) {	  	  
+	  auto* pNeighbour = hits_to_clusters_by_hit_index[found_hit.data];
 	  if( *(clusterIter) != pNeighbour ) { // make sure this is a neighbour
 	    neighbours.insert(pNeighbour);
 	  }
@@ -189,7 +218,7 @@ StatusCode MainFragmentRemovalAlgorithm::Run()
         shouldRecalculate = false;
         Cluster *pBestParentCluster(NULL), *pBestDaughterCluster(NULL);
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetChargedClusterContactMap(isFirstPass, affectedClusters, chargedClusterContactMap, clusters_to_clusters, neighbours_cache));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetChargedClusterContactMap(isFirstPass, affectedClusters, chargedClusterContactMap, clusters_to_clusters, neighbours_cache, clusters_to_hit_tree));
 
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetClusterMergingCandidates(chargedClusterContactMap, pBestParentCluster,
             pBestDaughterCluster));
@@ -206,6 +235,15 @@ StatusCode MainFragmentRemovalAlgorithm::Run()
 
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::MergeAndDeleteClusters(*this, pBestParentCluster,
                 pBestDaughterCluster));
+	    // update the parent cluster kd tree
+	    auto& tree = clusters_to_hit_tree[pBestParentCluster];
+	    tree.reset(new HitKDTree());
+	    CaloHitList temp;
+	    std::vector<HitKDNode> hit_nodes;
+	    pBestParentCluster->GetOrderedCaloHitList().GetCaloHitList(temp);
+	    KDTreeCube clusterBoundingBox =
+	      fill_and_bound_3d_kd_tree(temp,hit_nodes);
+	    tree->build(hit_nodes,clusterBoundingBox);
         }
     }
 
@@ -216,7 +254,7 @@ StatusCode MainFragmentRemovalAlgorithm::Run()
 
 StatusCode MainFragmentRemovalAlgorithm::GetChargedClusterContactMap(bool &isFirstPass, const ClusterList &affectedClusters,
 	ChargedClusterContactMap &chargedClusterContactMap, const ClusterToClusterMap& clusters_to_clusters, 
-        const ClusterToNeighbourClustersMap& neighbours_cache) const
+	const ClusterToNeighbourClustersMap& neighbours_cache, const ClusterToKDTreeMap& cluster_to_tree) const
 {
     const ClusterList *pClusterList = NULL;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pClusterList));
@@ -261,28 +299,31 @@ StatusCode MainFragmentRemovalAlgorithm::GetChargedClusterContactMap(bool &isFir
 
 	// find our nearby clusters in the neighbours cache	
 	ClusterList nearby_clusters;
-	auto original_neighbours = neighbours_cache.find(pDaughterCluster)->second;
+	const auto& original_neighbours = neighbours_cache.find(pDaughterCluster)->second;
 	for( auto* neighbour : original_neighbours ) {
 	  nearby_clusters.insert( clusters_to_clusters.find(neighbour)->second );
 	}
 
         // Calculate the cluster contact information
+	
         for (auto iterJ = nearby_clusters.begin(), iterJEnd = nearby_clusters.end(); iterJ != iterJEnd; ++iterJ)
         {
-	    Cluster *pParentCluster = *iterJ;
+	    Cluster *pParentCluster = *iterJ;	    
 
-            if (pDaughterCluster == pParentCluster)
+            if (pDaughterCluster == pParentCluster )
                 continue;
 
             if (pParentCluster->GetAssociatedTrackList().empty())
                 continue;
+	    	    
+	    const auto& tree = cluster_to_tree.find(pParentCluster)->second;
 
-            ChargedClusterContact chargedClusterContact(this->GetPandora(), pDaughterCluster, pParentCluster, m_contactParameters);
+            ChargedClusterContact chargedClusterContact(this->GetPandora(), pDaughterCluster, pParentCluster, m_contactParameters, tree);
 
             if (this->PassesClusterContactCuts(chargedClusterContact))
             {
 	        chargedClusterContactMap[pDaughterCluster].push_back(std::move(chargedClusterContact));
-            }
+            }	    
         }
     }
     isFirstPass = false;
@@ -651,6 +692,17 @@ StatusCode MainFragmentRemovalAlgorithm::GetAffectedClusters(const ChargedCluste
 ChargedClusterContact::ChargedClusterContact(const Pandora &pandora, Cluster *const pDaughterCluster, Cluster *const pParentCluster,
         const Parameters &parameters) :
     ClusterContact(pandora, pDaughterCluster, pParentCluster, parameters),
+    m_coneFraction2(FragmentRemovalHelper::GetFractionOfHitsInCone(pandora, pDaughterCluster, pParentCluster, parameters.m_coneCosineHalfAngle2)),
+    m_coneFraction3(FragmentRemovalHelper::GetFractionOfHitsInCone(pandora, pDaughterCluster, pParentCluster, parameters.m_coneCosineHalfAngle3)),
+    m_meanDistanceToHelix(std::numeric_limits<float>::max()),
+    m_closestDistanceToHelix(std::numeric_limits<float>::max())
+{
+    this->ClusterHelixComparison(pandora, pDaughterCluster, pParentCluster, parameters);
+}
+
+ChargedClusterContact::ChargedClusterContact(const Pandora &pandora, Cluster *const pDaughterCluster, Cluster *const pParentCluster,
+        const Parameters &parameters, const std::unique_ptr<HitKDTree>& hit_tree) :
+    ClusterContact(pandora, pDaughterCluster, pParentCluster, parameters, hit_tree),
     m_coneFraction2(FragmentRemovalHelper::GetFractionOfHitsInCone(pandora, pDaughterCluster, pParentCluster, parameters.m_coneCosineHalfAngle2)),
     m_coneFraction3(FragmentRemovalHelper::GetFractionOfHitsInCone(pandora, pDaughterCluster, pParentCluster, parameters.m_coneCosineHalfAngle3)),
     m_meanDistanceToHelix(std::numeric_limits<float>::max()),

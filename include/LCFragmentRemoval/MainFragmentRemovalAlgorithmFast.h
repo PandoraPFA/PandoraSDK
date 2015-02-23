@@ -18,6 +18,16 @@
 namespace lc_content_fast
 {  
   
+
+typedef KDTreeLinkerAlgo<pandora::CaloHit*,3> HitKDTree;
+typedef KDTreeNodeInfoT<pandora::CaloHit*,3> HitKDNode;
+typedef KDTreeLinkerAlgo<unsigned,3> HitKDTreeByIndex;
+typedef KDTreeNodeInfoT<unsigned,3> HitKDNodeByIndex;
+typedef std::unordered_map<pandora::Cluster*,pandora::Cluster*> ClusterToClusterMap; // maps the beginning cluster list to the final
+typedef std::unordered_map<pandora::CaloHit*,pandora::Cluster*> HitsToClustersMap; // note that this map is used indirected
+typedef std::unordered_map<pandora::Cluster*,pandora::ClusterList> ClusterToNeighbourClustersMap;
+typedef std::unordered_map<pandora::Cluster*,std::unique_ptr<HitKDTree> > ClusterToKDTreeMap;
+
 /**
  *  @brief  ChargedClusterContact class, describing the interactions and proximity between parent and daughter candidate clusters
  */
@@ -50,6 +60,9 @@ public:
      */
     ChargedClusterContact(const pandora::Pandora &pandora, pandora::Cluster *const pDaughterCluster, pandora::Cluster *const pParentCluster,
         const Parameters &parameters);
+
+    ChargedClusterContact(const pandora::Pandora &pandora, pandora::Cluster *const pDaughterCluster, pandora::Cluster *const pParentCluster,
+        const Parameters &parameters, const std::unique_ptr<HitKDTree>&);
 
     /**
      *  @brief  Get the sum of energies of tracks associated with parent cluster
@@ -105,16 +118,11 @@ private:
     float               m_closestDistanceToHelix;       ///< Closest distance between daughter cluster and helix fits to parent associated tracks
 };
 
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 typedef std::vector<ChargedClusterContact> ChargedClusterContactVector;
 typedef std::unordered_map<pandora::Cluster *, ChargedClusterContactVector> ChargedClusterContactMap;
-typedef KDTreeLinkerAlgo<pandora::CaloHit*,3> HitKDTree;
-typedef KDTreeNodeInfoT<pandora::CaloHit*,3> HitKDNode;
-typedef std::unordered_map<pandora::Cluster*,pandora::Cluster*> ClusterToClusterMap; // maps the beginning cluster list to the final
-typedef std::unordered_map<pandora::CaloHit*,pandora::Cluster*> HitsToClustersMap; // note that this map is used indirected
-typedef std::unordered_map<pandora::Cluster*,pandora::ClusterList> ClusterToNeighbourClustersMap;
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
  *  @brief  MainFragmentRemovalAlgorithm class
@@ -156,7 +164,8 @@ private:
     pandora::StatusCode GetChargedClusterContactMap(bool &isFirstPass, const pandora::ClusterList &affectedClusters,
 						    ChargedClusterContactMap &chargedClusterContactMap, 
 						    const ClusterToClusterMap& clusters_to_clusters,
-						    const ClusterToNeighbourClustersMap& neighbours_cache) const;
+						    const ClusterToNeighbourClustersMap& neighbours_cache,
+						    const ClusterToKDTreeMap& cluster_to_tree) const;
 
     /**
      *  @brief  Whether candidate parent and daughter clusters are sufficiently in contact to warrant further investigation

@@ -65,12 +65,13 @@ private:
     /**
      *  @brief  Count number of "nearby" hits using the isolation scheme
      * 
-     *  @param  searchLayer -- the pseudolayer to search in
      *  @param  pCaloHit the calo hit
+     *  @param  pCaloHitList the calo hit list
      * 
      *  @return the number of nearby hits
      */
-    unsigned int IsolationCountNearbyHits(unsigned int searchLayer, pandora::CaloHit* pCaloHit);
+    unsigned int IsolationCountNearbyHits(const pandora::CaloHit *const pCaloHit, const pandora::CaloHitList *const pCaloHitList) const;
+    
 
     /**
      *  @brief  Count number of "nearby" hits using the mip identification scheme

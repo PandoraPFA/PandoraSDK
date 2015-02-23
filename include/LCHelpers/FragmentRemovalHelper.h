@@ -10,6 +10,9 @@
 
 #include "Pandora/PandoraInternal.h"
 #include "Pandora/StatusCodes.h"
+#include "LCUtility/KDTreeLinkerAlgoT.h"
+
+#include <memory>
 
 namespace lc_content
 {
@@ -20,6 +23,8 @@ namespace lc_content
 class ClusterContact
 {
 public:
+    typedef KDTreeLinkerAlgo<pandora::CaloHit*,3> HitKDTree;
+    typedef KDTreeNodeInfoT<pandora::CaloHit*,3> HitKDNode;
     /**
      *  @brief  Parameters class
      */
@@ -32,7 +37,7 @@ public:
         float           m_minCosOpeningAngle;           ///< Min opening angle between two clusters to perform contact hit comparisons
         float           m_distanceThreshold;            ///< Number of calorimeter cell-widths used to identify cluster contact layers
     };
-
+    
     /**
      *  @brief  Constructor
      * 
@@ -42,7 +47,10 @@ public:
      *  @param  parameters the cluster contact parameters
      */
     ClusterContact(const pandora::Pandora &pandora, const pandora::Cluster *const pDaughterCluster, const pandora::Cluster *const pParentCluster,
-        const Parameters &parameters);
+		   const Parameters &parameters);
+
+    ClusterContact(const pandora::Pandora &pandora, const pandora::Cluster *const pDaughterCluster, const pandora::Cluster *const pParentCluster,
+		   const Parameters &parameters, const std::unique_ptr<HitKDTree>&);
 
     /**
      *  @brief  Get the address of the daughter candidate cluster
@@ -110,6 +118,7 @@ protected:
      *  @param  parameters the cluster contact parameters
      */
     void HitDistanceComparison(const pandora::Cluster *const pDaughterCluster, const pandora::Cluster *const pParentCluster, const Parameters &parameters);
+    void HitDistanceComparison(const pandora::Cluster *const pDaughterCluster, const pandora::Cluster *const pParentCluster, const Parameters &parameters, const std::unique_ptr<ClusterContact::HitKDTree>&);
 
     const pandora::Cluster     *m_pDaughterCluster;         ///< Address of the daughter candidate cluster
     const pandora::Cluster     *m_pParentCluster;           ///< Address of the parent candidate cluster
