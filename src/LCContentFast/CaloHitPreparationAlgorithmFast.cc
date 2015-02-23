@@ -85,7 +85,7 @@ void CaloHitPreparationAlgorithm::InitializeKDTree(const CaloHitList* pCaloHitLi
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(CaloHit *pCaloHit, const OrderedCaloHitList &orderedCaloHitList)
+void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(CaloHit *const pCaloHit, const OrderedCaloHitList &orderedCaloHitList)
 {
     // Calculate number of adjacent pseudolayers to examine
     const unsigned int pseudoLayer(pCaloHit->GetPseudoLayer());
@@ -174,7 +174,7 @@ unsigned int CaloHitPreparationAlgorithm::IsolationCountNearbyHits(const CaloHit
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-unsigned int CaloHitPreparationAlgorithm::MipCountNearbyHits(unsigned int searchLayer, CaloHit *pCaloHit) 
+unsigned int CaloHitPreparationAlgorithm::MipCountNearbyHits(unsigned int searchLayer, const CaloHit *const pCaloHit) 
 {
     const float mipNCellsForNearbyHit(m_mipNCellsForNearbyHit + 0.5f);
 

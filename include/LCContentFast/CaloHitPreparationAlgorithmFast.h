@@ -22,8 +22,8 @@ namespace lc_content_fast
 class CaloHitPreparationAlgorithm : public pandora::Algorithm
 {
 public:
-    typedef KDTreeLinkerAlgo<pandora::CaloHit*,4> HitKDTree4D;
-    typedef KDTreeNodeInfoT<pandora::CaloHit*,4> HitKDNode4D;
+    typedef KDTreeLinkerAlgo<const pandora::CaloHit*,4> HitKDTree4D;
+    typedef KDTreeNodeInfoT<const pandora::CaloHit*,4> HitKDNode4D;
 
     /**
      *  @brief  Factory class for instantiating algorithm
@@ -60,7 +60,7 @@ private:
      *  @param  pCaloHit the calo hit
      *  @param  pOrderedCaloHitList the ordered calo hit list
      */
-    void CalculateCaloHitProperties(pandora::CaloHit* pCaloHit, const pandora::OrderedCaloHitList &orderedCaloHitList);
+    void CalculateCaloHitProperties pandora::CaloHit *const pCaloHit, const pandora::OrderedCaloHitList &orderedCaloHitList);
 
     /**
      *  @brief  Count number of "nearby" hits using the isolation scheme
@@ -81,7 +81,7 @@ private:
      * 
      *  @return the number of nearby hits
      */
-    unsigned int MipCountNearbyHits(unsigned int searchLayer, pandora::CaloHit* pCaloHit);
+    unsigned int MipCountNearbyHits(unsigned int searchLayer, const pandora::CaloHit *const pCaloHit);
 
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
 
