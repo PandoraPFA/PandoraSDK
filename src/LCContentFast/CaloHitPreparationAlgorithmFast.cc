@@ -8,9 +8,9 @@
 
 #include "Pandora/AlgorithmHeaders.h"
 
-#include "LCUtility/CaloHitPreparationAlgorithmFast.h"
+#include "LCContentFast/CaloHitPreparationAlgorithmFast.h"
 
-#include "LCUtility/KDTreeLinkerAlgoT.h"
+#include "LCContentFast/KDTreeLinkerAlgoT.h"
 
 using namespace pandora;
 
@@ -85,7 +85,7 @@ void CaloHitPreparationAlgorithm::InitializeKDTree(const CaloHitList* pCaloHitLi
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(CaloHit *const pCaloHit, const OrderedCaloHitList &orderedCaloHitList)
+void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(const CaloHit *const pCaloHit, const OrderedCaloHitList &orderedCaloHitList)
 {
     // Calculate number of adjacent pseudolayers to examine
     const unsigned int pseudoLayer(pCaloHit->GetPseudoLayer());
@@ -118,8 +118,10 @@ void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(CaloHit *const pCal
         {
             if (MUON == pCaloHit->GetHitType())
             {
-                pCaloHit->SetPossibleMipFlag(true);
-                continue;
+	        PandoraContentApi::CaloHit::Metadata metadata;
+		metadata.m_isPossibleMip = true;
+		PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pCaloHit, metadata));
+		continue;	      
             }
 
             const CartesianVector &positionVector(pCaloHit->GetPositionVector());
@@ -133,14 +135,20 @@ void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(CaloHit *const pCal
 
             if ((pCaloHit->GetMipEquivalentEnergy() <= (m_mipLikeMipCut * angularCorrection) || pCaloHit->IsDigital()) &&
                 (m_mipMaxNearbyHits >= this->MipCountNearbyHits(iPseudoLayer,pCaloHit)))
-            {
-                pCaloHit->SetPossibleMipFlag(true);
+            { 
+		PandoraContentApi::CaloHit::Metadata metadata;
+		metadata.m_isPossibleMip = true;
+		PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pCaloHit, metadata));
             }
         }
     }
 
     if (isIsolated)
-        pCaloHit->SetIsolatedFlag(true);
+    {
+	PandoraContentApi::CaloHit::Metadata metadata;
+	metadata.m_isIsolated = true;
+	PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pCaloHit, metadata));
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -196,7 +204,7 @@ unsigned int CaloHitPreparationAlgorithm::MipCountNearbyHits(unsigned int search
 
     for (auto iter = found.begin(), iterEnd = found.end(); iter != iterEnd; ++iter)
     {        
-        CaloHit* nearby_hit = iter->data;
+        const CaloHit* nearby_hit = iter->data;
         if (pCaloHit == nearby_hit)
             continue;
 

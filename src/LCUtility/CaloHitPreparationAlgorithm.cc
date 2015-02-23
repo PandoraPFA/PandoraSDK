@@ -59,7 +59,7 @@ StatusCode CaloHitPreparationAlgorithm::Run()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(CaloHit *const pCaloHit, const OrderedCaloHitList &orderedCaloHitList) const
+void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(const CaloHit *const pCaloHit, const OrderedCaloHitList &orderedCaloHitList) const
 {
     // Calculate number of adjacent pseudolayers to examine
     const unsigned int pseudoLayer(pCaloHit->GetPseudoLayer());
@@ -78,7 +78,7 @@ void CaloHitPreparationAlgorithm::CalculateCaloHitProperties(CaloHit *const pCal
         if (orderedCaloHitList.end() == adjacentPseudoLayerIter)
             continue;
 
-        CaloHitList *pCaloHitList = adjacentPseudoLayerIter->second;
+        const CaloHitList *const pCaloHitList = adjacentPseudoLayerIter->second;
 
         // IsIsolated flag
         if (isIsolated && (isolationMinLayer <= iPseudoLayer) && (isolationMaxLayer >= iPseudoLayer))

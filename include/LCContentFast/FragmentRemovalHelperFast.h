@@ -5,15 +5,16 @@
  * 
  *  $Log: $
  */
-#ifndef LC_FRAGMENT_REMOVAL_HELPER_H
-#define LC_FRAGMENT_REMOVAL_HELPER_H 1
+#ifndef LC_FRAGMENT_REMOVAL_HELPER_FAST_H
+#define LC_FRAGMENT_REMOVAL_HELPER_FAST_H 1
 
 #include "Pandora/PandoraInternal.h"
 #include "Pandora/StatusCodes.h"
+#include "LCContentFast/KDTreeLinkerAlgoT.h"
 
 #include <memory>
 
-namespace lc_content
+namespace lc_content_fast
 {
 
 /**
@@ -22,6 +23,8 @@ namespace lc_content
 class ClusterContact
 {
 public:
+    typedef KDTreeLinkerAlgo<const pandora::CaloHit*,3> HitKDTree;
+    typedef KDTreeNodeInfoT<const pandora::CaloHit*,3> HitKDNode;
     /**
      *  @brief  Parameters class
      */
@@ -45,7 +48,10 @@ public:
      */
     ClusterContact(const pandora::Pandora &pandora, const pandora::Cluster *const pDaughterCluster, const pandora::Cluster *const pParentCluster,
 		   const Parameters &parameters);
-    
+
+    ClusterContact(const pandora::Pandora &pandora, const pandora::Cluster *const pDaughterCluster, const pandora::Cluster *const pParentCluster,
+		   const Parameters &parameters, const std::unique_ptr<HitKDTree>&);
+
     /**
      *  @brief  Get the address of the daughter candidate cluster
      * 
@@ -111,7 +117,8 @@ protected:
      *  @param  pParentCluster address of the parent candidate cluster
      *  @param  parameters the cluster contact parameters
      */
-    void HitDistanceComparison(const pandora::Cluster *const pDaughterCluster, const pandora::Cluster *const pParentCluster, const Parameters &parameters);    
+    void HitDistanceComparison(const pandora::Cluster *const pDaughterCluster, const pandora::Cluster *const pParentCluster, const Parameters &parameters);
+    void HitDistanceComparison(const pandora::Cluster *const pDaughterCluster, const pandora::Cluster *const pParentCluster, const Parameters &parameters, const std::unique_ptr<ClusterContact::HitKDTree>&);
 
     const pandora::Cluster     *m_pDaughterCluster;         ///< Address of the daughter candidate cluster
     const pandora::Cluster     *m_pParentCluster;           ///< Address of the parent candidate cluster

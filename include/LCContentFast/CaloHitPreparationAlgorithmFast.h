@@ -10,11 +10,13 @@
 
 #include "Pandora/Algorithm.h"
 
-template<typename,unsigned int> class KDTreeLinkerAlgo;
-template<typename,unsigned int> class KDTreeNodeInfoT;
 
 namespace lc_content_fast
 {
+
+template<typename,unsigned int> class KDTreeLinkerAlgo;
+template<typename,unsigned int> class KDTreeNodeInfoT;
+
 
 /**
  *  @brief  CaloHitPreparationAlgorithm class
@@ -60,7 +62,7 @@ private:
      *  @param  pCaloHit the calo hit
      *  @param  pOrderedCaloHitList the ordered calo hit list
      */
-    void CalculateCaloHitProperties pandora::CaloHit *const pCaloHit, const pandora::OrderedCaloHitList &orderedCaloHitList);
+    void CalculateCaloHitProperties(const pandora::CaloHit *const pCaloHit, const pandora::OrderedCaloHitList &orderedCaloHitList);
 
     /**
      *  @brief  Count number of "nearby" hits using the isolation scheme

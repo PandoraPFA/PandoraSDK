@@ -16,11 +16,9 @@
 
 #include "LCClustering/ClusteringParentAlgorithm.h"
 #include "LCClustering/ConeClusteringAlgorithm.h"
-#include "LCClustering/ConeClusteringAlgorithmFast.h"
 #include "LCClustering/ForcedClusteringAlgorithm.h"
 
 #include "LCFragmentRemoval/MainFragmentRemovalAlgorithm.h"
-#include "LCFragmentRemoval/MainFragmentRemovalAlgorithmFast.h"
 #include "LCFragmentRemoval/MergeSplitPhotonsAlgorithm.h"
 #include "LCFragmentRemoval/NeutralFragmentRemovalAlgorithm.h"
 #include "LCFragmentRemoval/PhotonFragmentRemovalAlgorithm.h"
@@ -74,13 +72,11 @@
 
 #include "LCTrackClusterAssociation/LoopingTrackAssociationAlgorithm.h"
 #include "LCTrackClusterAssociation/TrackClusterAssociationAlgorithm.h"
-#include "LCTrackClusterAssociation/TrackClusterAssociationAlgorithmFast.h"
 #include "LCTrackClusterAssociation/TrackRecoveryAlgorithm.h"
 #include "LCTrackClusterAssociation/TrackRecoveryHelixAlgorithm.h"
 #include "LCTrackClusterAssociation/TrackRecoveryInteractionsAlgorithm.h"
 
 #include "LCUtility/CaloHitPreparationAlgorithm.h"
-#include "LCUtility/CaloHitPreparationAlgorithmFast.h"
 #include "LCUtility/ClusterPreparationAlgorithm.h"
 #include "LCUtility/EventPreparationAlgorithm.h"
 #include "LCUtility/PfoPreparationAlgorithm.h"
@@ -100,10 +96,8 @@ public:
         d("PerfectParticleFlow",                    lc_content::PerfectParticleFlowAlgorithm::Factory)                          \
         d("ClusteringParent",                       lc_content::ClusteringParentAlgorithm::Factory)                             \
         d("ConeClustering",                         lc_content::ConeClusteringAlgorithm::Factory)                               \
-	d("ConeClusteringFast",                     lc_content_fast::ConeClusteringAlgorithm::Factory)                          \
         d("ForcedClustering",                       lc_content::ForcedClusteringAlgorithm::Factory)                             \
         d("MainFragmentRemoval",                    lc_content::MainFragmentRemovalAlgorithm::Factory)                          \
-        d("MainFragmentRemovalFast",                lc_content_fast::MainFragmentRemovalAlgorithm::Factory)                     \
         d("MergeSplitPhotons",                      lc_content::MergeSplitPhotonsAlgorithm::Factory)                            \
         d("NeutralFragmentRemoval",                 lc_content::NeutralFragmentRemovalAlgorithm::Factory)                       \
         d("PhotonFragmentRemoval",                  lc_content::PhotonFragmentRemovalAlgorithm::Factory)                        \
@@ -148,9 +142,7 @@ public:
         d("TrackRecoveryHelix",                     lc_content::TrackRecoveryHelixAlgorithm::Factory)                           \
         d("TrackRecoveryInteractions",              lc_content::TrackRecoveryInteractionsAlgorithm::Factory)                    \
         d("TrackClusterAssociation",                lc_content::TrackClusterAssociationAlgorithm::Factory)                      \
-	d("TrackClusterAssociationFast",            lc_content_fast::TrackClusterAssociationAlgorithm::Factory)                 \
         d("CaloHitPreparation",                     lc_content::CaloHitPreparationAlgorithm::Factory)                           \
-	d("CaloHitPreparationFast",                 lc_content_fast::CaloHitPreparationAlgorithm::Factory)                      \
         d("ClusterPreparation",                     lc_content::ClusterPreparationAlgorithm::Factory)                           \
         d("EventPreparation",                       lc_content::EventPreparationAlgorithm::Factory)                             \
         d("PfoPreparation",                         lc_content::PfoPreparationAlgorithm::Factory)                               \

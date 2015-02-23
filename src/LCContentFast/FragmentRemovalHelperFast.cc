@@ -8,11 +8,11 @@
 
 #include "Pandora/AlgorithmHeaders.h"
 
-#include "LCHelpers/FragmentRemovalHelper.h"
+#include "LCContentFast/FragmentRemovalHelperFast.h"
 
 using namespace pandora;
 
-namespace lc_content
+namespace lc_content_fast
 {
 
 float FragmentRemovalHelper::GetFractionOfCloseHits(const Cluster *const pClusterI, const Cluster *const pClusterJ, const float distanceThreshold)
@@ -328,6 +328,25 @@ ClusterContact::ClusterContact(const Pandora &pandora, const Cluster *const pDau
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+ClusterContact::ClusterContact(const Pandora &pandora, const Cluster *const pDaughterCluster, const Cluster *const pParentCluster, const Parameters &parameters,
+			       const std::unique_ptr<ClusterContact::HitKDTree>& hit_tree) :
+    m_pDaughterCluster(pDaughterCluster),
+    m_pParentCluster(pParentCluster),
+    m_nContactLayers(0),
+    m_contactFraction(0.f),
+    m_coneFraction1(FragmentRemovalHelper::GetFractionOfHitsInCone(pandora, pDaughterCluster, pParentCluster, parameters.m_coneCosineHalfAngle1)),
+    m_closeHitFraction1(0.f),
+    m_closeHitFraction2(0.f),
+    m_distanceToClosestHit(std::numeric_limits<float>::max())
+{
+    (void) FragmentRemovalHelper::GetClusterContactDetails(pDaughterCluster, pParentCluster, parameters.m_distanceThreshold,
+        m_nContactLayers, m_contactFraction);
+
+    this->HitDistanceComparison(pDaughterCluster, pParentCluster, parameters, hit_tree);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 void ClusterContact::HitDistanceComparison(const Cluster *const pDaughterCluster, const Cluster *const pParentCluster, const Parameters &parameters)
 {
     const float closeHitDistance1Squared(parameters.m_closeHitDistance1 * parameters.m_closeHitDistance1);
@@ -390,4 +409,63 @@ void ClusterContact::HitDistanceComparison(const Cluster *const pDaughterCluster
     m_closeHitFraction2 = static_cast<float>(nCloseHits2) / static_cast<float>(nDaughterCaloHits);
 }
 
-} // namespace lc_content
+void ClusterContact::HitDistanceComparison(const Cluster *const pDaughterCluster, const Cluster *const pParentCluster, const Parameters &parameters, const std::unique_ptr<ClusterContact::HitKDTree>& hit_tree)
+{
+    const float closeHitDistance1Squared(parameters.m_closeHitDistance1 * parameters.m_closeHitDistance1);
+    const float closeHitDistance2Squared(parameters.m_closeHitDistance2 * parameters.m_closeHitDistance2);
+
+    // Apply simple preselection using cosine of opening angle between the clusters
+    const float cosOpeningAngle(pDaughterCluster->GetInitialDirection().GetCosOpeningAngle(pParentCluster->GetInitialDirection()));
+
+    if (cosOpeningAngle < parameters.m_minCosOpeningAngle)
+        return;
+
+    // Calculate all hit distance properties in a single loop, for efficiency
+    unsigned int nCloseHits1(0), nCloseHits2(0);
+    float minDistanceSquared(std::numeric_limits<float>::max());
+        
+    const OrderedCaloHitList &orderedCaloHitListI(pDaughterCluster->GetOrderedCaloHitList());
+    //const OrderedCaloHitList &orderedCaloHitListJ(pParentCluster->GetOrderedCaloHitList());
+
+    // Loop over hits in daughter cluster
+    for (OrderedCaloHitList::const_iterator iterI = orderedCaloHitListI.begin(), iterIEnd = orderedCaloHitListI.end(); iterI != iterIEnd; ++iterI)
+    {
+        for (CaloHitList::const_iterator hitIterI = iterI->second->begin(), hitIterIEnd = iterI->second->end(); hitIterI != hitIterIEnd; ++hitIterI)
+        {   
+            bool isCloseHit1(false), isCloseHit2(false);
+            const CartesianVector &positionVectorI((*hitIterI)->GetPositionVector());
+
+            // find the NN in the parent cluster and test
+	    float parent_distance = std::numeric_limits<float>::max();
+	    HitKDNode daughter_point(*hitIterI,positionVectorI.GetX(),positionVectorI.GetY(),positionVectorI.GetZ());
+	    HitKDNode* theresult = nullptr;
+	    hit_tree->findNearestNeighbour(daughter_point,theresult,parent_distance);	    
+	    if( nullptr != theresult && parent_distance != std::numeric_limits<float>::max() ) {
+	      const float dist2 = parent_distance*parent_distance;
+	      if( !isCloseHit1 && (dist2 < closeHitDistance1Squared) ) 
+		isCloseHit1 = true;
+	      if( !isCloseHit2 && (dist2 < closeHitDistance2Squared) )
+		isCloseHit2 = true;
+	      if( dist2 < minDistanceSquared ) 
+		minDistanceSquared = dist2;
+	    }            
+
+            if (isCloseHit1)
+                nCloseHits1++;
+
+            if (isCloseHit2)
+                nCloseHits2++;
+        }
+    }
+
+    const unsigned int nDaughterCaloHits(pDaughterCluster->GetNCaloHits());
+
+    if (0 == nDaughterCaloHits)
+        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+
+    m_distanceToClosestHit = std::sqrt(minDistanceSquared);
+    m_closeHitFraction1 = static_cast<float>(nCloseHits1) / static_cast<float>(nDaughterCaloHits);
+    m_closeHitFraction2 = static_cast<float>(nCloseHits2) / static_cast<float>(nDaughterCaloHits);
+}
+
+} // namespace lc_content_fast
