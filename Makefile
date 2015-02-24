@@ -1,3 +1,10 @@
+ifndef PROJECT_DIR
+    PROJECT_DIR = $(PANDORA_DIR)/PandoraSDK
+    PROJECT_LIBRARY_DIR = $(PANDORA_DIR)/lib
+else
+    PROJECT_LIBRARY_DIR = $(PROJECT_DIR)/lib
+endif
+
 CC = g++
 CFLAGS = -c -g -fPIC -O2 -Wall -Wextra -pedantic -Wshadow -Werror -ansi -std=c++11
 ifdef BUILD_32BIT_COMPATIBLE
@@ -9,20 +16,20 @@ ifdef BUILD_32BIT_COMPATIBLE
     LIBS += -m32
 endif
 
-PROJECT_INCLUDE_DIR = $(PANDORA_DIR)/PandoraSDK/include/
-PROJECT_LIBRARY = $(PANDORA_DIR)/lib/libPandoraSDK.so
+PROJECT_INCLUDE_DIR = $(PROJECT_DIR)/include/
+PROJECT_LIBRARY = $(PROJECT_LIBRARY_DIR)/libPandoraSDK.so
 
 INCLUDES = -I$(PROJECT_INCLUDE_DIR)
 
-SOURCES  = $(wildcard $(PANDORA_DIR)/PandoraSDK/src/*.cc)
-SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Api/*.cc)
-SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Helpers/*.cc)
-SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Managers/*.cc)
-SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Objects/*.cc)
-SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Pandora/*.cc)
-SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Persistency/*.cc)
-SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Plugins/*.cc)
-SOURCES += $(wildcard $(PANDORA_DIR)/PandoraSDK/src/Xml/*.cc)
+SOURCES  = $(wildcard $(PROJECT_DIR)/src/*.cc)
+SOURCES += $(wildcard $(PROJECT_DIR)/src/Api/*.cc)
+SOURCES += $(wildcard $(PROJECT_DIR)/src/Helpers/*.cc)
+SOURCES += $(wildcard $(PROJECT_DIR)/src/Managers/*.cc)
+SOURCES += $(wildcard $(PROJECT_DIR)/src/Objects/*.cc)
+SOURCES += $(wildcard $(PROJECT_DIR)/src/Pandora/*.cc)
+SOURCES += $(wildcard $(PROJECT_DIR)/src/Persistency/*.cc)
+SOURCES += $(wildcard $(PROJECT_DIR)/src/Plugins/*.cc)
+SOURCES += $(wildcard $(PROJECT_DIR)/src/Xml/*.cc)
 OBJECTS = $(SOURCES:.cc=.o)
 DEPENDS = $(OBJECTS:.o=.d)
 
