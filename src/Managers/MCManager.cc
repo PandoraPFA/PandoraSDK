@@ -35,7 +35,7 @@ MCManager::~MCManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MCManager::CreateMCParticle(const PandoraApi::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle)
+StatusCode MCManager::Create(const PandoraApi::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle)
 {
     pMCParticle = NULL;
 

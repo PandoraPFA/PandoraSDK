@@ -47,7 +47,7 @@ private:
      *  @param  pCaloHit to receive the address of the calo hit
      */
     template <typename PARAMETERS>
-    StatusCode CreateCaloHit(const PARAMETERS &parameters, const CaloHit *&pCaloHit);
+    StatusCode Create(const PARAMETERS &parameters, const CaloHit *&pCaloHit);
 
     /**
      *  @brief  Perform the actual calo hit instantiation

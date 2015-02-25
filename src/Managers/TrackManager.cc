@@ -31,7 +31,7 @@ TrackManager::~TrackManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode TrackManager::CreateTrack(const PandoraApi::Track::Parameters &parameters, const Track *&pTrack)
+StatusCode TrackManager::Create(const PandoraApi::Track::Parameters &parameters, const Track *&pTrack)
 {
     pTrack = NULL;
 

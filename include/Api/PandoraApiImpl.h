@@ -29,7 +29,7 @@ private:
      *  @param  parameters the object parameters
      */
     template <typename PARAMETERS>
-    StatusCode CreateObject(const PARAMETERS &parameters) const;
+    StatusCode Create(const PARAMETERS &parameters) const;
 
     /**
      *  @brief  Process event

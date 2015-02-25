@@ -25,6 +25,25 @@ class Pandora;
 class PandoraContentApiImpl
 {
 private:
+    /**
+     *  @brief  Return type adaptor
+     */
+    template<class T>
+    class ReturnType
+    {
+    public:
+        typedef T Type;
+    };
+
+    /**
+     *  @brief  Manager type adaptor
+     * 
+     *  @return the address of the manager
+     */
+    template<typename T>
+    typename ReturnType<T>::Type *GetManager() const;
+
+
     /* Object-metadata manipulation */
 
     /**
@@ -47,7 +66,7 @@ private:
      *  @param  pObject to receive the address of the object created
      */
     template <typename PARAMETERS, typename OBJECT>
-    StatusCode CreateObject(const PARAMETERS &parameters, const OBJECT *&pObject) const;
+    StatusCode Create(const PARAMETERS &parameters, const OBJECT *&pObject) const;
 
 
     /* Accessors for plugins and global settings */
@@ -267,7 +286,8 @@ private:
      *  @brief  Delete an object from a specified list
      * 
      *  @param  pT address of the object, or a list of objects, to delete
-     *  @param  listName name of the list containing the object     */
+     *  @param  listName name of the list containing the object
+     */
     template <typename T>
     StatusCode Delete(const T *const pT, const std::string &listName) const;
 

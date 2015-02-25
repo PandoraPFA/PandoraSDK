@@ -44,7 +44,7 @@ private:
      *  @param  parameters the cluster parameters
      *  @param  pCluster to receive the address of the cluster created
      */
-    StatusCode CreateCluster(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster);
+    StatusCode Create(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster);
 
     /**
      *  @brief  Alter the metadata information stored in a cluster
@@ -107,14 +107,6 @@ private:
     StatusCode RemoveIsolatedFromCluster(const Cluster *const pCluster, const CaloHit *const pCaloHit);
 
     /**
-     *  @brief  Merge two clusters in the current list, enlarging one cluster and deleting the second
-     * 
-     *  @param  pClusterToEnlarge address of the cluster to enlarge
-     *  @param  pClusterToDelete address of the cluster to delete
-     */
-    StatusCode MergeAndDeleteClusters(const Cluster *const pClusterToEnlarge, const Cluster *const pClusterToDelete);
-
-    /**
      *  @brief  Merge two clusters from two specified lists, enlarging one cluster and deleting the second
      * 
      *  @param  pClusterToEnlarge address of the cluster to enlarge
@@ -122,8 +114,8 @@ private:
      *  @param  enlargeListName name of the list containing the cluster to enlarge
      *  @param  deleteListName name of the list containing the cluster to delete
      */
-    StatusCode MergeAndDeleteClusters(const Cluster *const pClusterToEnlarge, const Cluster *const pClusterToDelete, const std::string &enlargeListName,
-        const std::string &deleteListName);
+    StatusCode MergeAndDeleteClusters(const Cluster *const pClusterToEnlarge, const Cluster *const pClusterToDelete,
+        const std::string &enlargeListName, const std::string &deleteListName);
 
     /**
      *  @brief  Add an association between a cluster and a track

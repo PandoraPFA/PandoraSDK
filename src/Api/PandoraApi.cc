@@ -12,7 +12,7 @@
 template <typename PARAMETERS>
 pandora::StatusCode PandoraApi::ObjectCreationHelper<PARAMETERS>::Create(const pandora::Pandora &pandora, const Parameters &parameters)
 {
-    return pandora.GetPandoraApiImpl()->CreateObject(parameters);
+    return pandora.GetPandoraApiImpl()->Create(parameters);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

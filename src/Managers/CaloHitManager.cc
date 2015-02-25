@@ -38,7 +38,7 @@ CaloHitManager::~CaloHitManager()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename PARAMETERS>
-StatusCode CaloHitManager::CreateCaloHit(const PARAMETERS &parameters, const CaloHit *&pCaloHit)
+StatusCode CaloHitManager::Create(const PARAMETERS &parameters, const CaloHit *&pCaloHit)
 {
     pCaloHit = NULL;
 
@@ -515,7 +515,7 @@ StatusCode CaloHitManager::Update(CaloHitList *const pCaloHitList, const CaloHit
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template StatusCode CaloHitManager::CreateCaloHit<PandoraApi::RectangularCaloHit::Parameters>(const PandoraApi::RectangularCaloHit::Parameters &, const CaloHit *&);
-template StatusCode CaloHitManager::CreateCaloHit<PandoraApi::PointingCaloHit::Parameters>(const PandoraApi::PointingCaloHit::Parameters &, const CaloHit *&);
+template StatusCode CaloHitManager::Create<PandoraApi::RectangularCaloHit::Parameters>(const PandoraApi::RectangularCaloHit::Parameters &, const CaloHit *&);
+template StatusCode CaloHitManager::Create<PandoraApi::PointingCaloHit::Parameters>(const PandoraApi::PointingCaloHit::Parameters &, const CaloHit *&);
 
 } // namespace pandora

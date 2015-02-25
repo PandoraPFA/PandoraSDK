@@ -95,26 +95,12 @@ protected:
     virtual StatusCode TemporarilyReplaceCurrentList(const std::string &listName);
 
     /**
-     *  @brief  Delete an object from the current list
-     * 
-     *  @param  pCluster address of the object to delete
-     */
-    virtual StatusCode DeleteObject(const T *const pT);
-
-    /**
      *  @brief  Delete an object from a specified list
      * 
      *  @param  pCluster address of the object to delete
      *  @param  listName the name of the list containing the object
      */
     virtual StatusCode DeleteObject(const T *const pT, const std::string &listName);
-
-    /**
-     *  @brief  Delete a list of objects from the current list
-     * 
-     *  @param  objectList the list of objects to delete
-     */
-    virtual StatusCode DeleteObjects(const ObjectList &objectList);
 
     /**
      *  @brief  Delete a list of objects from a specified list

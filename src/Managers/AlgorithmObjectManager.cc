@@ -160,14 +160,6 @@ StatusCode AlgorithmObjectManager<T>::TemporarilyReplaceCurrentList(const std::s
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<typename T>
-StatusCode AlgorithmObjectManager<T>::DeleteObject(const T *const pT)
-{
-    return this->DeleteObject(pT, Manager<T>::m_currentListName);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template<typename T>
 StatusCode AlgorithmObjectManager<T>::DeleteObject(const T *const pT, const std::string &listName)
 {
     typename Manager<T>::NameToListMap::iterator listIter = Manager<T>::m_nameToListMap.find(listName);
@@ -184,14 +176,6 @@ StatusCode AlgorithmObjectManager<T>::DeleteObject(const T *const pT, const std:
     listIter->second->erase(deletionIter);
 
     return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template<typename T>
-StatusCode AlgorithmObjectManager<T>::DeleteObjects(const ObjectList &objectList)
-{
-    return this->DeleteObjects(objectList, Manager<T>::m_currentListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
