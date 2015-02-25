@@ -350,7 +350,7 @@ KDTreeCube fill_and_bound_3d_kd_tree(const std::unordered_set<const T*> &points,
 
 template<typename T>
 KDTreeCube fill_and_bound_3d_kd_tree(const pandora::Algorithm *const caller, const std::unordered_set<const T*> &points,
-    std::vector<KDTreeNodeInfoT<const T*, 3> > &nodes, bool passthru = false)
+    std::vector<KDTreeNodeInfoT<const T*, 3> > &nodes, bool passthru)
 {
     std::array<float,3> minpos{ {0.f, 0.f, 0.f} }, maxpos{ {0.f, 0.f, 0.f} };
 
