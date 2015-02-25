@@ -28,7 +28,7 @@ VertexManager::~VertexManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode VertexManager::CreateVertex(const PandoraContentApi::Vertex::Parameters &parameters, const Vertex *&pVertex)
+StatusCode VertexManager::Create(const PandoraContentApi::Vertex::Parameters &parameters, const Vertex *&pVertex)
 {
     pVertex = NULL;
 

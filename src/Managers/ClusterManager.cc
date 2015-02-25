@@ -26,7 +26,7 @@ ClusterManager::~ClusterManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ClusterManager::CreateCluster(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster)
+StatusCode ClusterManager::Create(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster)
 {
     pCluster = NULL;
 
@@ -126,13 +126,6 @@ StatusCode ClusterManager::AddIsolatedToCluster(const Cluster *const pCluster, c
 StatusCode ClusterManager::RemoveIsolatedFromCluster(const Cluster *const pCluster, const CaloHit *const pCaloHit)
 {
     return this->Modifiable(pCluster)->RemoveIsolatedCaloHit(pCaloHit);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode ClusterManager::MergeAndDeleteClusters(const Cluster *const pClusterToEnlarge, const Cluster *const pClusterToDelete)
-{
-    return this->MergeAndDeleteClusters(pClusterToEnlarge, pClusterToDelete, m_currentListName, m_currentListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

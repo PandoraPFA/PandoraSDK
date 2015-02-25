@@ -42,7 +42,7 @@ private:
      *  @param  parameters the track parameters
      *  @param  pTrack to receive the address of the track
      */
-    StatusCode CreateTrack(const PandoraApi::Track::Parameters &parameters, const Track *&pTrack);
+    StatusCode Create(const PandoraApi::Track::Parameters &parameters, const Track *&pTrack);
 
     /**
      *  @brief  Is a track, or a list of tracks, available to add to a particle flow object

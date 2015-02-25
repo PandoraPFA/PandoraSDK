@@ -42,7 +42,7 @@ private:
      *  @param  parameters the vertex parameters
      *  @param  pVertex to receive the address of the vertex created
      */
-    StatusCode CreateVertex(const PandoraContentApi::Vertex::Parameters &parameters, const Vertex *&pVertex);
+    StatusCode Create(const PandoraContentApi::Vertex::Parameters &parameters, const Vertex *&pVertex);
 
     /**
      *  @brief  Is a vertex, or a list of vertices, available to add to a particle flow object
