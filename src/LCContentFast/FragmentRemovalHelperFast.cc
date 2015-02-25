@@ -10,6 +10,8 @@
 
 #include "LCContentFast/FragmentRemovalHelperFast.h"
 
+#include <stdexcept>
+
 using namespace pandora;
 
 namespace lc_content_fast
@@ -433,13 +435,13 @@ void ClusterContact::HitDistanceComparison(const Cluster *const pDaughterCluster
         for (CaloHitList::const_iterator hitIterI = iterI->second->begin(), hitIterIEnd = iterI->second->end(); hitIterI != hitIterIEnd; ++hitIterI)
         {   
             bool isCloseHit1(false), isCloseHit2(false);
-            const CartesianVector &positionVectorI((*hitIterI)->GetPositionVector());
+            const CartesianVector &positionVectorI((*hitIterI)->GetPositionVector());	    
 
             // find the NN in the parent cluster and test
 	    float parent_distance = std::numeric_limits<float>::max();
 	    HitKDNode daughter_point(*hitIterI,positionVectorI.GetX(),positionVectorI.GetY(),positionVectorI.GetZ());
-	    HitKDNode* theresult = nullptr;
-	    hit_tree->findNearestNeighbour(daughter_point,theresult,parent_distance);	    
+	    const HitKDNode* theresult = nullptr;
+	    hit_tree->findNearestNeighbour(daughter_point,theresult,parent_distance);	    	    
 	    if( nullptr != theresult && parent_distance != std::numeric_limits<float>::max() ) {
 	      const float dist2 = parent_distance*parent_distance;
 	      if( !isCloseHit1 && (dist2 < closeHitDistance1Squared) ) 

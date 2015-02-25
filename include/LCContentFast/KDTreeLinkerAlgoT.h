@@ -30,7 +30,7 @@ class KDTreeLinkerAlgo
 	      std::vector<KDTreeNodeInfoT<DATA,DIM> >	&resRecHitList);
 
   void findNearestNeighbour( const KDTreeNodeInfoT<DATA,DIM> &point,
-			     const KDTreeNodeInfoT<DATA,DIM> *result,
+			     const KDTreeNodeInfoT<DATA,DIM> *&result,
 			     float& distance );
 
   // This reurns true if the tree is empty
@@ -80,7 +80,7 @@ class KDTreeLinkerAlgo
  void recNearestNeighbour(unsigned depth,
 			  const KDTreeNodeT<DATA,DIM> *current,
 			  const KDTreeNodeInfoT<DATA,DIM>& point, 
-			  const KDTreeNodeT<DATA,DIM> *best_match,
+			  const KDTreeNodeT<DATA,DIM> *&best_match,
 			  float& );
 
   // Add all elements of an subtree to the closest elements. Used during the recSearch().
@@ -240,7 +240,7 @@ KDTreeLinkerAlgo<DATA,DIM>::recSearch(const KDTreeNodeT<DATA,DIM> *current,
 template < typename DATA, unsigned DIM >
 void 
 KDTreeLinkerAlgo<DATA,DIM>::findNearestNeighbour( const KDTreeNodeInfoT<DATA,DIM> &point, 
-						  const KDTreeNodeInfoT<DATA,DIM> *result,
+						  const KDTreeNodeInfoT<DATA,DIM> *&result,
 						  float& distance ) {
   if( nullptr != result || distance != std::numeric_limits<float>::max() ) {
     result = nullptr;
@@ -261,7 +261,7 @@ void
 KDTreeLinkerAlgo<DATA,DIM>::recNearestNeighbour(unsigned int depth,
 						const KDTreeNodeT<DATA,DIM> *current,
 						const KDTreeNodeInfoT<DATA,DIM> &point,
-						const KDTreeNodeT<DATA,DIM> *best_match,
+						const KDTreeNodeT<DATA,DIM> *&best_match,
 						float& best_dist) {
   const unsigned int current_dim = depth % DIM;
   if( current->left == nullptr && current->right == nullptr ) {    
