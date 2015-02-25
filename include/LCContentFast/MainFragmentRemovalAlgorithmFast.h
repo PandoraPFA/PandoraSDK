@@ -27,6 +27,7 @@ typedef std::unordered_map<const pandora::Cluster*,const pandora::Cluster*> Clus
 typedef std::unordered_map<const pandora::CaloHit*,const pandora::Cluster*> HitsToClustersMap; // note that this map is used indirected
 typedef std::unordered_map<const pandora::Cluster*,pandora::ClusterList> ClusterToNeighbourClustersMap;
 typedef std::unordered_map<const pandora::Cluster*,std::unique_ptr<HitKDTree> > ClusterToKDTreeMap;
+typedef std::unordered_map<const pandora::Cluster*, bool> IdCache;
 
 /**
  *  @brief  ChargedClusterContact class, describing the interactions and proximity between parent and daughter candidate clusters
@@ -159,13 +160,12 @@ private:
      *  @param  tree, the kd-tree of rechits so we can quickly find the NNs
      *  @param  hits_to_clusters, the map of hits back to their containing clusters (indirected as clusters are merged)
      *  @param  clus_to_clus, the indirection map
-     *  @param  neighbours_cache, the map of clusters to all neighbouring clusters
      */
     pandora::StatusCode GetChargedClusterContactMap(bool &isFirstPass, const pandora::ClusterList &affectedClusters,
 						    ChargedClusterContactMap &chargedClusterContactMap, 
 						    const ClusterToClusterMap& clusters_to_clusters,
 						    const ClusterToNeighbourClustersMap& neighbours_cache,
-						    const ClusterToKDTreeMap& cluster_to_tree) const;
+						    const IdCache& id_cache) const;
 
     /**
      *  @brief  Whether candidate parent and daughter clusters are sufficiently in contact to warrant further investigation
