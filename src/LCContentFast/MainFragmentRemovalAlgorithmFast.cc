@@ -136,10 +136,6 @@ StatusCode MainFragmentRemovalAlgorithm::Run()
     ClusterList affectedClusters;
     ChargedClusterContactMap chargedClusterContactMap;
 
-    // setup fast search utilities    
-    ClusterToClusterMap clusters_to_clusters;
-    ClusterToNeighbourClustersMap neighbours_cache;
-
     // need to so some of the searching with vectors (hash table too slow)
     HitKDTreeByIndex hits_kdtree_byindex;
     std::vector<HitKDNodeByIndex> hit_nodes_by_index;
@@ -149,8 +145,10 @@ StatusCode MainFragmentRemovalAlgorithm::Run()
     // get the *starting* cluster list 
     const ClusterList *pClusterList = nullptr;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pClusterList));
-    clusters_to_clusters.reserve(pClusterList->size());
-    neighbours_cache.reserve(pClusterList->size());
+
+    // setup fast search utilities    
+    ClusterToClusterMap clusters_to_clusters(pClusterList->size());
+    ClusterToNeighbourClustersMap neighbours_cache(pClusterList->size());
     
     for( auto clusterIter = pClusterList->begin(); clusterIter != pClusterList->end(); ++clusterIter ) {
       clusters_to_clusters.emplace(*clusterIter,*clusterIter);
@@ -168,13 +166,13 @@ StatusCode MainFragmentRemovalAlgorithm::Run()
     
     // now we build the neighbours cache so that we can efficiently search in the inner loop
     // build a cache of the muon and electron id results while we do this too
-    IdCache mu_or_ele_id_cache;
+    IdCache mu_or_ele_id_cache(pClusterList->size());
     for( auto clusterIter = pClusterList->begin(); clusterIter != pClusterList->end(); ++clusterIter ) {
       const Cluster *pCluster = *clusterIter;
 	mu_or_ele_id_cache[pCluster] = (pParticleId->IsMuon(pCluster) || pParticleId->IsElectron(pCluster));
       CaloHitList hits;
       pCluster->GetOrderedCaloHitList().GetCaloHitList(hits);
-      ClusterList neighbours;
+      ClusterList neighbours(500);
       for( auto* hit : hits ) {
 	KDTreeCube hitSearchRegion = build_3d_kd_search_region(hit,
 							       m_minimalSearchRadius,
@@ -188,7 +186,7 @@ StatusCode MainFragmentRemovalAlgorithm::Run()
 	    neighbours.insert(pNeighbour);
 	  }
 	}
-      }
+      }      
       neighbours_cache.emplace(*clusterIter,std::move(neighbours));
     }
     
