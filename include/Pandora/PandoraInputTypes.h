@@ -113,6 +113,21 @@ enum VertexType
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
+ *  @brief  Vertex label enum
+ */
+enum VertexLabel
+{
+    VERTEX_INTERACTION,
+    VERTEX_START,
+    VERTEX_END,
+    VERTEX_APEX,
+    VERTEX_CORNER,
+    VERTEX_FEATURE
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
  *  @brief  Granularity enum
  */
 enum Granularity
@@ -222,6 +237,7 @@ typedef PandoraInputType<HitRegion> InputHitRegion;
 typedef PandoraInputType<MCParticleType> InputMCParticleType;
 typedef PandoraInputType<SubDetectorType> InputSubDetectorType;
 typedef PandoraInputType<VertexType> InputVertexType;
+typedef PandoraInputType<VertexLabel> InputVertexLabel;
 
 typedef PandoraInputType<CartesianVector> InputCartesianVector;
 typedef PandoraInputType<TrackState> InputTrackState;
@@ -399,6 +415,12 @@ inline bool PandoraInputType<SubDetectorType>::IsValid(const SubDetectorType &t)
 
 template <>
 inline bool PandoraInputType<VertexType>::IsValid(const VertexType &t) const
+{
+    return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
+}
+
+template <>
+inline bool PandoraInputType<VertexLabel>::IsValid(const VertexLabel &t) const
 {
     return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
 }

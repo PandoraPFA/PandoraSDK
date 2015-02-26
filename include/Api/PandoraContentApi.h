@@ -59,6 +59,16 @@ public:
     };
 
     /**
+     *  @brief  VertexMetadata class
+     */
+    class VertexMetadata
+    {
+    public:
+        pandora::InputVertexLabel       m_vertexLabel;          ///< The vertex label (interaction, start, end, etc.)
+        pandora::InputVertexType        m_vertexType;           ///< The vertex type (3d, view u, v, w, etc.)
+    };
+
+    /**
      *  @brief  Alter the metadata information stored in an object
      * 
      *  @param  algorithm the algorithm calling this function
@@ -121,16 +131,15 @@ public:
     /**
      *  @brief  Vertex creation class
      */
-    class VertexParameters
+    class VertexParameters : public VertexMetadata
     {
     public:
         pandora::InputCartesianVector   m_position;             ///< The vertex position
-        pandora::InputVertexType        m_vertexType;           ///< The vertex type
     };
 
     typedef ObjectCreationHelper<ClusterParameters, ClusterMetadata, const pandora::Cluster> Cluster;
     typedef ObjectCreationHelper<ParticleFlowObjectParameters, ParticleFlowObjectMetadata, const pandora::ParticleFlowObject> ParticleFlowObject;
-    typedef ObjectCreationHelper<VertexParameters, void, const pandora::Vertex> Vertex;
+    typedef ObjectCreationHelper<VertexParameters, VertexMetadata, const pandora::Vertex> Vertex;
     typedef ObjectCreationHelper<PandoraApi::MCParticle::Parameters, void, const pandora::MCParticle> MCParticle;
     typedef ObjectCreationHelper<PandoraApi::Track::Parameters, void, const pandora::Track> Track;
     typedef ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters, CaloHitMetadata, const pandora::CaloHit> CaloHit;

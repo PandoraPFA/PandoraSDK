@@ -15,6 +15,7 @@ namespace pandora
 
 Vertex::Vertex(const PandoraContentApi::Vertex::Parameters &parameters) :
     m_position(parameters.m_position.Get()),
+    m_vertexLabel(parameters.m_vertexLabel.Get()),
     m_vertexType(parameters.m_vertexType.Get()),
     m_isAvailable(true)
 {
@@ -24,6 +25,19 @@ Vertex::Vertex(const PandoraContentApi::Vertex::Parameters &parameters) :
 
 Vertex::~Vertex()
 {
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode Vertex::AlterMetadata(const PandoraContentApi::Vertex::Metadata &metadata)
+{
+    if (metadata.m_vertexLabel.IsInitialized())
+        m_vertexLabel = metadata.m_vertexLabel.Get();
+
+    if (metadata.m_vertexType.IsInitialized())
+        m_vertexType = metadata.m_vertexType.Get();
+
+    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

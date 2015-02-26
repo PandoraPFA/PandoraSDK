@@ -802,6 +802,7 @@ StatusCode PandoraContentApiImpl::PostRunAlgorithm(Algorithm *const pAlgorithm) 
 template StatusCode PandoraContentApiImpl::AlterMetadata(const CaloHit *const, const PandoraContentApi::CaloHit::Metadata &) const;
 template StatusCode PandoraContentApiImpl::AlterMetadata(const Cluster *const, const PandoraContentApi::Cluster::Metadata &) const;
 template StatusCode PandoraContentApiImpl::AlterMetadata(const ParticleFlowObject *const, const PandoraContentApi::ParticleFlowObject::Metadata &) const;
+template StatusCode PandoraContentApiImpl::AlterMetadata(const Vertex *const, const PandoraContentApi::Vertex::Metadata &) const;
 
 template StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::RectangularCaloHit::Parameters &, const CaloHit *&) const;
 template StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::PointingCaloHit::Parameters &, const CaloHit *&) const;
