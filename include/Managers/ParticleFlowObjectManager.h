@@ -22,7 +22,7 @@ namespace pandora
  */
 class ParticleFlowObjectManager : public AlgorithmObjectManager<ParticleFlowObject>
 {
-    public:
+public:
     /**
      *  @brief  Constructor
      * 

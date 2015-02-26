@@ -63,6 +63,13 @@ StatusCode VertexManager::Create(const PandoraContentApi::Vertex::Parameters &pa
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode VertexManager::AlterMetadata(const Vertex *const pVertex, const PandoraContentApi::Vertex::Metadata &metadata) const
+{
+    return this->Modifiable(pVertex)->AlterMetadata(metadata);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 template <>
 bool VertexManager::IsAvailable(const Vertex *const pVertex) const
 {

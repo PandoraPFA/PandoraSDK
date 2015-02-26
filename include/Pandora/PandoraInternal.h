@@ -179,6 +179,7 @@ typedef std::vector<std::string> StringVector;
 typedef std::vector<int> IntVector;
 typedef std::vector<float> FloatVector;
 typedef std::vector<CartesianVector> CartesianPointList;
+typedef std::vector<TrackState> TrackStateList;
 
 typedef const void * Uid;
 typedef std::map<Uid, const MCParticle *> UidToMCParticleMap;

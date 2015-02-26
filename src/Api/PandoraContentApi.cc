@@ -389,10 +389,11 @@ pandora::StatusCode PandoraContentApi::EndReclustering(const pandora::Algorithm 
 template pandora::StatusCode PandoraContentApi::AlterMetadata<pandora::CaloHit, PandoraContentApi::CaloHit::Metadata>(const pandora::Algorithm &, const pandora::CaloHit *, const PandoraContentApi::CaloHit::Metadata &);
 template pandora::StatusCode PandoraContentApi::AlterMetadata<pandora::Cluster, PandoraContentApi::Cluster::Metadata>(const pandora::Algorithm &, const pandora::Cluster *, const PandoraContentApi::Cluster::Metadata &);
 template pandora::StatusCode PandoraContentApi::AlterMetadata<pandora::ParticleFlowObject, PandoraContentApi::ParticleFlowObject::Metadata>(const pandora::Algorithm &, const pandora::ParticleFlowObject *, const PandoraContentApi::ParticleFlowObject::Metadata &);
+template pandora::StatusCode PandoraContentApi::AlterMetadata<pandora::Vertex, PandoraContentApi::Vertex::Metadata>(const pandora::Algorithm &, const pandora::Vertex *, const PandoraContentApi::Vertex::Metadata &);
 
 template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::Cluster::Parameters, PandoraContentApi::Cluster::Metadata, const pandora::Cluster>;
 template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::ParticleFlowObject::Parameters, PandoraContentApi::ParticleFlowObject::Metadata, const pandora::ParticleFlowObject>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::Vertex::Parameters, void, const pandora::Vertex>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::Vertex::Parameters, PandoraContentApi::Vertex::Metadata, const pandora::Vertex>;
 template class PandoraContentApi::ObjectCreationHelper<PandoraApi::MCParticle::Parameters, void, const pandora::MCParticle>;
 template class PandoraContentApi::ObjectCreationHelper<PandoraApi::Track::Parameters, void, const pandora::Track>;
 template class PandoraContentApi::ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters, PandoraContentApi::CaloHit::Metadata, const pandora::CaloHit>;
