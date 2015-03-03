@@ -438,20 +438,7 @@ bool ClusterHelper::ContainsHitType(const Cluster *const pCluster, const HitType
 
 bool ClusterHelper::ContainsHitInOuterSamplingLayer(const Cluster *const pCluster)
 {
-    const OrderedCaloHitList &orderedCaloHitList(pCluster->GetOrderedCaloHitList());
-
-    for (OrderedCaloHitList::const_reverse_iterator iter = orderedCaloHitList.rbegin(), iterEnd = orderedCaloHitList.rend(); iter != iterEnd; ++iter)
-    {
-        for (CaloHitList::const_iterator hIter = iter->second->begin(), hIterEnd = iter->second->end(); hIter != hIterEnd; ++hIter)
-        {
-            const CaloHit *const pCaloHit(*hIter);
-
-            if (pCaloHit->IsInOuterSamplingLayer())
-                return true;
-        }
-    }
-
-    return false;
+    return (0 != pCluster->GetNHitsInOuterLayer());
 }
 
 } // namespace lc_content
