@@ -150,15 +150,18 @@ StatusCode AlgorithmManager::CreateAlgorithmTool(TiXmlElement *const pXmlElement
         return STATUS_CODE_NOT_FOUND;
     }
 
-    pAlgorithmTool = iter->second->CreateAlgorithmTool();
+    AlgorithmTool *pLocalAlgorithmTool = NULL;
+    pLocalAlgorithmTool = iter->second->CreateAlgorithmTool();
 
-    if (NULL == pAlgorithmTool)
+    if (NULL == pLocalAlgorithmTool)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pAlgorithmTool->RegisterDetails(m_pPandora, iter->first));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pAlgorithmTool->ReadSettings(TiXmlHandle(pXmlElement)));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pAlgorithmTool->Initialize());
-    m_algorithmToolList.push_back(pAlgorithmTool);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->RegisterDetails(m_pPandora, iter->first));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->ReadSettings(TiXmlHandle(pXmlElement)));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->Initialize());
+    m_algorithmToolList.push_back(pLocalAlgorithmTool);
+
+    pAlgorithmTool = pLocalAlgorithmTool;
 
     return STATUS_CODE_SUCCESS;
 }
