@@ -237,6 +237,13 @@ KDTreeTesseract build_4d_kd_search_region(const pandora::CartesianVector &pos, c
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<unsigned DIM>
+inline KDTreeBoxT<DIM>::KDTreeBoxT()
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template<unsigned DIM>
 template<typename... Ts>
 inline KDTreeBoxT<DIM>::KDTreeBoxT(Ts... dimargs)
 {
@@ -251,17 +258,11 @@ inline KDTreeBoxT<DIM>::KDTreeBoxT(Ts... dimargs)
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-
-template<unsigned DIM>
-inline KDTreeBoxT<DIM>::KDTreeBoxT()
-{
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<typename DATA, unsigned DIM>
-inline KDTreeNodeInfoT<DATA, DIM>::KDTreeNodeInfoT()
+inline KDTreeNodeInfoT<DATA, DIM>::KDTreeNodeInfoT() :
+    data()
 {
 }
 
@@ -269,7 +270,7 @@ inline KDTreeNodeInfoT<DATA, DIM>::KDTreeNodeInfoT()
 
 template<typename DATA, unsigned DIM>
 template<typename... Ts>
-inline KDTreeNodeInfoT<DATA, DIM>::KDTreeNodeInfoT(const DATA& d,Ts... dimargs) : 
+inline KDTreeNodeInfoT<DATA, DIM>::KDTreeNodeInfoT(const DATA &d, Ts... dimargs) : 
     data(d),
     dims{ {dimargs...} }
 {
@@ -280,15 +281,15 @@ inline KDTreeNodeInfoT<DATA, DIM>::KDTreeNodeInfoT(const DATA& d,Ts... dimargs) 
 
 template <typename DATA, unsigned DIM>
 inline KDTreeNodeT<DATA, DIM>::KDTreeNodeT() :
-    left(0),
-    right(0)
+    left(nullptr),
+    right(nullptr)
 {
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename DATA, unsigned DIM>
-inline void KDTreeNodeT<DATA, DIM>::setAttributs(const KDTreeBoxT<DIM> &regionBox, const KDTreeNodeInfoT<DATA, DIM> &infoToStore) 
+inline void KDTreeNodeT<DATA, DIM>::setAttributs(const KDTreeBoxT<DIM> &regionBox, const KDTreeNodeInfoT<DATA, DIM> &infoToStore)
 {
     info = infoToStore;
     region = regionBox;
