@@ -52,7 +52,8 @@ ConeClusteringAlgorithm::ConeClusteringAlgorithm() :
     m_fitSuccessChi2Cut1(5.0f),
     m_fitSuccessDotProductCut2(0.50f),
     m_fitSuccessChi2Cut2(2.5f),
-    m_mipTrackChi2Cut(2.5f)
+    m_mipTrackChi2Cut(2.5f),
+    m_firstLayer(1)
 {
 }
 

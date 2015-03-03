@@ -160,10 +160,12 @@ private:
 
 template <typename DATA, unsigned DIM>
 inline KDTreeLinkerAlgo<DATA, DIM>::KDTreeLinkerAlgo() :
-    root_(0),
-    nodePool_(0),
+    root_(nullptr),
+    nodePool_(nullptr),
     nodePoolSize_(-1),
-    nodePoolPos_(-1)
+    nodePoolPos_(-1),
+    closestNeighbour(nullptr),
+    initialEltList(nullptr)
 {
 }
 
@@ -190,7 +192,7 @@ inline void KDTreeLinkerAlgo<DATA, DIM>::build(std::vector<KDTreeNodeInfoT<DATA,
 
         // Here we build the KDTree
         root_ = this->recBuild(0, mysize, 0, region);
-        initialEltList = 0;
+        initialEltList = nullptr;
     }
 }
 
@@ -247,7 +249,7 @@ inline void KDTreeLinkerAlgo<DATA, DIM>::search(const KDTreeBoxT<DIM> &trackBox,
     {
         closestNeighbour = &recHits;
         this->recSearch(root_, trackBox);
-        closestNeighbour = 0;
+        closestNeighbour = nullptr;
     }
 }
 
@@ -261,7 +263,7 @@ inline void KDTreeLinkerAlgo<DATA, DIM>::recSearch(const KDTreeNodeT<DATA, DIM> 
     // By Construction, a node can't have just 1 son.
     //assert (!(((current->left == 0) && (current->right != 0)) || ((current->left != 0) && (current->right == 0))));
 
-    if ((current->left == 0) && (current->right == 0)) 
+    if ((current->left == nullptr) && (current->right == nullptr))
     {
         // Leaf case
         // If point inside the rectangle/area
@@ -297,7 +299,7 @@ inline void KDTreeLinkerAlgo<DATA, DIM>::recSearch(const KDTreeNodeT<DATA, DIM> 
         }
         else if (hasIntersection)
         {
-            this->recSearch(current->left, trackBox); 
+            this->recSearch(current->left, trackBox);
         }
 
         //if region( v->right ) is fully contained in the rectangle
@@ -418,7 +420,7 @@ inline void KDTreeLinkerAlgo<DATA, DIM>::addSubtree(const KDTreeNodeT<DATA, DIM>
     // By construction, current can't be null
     //assert(current != 0);
 
-    if ((current->left == 0) && (current->right == 0))
+    if ((current->left == nullptr) && (current->right == nullptr))
     {
         // Leaf case
         closestNeighbour->push_back(current->info);
@@ -441,7 +443,7 @@ inline float KDTreeLinkerAlgo<DATA, DIM>::dist2(const KDTreeNodeInfoT<DATA, DIM>
     for (unsigned i = 0 ; i < DIM; ++i)
     {
         const double diff = a.dims[i] - b.dims[i];
-        d += diff*diff;
+        d += diff * diff;
     }
 
     return (float)d;
@@ -453,8 +455,8 @@ template <typename DATA, unsigned DIM>
 inline void KDTreeLinkerAlgo<DATA, DIM>::clearTree()
 {
     delete[] nodePool_;
-    nodePool_ = 0;
-    root_ = 0;
+    nodePool_ = nullptr;
+    root_ = nullptr;
     nodePoolSize_ = -1;
     nodePoolPos_ = -1;
 }
@@ -464,7 +466,7 @@ inline void KDTreeLinkerAlgo<DATA, DIM>::clearTree()
 template <typename DATA, unsigned DIM>
 inline bool KDTreeLinkerAlgo<DATA, DIM>::empty()
 {
-    return nodePoolPos_ == -1;
+    return (nodePoolPos_ == -1);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -472,7 +474,7 @@ inline bool KDTreeLinkerAlgo<DATA, DIM>::empty()
 template <typename DATA, unsigned DIM>
 inline int KDTreeLinkerAlgo<DATA, DIM>::size()
 {
-    return nodePoolPos_ + 1;
+    return (nodePoolPos_ + 1);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
