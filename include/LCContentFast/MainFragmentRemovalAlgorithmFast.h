@@ -10,28 +10,36 @@
 
 #include "Pandora/Algorithm.h"
 
-#include "LCHelpers/FragmentRemovalHelper.h"
+#include "LCContentFast/FragmentRemovalHelperFast.h"
+#include "LCContentFast/KDTreeLinkerAlgoT.h"
 
 #include <unordered_map>
 
 namespace lc_content_fast
 {
 
-template<typename, unsigned int> class KDTreeLinkerAlgo;
-template<typename, unsigned int> class KDTreeNodeInfoT;
+typedef KDTreeLinkerAlgo<const pandora::CaloHit*, 3> HitKDTree;
+typedef KDTreeNodeInfoT<const pandora::CaloHit*, 3> HitKDNode;
+typedef KDTreeLinkerAlgo<unsigned,3> HitKDTreeByIndex;
+typedef KDTreeNodeInfoT<unsigned,3> HitKDNodeByIndex;
+typedef std::unordered_map<const pandora::Cluster*, const pandora::Cluster*> ClusterToClusterMap; // maps the beginning cluster list to the final
+typedef std::unordered_map<const pandora::CaloHit*, const pandora::Cluster*> HitsToClustersMap; // note that this map is used indirected
+typedef std::unordered_map<const pandora::Cluster*, pandora::ClusterList> ClusterToNeighbourClustersMap;
+typedef std::unordered_map<const pandora::Cluster*, std::unique_ptr<HitKDTree> > ClusterToKDTreeMap;
+typedef std::unordered_map<const pandora::Cluster*, bool> IdCache;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
  *  @brief  ChargedClusterContact class, describing the interactions and proximity between parent and daughter candidate clusters
  */
-class ChargedClusterContact : public lc_content::ClusterContact
+class ChargedClusterContact : public ClusterContact
 {
 public:
     /**
      *  @brief  Parameters class
      */
-  class Parameters : public lc_content::ClusterContact::Parameters
+    class Parameters : public ClusterContact::Parameters
     {
     public:
         float           m_coneCosineHalfAngle2;         ///< Cosine half angle for second cone comparison in cluster contact object
@@ -54,6 +62,18 @@ public:
      */
     ChargedClusterContact(const pandora::Pandora &pandora, const pandora::Cluster *const pDaughterCluster,
         const pandora::Cluster *const pParentCluster, const Parameters &parameters);
+
+    /**
+     *  @brief  Constructor
+     * 
+     *  @param  pandora the associated pandora instance
+     *  @param  pDaughterCluster address of the daughter candidate cluster
+     *  @param  pParentCluster address of the parent candidate cluster
+     *  @param  parameters the cluster contact parameters
+     *  @param  hit_tree
+     */
+    ChargedClusterContact(const pandora::Pandora &pandora, const pandora::Cluster *const pDaughterCluster,
+        const pandora::Cluster *const pParentCluster, const Parameters &parameters, const std::unique_ptr<HitKDTree> &hit_tree);
 
     /**
      *  @brief  Get the sum of energies of tracks associated with parent cluster
@@ -136,12 +156,6 @@ public:
     MainFragmentRemovalAlgorithm();
 
 private:
-    typedef KDTreeLinkerAlgo<const pandora::CaloHit*, 3> HitKDTree;
-    typedef KDTreeNodeInfoT<const pandora::CaloHit*, 3> HitKDNode;
-    typedef std::unordered_map<const pandora::Cluster*, const pandora::Cluster*> ClusterToClusterMap; // maps the beginning cluster list to the final
-    typedef std::unordered_map<const pandora::CaloHit*, const pandora::Cluster*> HitsToClustersMap; // note that this map is used indirected
-    typedef std::unordered_map<const pandora::Cluster*, pandora::ClusterList> ClusterToNeighbourClustersMap;
-
     pandora::StatusCode Run();
 
     /**
@@ -150,15 +164,14 @@ private:
      * 
      *  @param  isFirstPass whether this is the first call to GetChargedClusterContactMap
      *  @param  affectedClusters list of those clusters affected by previous cluster merging, for which contact details must be updated
-     *  @param  chargedClusterContactMap to receive the populated cluster contact map
      *  @param  tree, the kd-tree of rechits so we can quickly find the NNs
      *  @param  hits_to_clusters, the map of hits back to their containing clusters (indirected as clusters are merged)
      *  @param  clus_to_clus, the indirection map
-     *  @param  neighbours_cache, the map of clusters to all neighbouring clusters
+     *  @param  chargedClusterContactMap to receive the populated cluster contact map
      */
     pandora::StatusCode GetChargedClusterContactMap(bool &isFirstPass, const pandora::ClusterList &affectedClusters,
-        ChargedClusterContactMap &chargedClusterContactMap, const ClusterToClusterMap& clusters_to_clusters,
-        const ClusterToNeighbourClustersMap &neighbours_cache) const;
+        const ClusterToClusterMap &clusters_to_clusters, const ClusterToNeighbourClustersMap &neighbours_cache, const IdCache &id_cache,
+        ChargedClusterContactMap &chargedClusterContactMap) const;
 
     /**
      *  @brief  Whether candidate parent and daughter clusters are sufficiently in contact to warrant further investigation
@@ -176,8 +189,8 @@ private:
      *  @param  pBestParentCluster to receive the address of the best parent cluster candidate
      *  @param  pBestDaughterCluster to receive the address of the best daughter cluster candidate
      */
-    pandora::StatusCode GetClusterMergingCandidates(const ChargedClusterContactMap &chargedClusterContactMap, const pandora::Cluster *&pBestParentCluster,
-        const pandora::Cluster *&pBestDaughterCluster);
+    pandora::StatusCode GetClusterMergingCandidates(const ChargedClusterContactMap &chargedClusterContactMap,
+        const pandora::Cluster *&pBestParentCluster, const pandora::Cluster *&pBestDaughterCluster);
 
     /**
      *  @brief  Whether the candidate parent and daughter clusters pass quick preselection for fragment removal merging
