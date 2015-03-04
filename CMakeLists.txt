@@ -15,24 +15,14 @@ SET( PandoraSDK_VERSION_MINOR 17 )
 SET( PandoraSDK_VERSION_PATCH 0 )
 
 
-### DEPENDENCIES ############################################################
+### CMAKE ###################################################################
+
 FIND_PACKAGE( ILCUTIL COMPONENTS ILCSOFT_CMAKE_MODULES QUIET )
 
 IF( ILCUTIL_FOUND )
     INCLUDE( ilcsoft_default_settings )
 ELSE()
     INCLUDE( Default_settings )
-ENDIF()
-
-
-### DOCUMENTATION ############################################################
-OPTION( INSTALL_DOC "Set to OFF to skip build/install Documentation" OFF )
-
-IF( INSTALL_DOC AND EXISTS "${PROJECT_SOURCE_DIR}/doc/CMakeLists.txt" )
-    ADD_SUBDIRECTORY( ./doc )
-ELSE()
-    MESSAGE( STATUS "INSTALL_DOC set to OFF" )
-    SET( INSTALL_DOC OFF )
 ENDIF()
 
 
@@ -68,10 +58,25 @@ endif()
 ADD_DEFINITIONS( "-Wno-long-long -Wno-sign-compare -fno-strict-aliasing" )
 
 
+### DOCUMENTATION ###########################################################
+
+OPTION( INSTALL_DOC "Set to OFF to skip build/install Documentation" OFF )
+
+IF( INSTALL_DOC AND EXISTS "${PROJECT_SOURCE_DIR}/doc/CMakeLists.txt" )
+    ADD_SUBDIRECTORY( ./doc )
+ELSE()
+    MESSAGE( STATUS "INSTALL_DOC set to OFF" )
+    SET( INSTALL_DOC OFF )
+ENDIF()
+
+
 ### LIBRARY #################################################################
 
 # add library
 ADD_SHARED_LIBRARY( PandoraSDK ${SDK_SRCS} )
+
+
+### INSTALL #################################################################
 
 # install library
 INSTALL_SHARED_LIBRARY( PandoraSDK DESTINATION lib )
