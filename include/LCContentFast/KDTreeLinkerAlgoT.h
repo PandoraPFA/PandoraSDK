@@ -56,7 +56,7 @@ public:
      *  @param  result
      *  @param  distance
      */
-    void findNearestNeighbour(const KDTreeNodeInfoT<DATA, DIM> &point, const KDTreeNodeInfoT<DATA, DIM> *result, float &distance);
+    void findNearestNeighbour(const KDTreeNodeInfoT<DATA, DIM> &point, const KDTreeNodeInfoT<DATA, DIM> *&result, float &distance);
 
     /**
      *  @brief  Whether the tree is empty
@@ -328,7 +328,7 @@ inline void KDTreeLinkerAlgo<DATA, DIM>::recSearch(const KDTreeNodeT<DATA, DIM> 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename DATA, unsigned DIM>
-inline void KDTreeLinkerAlgo<DATA, DIM>::findNearestNeighbour(const KDTreeNodeInfoT<DATA, DIM> &point, const KDTreeNodeInfoT<DATA, DIM> *result,
+inline void KDTreeLinkerAlgo<DATA, DIM>::findNearestNeighbour(const KDTreeNodeInfoT<DATA, DIM> &point, const KDTreeNodeInfoT<DATA, DIM> *&result,
     float &distance)
 {
     if (nullptr != result || distance != std::numeric_limits<float>::max())
