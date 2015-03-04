@@ -109,23 +109,29 @@ StatusCode AlgorithmManager::CreateAlgorithm(TiXmlElement *const pXmlElement, st
         return STATUS_CODE_NOT_FOUND;
     }
 
-    Algorithm *pAlgorithm = NULL;
-    pAlgorithm = iter->second->CreateAlgorithm();
+    Algorithm *const pLocalAlgorithm = iter->second->CreateAlgorithm();
 
-    if (NULL == pAlgorithm)
-        return STATUS_CODE_FAILURE;
+    try
+    {
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithm->RegisterDetails(m_pPandora, iter->first));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithm->ReadSettings(TiXmlHandle(pXmlElement)));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithm->Initialize());
+        algorithmName = TypeToString(pLocalAlgorithm);
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pAlgorithm->RegisterDetails(m_pPandora, iter->first));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pAlgorithm->ReadSettings(TiXmlHandle(pXmlElement)));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pAlgorithm->Initialize());
+        if (!m_algorithmMap.insert(AlgorithmMap::value_type(algorithmName, pLocalAlgorithm)).second)
+            throw StatusCodeException(STATUS_CODE_FAILURE);
 
-    algorithmName = TypeToString(pAlgorithm);
-
-    if (!m_algorithmMap.insert(AlgorithmMap::value_type(algorithmName, pAlgorithm)).second)
-        return STATUS_CODE_FAILURE;
-
-    if (!instanceLabel.empty() && !m_specificAlgorithmInstanceMap.insert(SpecificAlgorithmInstanceMap::value_type(instanceLabel, algorithmName)).second)
-        return STATUS_CODE_FAILURE;
+        if (!instanceLabel.empty() && !m_specificAlgorithmInstanceMap.insert(SpecificAlgorithmInstanceMap::value_type(instanceLabel, algorithmName)).second)
+        {
+            m_algorithmMap.erase(algorithmName);
+            throw StatusCodeException(STATUS_CODE_FAILURE);
+        }
+    }
+    catch (StatusCodeException &statusCodeException)
+    {
+        delete pLocalAlgorithm;
+        throw statusCodeException;
+    }
 
     return STATUS_CODE_SUCCESS;
 }
@@ -150,18 +156,22 @@ StatusCode AlgorithmManager::CreateAlgorithmTool(TiXmlElement *const pXmlElement
         return STATUS_CODE_NOT_FOUND;
     }
 
-    AlgorithmTool *pLocalAlgorithmTool = NULL;
-    pLocalAlgorithmTool = iter->second->CreateAlgorithmTool();
+    AlgorithmTool *const pLocalAlgorithmTool = iter->second->CreateAlgorithmTool();
 
-    if (NULL == pLocalAlgorithmTool)
-        return STATUS_CODE_FAILURE;
+    try
+    {
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->RegisterDetails(m_pPandora, iter->first));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->ReadSettings(TiXmlHandle(pXmlElement)));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->Initialize());
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->RegisterDetails(m_pPandora, iter->first));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->ReadSettings(TiXmlHandle(pXmlElement)));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->Initialize());
-    m_algorithmToolList.push_back(pLocalAlgorithmTool);
-
-    pAlgorithmTool = pLocalAlgorithmTool;
+        m_algorithmToolList.push_back(pLocalAlgorithmTool);
+        pAlgorithmTool = pLocalAlgorithmTool;
+    }
+    catch (StatusCodeException &statusCodeException)
+    {
+        delete pLocalAlgorithmTool;
+        throw statusCodeException;
+    }
 
     return STATUS_CODE_SUCCESS;
 }
