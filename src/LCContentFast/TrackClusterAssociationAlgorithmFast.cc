@@ -66,14 +66,13 @@ StatusCode TrackClusterAssociationAlgorithm::Run()
 
     HitKDTree hits_kdtree;
     std::vector<HitKDNode> hit_nodes;
-    CaloHitList hit_list;
+    CaloHitList hit_list, clusterHits;
     TracksToHitsInPseudoLayerMap tracks_to_hits;
-    HitsToClustersMap hits_to_clusters;
+    HitsToClustersMap hits_to_clusters;    
 
     // build the kd-tree of hits from the input clusters and save the map of hits to clusters
     for (const Cluster *const pCluster : *pClusterList)
     {
-        CaloHitList clusterHits;
         pCluster->GetOrderedCaloHitList().GetCaloHitList(clusterHits);
 
         for (const CaloHit *const pCaloHit : clusterHits)
@@ -81,12 +80,17 @@ StatusCode TrackClusterAssociationAlgorithm::Run()
             hit_list.insert(pCaloHit);
             hits_to_clusters.emplace(pCaloHit, pCluster);
         }
+        clusterHits.clear();
     }
 
     KDTreeTesseract hitsBoundingRegion = fill_and_bound_4d_kd_tree(this, hit_list, hit_nodes, true);
     hit_list.clear();
     hits_kdtree.build(hit_nodes,hitsBoundingRegion);
     hit_nodes.clear();
+
+    // move result caches out of the loop
+    ClusterList nearby_clusters;
+    std::vector<HitKDNode> found_hits;
 
     // Look to make new associations
     for (const Track *const pTrack : trackVector)
@@ -111,7 +115,6 @@ StatusCode TrackClusterAssociationAlgorithm::Run()
         float minLowEnergyDifference(std::numeric_limits<float>::max());
 
         // short circuit this loop with a kd-tree search beforehand
-        ClusterList nearby_clusters;
         // iterating over a std::map is expensive, avoid where possible
         for (unsigned iPseudoLayer = 0; iPseudoLayer <= m_maxSearchLayer; ++iPseudoLayer)
         {
@@ -131,7 +134,6 @@ StatusCode TrackClusterAssociationAlgorithm::Run()
             {
                 // do search and cache result
                 KDTreeTesseract searchRegionHits = build_4d_kd_search_region(trackPosition, m_parallelDistanceCut, m_parallelDistanceCut, m_parallelDistanceCut, iPseudoLayer);
-                std::vector<HitKDNode> found_hits;
                 hits_kdtree.search(searchRegionHits, found_hits);
 
                 for (const auto &hit : found_hits)
@@ -145,6 +147,7 @@ StatusCode TrackClusterAssociationAlgorithm::Run()
                         nearby_clusters.insert(assc_cluster->second);
                     }
                 }
+                found_hits.clear();
             }
         }
 
@@ -182,6 +185,7 @@ StatusCode TrackClusterAssociationAlgorithm::Run()
                 }
             }
         }
+        nearby_clusters.clear();
 
         // Apply a final track-cluster association distance cut
         const Cluster *pMatchedCluster = nullptr;
