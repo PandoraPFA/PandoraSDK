@@ -81,7 +81,7 @@ private:
      */
     pandora::StatusCode SeedClustersWithTracks(const pandora::TrackList *const pTrackList, pandora::ClusterVector &clusterVector);
 
-    typedef std::map<const pandora::Cluster*, const pandora::ClusterFitResult> ClusterFitResultMap;
+    typedef std::unordered_map<const pandora::Cluster*, const pandora::ClusterFitResult> ClusterFitResultMap;
     typedef KDTreeLinkerAlgo<const pandora::CaloHit*, 4> HitKDTree;
     typedef KDTreeNodeInfoT<const pandora::CaloHit*, 4> HitKDNode;
     typedef KDTreeLinkerAlgo<const pandora::Track*, 3> TrackKDTree;
