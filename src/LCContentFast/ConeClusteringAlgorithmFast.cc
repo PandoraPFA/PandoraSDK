@@ -251,6 +251,10 @@ StatusCode ConeClusteringAlgorithm::FindHitsInPreviousLayers(unsigned int pseudo
 {
     const float maxTrackSeedSeparation = std::sqrt(m_maxTrackSeedSeparation2);
 
+    std::vector<HitKDNode> found_hits;
+    std::vector<TrackKDNode> found_tracks;
+    ClusterList nearby_clusters;
+
     for (CustomSortedCaloHitList::iterator iter = pCustomSortedCaloHitList->begin(); iter != pCustomSortedCaloHitList->end();)
     {
         const CaloHit *const pCaloHit = *iter;
@@ -275,10 +279,8 @@ StatusCode ConeClusteringAlgorithm::FindHitsInPreviousLayers(unsigned int pseudo
 
             // need to reorganize this to use a kd-tree. On rechits comprising clusters we are mutating
             // goal -> determine search distances for KD-tree from cut values and associated scalings
-            ClusterList nearby_clusters;
             // search for tracks that would satisfy the search criteria in GetGenericDistanceToHit()
             KDTreeCube searchRegionTks = build_3d_kd_search_region(pCaloHit, largestAllowedDistanceForSearch, largestAllowedDistanceForSearch, largestAllowedDistanceForSearch);
-            std::vector<TrackKDNode> found_tracks;
             m_tracksKdTree.search(searchRegionTks,found_tracks);
             for (auto &track : found_tracks )
             {
@@ -292,7 +294,6 @@ StatusCode ConeClusteringAlgorithm::FindHitsInPreviousLayers(unsigned int pseudo
 
             // now search for hits-in-clusters that would also satisfy the criteria
             KDTreeTesseract searchRegionHits = build_4d_kd_search_region(pCaloHit, largestAllowedDistanceForSearch, largestAllowedDistanceForSearch, largestAllowedDistanceForSearch, searchLayer);
-            std::vector<HitKDNode> found_hits;
             m_hitsKdTree.search(searchRegionHits,found_hits);
             for (auto &hit : found_hits)
             {
@@ -325,6 +326,7 @@ StatusCode ConeClusteringAlgorithm::FindHitsInPreviousLayers(unsigned int pseudo
                     smallestGenericDistance = genericDistance;
                 }
             }
+            nearby_clusters.clear();
 
             // Add best hit found after completing examination of a stepback layer
             if ((0 == m_clusterFormationStrategy) && (nullptr != pBestCluster))
@@ -372,6 +374,11 @@ StatusCode ConeClusteringAlgorithm::FindHitsInSameLayer(unsigned int pseudoLayer
     //tactical cache hits -> hits
     std::unordered_multimap<const CaloHit*, const CaloHit*> hitsToHitsLocal;
 
+    //pull out result caches to help keep memory locality
+    std::vector<TrackKDNode> found_tracks;
+    std::vector<HitKDNode> found_hits;
+    ClusterList nearby_clusters;
+
     while (!available_hits_in_layer.empty())
     {
         bool clustersModified = true;
@@ -396,7 +403,6 @@ StatusCode ConeClusteringAlgorithm::FindHitsInSameLayer(unsigned int pseudoLayer
                 float bestClusterEnergy(0.f);
                 float smallestGenericDistance(m_genericDistanceCut);
 
-                ClusterList nearby_clusters;
                 // search for tracks that would satisfy the search criteria in GetGenericDistanceToHit()
                 auto track_assc_cache = hitsToTracksLocal.find(pCaloHit);
                 if (track_assc_cache != hitsToTracksLocal.end())
@@ -414,7 +420,6 @@ StatusCode ConeClusteringAlgorithm::FindHitsInSameLayer(unsigned int pseudoLayer
                 else
                 {
                     KDTreeCube searchRegionTks = build_3d_kd_search_region(pCaloHit, track_search_width, track_search_width, track_search_width);
-                    std::vector<TrackKDNode> found_tracks;
                     m_tracksKdTree.search(searchRegionTks,found_tracks);
                     for (auto &track : found_tracks)
                     {
@@ -444,7 +449,6 @@ StatusCode ConeClusteringAlgorithm::FindHitsInSameLayer(unsigned int pseudoLayer
                 else
                 {
                     KDTreeTesseract searchRegionHits = build_4d_kd_search_region(pCaloHit, hit_search_width, hit_search_width, hit_search_width, pseudoLayer);
-                    std::vector<HitKDNode> found_hits;
                     m_hitsKdTree.search(searchRegionHits,found_hits);
                     for (auto &hit : found_hits)
                     {
@@ -476,6 +480,7 @@ StatusCode ConeClusteringAlgorithm::FindHitsInSameLayer(unsigned int pseudoLayer
                         smallestGenericDistance = genericDistance;
                     }
                 }
+                nearby_clusters.clear();
 
                 if (nullptr != pBestCluster)
                 {
