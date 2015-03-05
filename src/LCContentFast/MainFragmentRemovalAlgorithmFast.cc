@@ -204,6 +204,9 @@ StatusCode MainFragmentRemovalAlgorithm::Run()
         hits_in_cluster.clear();
         neighbours.clear();
     }
+    // zero out hits_in_cluster and found_hits ( neighbours is already taken care of by the std::move() )
+    hits_in_cluster = std::move(CaloHitList());
+    found_hits = std::move(std::vector<HitKDNodeByIndex>());
 
     while (shouldRecalculate)
     {
