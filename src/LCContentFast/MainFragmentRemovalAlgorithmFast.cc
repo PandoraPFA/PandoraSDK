@@ -170,20 +170,24 @@ StatusCode MainFragmentRemovalAlgorithm::Run()
     // now we build the neighbours cache so that we can efficiently search in the inner loop
     // build a cache of the muon and electron id results while we do this too
     IdCache mu_or_ele_id_cache(pClusterList->size());
+    CaloHitList hits_in_cluster(5000);
+    ClusterList neighbours;
+    std::vector<HitKDNodeByIndex> found_hits;
+    
+    found_hits.reserve(5000);
 
     for (auto clusterIter = pClusterList->begin(); clusterIter != pClusterList->end(); ++clusterIter)
     {
+        neighbours.rehash(500); 
+        
         const Cluster *const pCluster = *clusterIter;
         mu_or_ele_id_cache[pCluster] = (pParticleId->IsMuon(pCluster) || pParticleId->IsElectron(pCluster));
+        
+        pCluster->GetOrderedCaloHitList().GetCaloHitList(hits_in_cluster);
 
-        CaloHitList hits;
-        pCluster->GetOrderedCaloHitList().GetCaloHitList(hits);
-
-        ClusterList neighbours(500);
-        for (auto *hit : hits)
+        for (auto *hit : hits_in_cluster)
         {
             KDTreeCube hitSearchRegion = build_3d_kd_search_region(hit, m_minimalSearchRadius, m_minimalSearchRadius, m_minimalSearchRadius);
-            std::vector<HitKDNodeByIndex> found_hits;
             hits_kdtree_byindex.search(hitSearchRegion, found_hits);
 
             for (auto &found_hit : found_hits)
@@ -193,8 +197,12 @@ StatusCode MainFragmentRemovalAlgorithm::Run()
                 if (pCluster != pNeighbour) // make sure this is a neighbour
                     neighbours.insert(pNeighbour);
             }
+
+            found_hits.clear();
         }
         neighbours_cache.emplace(*clusterIter, std::move(neighbours));
+        hits_in_cluster.clear();
+        neighbours.clear();
     }
 
     while (shouldRecalculate)
