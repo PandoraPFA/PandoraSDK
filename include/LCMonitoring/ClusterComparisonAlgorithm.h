@@ -59,8 +59,11 @@ private:
      * 
      *  @param  clusterList1 the first cluster list
      *  @param  clusterList2 the second cluster list
+     *  @param  outputList1 to receive the subset of relevant/different clusters from the first cluster list
+     *  @param  outputList2 to receive the subset of relevant/different clusters from the second cluster list
      */
-    void CompareClusters(const pandora::ClusterList &clusterList1, const pandora::ClusterList &clusterList2) const;
+    void CompareClusters(const pandora::ClusterList &clusterList1, const pandora::ClusterList &clusterList2, pandora::ClusterList &outputList1,
+        pandora::ClusterList &outputList2) const;
 
     typedef std::map<const pandora::Cluster*, pandora::CaloHitList> ClusterToHitListMap;
     typedef std::map<const pandora::CaloHit*, const pandora::Cluster*> HitToClusterMap;

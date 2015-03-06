@@ -10,9 +10,9 @@ PROJECT( LCContent )
 
 
 # project version
-SET( LCContent_VERSION_MAJOR 0 )
-SET( LCContent_VERSION_MINOR 17 )
-SET( LCContent_VERSION_PATCH 0 )
+SET( LCContent_VERSION_MAJOR 01 )
+SET( LCContent_VERSION_MINOR 00 )
+SET( LCContent_VERSION_PATCH 00 )
 
 
 ### CMAKE ###################################################################
@@ -65,7 +65,7 @@ ADD_DEFINITIONS( "-Wno-long-long -Wno-sign-compare -fno-strict-aliasing" )
 
 ### DEPENDENCIES ############################################################
 
-FIND_PACKAGE( PandoraSDK 0.17 REQUIRED )
+FIND_PACKAGE( PandoraSDK 01.00.00 REQUIRED )
 FOREACH( pkg PandoraSDK )
     IF( ${pkg}_FOUND )
         INCLUDE_DIRECTORIES( ${${pkg}_INCLUDE_DIRS} )
@@ -75,7 +75,7 @@ FOREACH( pkg PandoraSDK )
 ENDFOREACH()
 
 IF( PANDORA_MONITORING )
-    FIND_PACKAGE( PandoraMonitoring 0.17 REQUIRED )
+    FIND_PACKAGE( PandoraMonitoring 01.00.00 REQUIRED )
     IF( PandoraMonitoring_FOUND )
         INCLUDE_DIRECTORIES( ${PandoraMonitoring_INCLUDE_DIRS} )
         LINK_LIBRARIES( ${PandoraMonitoring_LIBRARIES} )

@@ -82,7 +82,20 @@ void ClusterComparisonAlgorithm::RunReclustering() const
         std::string reclusterListName;
         const ClusterList *pReclusterList(NULL);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::RunClusteringAlgorithm(*this, *iter, pReclusterList, reclusterListName));
-        this->CompareClusters(originalClusterList, *pReclusterList);
+
+        ClusterList outputOriginalClusters, outputAlternativeClusters;
+        this->CompareClusters(originalClusterList, *pReclusterList, outputOriginalClusters, outputAlternativeClusters);
+        this->CompareClusters(*pReclusterList, originalClusterList, outputAlternativeClusters, outputOriginalClusters);
+
+        // Debug event display showing relevant clusters
+        if (!outputOriginalClusters.empty() || !outputAlternativeClusters.empty())
+        {
+            std::cout << "nRelevant original clusters: " << outputOriginalClusters.size() << ", nRelevant alternative clusters: " << outputAlternativeClusters.size() << std::endl;
+            PANDORA_MONITORING_API(SetEveDisplayParameters(this->GetPandora()));
+            PANDORA_MONITORING_API(VisualizeClusters(this->GetPandora(), &outputOriginalClusters, "Original Clusters", BLUE));
+            PANDORA_MONITORING_API(VisualizeClusters(this->GetPandora(), &outputAlternativeClusters, "Alternative Clusters", RED));
+            PANDORA_MONITORING_API(ViewEvent(this->GetPandora()));
+        }
     }
 
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::EndReclustering(*this, newListNameForOriginalClusters));
@@ -90,14 +103,13 @@ void ClusterComparisonAlgorithm::RunReclustering() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void ClusterComparisonAlgorithm::CompareClusters(const ClusterList &clusterList1, const ClusterList &clusterList2) const
+void ClusterComparisonAlgorithm::CompareClusters(const ClusterList &clusterList1, const ClusterList &clusterList2, ClusterList &outputList1,
+    ClusterList &outputList2) const
 {
     ClusterToHitListMap clusterToHitListMap1, clusterToHitListMap2;
     HitToClusterMap hitToClusterMap1, hitToClusterMap2;
     this->PopulateMaps(clusterList1, clusterToHitListMap1, hitToClusterMap1);
     this->PopulateMaps(clusterList2, clusterToHitListMap2, hitToClusterMap2);
-
-    ClusterList outputList1, outputList2;
 
     for (ClusterToHitListMap::const_iterator iter = clusterToHitListMap1.begin(), iterEnd = clusterToHitListMap1.end(); iter != iterEnd; ++iter)
     {
@@ -131,16 +143,6 @@ void ClusterComparisonAlgorithm::CompareClusters(const ClusterList &clusterList1
             outputList1.insert(pCluster1);
             outputList2.insert(linkedClusterList2.begin(), linkedClusterList2.end());
         }
-    }
-
-    // Debug event display showing relevant clusters
-    if (!outputList1.empty() || !outputList2.empty())
-    {
-        std::cout << "nRelevant clusters in list 1: " << outputList1.size() << ", nRelevant clusters in list 2: " << outputList2.size() << std::endl;
-        PANDORA_MONITORING_API(SetEveDisplayParameters(this->GetPandora()));
-        PANDORA_MONITORING_API(VisualizeClusters(this->GetPandora(), &outputList1, "Original Clusters", BLUE));
-        PANDORA_MONITORING_API(VisualizeClusters(this->GetPandora(), &outputList2, "Alternative Clusters", RED));
-        PANDORA_MONITORING_API(ViewEvent(this->GetPandora()));
     }
 }
 

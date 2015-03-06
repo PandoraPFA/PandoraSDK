@@ -1,4 +1,17 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
+TAG v01-00-00
+--------------------------------------------------------------------------------------------------------------------------------------------
+Milestone v01 release.
+Update to reflect recent changes to PandoraSDK.
+Improved const-correctness. Algorithms are now only exposed to pointers to const managed-objects. Access to managed-object non-const functionality is now only via Pandora APIs.
+Support c++11 (and 98/03, with reduced functionality).
+Added LCContentFast, containing faster versions of algorithms in the LCContent library, using e.g. KD-trees and relying on c++11.
+Added KD-tree and QuickUnion implementations.
+Added ClusterComparison algorithm.
+Address issues highlighted by coverity.
+Makefile and CMakeLists overhaul.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
 TAG v00-17
 --------------------------------------------------------------------------------------------------------------------------------------------
 Rename FineGranularityContent to LCContent.
