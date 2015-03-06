@@ -1,4 +1,19 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
+TAG v01-00-00
+--------------------------------------------------------------------------------------------------------------------------------------------
+Milestone v01 release.
+Improved managed-object container efficiency if c++11 is available.
+Improved const-correctness. Algorithms are now only exposed to pointers to const managed-objects. Access to managed-object non-const functionality is now only via Pandora APIs.
+New managed-object metadata functionality, allowing for flexible modification of information associated with managed-objects.
+Overhaul of rules governing addition of objects to particle flow objects.
+Added VertexLabel property to Vertex class.
+Efficiency improvement keeping track of number of hits in cluster in calorimeter outer sampling layers.
+Efficiency improvement for calculation of cluster layer centroids.
+Reset current calo hit list at end of cluster fragmentation.
+Address issues highlighted by Coverity.
+Makefile and CMakeLists overhaul.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
 TAG v00-17
 --------------------------------------------------------------------------------------------------------------------------------------------
 Overhaul, with emphasis on ensuring that client applications can instantiate and use multiple concurrent pandora instances.

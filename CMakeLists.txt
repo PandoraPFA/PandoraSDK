@@ -10,9 +10,9 @@ PROJECT( PandoraSDK )
 
 
 # project version
-SET( PandoraSDK_VERSION_MAJOR 0 )
-SET( PandoraSDK_VERSION_MINOR 17 )
-SET( PandoraSDK_VERSION_PATCH 0 )
+SET( PandoraSDK_VERSION_MAJOR 01 )
+SET( PandoraSDK_VERSION_MINOR 00 )
+SET( PandoraSDK_VERSION_PATCH 00 )
 
 
 ### CMAKE ###################################################################
