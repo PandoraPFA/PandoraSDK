@@ -208,13 +208,16 @@ void Histogram::Fill(const float valueX, const float weight)
 {
     const int binX(std::max(-1, std::min(m_nBinsX, static_cast<int>((valueX - m_xLow) / m_xBinWidth)) ));
 
-    if (m_histogramMap.count(binX) > 0)
+    HistogramMap::iterator iter = m_histogramMap.find(binX);
+
+    if (m_histogramMap.end() != iter)
     {
-        m_histogramMap[binX] += weight;
+        iter->second += weight;
     }
     else
     {
-        m_histogramMap[binX] = weight;
+        if (!m_histogramMap.insert(HistogramMap::value_type(binX, weight)).second)
+            throw StatusCodeException(STATUS_CODE_FAILURE);
     }
 }
 
@@ -600,14 +603,16 @@ void TwoDHistogram::Fill(const float valueX, const float valueY, const float wei
     const int binY(std::max(-1, std::min(m_nBinsY, static_cast<int>((valueY - m_yLow) / m_yBinWidth)) ));
 
     HistogramMap &yHistogramMap(m_xyHistogramMap[binX]);
+    HistogramMap::iterator iter = yHistogramMap.find(binY);
 
-    if (yHistogramMap.count(binY) > 0)
+    if (yHistogramMap.end() != iter)
     {
-        yHistogramMap[binY] += weight;
+        iter->second += weight;
     }
     else
     {
-        yHistogramMap[binY] = weight;
+        if (!yHistogramMap.insert(HistogramMap::value_type(binY, weight)).second)
+            throw StatusCodeException(STATUS_CODE_FAILURE);
     }
 
     m_yxHistogramMap[binY][binX] = yHistogramMap[binY];
