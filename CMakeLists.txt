@@ -46,32 +46,33 @@ AUX_SOURCE_DIRECTORY( ./src/LCTopologicalAssociation LCContent_SRCS )
 AUX_SOURCE_DIRECTORY( ./src/LCTrackClusterAssociation LCContent_SRCS )
 AUX_SOURCE_DIRECTORY( ./src/LCUtility LCContent_SRCS )
 
-# require proper C++
-ADD_DEFINITIONS( "-Wall -ansi -pedantic" )
-
-# need long long for int64 for now
-ADD_DEFINITIONS( "-Wno-long-long -Wno-sign-compare -fno-strict-aliasing" )
-
 INCLUDE( CheckCXXCompilerFlag )
+
+UNSET( COMPILER_SUPPORTS_CXX11 CACHE )
+CHECK_CXX_COMPILER_FLAG( "-std=c++11" COMPILER_SUPPORTS_CXX11 )
+IF( COMPILER_SUPPORTS_CXX11 )
+    AUX_SOURCE_DIRECTORY( ./src/LCContentFast LCContent_SRCS )
+ELSE()
+    MESSAGE( STATUS "The compiler ${CMAKE_CXX_COMPILER} does not support c++11 - will build with reduced functionality" )
+ENDIF()
+
 IF( NOT CMAKE_CXX_FLAGS )
     SET( CMAKE_CXX_FLAGS "-std=c++11" )
     SET( PROCEED_WITHOUT_CXX_FLAGS ON )
 ENDIF()
-UNSET( COMPILER_SUPPORTS_FLAGS CACHE )
-CHECK_CXX_COMPILER_FLAG( ${CMAKE_CXX_FLAGS} COMPILER_SUPPORTS_FLAGS )
-IF( COMPILER_SUPPORTS_FLAGS )
-    MESSAGE( STATUS "The compiler ${CMAKE_CXX_COMPILER} supports user-provided flags ${CMAKE_CXX_FLAGS}" )
-    AUX_SOURCE_DIRECTORY( ./src/LCContentFast LCContent_SRCS )
-    ADD_DEFINITIONS( ${CMAKE_CXX_FLAGS} )
-ELSE()
-    MESSAGE( STATUS "The compiler ${CMAKE_CXX_COMPILER} does not support user-provided flags ${CMAKE_CXX_FLAGS}" )
-    IF( PROCEED_WITHOUT_CXX_FLAGS )
-        MESSAGE( STATUS "Proceed without user-provided flags ${CMAKE_CXX_FLAGS} (limited functionality)" )
-        UNSET( CMAKE_CXX_FLAGS )
-    ELSE()
+
+UNSET( COMPILER_SUPPORTS_CXX_FLAGS CACHE )
+CHECK_CXX_COMPILER_FLAG( ${CMAKE_CXX_FLAGS} COMPILER_SUPPORTS_CXX_FLAGS )
+IF( NOT COMPILER_SUPPORTS_CXX_FLAGS )
+    MESSAGE( STATUS "The compiler ${CMAKE_CXX_COMPILER} does not support cxx flags ${CMAKE_CXX_FLAGS}" )
+    IF( NOT PROCEED_WITHOUT_CXX_FLAGS )
         MESSAGE( FATAL_ERROR "CMake abort." )
     ENDIF()
+    MESSAGE( STATUS "Proceed without cxx flags ${CMAKE_CXX_FLAGS}" )
+    UNSET( CMAKE_CXX_FLAGS )
 ENDIF()
+
+SET( CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -ansi -pedantic -Wno-long-long -Wno-sign-compare -Wshadow -fno-strict-aliasing ${CMAKE_CXX_FLAGS}" )
 
 
 ### DEPENDENCIES ############################################################
