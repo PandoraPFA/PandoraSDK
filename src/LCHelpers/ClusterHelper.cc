@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraSDK/src/LCHelpers/ClusterHelper.cc
+ *  @file   LCContent/src/LCHelpers/ClusterHelper.cc
  * 
  *  @brief  Implementation of the cluster helper class.
  * 

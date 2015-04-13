@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraSDK/src/LCHelpers/SortingHelper.cc
+ *  @file   LCContent/src/LCHelpers/SortingHelper.cc
  * 
  *  @brief  Implementation of the sorting helper class.
  * 

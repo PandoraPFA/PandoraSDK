@@ -121,8 +121,11 @@ private:
     void NormalizeHistogram(pandora::Histogram *const pHistogram) const;
 
     std::string             m_photonClusteringAlgName;      ///< The name of the photon clustering algorithm to run
+    std::string             m_fragmentMergingAlgName;       ///< The name of the photon fragment merging algorithm to run
+
     std::string             m_clusterListName;              ///< The name of the output cluster list 
     bool                    m_replaceCurrentClusterList;    ///< Whether to subsequently use the new cluster list as the "current" list
+    bool                    m_shouldDeleteNonPhotonClusters;///< Whether to delete clusters that are not reconstructed photons
 
     std::string             m_histogramFile;                ///< The name of the file containing (or to contain) pdf histograms
     bool                    m_shouldMakePdfHistograms;      ///< Whether to create pdf histograms, rather than perform photon reconstruction
