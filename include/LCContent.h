@@ -18,11 +18,13 @@
 #include "LCClustering/ConeClusteringAlgorithm.h"
 #include "LCClustering/ForcedClusteringAlgorithm.h"
 
+#include "LCFragmentRemoval/BeamHaloMuonRemovalAlgorithm.h"
 #include "LCFragmentRemoval/MainFragmentRemovalAlgorithm.h"
 #include "LCFragmentRemoval/MergeSplitPhotonsAlgorithm.h"
 #include "LCFragmentRemoval/NeutralFragmentRemovalAlgorithm.h"
+#include "LCFragmentRemoval/PhotonFragmentMergingAlgorithm.h"
 #include "LCFragmentRemoval/PhotonFragmentRemovalAlgorithm.h"
-#include "LCFragmentRemoval/BeamHaloMuonRemovalAlgorithm.h"
+#include "LCFragmentRemoval/RecoPhotonFragmentMergingAlgorithm.h"
 
 #include "LCMonitoring/ClusterComparisonAlgorithm.h"
 #include "LCMonitoring/DumpPfosMonitoringAlgorithm.h"
@@ -97,11 +99,13 @@ public:
         d("ClusteringParent",                       lc_content::ClusteringParentAlgorithm::Factory)                             \
         d("ConeClustering",                         lc_content::ConeClusteringAlgorithm::Factory)                               \
         d("ForcedClustering",                       lc_content::ForcedClusteringAlgorithm::Factory)                             \
+        d("BeamHaloMuonRemoval",                    lc_content::BeamHaloMuonRemovalAlgorithm::Factory)                          \
         d("MainFragmentRemoval",                    lc_content::MainFragmentRemovalAlgorithm::Factory)                          \
         d("MergeSplitPhotons",                      lc_content::MergeSplitPhotonsAlgorithm::Factory)                            \
         d("NeutralFragmentRemoval",                 lc_content::NeutralFragmentRemovalAlgorithm::Factory)                       \
+        d("PhotonFragmentMerging",                  lc_content::PhotonFragmentMergingAlgorithm::Factory)                        \
         d("PhotonFragmentRemoval",                  lc_content::PhotonFragmentRemovalAlgorithm::Factory)                        \
-        d("BeamHaloMuonRemoval",                    lc_content::BeamHaloMuonRemovalAlgorithm::Factory)                          \
+        d("RecoPhotonFragmentMerging",              lc_content::RecoPhotonFragmentMergingAlgorithm::Factory)                    \
         d("ClusterComparison",                      lc_content::ClusterComparisonAlgorithm::Factory)                            \
         d("DumpPfosMonitoring",                     lc_content::DumpPfosMonitoringAlgorithm::Factory)                           \
         d("EfficiencyMonitoring",                   lc_content::EfficiencyMonitoringAlgorithm::Factory)                         \

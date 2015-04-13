@@ -223,6 +223,26 @@ public:
      */
     static pandora::StatusCode GetClusterContactDetails(const pandora::Cluster *const pClusterI, const pandora::Cluster *const pClusterJ,
         const float distanceThreshold, unsigned int &nContactLayers, float &contactFraction);
+
+    /**
+     *  @brief  Get the electromagnetic energy-weighted mean common layer separation for a pair of provided clusters
+     *          Note: energy-weighting uses only energies from cluster j
+     * 
+     *  @param  pClusterI address of first cluster
+     *  @param  pClusterJ address of second cluster
+     * 
+     *  @return the energy-weighted mean common layer separation
+     */
+    static float GetEMEnergyWeightedLayerSeparation(const pandora::Cluster *const pClusterI, const pandora::Cluster *const pClusterJ);
+
+    /**
+     *  @brief  Get the electromagnetic energy-weighted mean cluster position for a provided cluster
+     * 
+     *  @param  pCluster address of the cluster
+     * 
+     *  @return the electromagnetic energy-weighted mean cluster position
+     */
+    static pandora::CartesianVector GetEMEnergyWeightedPosition(const pandora::Cluster *const pCluster);
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

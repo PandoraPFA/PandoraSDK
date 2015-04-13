@@ -20,6 +20,7 @@ namespace lc_content
 
 PhotonReconstructionAlgorithm::PhotonReconstructionAlgorithm() :
     m_replaceCurrentClusterList(false),
+    m_shouldDeleteNonPhotonClusters(true),
     m_shouldMakePdfHistograms(false),
     m_shouldDrawPdfHistograms(false),
     m_nEnergyBins(0),
@@ -206,7 +207,7 @@ StatusCode PhotonReconstructionAlgorithm::Run()
                         metadata.m_particleId = PHOTON;
                         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pRelevantCluster, metadata));
                     }
-                    else
+                    else if (m_shouldDeleteNonPhotonClusters)
                     {
                         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Delete(*this, pPeakCluster));
                     }
@@ -223,11 +224,15 @@ StatusCode PhotonReconstructionAlgorithm::Run()
         }
 
         // Delete clusters from which no components have been used
-        if (!usedCluster)
+        if (!usedCluster && m_shouldDeleteNonPhotonClusters)
         {
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Delete(*this, pCluster));
         }
     }
+
+    // Run the daughter fragment merging algorithm, if provided
+    if (!m_fragmentMergingAlgName.empty())
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::RunDaughterAlgorithm(*this, m_fragmentMergingAlgName));
 
     const std::string replacementListName(m_replaceCurrentClusterList ? m_clusterListName : inputClusterListName);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<Cluster>(*this, replacementListName));
@@ -472,11 +477,17 @@ StatusCode PhotonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHand
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ProcessAlgorithm(*this, xmlHandle,
         "PhotonClusterFormation", m_photonClusteringAlgName));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
-        "ReplaceCurrentClusterList", m_replaceCurrentClusterList));
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ProcessAlgorithm(*this, xmlHandle,
+        "PhotonFragmentMerging", m_fragmentMergingAlgName));
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "ClusterListName", m_clusterListName));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        "ReplaceCurrentClusterList", m_replaceCurrentClusterList));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "ShouldDeleteNonPhotonClusters", m_shouldDeleteNonPhotonClusters));
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
         "HistogramFile", m_histogramFile));

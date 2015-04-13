@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraSDK/src/LCHelpers/FragmentRemovalHelper.cc
+ *  @file   LCContent/src/LCHelpers/FragmentRemovalHelper.cc
  * 
  *  @brief  Implementation of the fragment removal helper class.
  * 
@@ -305,6 +305,90 @@ StatusCode FragmentRemovalHelper::GetClusterContactDetails(const Cluster *const 
     }
 
     return STATUS_CODE_NOT_FOUND;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+float FragmentRemovalHelper::GetEMEnergyWeightedLayerSeparation(const Cluster *const pClusterI, const Cluster *const pClusterJ)
+{
+    const unsigned int startPseudoLayer(std::max(pClusterJ->GetInnerPseudoLayer(), pClusterI->GetInnerPseudoLayer()));
+    const unsigned int endPseudoLayer(std::min(pClusterJ->GetOuterPseudoLayer(), pClusterI->GetOuterPseudoLayer()));
+
+    const OrderedCaloHitList &orderedCaloHitListI(pClusterI->GetOrderedCaloHitList());
+    const OrderedCaloHitList &orderedCaloHitListJ(pClusterJ->GetOrderedCaloHitList());
+
+    float energySum(0.f), weightedDistance(0.f);
+
+    for (unsigned int pseudoLayer = startPseudoLayer; pseudoLayer <= endPseudoLayer; ++pseudoLayer)
+    {
+        bool isDistanceFound(false);
+        float clusterJLayerEnergy(0.f), closestDistanceSquared(std::numeric_limits<float>::max());
+
+        OrderedCaloHitList::const_iterator iterI = orderedCaloHitListI.find(pseudoLayer);
+        OrderedCaloHitList::const_iterator iterJ = orderedCaloHitListJ.find(pseudoLayer);
+
+        if ((orderedCaloHitListI.end() == iterI) || (orderedCaloHitListJ.end() == iterJ))
+            continue;
+
+        for (CaloHitList::const_iterator hIterJ = iterJ->second->begin(), hIterJEnd = iterJ->second->end(); hIterJ != hIterJEnd; ++hIterJ)
+        {
+            const CaloHit *const pCaloHitJ(*hIterJ);
+            const CartesianVector &positionJ(pCaloHitJ->GetPositionVector());
+
+            for (CaloHitList::const_iterator hIterI = iterI->second->begin(), hIterIEnd = iterI->second->end(); hIterI != hIterIEnd; ++hIterI)
+            {
+                const CaloHit *const pCaloHitI(*hIterI);
+                const CartesianVector &positionI(pCaloHitI->GetPositionVector());
+
+                const float distanceSquared((positionI - positionJ).GetMagnitudeSquared()); 
+
+                if (distanceSquared < closestDistanceSquared)
+                {
+                    isDistanceFound = true;
+                    closestDistanceSquared = distanceSquared;
+                }
+            }
+
+            clusterJLayerEnergy += pCaloHitJ->GetElectromagneticEnergy();
+        }
+
+        if (!isDistanceFound)
+            continue;
+
+        // TODO Consider whether to use both clusters I and J for energy weighting per-layer
+        energySum += clusterJLayerEnergy;
+        weightedDistance += std::sqrt(closestDistanceSquared) * clusterJLayerEnergy;
+    }
+
+    if (energySum < std::numeric_limits<float>::epsilon())
+        throw StatusCodeException(STATUS_CODE_NOT_FOUND);
+
+    return (weightedDistance / energySum);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+CartesianVector FragmentRemovalHelper::GetEMEnergyWeightedPosition(const Cluster *const pCluster)
+{
+    float energySum(0.f);
+    CartesianVector weightedPosition(0.f, 0.f, 0.f);
+
+    const OrderedCaloHitList &orderedCaloHitList(pCluster->GetOrderedCaloHitList());
+
+    for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
+    {
+        for (CaloHitList::const_iterator hIter = iter->second->begin(), hIterEnd = iter->second->end(); hIter != hIterEnd; ++hIter)
+        {
+            const CaloHit *const pCaloHit(*hIter);
+            energySum += pCaloHit->GetElectromagneticEnergy();
+            weightedPosition += pCaloHit->GetPositionVector() * pCaloHit->GetElectromagneticEnergy();
+        }
+    }
+
+    if (energySum < std::numeric_limits<float>::epsilon())
+        throw StatusCodeException(STATUS_CODE_NOT_FOUND);
+
+    return (weightedPosition * (1.f / energySum));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

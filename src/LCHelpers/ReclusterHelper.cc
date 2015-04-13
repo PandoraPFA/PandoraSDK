@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraSDK/src/LCHelpers/ReclusterHelper.cc
+ *  @file   LCContent/src/LCHelpers/ReclusterHelper.cc
  * 
  *  @brief  Implementation of the recluster helper class.
  * 
