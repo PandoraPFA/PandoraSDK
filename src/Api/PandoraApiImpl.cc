@@ -42,14 +42,7 @@ StatusCode PandoraApiImpl::Create(const PandoraApi::Track::Parameters &parameter
 }
 
 template <>
-StatusCode PandoraApiImpl::Create(const PandoraApi::RectangularCaloHit::Parameters &parameters) const
-{
-    const CaloHit *pCaloHit(NULL);
-    return m_pPandora->m_pCaloHitManager->Create(parameters, pCaloHit);
-}
-
-template <>
-StatusCode PandoraApiImpl::Create(const PandoraApi::PointingCaloHit::Parameters &parameters) const
+StatusCode PandoraApiImpl::Create(const PandoraApi::CaloHit::Parameters &parameters) const
 {
     const CaloHit *pCaloHit(NULL);
     return m_pPandora->m_pCaloHitManager->Create(parameters, pCaloHit);

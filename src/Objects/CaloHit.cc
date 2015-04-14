@@ -14,10 +14,13 @@
 namespace pandora
 {
 
-CaloHit::CaloHit(const PandoraApi::CaloHitBaseParameters &parameters) :
+CaloHit::CaloHit(const PandoraApi::CaloHit::Parameters &parameters) :
     m_positionVector(parameters.m_positionVector.Get()),
     m_expectedDirection(parameters.m_expectedDirection.Get().GetUnitVector()),
     m_cellNormalVector(parameters.m_cellNormalVector.Get().GetUnitVector()),
+    m_cellGeometry(parameters.m_cellGeometry.Get()),
+    m_cellSize0(parameters.m_cellSize0.Get()),
+    m_cellSize1(parameters.m_cellSize1.Get()),
     m_cellThickness(parameters.m_cellThickness.Get()),
     m_nCellRadiationLengths(parameters.m_nCellRadiationLengths.Get()),
     m_nCellInteractionLengths(parameters.m_nCellInteractionLengths.Get()),
@@ -31,13 +34,14 @@ CaloHit::CaloHit(const PandoraApi::CaloHitBaseParameters &parameters) :
     m_hitRegion(parameters.m_hitRegion.Get()),
     m_layer(parameters.m_layer.Get()),
     m_isInOuterSamplingLayer(parameters.m_isInOuterSamplingLayer.Get()),
+    m_cellLengthScale(0.f),
     m_isPossibleMip(false),
     m_isIsolated(false),
     m_isAvailable(true),
     m_weight(1.f),
-    m_cellGeometry(UNKNOWN_CELL_GEOMETRY),
     m_pParentAddress(parameters.m_pParentAddress.Get())
 {
+    m_cellLengthScale = this->CalculateCellLengthScale();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -46,6 +50,9 @@ CaloHit::CaloHit(const CaloHit *const pCaloHit, const float weight) :
     m_positionVector(pCaloHit->m_positionVector),
     m_expectedDirection(pCaloHit->m_expectedDirection),
     m_cellNormalVector(pCaloHit->m_cellNormalVector),
+    m_cellGeometry(pCaloHit->m_cellGeometry),
+    m_cellSize0(pCaloHit->m_cellSize0),
+    m_cellSize1(pCaloHit->m_cellSize1),
     m_cellThickness(pCaloHit->m_cellThickness),
     m_nCellRadiationLengths(pCaloHit->m_nCellRadiationLengths),
     m_nCellInteractionLengths(pCaloHit->m_nCellInteractionLengths),
@@ -60,11 +67,11 @@ CaloHit::CaloHit(const CaloHit *const pCaloHit, const float weight) :
     m_layer(pCaloHit->m_layer),
     m_pseudoLayer(pCaloHit->m_pseudoLayer),
     m_isInOuterSamplingLayer(pCaloHit->m_isInOuterSamplingLayer),
+    m_cellLengthScale(pCaloHit->m_cellLengthScale),
     m_isPossibleMip(pCaloHit->m_isPossibleMip),
     m_isIsolated(pCaloHit->m_isIsolated),
     m_isAvailable(pCaloHit->m_isAvailable),
     m_weight(weight * pCaloHit->m_weight),
-    m_cellGeometry(pCaloHit->m_cellGeometry),
     m_mcParticleWeightMap(pCaloHit->m_mcParticleWeightMap),
     m_pParentAddress(pCaloHit->m_pParentAddress)
 {
@@ -116,30 +123,51 @@ void CaloHit::RemoveMCParticles()
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
 
-RectangularCaloHit::RectangularCaloHit(const PandoraApi::RectangularCaloHit::Parameters &parameters) :
-    CaloHit(parameters),
-    m_cellSizeU(parameters.m_cellSizeU.Get()),
-    m_cellSizeV(parameters.m_cellSizeV.Get()),
-    m_cellLengthScale(std::sqrt(m_cellSizeU * m_cellSizeV))
+float CaloHit::CalculateCellLengthScale() const
 {
-     m_cellGeometry = RECTANGULAR;
+    if (RECTANGULAR == this->GetCellGeometry())
+    {
+        return std::sqrt(this->GetCellSize0() * this->GetCellSize1());
+    }
+    else if (POINTING == this->GetCellGeometry())
+    {
+        float radius(0.f), phi(0.f), theta(0.f);
+        this->GetPositionVector().GetSphericalCoordinates(radius, phi, theta);
+        const float centralEta(-1.f * std::log(std::tan(theta / 2.f)));
+
+        const float etaMin(centralEta - this->GetCellSize0() / 2.f), etaMax(centralEta + this->GetCellSize0() / 2.f);
+        const float thetaMin(2.f * std::atan(std::exp(-1.f * etaMin))), thetaMax(2.f * std::atan(std::exp(-1.f * etaMax)));
+
+        return std::sqrt(std::fabs(radius * this->GetCellSize1() * radius * (thetaMax - thetaMin)));
+    }
+    else
+    {
+        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-RectangularCaloHit::RectangularCaloHit(const RectangularCaloHit *const pCaloHit, const float weight) :
-    CaloHit(pCaloHit, weight),
-    m_cellSizeU(pCaloHit->GetCellSizeU()),
-    m_cellSizeV(pCaloHit->GetCellSizeV()),
-    m_cellLengthScale(pCaloHit->GetCellLengthScale())
+void CaloHit::GetCellCorners(CartesianPointList &cartesianPointList) const
 {
+    if (RECTANGULAR == this->GetCellGeometry())
+    {
+        this->GetRectangularCellCorners(cartesianPointList);
+    }
+    else if (POINTING == this->GetCellGeometry())
+    {
+        this->GetPointingCellCorners(cartesianPointList);
+    }
+    else
+    {
+        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void RectangularCaloHit::GetCellCorners(CartesianPointList &cartesianPointList) const
+void CaloHit::GetRectangularCellCorners(CartesianPointList &cartesianPointList) const
 {
     const CartesianVector &position(this->GetPositionVector());
 
@@ -147,9 +175,9 @@ void RectangularCaloHit::GetCellCorners(CartesianPointList &cartesianPointList) 
     CartesianVector dirU((BARREL == this->GetHitRegion()) ? CartesianVector(0.f, 0.f, 1.f) : CartesianVector(0.f, 1.f, 0.f) );
     CartesianVector dirV(normal.GetCrossProduct(dirU));
 
-    dirU *= (this->GetCellSizeU() / 2.);
-    dirV *= (this->GetCellSizeV() / 2.);
-    normal *= (this->GetCellThickness() / 2.);
+    dirU *= (this->GetCellSize0() / 2.f);
+    dirV *= (this->GetCellSize1() / 2.f);
+    normal *= (this->GetCellThickness() / 2.f);
 
     cartesianPointList.push_back(CartesianVector(position - dirU - dirV - normal));
     cartesianPointList.push_back(CartesianVector(position + dirU - dirV - normal));
@@ -163,53 +191,17 @@ void RectangularCaloHit::GetCellCorners(CartesianPointList &cartesianPointList) 
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
 
-PointingCaloHit::PointingCaloHit(const PandoraApi::PointingCaloHit::Parameters &parameters) :
-    CaloHit(parameters),
-    m_cellSizeEta(parameters.m_cellSizeEta.Get()),
-    m_cellSizePhi(parameters.m_cellSizePhi.Get()),
-    m_cellLengthScale(this->CalculateCellLengthScale())
-{
-    m_cellGeometry = POINTING;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-PointingCaloHit::PointingCaloHit(const PointingCaloHit *const pCaloHit, const float weight) :
-    CaloHit(pCaloHit, weight),
-    m_cellSizeEta(pCaloHit->GetCellSizeEta()),
-    m_cellSizePhi(pCaloHit->GetCellSizePhi()),
-    m_cellLengthScale(pCaloHit->GetCellLengthScale())
-{
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-float PointingCaloHit::CalculateCellLengthScale() const
+void CaloHit::GetPointingCellCorners(CartesianPointList &cartesianPointList) const
 {
     float radius(0.f), phi(0.f), theta(0.f);
     this->GetPositionVector().GetSphericalCoordinates(radius, phi, theta);
-    const float centralEta(-1. * std::log(std::tan(theta / 2.)));
+    const float centralEta(-1.f * std::log(std::tan(theta / 2.f)));
 
-    const float etaMin(centralEta - this->GetCellSizeEta() / 2.), etaMax(centralEta + this->GetCellSizeEta() / 2.);
-    const float thetaMin(2. * std::atan(std::exp(-1. * etaMin))), thetaMax(2. * std::atan(std::exp(-1. * etaMax)));
-
-    return std::sqrt(std::fabs(radius * this->GetCellSizePhi() * radius * (thetaMax - thetaMin)));
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void PointingCaloHit::GetCellCorners(CartesianPointList &cartesianPointList) const
-{
-    float radius(0.f), phi(0.f), theta(0.f);
-    this->GetPositionVector().GetSphericalCoordinates(radius, phi, theta);
-    const float centralEta(-1. * std::log(std::tan(theta / 2.)));
-
-    const float rMin(radius - this->GetCellThickness() / 2.), rMax(radius + this->GetCellThickness() / 2.);
-    const float phiMin(phi - this->GetCellSizePhi() / 2.), phiMax(phi + this->GetCellSizePhi() / 2.);
-    const float etaMin(centralEta - this->GetCellSizeEta() / 2.), etaMax(centralEta + this->GetCellSizeEta() / 2.);
-    const float thetaMin(2. * std::atan(std::exp(-1. * etaMin))), thetaMax(2. * std::atan(std::exp(-1. * etaMax)));
+    const float rMin(radius - this->GetCellThickness() / 2.f), rMax(radius + this->GetCellThickness() / 2.f);
+    const float phiMin(phi - this->GetCellSize1() / 2.f), phiMax(phi + this->GetCellSize1() / 2.f);
+    const float etaMin(centralEta - this->GetCellSize0() / 2.f), etaMax(centralEta + this->GetCellSize0() / 2.f);
+    const float thetaMin(2.f * std::atan(std::exp(-1.f * etaMin))), thetaMax(2.f * std::atan(std::exp(-1.f * etaMax)));
 
     const float sinTheta(std::sin(theta)), cosTheta(std::cos(theta));
     const float sinThetaMin(std::sin(thetaMin)), cosThetaMin(std::cos(thetaMin)), sinPhiMin(std::sin(phiMin)), cosPhiMin(std::cos(phiMin));

@@ -396,8 +396,7 @@ template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::Partic
 template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::Vertex::Parameters, PandoraContentApi::Vertex::Metadata, const pandora::Vertex>;
 template class PandoraContentApi::ObjectCreationHelper<PandoraApi::MCParticle::Parameters, void, const pandora::MCParticle>;
 template class PandoraContentApi::ObjectCreationHelper<PandoraApi::Track::Parameters, void, const pandora::Track>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters, PandoraContentApi::CaloHit::Metadata, const pandora::CaloHit>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraApi::PointingCaloHit::Parameters, PandoraContentApi::CaloHit::Metadata, const pandora::CaloHit>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraApi::CaloHit::Parameters, PandoraContentApi::CaloHit::Metadata, const pandora::CaloHit>;
 
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::CaloHitList>(const pandora::Algorithm &, const pandora::CaloHitList *&);
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::TrackList>(const pandora::Algorithm &, const pandora::TrackList *&);

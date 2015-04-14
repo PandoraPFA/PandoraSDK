@@ -21,18 +21,6 @@ template<typename T> class InputObjectManager;
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
- *  @brief  The calo cell type enum
- */
-enum CellGeometry
-{
-    RECTANGULAR,
-    POINTING,
-    UNKNOWN_CELL_GEOMETRY
-};
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-/**
  *  @brief  CaloHit class
  */
 class CaloHit
@@ -58,6 +46,27 @@ public:
      *  @return the normal vector
      */
     const CartesianVector &GetCellNormalVector() const;
+
+    /**
+     *  @brief  Get the cell geometry
+     * 
+     *  @return the cell geometry
+     */
+    CellGeometry GetCellGeometry() const;
+
+    /**
+     *  @brief  Get the cell size 0 [pointing: eta, rectangular: up in ENDCAP, along beam in BARREL, units mm]
+     * 
+     *  @return the cell size 0
+     */
+    float GetCellSize0() const;
+
+    /**
+     *  @brief  Get the cell size 1 [pointing: phi, rectangular: perpendicular to size 0 and thickness, units mm]
+     * 
+     *  @return the cell size 1
+     */
+    float GetCellSize1() const;
 
     /**
      *  @brief  Get the thickness of cell, units mm
@@ -158,6 +167,13 @@ public:
     float GetHadronicEnergy() const;
 
     /**
+     *  @brief  Get the typical length scale of cell, units mm
+     * 
+     *  @return the typical length scale of cell
+     */
+    float GetCellLengthScale() const;
+
+    /**
      *  @brief  Whether the calo hit is flagged as a possible mip hit
      * 
      *  @return boolean
@@ -179,13 +195,6 @@ public:
     float GetWeight() const;
 
     /**
-     *  @brief  Get the cell geometry
-     * 
-     *  @return the cell geometry
-     */
-    CellGeometry GetCellGeometry() const;
-
-    /**
      *  @brief  Get mc particle weight map for the calo hit
      * 
      *  @return the mc particle weight map
@@ -198,26 +207,19 @@ public:
     const void *GetParentCaloHitAddress() const;
 
     /**
-     *  @brief  Get the typical length scale of cell, units mm
-     * 
-     *  @return the typical length scale of cell
-     */
-    virtual float GetCellLengthScale() const = 0;
-
-    /**
      *  @brief  Get the list of cartesian coordinates for the cell corners
      * 
      *  @param  cartesianPointList to receive the cartesian coordinates of the cell corners
      */
-    virtual void GetCellCorners(CartesianPointList &cartesianPointList) const = 0;
+    void GetCellCorners(CartesianPointList &cartesianPointList) const;
 
-protected:
+private:
     /**
      *  @brief  Constructor
      * 
      *  @param  parameters the calo hit parameters
      */
-    CaloHit(const PandoraApi::CaloHitBaseParameters &parameters);
+    CaloHit(const PandoraApi::CaloHit::Parameters &parameters);
 
     /**
      *  @brief  Weighted copy constructor
@@ -230,7 +232,7 @@ protected:
     /**
      *  @brief  Destructor
      */
-    virtual ~CaloHit();
+    ~CaloHit();
 
     /**
      *  @brief  Set the mc pseudo layer for the calo hit
@@ -259,6 +261,27 @@ protected:
     void RemoveMCParticles();
 
     /**
+     *  @brief  Calculate the typical length scale of the cell, units mm
+     * 
+     *  @return the typical length scale of cell
+     */
+    float CalculateCellLengthScale() const;
+
+    /**
+     *  @brief  Get the list of cartesian coordinates for rectangular cell corners
+     * 
+     *  @param  cartesianPointList to receive the cartesian coordinates of the cell corners
+     */
+    void GetRectangularCellCorners(CartesianPointList &cartesianPointList) const;
+
+    /**
+     *  @brief  Get the list of cartesian coordinates for pointing cell corners
+     * 
+     *  @param  cartesianPointList to receive the cartesian coordinates of the cell corners
+     */
+    void GetPointingCellCorners(CartesianPointList &cartesianPointList) const;
+
+    /**
      *  @brief  Whether the calo hit is available to be added to a cluster (access this function via PandoraContentAPI)
      * 
      *  @return boolean
@@ -275,6 +298,10 @@ protected:
     const CartesianVector   m_positionVector;           ///< Position vector of center of calorimeter cell, units mm
     const CartesianVector   m_expectedDirection;        ///< Unit vector in direction of expected hit propagation
     const CartesianVector   m_cellNormalVector;         ///< Unit normal to the sampling layer, pointing outwards from the origin
+
+    const CellGeometry      m_cellGeometry;             ///< The cell geometry type, pointing or rectangular
+    const float             m_cellSize0;                ///< Cell size 0 [pointing: pseudo rapidity, eta, rectangular: up in ENDCAP, along beam in BARREL, units mm]
+    const float             m_cellSize1;                ///< Cell size 1 [pointing: azimuthal angle, phi, rectangular: perpendicular to size 0 and thickness, units mm]
     const float             m_cellThickness;            ///< Thickness of cell, units mm
 
     const float             m_nCellRadiationLengths;    ///< Absorber material in front of cell, units radiation lengths
@@ -293,12 +320,11 @@ protected:
     InputUInt               m_pseudoLayer;              ///< The pseudo layer to which the calo hit has been assigned
     const bool              m_isInOuterSamplingLayer;   ///< Whether cell is in one of the outermost detector sampling layers
 
+    float                   m_cellLengthScale;          ///< Typical length scale [pointing: measured at cell mid-point, rectangular: std::sqrt(cellSize0 * cellSize1), units mm ]
     bool                    m_isPossibleMip;            ///< Whether the calo hit is a possible mip hit
     bool                    m_isIsolated;               ///< Whether the calo hit is isolated
     bool                    m_isAvailable;              ///< Whether the calo hit is available to be added to a cluster
     float                   m_weight;                   ///< The calo hit weight, which may not be unity if the hit has been fragmented
-
-    CellGeometry            m_cellGeometry;             ///< The cell geometry
 
     MCParticleWeightMap     m_mcParticleWeightMap;      ///< The mc particle weight map
     const void             *m_pParentAddress;           ///< The address of the parent calo hit in the user framework
@@ -306,111 +332,6 @@ protected:
     friend class CaloHitMetadata;
     friend class CaloHitManager;
     friend class InputObjectManager<CaloHit>;
-};
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-/**
- *  @brief  RectangularCaloHit class
- */
-class RectangularCaloHit : public CaloHit
-{
-public:
-    /**
-     *  @brief  Get the u dimension of cell (up in ENDCAP, along beam in BARREL), units mm
-     * 
-     *  @return the u dimension of cell
-     */
-    float GetCellSizeU() const;
-
-    /**
-     *  @brief  Get the v dimension of cell (perpendicular to u and thickness), units mm
-     * 
-     *  @return the v dimension of cell
-     */
-    float GetCellSizeV() const;
-
-    float GetCellLengthScale() const;
-    void GetCellCorners(CartesianPointList &cartesianPointList) const;
-
-private:
-    /**
-     *  @brief  Constructor
-     * 
-     *  @param  parameters the calo hit parameters
-     */
-    RectangularCaloHit(const PandoraApi::RectangularCaloHit::Parameters &parameters);
-
-    /**
-     *  @brief  Weighted copy constructor
-     * 
-     *  @param  pCaloHit address of the calo hit to copy
-     *  @param  weight the weight to apply to energy depositions
-     */
-    RectangularCaloHit(const RectangularCaloHit *const pCaloHit, const float weight = 1.f);
-
-    const float             m_cellSizeU;                ///< Dimension of cell (up in ENDCAP, along beam in BARREL), units mm
-    const float             m_cellSizeV;                ///< Dimension of cell (perpendicular to u and thickness), units mm
-    const float             m_cellLengthScale;          ///< Typical length scale of cell, std::sqrt(CellSizeU * CellSizeV), units mm
-
-    friend class CaloHitManager;
-};
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-/**
- *  @brief  PointingCaloHit class
- */
-class PointingCaloHit : public CaloHit
-{
-public:
-    /**
-     *  @brief  Get the dimension of cell, as measured by change in pseudo rapidity, eta
-     * 
-     *  @return the eta dimension of cell
-     */
-    float GetCellSizeEta() const;
-
-    /**
-     *  @brief  Get the dimension of cell, as measured by change in azimuthal angle, phi
-     * 
-     *  @return the phi dimension of cell
-     */
-    float GetCellSizePhi() const;
-
-    float GetCellLengthScale() const;
-    void GetCellCorners(CartesianPointList &cartesianPointList) const;
-
-private:
-    /**
-     *  @brief  Constructor
-     * 
-     *  @param  parameters the calo hit parameters
-     */
-    PointingCaloHit(const PandoraApi::PointingCaloHit::Parameters &parameters);
-
-    /**
-     *  @brief  Weighted copy constructor
-     * 
-     *  @param  pCaloHit address of the calo hit to copy
-     *  @param  weight the weight to apply to energy depositions
-     */
-    PointingCaloHit(const PointingCaloHit *const pCaloHit, const float weight = 1.f);
-
-    /**
-     *  @brief  Calculate the typical length scale of cell, measured at cell mid-point, units mm
-     * 
-     *  @return the typical length scale of cell
-     */
-    float CalculateCellLengthScale() const;
-
-    const float             m_cellSizeEta;              ///< Dimension of cell, as measured by change in pseudo rapidity, eta
-    const float             m_cellSizePhi;              ///< Dimension of cell, as measured by change in azimuthal angle, phi
-    const float             m_cellLengthScale;          ///< Typical length scale of cell, measured at cell mid-point, units mm
-
-    friend class CaloHitManager;
 };
 
 /**
@@ -421,7 +342,6 @@ private:
  */
 std::ostream &operator<<(std::ostream &stream, const CaloHit &caloHit);
 
-//------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 inline const CartesianVector &CaloHit::GetPositionVector() const
@@ -441,6 +361,27 @@ inline const CartesianVector &CaloHit::GetExpectedDirection() const
 inline const CartesianVector &CaloHit::GetCellNormalVector() const
 {
     return m_cellNormalVector;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline CellGeometry CaloHit::GetCellGeometry() const
+{
+    return m_cellGeometry;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float CaloHit::GetCellSize0() const
+{
+    return m_cellSize0;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float CaloHit::GetCellSize1() const
+{
+    return m_cellSize1;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -543,6 +484,13 @@ inline float CaloHit::GetHadronicEnergy() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+inline float CaloHit::GetCellLengthScale() const
+{
+    return m_cellLengthScale;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 inline bool CaloHit::IsPossibleMip() const
 {
     return m_isPossibleMip;
@@ -560,13 +508,6 @@ inline float CaloHit::GetWeight() const
 inline bool CaloHit::IsIsolated() const
 {
     return m_isIsolated;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline CellGeometry CaloHit::GetCellGeometry() const
-{
-    return m_cellGeometry;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -595,50 +536,6 @@ inline bool CaloHit::IsAvailable() const
 inline void CaloHit::SetAvailability(bool isAvailable)
 {
     m_isAvailable = isAvailable;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float RectangularCaloHit::GetCellSizeU() const
-{
-    return m_cellSizeU;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float RectangularCaloHit::GetCellSizeV() const
-{
-    return m_cellSizeV;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float RectangularCaloHit::GetCellLengthScale() const
-{
-    return m_cellLengthScale;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float PointingCaloHit::GetCellSizeEta() const
-{
-    return m_cellSizeEta;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float PointingCaloHit::GetCellSizePhi() const
-{
-    return m_cellSizePhi;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float PointingCaloHit::GetCellLengthScale() const
-{
-    return m_cellLengthScale;
 }
 
 } // namespace pandora

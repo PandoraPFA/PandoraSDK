@@ -25,12 +25,23 @@ namespace pandora
 {
 
 /**
- *  @brief  EnergyCorrectionType enum
+ *  @brief  Energy correction type enum
  */
 enum EnergyCorrectionType
 {
     HADRONIC,
     ELECTROMAGNETIC
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ *  @brief  Cell geometry enum
+ */
+enum CellGeometry
+{
+    RECTANGULAR,
+    POINTING
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -232,6 +243,7 @@ typedef PandoraInputType<const void *> InputAddress;
 typedef PandoraInputType<bool> InputBool;
 typedef PandoraInputType<std::string> InputString;
 
+typedef PandoraInputType<CellGeometry> InputCellGeometry;
 typedef PandoraInputType<HitType> InputHitType;
 typedef PandoraInputType<HitRegion> InputHitRegion;
 typedef PandoraInputType<MCParticleType> InputMCParticleType;
@@ -387,6 +399,12 @@ template <>
 inline bool PandoraInputType<std::string>::IsValid(const std::string &t) const
 {
     return !t.empty();
+}
+
+template <>
+inline bool PandoraInputType<CellGeometry>::IsValid(const CellGeometry &t) const
+{
+    return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
 }
 
 template <>
