@@ -158,8 +158,7 @@ pandora::StatusCode PandoraApi::Reset(const pandora::Pandora &pandora)
 
 template class PandoraApi::ObjectCreationHelper<PandoraApi::MCParticle::Parameters>;
 template class PandoraApi::ObjectCreationHelper<PandoraApi::Track::Parameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::PointingCaloHit::Parameters>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::CaloHit::Parameters>;
 template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::SubDetector::Parameters>;
 template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::BoxGap::Parameters>;
 template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::ConcentricGap::Parameters>;

@@ -142,9 +142,7 @@ public:
     typedef ObjectCreationHelper<VertexParameters, VertexMetadata, const pandora::Vertex> Vertex;
     typedef ObjectCreationHelper<PandoraApi::MCParticle::Parameters, void, const pandora::MCParticle> MCParticle;
     typedef ObjectCreationHelper<PandoraApi::Track::Parameters, void, const pandora::Track> Track;
-    typedef ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters, CaloHitMetadata, const pandora::CaloHit> CaloHit;
-    typedef ObjectCreationHelper<PandoraApi::RectangularCaloHit::Parameters, CaloHitMetadata, const pandora::CaloHit> RectangularCaloHit;
-    typedef ObjectCreationHelper<PandoraApi::PointingCaloHit::Parameters, CaloHitMetadata, const pandora::CaloHit> PointingCaloHit;
+    typedef ObjectCreationHelper<PandoraApi::CaloHit::Parameters, CaloHitMetadata, const pandora::CaloHit> CaloHit;
 
 
     /* Accessors for plugins and global settings */

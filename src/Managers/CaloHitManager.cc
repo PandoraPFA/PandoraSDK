@@ -37,14 +37,13 @@ CaloHitManager::~CaloHitManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template <typename PARAMETERS>
-StatusCode CaloHitManager::Create(const PARAMETERS &parameters, const CaloHit *&pCaloHit)
+StatusCode CaloHitManager::Create(const PandoraApi::CaloHit::Parameters &parameters, const CaloHit *&pCaloHit)
 {
     pCaloHit = NULL;
 
     try
     {
-        pCaloHit = this->HitInstantiation(parameters);
+        pCaloHit = new CaloHit(parameters);
 
         if (NULL == pCaloHit)
             throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -66,20 +65,6 @@ StatusCode CaloHitManager::Create(const PARAMETERS &parameters, const CaloHit *&
         pCaloHit = NULL;
         return statusCodeException.GetStatusCode();
     }
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template <>
-CaloHit *CaloHitManager::HitInstantiation(const PandoraApi::RectangularCaloHit::Parameters &parameters)
-{
-    return new RectangularCaloHit(parameters);
-}
-
-template <>
-CaloHit *CaloHitManager::HitInstantiation(const PandoraApi::PointingCaloHit::Parameters &parameters)
-{
-    return new PointingCaloHit(parameters);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -227,26 +212,8 @@ StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit
     if (!this->CanFragmentCaloHit(pOriginalCaloHit, fraction1))
         return STATUS_CODE_NOT_ALLOWED;
 
-    if (RECTANGULAR == pOriginalCaloHit->GetCellGeometry())
-    {
-        const RectangularCaloHit *const pOriginalRectangularCaloHit = dynamic_cast<const RectangularCaloHit *>(pOriginalCaloHit);
-
-        if (NULL == pOriginalRectangularCaloHit)
-            return STATUS_CODE_FAILURE;
-
-        pDaughterCaloHit1 = new RectangularCaloHit(pOriginalRectangularCaloHit, fraction1);
-        pDaughterCaloHit2 = new RectangularCaloHit(pOriginalRectangularCaloHit, 1.f - fraction1);
-    }
-    else if (POINTING == pOriginalCaloHit->GetCellGeometry())
-    {
-        const PointingCaloHit *const pOriginalPointingCaloHit = dynamic_cast<const PointingCaloHit *>(pOriginalCaloHit);
-
-        if (NULL == pOriginalPointingCaloHit)
-            return STATUS_CODE_FAILURE;
-
-        pDaughterCaloHit1 = new PointingCaloHit(pOriginalPointingCaloHit, fraction1);
-        pDaughterCaloHit2 = new PointingCaloHit(pOriginalPointingCaloHit, 1.f - fraction1);
-    }
+    pDaughterCaloHit1 = new CaloHit(pOriginalCaloHit, fraction1);
+    pDaughterCaloHit2 = new CaloHit(pOriginalCaloHit, 1.f - fraction1);
 
     if ((NULL == pDaughterCaloHit1) || (NULL == pDaughterCaloHit2))
         return STATUS_CODE_FAILURE;
@@ -277,25 +244,7 @@ StatusCode CaloHitManager::MergeCaloHitFragments(const CaloHit *const pFragmentC
         return STATUS_CODE_NOT_ALLOWED;
 
     const float newWeight((pFragmentCaloHit1->GetWeight() + pFragmentCaloHit2->GetWeight()) / pFragmentCaloHit1->GetWeight());
-
-    if ((RECTANGULAR == pFragmentCaloHit1->GetCellGeometry()) && (RECTANGULAR == pFragmentCaloHit2->GetCellGeometry()))
-    {
-        const RectangularCaloHit *const pOriginalRectangularCaloHit = dynamic_cast<const RectangularCaloHit *>(pFragmentCaloHit1);
-
-        if (NULL == pOriginalRectangularCaloHit)
-            return STATUS_CODE_FAILURE;
-
-        pMergedCaloHit = new RectangularCaloHit(pOriginalRectangularCaloHit, newWeight);
-    }
-    else if ((POINTING == pFragmentCaloHit1->GetCellGeometry()) && (POINTING == pFragmentCaloHit2->GetCellGeometry()))
-    {
-        const PointingCaloHit *const pOriginalPointingCaloHit = dynamic_cast<const PointingCaloHit *>(pFragmentCaloHit1);
-
-        if (NULL == pOriginalPointingCaloHit)
-            return STATUS_CODE_FAILURE;
-
-        pMergedCaloHit = new PointingCaloHit(pOriginalPointingCaloHit, newWeight);
-    }
+    pMergedCaloHit = new CaloHit(pFragmentCaloHit1, newWeight);
 
     if (NULL == pMergedCaloHit)
         return STATUS_CODE_FAILURE;
@@ -512,10 +461,5 @@ StatusCode CaloHitManager::Update(CaloHitList *const pCaloHitList, const CaloHit
 
     return STATUS_CODE_SUCCESS;
 }
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template StatusCode CaloHitManager::Create<PandoraApi::RectangularCaloHit::Parameters>(const PandoraApi::RectangularCaloHit::Parameters &, const CaloHit *&);
-template StatusCode CaloHitManager::Create<PandoraApi::PointingCaloHit::Parameters>(const PandoraApi::PointingCaloHit::Parameters &, const CaloHit *&);
 
 } // namespace pandora

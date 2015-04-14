@@ -80,15 +80,18 @@ public:
     };
 
     /**
-     *  @brief  CaloHitBaseParameters class
+     *  @brief  CaloHitParameters class
      */
-    class CaloHitBaseParameters
+    class CaloHitParameters
     {
     public:
         pandora::InputCartesianVector       m_positionVector;           ///< Position vector of center of calorimeter cell, units mm
         pandora::InputCartesianVector       m_expectedDirection;        ///< Unit vector in direction of expected hit propagation
         pandora::InputCartesianVector       m_cellNormalVector;         ///< Unit normal to sampling layer, pointing outwards from the origin
-        pandora::InputFloat                 m_cellThickness;            ///< Thickness of cell, units mm
+        pandora::InputCellGeometry          m_cellGeometry;             ///< The cell geometry type, pointing or rectangular
+        pandora::InputFloat                 m_cellSize0;                ///< Cell size 0 [pointing: eta, rectangular: up in ENDCAP, along beam in BARREL, units mm]
+        pandora::InputFloat                 m_cellSize1;                ///< Cell size 1 [pointing: phi, rectangular: perpendicular to size 0 and thickness, units mm]
+        pandora::InputFloat                 m_cellThickness;            ///< Cell thickness, units mm
         pandora::InputFloat                 m_nCellRadiationLengths;    ///< Absorber material in front of cell, units radiation lengths
         pandora::InputFloat                 m_nCellInteractionLengths;  ///< Absorber material in front of cell, units interaction lengths
         pandora::InputFloat                 m_time;                     ///< Time of (earliest) energy deposition in this cell, units ns
@@ -102,26 +105,6 @@ public:
         pandora::InputUInt                  m_layer;                    ///< The subdetector readout layer number
         pandora::InputBool                  m_isInOuterSamplingLayer;   ///< Whether cell is in one of the outermost detector sampling layers
         pandora::InputAddress               m_pParentAddress;           ///< Address of the parent calo hit in the user framework
-    };
-
-    /**
-     *  @brief  RectangularCaloHitParameters class
-     */
-    class RectangularCaloHitParameters : public CaloHitBaseParameters
-    {
-    public:
-        pandora::InputFloat                 m_cellSizeU;                ///< Dimension of cell (up in ENDCAP, along beam in BARREL), units mm
-        pandora::InputFloat                 m_cellSizeV;                ///< Dimension of cell (perpendicular to u and thickness), units mm
-    };
-
-    /**
-     *  @brief  PointingCaloHitParameters class
-     */
-    class PointingCaloHitParameters : public CaloHitBaseParameters
-    {
-    public:
-        pandora::InputFloat                 m_cellSizeEta;              ///< Dimension of cell, as measured by change in pseudo rapidity, eta
-        pandora::InputFloat                 m_cellSizePhi;              ///< Dimension of cell, as measured by change in azimuthal angle, phi
     };
 
     /**
@@ -199,9 +182,7 @@ public:
 
     typedef ObjectCreationHelper<MCParticleParameters> MCParticle;
     typedef ObjectCreationHelper<TrackParameters> Track;
-    typedef ObjectCreationHelper<RectangularCaloHitParameters> CaloHit;
-    typedef ObjectCreationHelper<RectangularCaloHitParameters> RectangularCaloHit;
-    typedef ObjectCreationHelper<PointingCaloHitParameters> PointingCaloHit;
+    typedef ObjectCreationHelper<CaloHitParameters> CaloHit;
 
     /**
      *  @brief  Process an event

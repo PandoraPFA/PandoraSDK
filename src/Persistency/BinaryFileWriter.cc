@@ -203,31 +203,8 @@ StatusCode BinaryFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetLayer()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->IsInOuterSamplingLayer()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetParentCaloHitAddress()));
-
-    if (RECTANGULAR == cellGeometry)
-    {
-        const RectangularCaloHit *const pRectangularCaloHit = dynamic_cast<const RectangularCaloHit *>(pCaloHit);
-
-        if (NULL == pRectangularCaloHit)
-            return STATUS_CODE_FAILURE;
-
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pRectangularCaloHit->GetCellSizeU()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pRectangularCaloHit->GetCellSizeV()));
-    }
-    else if (POINTING == cellGeometry)
-    {
-        const PointingCaloHit *const pPointingCaloHit = dynamic_cast<const PointingCaloHit *>(pCaloHit);
-
-        if (NULL == pPointingCaloHit)
-            return STATUS_CODE_FAILURE;
-
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pPointingCaloHit->GetCellSizeEta()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pPointingCaloHit->GetCellSizePhi()));
-    }
-    else
-    {
-        return STATUS_CODE_FAILURE;
-    }
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetCellSize0()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetCellSize1()));
 
     return STATUS_CODE_SUCCESS;
 }

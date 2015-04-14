@@ -46,18 +46,7 @@ private:
      *  @param  parameters the calo hit parameters
      *  @param  pCaloHit to receive the address of the calo hit
      */
-    template <typename PARAMETERS>
-    StatusCode Create(const PARAMETERS &parameters, const CaloHit *&pCaloHit);
-
-    /**
-     *  @brief  Perform the actual calo hit instantiation
-     * 
-     *  @param  parameters the calo hit parameters
-     * 
-     *  @return address of the new calo hit
-     */
-    template <typename PARAMETERS>
-    CaloHit *HitInstantiation(const PARAMETERS &parameters);
+    StatusCode Create(const PandoraContentApi::CaloHit::Parameters &parameters, const CaloHit *&pCaloHit);
 
     /**
      *  @brief  Alter the metadata information stored in a calo hit

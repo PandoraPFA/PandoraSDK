@@ -804,8 +804,7 @@ template StatusCode PandoraContentApiImpl::AlterMetadata(const Cluster *const, c
 template StatusCode PandoraContentApiImpl::AlterMetadata(const ParticleFlowObject *const, const PandoraContentApi::ParticleFlowObject::Metadata &) const;
 template StatusCode PandoraContentApiImpl::AlterMetadata(const Vertex *const, const PandoraContentApi::Vertex::Metadata &) const;
 
-template StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::RectangularCaloHit::Parameters &, const CaloHit *&) const;
-template StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::PointingCaloHit::Parameters &, const CaloHit *&) const;
+template StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::CaloHit::Parameters &, const CaloHit *&) const;
 template StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::Track::Parameters &, const Track *&) const;
 template StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::MCParticle::Parameters &, const MCParticle *&) const;
 template StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::Vertex::Parameters &, const Vertex *&) const;
