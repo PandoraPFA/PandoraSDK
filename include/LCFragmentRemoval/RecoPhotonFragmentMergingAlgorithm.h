@@ -47,6 +47,103 @@ private:
      */
     pandora::StatusCode DeleteClusters(const pandora::ClusterVector &clusterVec, const bool nonFixedPhotonsOnly) const;
 
+    /**
+     *  @brief  A photon is a photon fragment if it looks like part of the main cluster from the 2D shower profile
+     *          and is close to the main cluster
+     * 
+     *  @param  parameters the cluster comparison parameters
+     * 
+     *  @return boolean
+     */
+    bool IsPhotonFragmentInShowerProfile(const Parameters &parameters) const;
+
+    /**
+     *  @brief  A photon is a photon fragment if it has absolute low energy and is close to the main cluster
+     * 
+     *  @param  parameters the cluster comparison parameters
+     * 
+     *  @return boolean
+     */
+    bool IsAbsoluteLowEnergyPhotonFragment(const Parameters &parameters) const;
+
+    /**
+     *  @brief  A photon is a photon fragment if it has few calo hits and is close to the main cluster
+     * 
+     *  @param  parameters the cluster comparison parameters
+     * 
+     *  @return boolean
+     */
+    bool IsSmallPhotonFragment1(const Parameters &parameters) const;
+
+    /**
+     *  @brief  A photon is a photon fragment if it has few calo hits and is close to the main cluster
+     * 
+     *  @param  parameters the cluster comparison parameters
+     * 
+     *  @return boolean
+     */
+    bool IsSmallPhotonFragment2(const Parameters &parameters) const;
+
+    /**
+     *  @brief  A high energy photon is a photon fragment if it looks like part of the main cluster from the 2D shower
+     *          profile (a triangular cut on ratio of energy of first peak to main cluster and ratio of energy of second
+     *          peak to candidate cluster) and is close to the main cluster
+     * 
+     *  @param  parameters the cluster comparison parameters
+     * 
+     *  @return boolean
+     */
+    bool IsHighEnergyPhotonFragmentInShowerProfile(const Parameters &parameters) const;
+
+    /**
+     *  @brief  A neutral hadron is a neutral hadron fragment if it looks like part of the main cluster from the 2D shower
+     *          profile and is close to the main cluster
+     * 
+     *  @param  parameters the cluster comparison parameters
+     * 
+     *  @return boolean
+     */
+    bool IsNeutralFragmentInShowerProfile(const Parameters &parameters) const;
+
+    /**
+     *  @brief  A neutral hadron is a neutral hadron fragment if it has few calo hits and is close to the main cluster
+     * 
+     *  @param  parameters the cluster comparison parameters
+     * 
+     *  @return boolean
+     */
+    bool IsSmallNeutralFragment(const Parameters &parameters) const;
+
+    /**
+     *  @brief  A neutral hadron is a neutral hadron fragment if it has relative low energy comparing to the main cluster
+     *          and is close to the main cluster
+     * 
+     *  @param  parameters the cluster comparison parameters
+     * 
+     *  @return boolean
+     */
+    bool IsRelativeLowEnergyNeutralFragment(const Parameters &parameters) const;
+
+    /**
+     *  @brief  A high energy neutral hadron is a neutral hadron fragment if it looks like part of the main cluster from
+     *          the 2D shower profile and is close to the main cluster
+     * 
+     *  @param  parameters the cluster comparison parameters
+     * 
+     *  @return boolean
+     */
+    bool IsHighEnergyNeutralFragmentInShowerProfile(const Parameters &parameters) const;
+
+    /**
+     *  @brief  A high energy neutral hadron is a fragment if it has relative low energy comparing to the main cluster and
+     *          is close to the main cluster
+     * 
+     *  @param  parameters the cluster comparison parameters
+     * 
+     *  @return boolean
+     */
+    bool IsHighEnergyRelativeLowEnergyNeutralFragment(const Parameters &parameters) const;
+
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
 
     pandora::StringVector   m_associationAlgorithms;                                    ///< Ordered list of topological association algorithms to be used

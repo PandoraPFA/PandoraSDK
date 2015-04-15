@@ -59,80 +59,17 @@ bool PhotonFragmentMergingAlgorithm::GetPhotonPhotonMergingFlag(const Parameters
 {
     if (parameters.m_energyOfCandidateCluster < m_lowEnergyOfCandidateClusterThreshold)
     {
-        if (parameters.m_energyOfCandidatePeak > 0.f &&
-            parameters.m_energyOfCandidateCluster > 0.f &&
-            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow1 &&
-            parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_energyRatioCandidatePeakToClusterPhotonThresholdLow1)
-        {
-            return true;
-        }
-
-        if (parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow2 &&
-            parameters.m_energyOfCandidateCluster < m_energyOfCandidateClusterPhotonPhotonThresholdLow2)
-        {
-            return true;
-        }
-
-        if (parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow3 &&
-            parameters.m_nCaloHitsCandidate < m_nCaloHitsCandidatePhotonPhotonThresholdLow3 &&
-            parameters.m_centroidSeparation < m_centroidSeparationPhotonPhotonThresholdLow3)
-        {
-            return true;
-        }
-
-        if (parameters.m_centroidSeparation < m_centroidSeparationPhotonPhotonThresholdLow4 &&
-            parameters.m_nCaloHitsCandidate < m_nCaloHitsCandidatePhotonPhotonThresholdLow4 &&
-            parameters.m_energyOfCandidateCluster < m_energyOfCandidateClusterPhotonPhotonThresholdLow4 &&
-            std::fabs(parameters.m_cosineMain) > m_cosineBarrelLimit)
-        {
-            return true;
-        }
-
-        if (parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_nCaloHitsCandidate < m_nCaloHitsCandidatePhotonPhotonThresholdLow5 &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow5)
-        {
-            return true;
-        }
-
-        if (parameters.m_energyOfMainCluster > 0.f &&
-            parameters.m_hitSeparation < m_hitSeparationPhotonPhotonThresholdLow6 &&
-            parameters.m_energyOfCandidateCluster / parameters.m_energyOfMainCluster < m_energyRatioCandidateToMainPhotonThresholdLow6 &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow6 &&
-            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation)
-        {
-            return true;
-        }
+        return (this->IsPhotonFragmentInShowerProfile(parameters) ||
+                this->IsAbsoluteLowEnergyPhotonFragment(parameters) ||
+                this->IsSmallPhotonFragment1(parameters) ||
+                this->IsSmallForwardPhotonFragment(parameters) ||
+                this->IsSmallPhotonFragment2(parameters) ||
+                this->IsRelativeLowEnergyPhotonFragment(parameters));
     }
     else
     {
-        if (parameters.m_energyOfCandidateCluster > 0.f &&
-            parameters.m_energyOfMainCluster > 0.f &&
-            parameters.m_energyOfCandidatePeak > 0.f &&
-            parameters.m_energyOfMainPeak>0.f &&
-            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdHigh1 &&
-            ( (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_energyRatioCandidatePeakToClusterPhotonThresholdHigh1 &&
-            parameters.m_energyOfMainPeak/parameters.m_energyOfMainCluster > m_energyRatioMainPeakToClusterPhotonThresholdHigh1 &&
-            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster + m_triangularEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1 * parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster) < m_triangularSumEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1) ||
-            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_linearEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1 &&
-            parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster > m_linearEnergyRatioMainPeakToClusterPhotonThresholdHigh1) ))
-        {
-            return true;
-        }
-
-        if (parameters.m_energyOfCandidateCluster > 0.f &&
-            parameters.m_energyOfMainCluster > 0.f &&
-            parameters.m_hitSeparation < m_hitSeparationPhotonPhotonThresholdHigh2 &&
-            parameters.m_energyOfCandidateCluster / parameters.m_energyOfMainCluster < m_energyRatioCandidateToMainPhotonThresholdHigh2 &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdHigh2 &&
-            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation)
-        {
-            return true;
-        }
+        return (this->IsHighEnergyPhotonFragmentInShowerProfile(parameters) ||
+                this->IsHighEnergyRelativeLowEnergyPhotonFragment(parameters));
     }
 
     return false;
@@ -144,80 +81,17 @@ bool PhotonFragmentMergingAlgorithm::GetPhotonNeutralMergingFlag(const Parameter
 {
     if (parameters.m_energyOfCandidateCluster < m_lowEnergyOfCandidateClusterThreshold)
     {
-        if (parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdLow1 &&
-            parameters.m_centroidSeparation < m_centroidSeparationPhotonNeutralThresholdLow1)
-        {
-            return true;
-        }
-
-        if (parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdLow2 &&
-            parameters.m_hitSeparation < m_hitSeparationPhotonNeutralThresholdLow2 &&
-            parameters.m_nCaloHitsCandidate < m_nCaloHitsCandidatePhotonNeutralThresholdLow2)
-        {
-            return true;
-        }
-
-        if (parameters.m_energyOfCandidateCluster > 0.f &&
-            parameters.m_energyOfMainCluster > 0.f &&
-            parameters.m_hitSeparation < m_hitSeparationPhotonNeutralThresholdLow3 &&
-            parameters.m_energyOfCandidateCluster / parameters.m_energyOfMainCluster < m_energyRatioCandidateToMainNeutralThresholdLow3 &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdLow3 &&
-            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation)
-        {
-            return true;
-        }
+        return (this->IsCloseByNeutralFragment(parameters) ||
+                this->IsSmallNeutralFragment(parameters) ||
+                this->IsRelativeLowEnergyNeutralFragment(parameters));
     }
     else
     {
-        if (parameters.m_energyOfCandidateCluster > 0.f &&
-            parameters.m_energyOfMainCluster > 0.f &&
-            parameters.m_energyOfCandidatePeak > 0.f &&
-            parameters.m_energyOfMainPeak>0.f &&
-            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdHigh1 &&
-            parameters.m_energyOfCandidateCluster/parameters.m_energyOfMainCluster<m_energyRatioCandidateToMainNeutralThresholdHigh1 &&
-            ( (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_energyRatioCandidatePeakToClusterNeutralThresholdHigh1 &&
-            parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster > m_energyRatioMainPeakToClusterNeutralThresholdHigh1 &&
-            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster + m_triangularEnergyRatioMainPeakToClusterNeutralThresholdHigh1 * parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster) < m_triangularSumEnergyRatioMainPeakToClusterNeutralThresholdHigh1) ||
-            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_squareEnergyRatioCandidatePeakToClusterNeutralThresholdHigh1 &&
-            parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster > m_squareEnergyRatioMainPeakToClusterNeutralThresholdHigh1) ))
-        {
-            return true;
-        }
-
-        if (parameters.m_energyOfCandidateCluster > 0.f &&
-            parameters.m_energyOfMainCluster > 0.f &&
-            parameters.m_hitSeparation < m_hitSeparationPhotonNeutralThresholdHigh2 &&
-            parameters.m_energyOfCandidateCluster / parameters.m_energyOfMainCluster < m_energyRatioCandidateToMainNeutralThresholdHigh2 &&
-            parameters.m_weightedLayerSeparation<m_weightedLayerSeparationPhotonNeutralThresholdHigh2 &&
-            parameters.m_weightedLayerSeparation>m_minWeightedLayerSeparation)
-        {
-            return true;
-        }
-
-        if (parameters.m_energyOfCandidateCluster > 0.f &&
-            parameters.m_energyOfMainCluster > 0.f &&
-            parameters.m_hitSeparation < m_hitSeparationPhotonNeutralThresholdHigh3 &&
-            parameters.m_energyOfCandidateCluster / parameters.m_energyOfMainCluster < m_energyRatioCandidateToMainNeutralThresholdHigh3 &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdHigh3 &&
-            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_energyOfCandidateCluster > m_energyOfCandidateClusterPhotonNeutralThresholdHigh3)
-        {
-            return true;
-        }
-
-        if (parameters.m_energyOfCandidateCluster > 0.f &&
-            parameters.m_energyOfMainCluster > 0.f &&
-            parameters.m_hitSeparation < m_hitSeparationPhotonNeutralThresholdHigh4 &&
-            parameters.m_energyOfCandidateCluster / parameters.m_energyOfMainCluster < m_energyRatioCandidateToMainNeutralThresholdHigh4 &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdHigh4 &&
-            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_energyOfCandidateCluster > m_energyOfCandidateClusterPhotonNeutralThresholdHigh4)
-        {
-            return true;
-        }
+        return (this->IsHighEnergyNeutralFragmentInShowerProfile(parameters) ||
+                this->IsHighEnergyRelativeLowEnergyNeutralFragment1(parameters) ||
+                this->IsHighEnergyRelativeLowEnergyNeutralFragment1(parameters) ||
+                this->IsHighEnergyRelativeLowEnergyNeutralFragment2(parameters) ||
+                this->IsHighEnergyRelativeLowEnergyNeutralFragment3(parameters));
     }
 
     return false;
@@ -229,6 +103,185 @@ StatusCode PhotonFragmentMergingAlgorithm::DeleteClusters(const ClusterVector &/
     const ClusterVector &/*unusedClusterVec*/) const
 {
     return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsPhotonFragmentInShowerProfile(const Parameters &parameters) const
+{
+    return (parameters.m_energyOfCandidatePeak > 0.f &&
+            parameters.m_energyOfCandidateCluster > 0.f &&
+            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow1 &&
+            (parameters.m_energyOfCandidatePeak + parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
+            parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_energyRatioCandidatePeakToClusterPhotonThresholdLow1);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsAbsoluteLowEnergyPhotonFragment(const Parameters &parameters) const
+{
+    return (parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow2 &&
+            parameters.m_energyOfCandidateCluster < m_energyOfCandidateClusterPhotonPhotonThresholdLow2);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsSmallPhotonFragment1(const Parameters &parameters) const
+{
+    return (parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow3 &&
+            parameters.m_nCaloHitsCandidate < m_nCaloHitsCandidatePhotonPhotonThresholdLow3 &&
+            parameters.m_centroidSeparation < m_centroidSeparationPhotonPhotonThresholdLow3);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsSmallPhotonFragment2(const Parameters &parameters) const
+{
+    return (parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
+            parameters.m_nCaloHitsCandidate < m_nCaloHitsCandidatePhotonPhotonThresholdLow5 &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow5);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsSmallForwardPhotonFragment(const Parameters &parameters) const
+{
+    return (parameters.m_centroidSeparation < m_centroidSeparationPhotonPhotonThresholdLow4 &&
+            parameters.m_nCaloHitsCandidate < m_nCaloHitsCandidatePhotonPhotonThresholdLow4 &&
+            parameters.m_energyOfCandidateCluster < m_energyOfCandidateClusterPhotonPhotonThresholdLow4 &&
+            std::fabs(parameters.m_cosineMain) > m_cosineBarrelLimit);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsRelativeLowEnergyPhotonFragment(const Parameters &parameters) const
+{
+    return (parameters.m_energyOfMainCluster > 0.f &&
+            parameters.m_hitSeparation < m_hitSeparationPhotonPhotonThresholdLow6 &&
+            parameters.m_energyOfCandidateCluster / parameters.m_energyOfMainCluster < m_energyRatioCandidateToMainPhotonThresholdLow6 &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow6 &&
+            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsHighEnergyPhotonFragmentInShowerProfile(const Parameters &parameters) const
+{
+    return (parameters.m_energyOfCandidateCluster > 0.f &&
+            parameters.m_energyOfMainCluster > 0.f &&
+            parameters.m_energyOfCandidatePeak > 0.f &&
+            parameters.m_energyOfMainPeak>0.f &&
+            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdHigh1 &&
+            (parameters.m_energyOfCandidatePeak + parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
+            ( (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_energyRatioCandidatePeakToClusterPhotonThresholdHigh1 &&
+            parameters.m_energyOfMainPeak/parameters.m_energyOfMainCluster > m_energyRatioMainPeakToClusterPhotonThresholdHigh1 &&
+            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster + m_triangularEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1 * parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster) < m_triangularSumEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1) ||
+            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_linearEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1 &&
+            parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster > m_linearEnergyRatioMainPeakToClusterPhotonThresholdHigh1) ));
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsHighEnergyRelativeLowEnergyPhotonFragment(const Parameters &parameters) const
+{
+    return (parameters.m_energyOfCandidateCluster > 0.f &&
+            parameters.m_energyOfMainCluster > 0.f &&
+            parameters.m_hitSeparation < m_hitSeparationPhotonPhotonThresholdHigh2 &&
+            parameters.m_energyOfCandidateCluster / parameters.m_energyOfMainCluster < m_energyRatioCandidateToMainPhotonThresholdHigh2 &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdHigh2 &&
+            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsCloseByNeutralFragment(const Parameters &parameters) const
+{
+    return (parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdLow1 &&
+            parameters.m_centroidSeparation < m_centroidSeparationPhotonNeutralThresholdLow1);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsSmallNeutralFragment(const Parameters &parameters) const
+{
+    return (parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdLow2 &&
+            parameters.m_hitSeparation < m_hitSeparationPhotonNeutralThresholdLow2 &&
+            parameters.m_nCaloHitsCandidate < m_nCaloHitsCandidatePhotonNeutralThresholdLow2);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsRelativeLowEnergyNeutralFragment(const Parameters &parameters) const
+{
+    return (parameters.m_energyOfCandidateCluster > 0.f &&
+            parameters.m_energyOfMainCluster > 0.f &&
+            parameters.m_hitSeparation < m_hitSeparationPhotonNeutralThresholdLow3 &&
+            parameters.m_energyOfCandidateCluster / parameters.m_energyOfMainCluster < m_energyRatioCandidateToMainNeutralThresholdLow3 &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdLow3 &&
+            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsHighEnergyNeutralFragmentInShowerProfile(const Parameters &parameters) const
+{
+    return (parameters.m_energyOfCandidateCluster > 0.f &&
+            parameters.m_energyOfMainCluster > 0.f &&
+            parameters.m_energyOfCandidatePeak > 0.f &&
+            parameters.m_energyOfMainPeak>0.f &&
+            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdHigh1 &&
+            (parameters.m_energyOfCandidatePeak + parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
+            parameters.m_energyOfCandidateCluster/parameters.m_energyOfMainCluster<m_energyRatioCandidateToMainNeutralThresholdHigh1 &&
+            ( (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_energyRatioCandidatePeakToClusterNeutralThresholdHigh1 &&
+            parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster > m_energyRatioMainPeakToClusterNeutralThresholdHigh1 &&
+            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster + m_triangularEnergyRatioMainPeakToClusterNeutralThresholdHigh1 * parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster) < m_triangularSumEnergyRatioMainPeakToClusterNeutralThresholdHigh1) ||
+            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_squareEnergyRatioCandidatePeakToClusterNeutralThresholdHigh1 &&
+            parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster > m_squareEnergyRatioMainPeakToClusterNeutralThresholdHigh1) ));
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsHighEnergyRelativeLowEnergyNeutralFragment1(const Parameters &parameters) const
+{
+    return (parameters.m_energyOfCandidateCluster > 0.f &&
+            parameters.m_energyOfMainCluster > 0.f &&
+            parameters.m_hitSeparation < m_hitSeparationPhotonNeutralThresholdHigh2 &&
+            parameters.m_energyOfCandidateCluster / parameters.m_energyOfMainCluster < m_energyRatioCandidateToMainNeutralThresholdHigh2 &&
+            parameters.m_weightedLayerSeparation<m_weightedLayerSeparationPhotonNeutralThresholdHigh2 &&
+            parameters.m_weightedLayerSeparation>m_minWeightedLayerSeparation);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsHighEnergyRelativeLowEnergyNeutralFragment2(const Parameters &parameters) const
+{
+    return (parameters.m_energyOfCandidateCluster > 0.f &&
+            parameters.m_energyOfMainCluster > 0.f &&
+            parameters.m_hitSeparation < m_hitSeparationPhotonNeutralThresholdHigh3 &&
+            parameters.m_energyOfCandidateCluster / parameters.m_energyOfMainCluster < m_energyRatioCandidateToMainNeutralThresholdHigh3 &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdHigh3 &&
+            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
+            parameters.m_energyOfCandidateCluster > m_energyOfCandidateClusterPhotonNeutralThresholdHigh3);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PhotonFragmentMergingAlgorithm::IsHighEnergyRelativeLowEnergyNeutralFragment3(const Parameters &parameters) const
+{
+    return (parameters.m_energyOfCandidateCluster > 0.f &&
+            parameters.m_energyOfMainCluster > 0.f &&
+            parameters.m_hitSeparation < m_hitSeparationPhotonNeutralThresholdHigh4 &&
+            parameters.m_energyOfCandidateCluster / parameters.m_energyOfMainCluster < m_energyRatioCandidateToMainNeutralThresholdHigh4 &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdHigh4 &&
+            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
+            parameters.m_energyOfCandidateCluster > m_energyOfCandidateClusterPhotonNeutralThresholdHigh4);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
