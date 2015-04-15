@@ -26,6 +26,7 @@ PhotonFragmentMergingBaseAlgorithm::PhotonFragmentMergingBaseAlgorithm() :
     m_minWeightedLayerSeparation(0.f),
     m_maxWeightedLayerSeparation(80.f),
     m_lowEnergyOfCandidateClusterThreshold(1.f),
+    m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold(0.9f),
     m_weightedLayerSeparationPhotonNeutralThresholdLow1(20.f),
     m_weightedLayerSeparationPhotonNeutralThresholdLow2(50.f),
     m_hitSeparationPhotonNeutralThresholdLow2(50.f),
@@ -306,6 +307,9 @@ StatusCode PhotonFragmentMergingBaseAlgorithm::ReadSettings(const TiXmlHandle xm
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxWeightedLayerSeparation", m_maxWeightedLayerSeparation));
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "MinRatioTotalShowerPeakEnergyToTotalEnergyThreshold", m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold));
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "LowEnergyOfCandidateClusterThreshold", m_lowEnergyOfCandidateClusterThreshold));

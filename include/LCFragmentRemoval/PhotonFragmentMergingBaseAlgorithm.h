@@ -95,6 +95,7 @@ protected:
     float           m_minWeightedLayerSeparation;                                           ///< Minimum distance weighted over layer between candidate and main to consider
     float           m_maxWeightedLayerSeparation;                                           ///< Max distance weighted over layer between candidate and main to consider
     float           m_lowEnergyOfCandidateClusterThreshold;                                 ///< Threshold for the low energy of the candidate cluster 
+    float           m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold;                  ///< Threshold the minimum ratio of sum of energy of 1st peak and 2nd peak divided by the sum of energy of candidate and main cluster
     float           m_weightedLayerSeparationPhotonNeutralThresholdLow1;                    ///< Distance weighted over layer between candidate and main threshold for low energy neutral 1
     float           m_weightedLayerSeparationPhotonNeutralThresholdLow2;                    ///< Distance weighted over layer between candidate and main threshold for low energy neutral 2
     float           m_hitSeparationPhotonNeutralThresholdLow2;                              ///< Closest distance separation between two clusters at calo hits level threshold for low energy neutral 2
