@@ -11,8 +11,8 @@ PROJECT( LCContent )
 
 # project version
 SET( LCContent_VERSION_MAJOR 01 )
-SET( LCContent_VERSION_MINOR 00 )
-SET( LCContent_VERSION_PATCH 01 )
+SET( LCContent_VERSION_MINOR 01 )
+SET( LCContent_VERSION_PATCH 00 )
 
 
 ### CMAKE ###################################################################
