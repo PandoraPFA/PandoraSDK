@@ -463,6 +463,12 @@ inline bool PandoraInputType<TrackState>::IsValid(const TrackState &t) const
 }
 
 template <>
+inline bool PandoraInputType<const CaloHit *>::IsValid(const CaloHit *const &) const
+{
+    return true;
+}
+
+template <>
 inline bool PandoraInputType<const Track *>::IsValid(const Track *const &) const
 {
     return true;

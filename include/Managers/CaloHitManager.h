@@ -45,18 +45,10 @@ private:
      * 
      *  @param  parameters the calo hit parameters
      *  @param  pCaloHit to receive the address of the calo hit
+     *  @param  factory the factory that performs the object allocation
      */
-    StatusCode Create(const PandoraApi::CaloHit::Parameters &parameters, const CaloHit *&pCaloHit);
-
-    /**
-     *  @brief  Create calo hit from a user calo hit factory
-     *
-     *  @param  factory the user factory that perform the calo hit instantiation
-     *  @param  parameters the parameters to pass to the calo hit factory
-     *  @param  pCaloHit to receive the address of the calo hit
-     */
-    template <typename PARAMETERS>
-    StatusCode Create(const PARAMETERS &parameters, const ObjectFactory<PARAMETERS, CaloHit> &factory, const CaloHit *&pCaloHit);
+    StatusCode Create(const PandoraApi::CaloHit::Parameters &parameters, const CaloHit *&pCaloHit,
+        const ObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit> &factory);
 
     /**
      *  @brief  Alter the metadata information stored in a calo hit

@@ -10,10 +10,9 @@
 
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraInputTypes.h"
+#include "Pandora/PandoraObjectFactories.h"
 
 namespace pandora { class AlgorithmFactory; class AlgorithmToolFactory; }
-namespace pandora { class CaloHit; class MCParticle; class Track; class SubDetector; class BoxGap; class ConcentricGap; }
-namespace pandora { template <typename PARAMETERS, typename OBJECT> class ObjectFactory; }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -36,22 +35,14 @@ public:
         typedef OBJECT Object;
 
         /**
-         *  @brief  Create a new object
-         * 
-         *  @param  pandora the pandora instance to create the new object
-         *  @param  parameters the object parameters
-         */
-        static pandora::StatusCode Create(const pandora::Pandora &pandora, const Parameters &parameters);
-
-        /**
          *  @brief  Create a new object from a user factory
          *
          *  @param  pandora the pandora instance to create the new object object
          *  @param  parameters the object parameters
-         *  @param  factory the user factory that performs the object allocation
+         *  @param  factory the factory that performs the object allocation
          */
         static pandora::StatusCode Create(const pandora::Pandora &pandora, const Parameters &parameters,
-            const pandora::ObjectFactory<PARAMETERS, OBJECT> &factory);
+            const pandora::ObjectFactory<Parameters, Object> &factory = pandora::PandoraObjectFactory<Parameters, Object>());
     };
 
     /**
@@ -75,6 +66,7 @@ public:
     class TrackParameters
     {
     public:
+        pandora::InputFloat                 m_bField;                   ///< The b-field used to perform a helix fit, units T // TODO remove this!
         pandora::InputFloat                 m_d0;                       ///< The 2D impact parameter wrt (0,0), units mm
         pandora::InputFloat                 m_z0;                       ///< The z coordinate at the 2D distance of closest approach, units mm
         pandora::InputInt                   m_particleId;               ///< The PDG code of the tracked particle

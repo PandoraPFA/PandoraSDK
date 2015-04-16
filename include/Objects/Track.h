@@ -16,6 +16,7 @@ namespace pandora
 {
 
 template<typename T> class InputObjectManager;
+template<typename T, typename S> class PandoraObjectFactory;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -200,14 +201,13 @@ public:
      */
     bool IsAvailable() const;
 
-private:
+protected:
     /**
      *  @brief  Constructor
      * 
      *  @param  parameters the calo hit parameters
-     *  @param  the bField strength to be used in a helix fit to the track
      */
-    Track(const PandoraApi::Track::Parameters &parameters, const float bField);
+    Track(const PandoraApi::Track::Parameters &parameters);
 
     /**
      *  @brief  Destructor
@@ -303,6 +303,7 @@ private:
 
     friend class TrackManager;
     friend class InputObjectManager<Track>;
+    friend class PandoraObjectFactory<PandoraApi::Track::Parameters, Track>;
 };
 
 /**

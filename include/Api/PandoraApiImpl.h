@@ -25,17 +25,9 @@ class PandoraApiImpl
 private:
     /**
      *  @brief  Create an object for pandora
-     * 
-     *  @param  parameters the object parameters
-     */
-    template <typename PARAMETERS>
-    StatusCode Create(const PARAMETERS &parameters) const;
-
-    /**
-     *  @brief  Create an object for pandora from a user factory
      *
      *  @param  parameters the object parameters
-     *  @param  factory the user factory that performs the object allocation
+     *  @param  factory the factory that performs the object allocation
      */
     template <typename PARAMETERS, typename OBJECT>
     StatusCode Create(const PARAMETERS &parameters, const ObjectFactory<PARAMETERS, OBJECT> &factory) const;

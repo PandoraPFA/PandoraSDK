@@ -35,13 +35,14 @@ MCManager::~MCManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MCManager::Create(const PandoraApi::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle)
+StatusCode MCManager::Create(const PandoraApi::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle,
+    const ObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle> &factory)
 {
     pMCParticle = NULL;
 
     try
     {
-        pMCParticle = new MCParticle(parameters);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pMCParticle));
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
 

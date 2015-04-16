@@ -12,10 +12,10 @@
 
 #include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraInternal.h"
+#include "Pandora/PandoraObjectFactories.h"
 
 namespace pandora { class Algorithm; class AlgorithmTool; class TiXmlElement; }
 namespace pandora { class CaloHit; class Cluster; class MCParticle; class ParticleFlowObject; class Track; class Vertex; }
-namespace pandora { template <typename PARAMETERS, typename OBJECT> class ObjectFactory; }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -98,24 +98,15 @@ public:
         typedef OBJECT Object;
 
         /**
-         *  @brief  Create a new object
-         * 
-         *  @param  algorithm the algorithm calling this function
-         *  @param  parameters the object parameters
-         *  @param  pObject to receive the address of the object created
-         */
-        static pandora::StatusCode Create(const pandora::Algorithm &algorithm, const Parameters &parameters, const Object *&pObject);
-
-        /**
          *  @brief  Create a new object from a user factory
          *
          *  @param  algorithm the algorithm calling this function
          *  @param  parameters the object parameters
-         *  @param  factory the user factory that performs the object allocation
          *  @param  pObject to receive the address of the object created
+         *  @param  factory the factory that performs the object allocation
          */
         static pandora::StatusCode Create(const pandora::Algorithm &algorithm, const Parameters &parameters,
-            const pandora::ObjectFactory<PARAMETERS, OBJECT> &factory, const Object *&pObject);
+            const Object *&pObject, const pandora::ObjectFactory<Parameters, Object> &factory = pandora::PandoraObjectFactory<Parameters, Object>());
     };
 
     /**
@@ -156,7 +147,7 @@ public:
     {
     public:
         const pandora::CaloHit         *m_pOriginalCaloHit;     ///< The address of the original calo hit
-        pandora::InputFloat             m_energyWeight;         ///< The fraction of energy to be assigned to the fragment
+        pandora::InputFloat             m_weight;               ///< The weight to be assigned to the fragment
     };
 
     typedef ObjectCreationHelper<PandoraApi::CaloHit::Parameters, CaloHitMetadata, pandora::CaloHit> CaloHit;

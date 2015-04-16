@@ -24,18 +24,9 @@ pandora::StatusCode PandoraContentApi::AlterMetadata(const pandora::Algorithm &a
 
 template <typename PARAMETERS, typename METADATA, typename OBJECT>
 pandora::StatusCode PandoraContentApi::ObjectCreationHelper<PARAMETERS, METADATA, OBJECT>::Create(const pandora::Algorithm &algorithm,
-    const Parameters &parameters, const Object *&pObject)
+    const PARAMETERS &parameters, const OBJECT *&pObject, const pandora::ObjectFactory<PARAMETERS, OBJECT> &factory)
 {
-    return algorithm.GetPandora().GetPandoraContentApiImpl()->Create(parameters, pObject);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template <typename PARAMETERS, typename METADATA, typename OBJECT>
-pandora::StatusCode PandoraContentApi::ObjectCreationHelper<PARAMETERS, METADATA, OBJECT>::Create(const pandora::Algorithm &algorithm,
-    const PARAMETERS &parameters, const pandora::ObjectFactory<PARAMETERS, OBJECT> &factory, const OBJECT *&pObject)
-{
-    return algorithm.GetPandora().GetPandoraContentApiImpl()->Create(parameters, factory, pObject);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->Create(parameters, pObject, factory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

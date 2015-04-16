@@ -64,19 +64,10 @@ private:
      * 
      *  @param  parameters the object parameters
      *  @param  pObject to receive the address of the object created
+     *  @param  factory the factory that performs the object allocation
      */
     template <typename PARAMETERS, typename OBJECT>
-    StatusCode Create(const PARAMETERS &parameters, const OBJECT *&pObject) const;
-
-    /**
-     *  @brief  Create an object for pandora
-     * 
-     *  @param  parameters the object parameters
-     *  @param  factory the user factory that performs the object allocation
-     *  @param  pObject to receive the address of the object created
-     */
-    template <typename PARAMETERS, typename OBJECT>
-    StatusCode Create(const PARAMETERS &parameters, const ObjectFactory<PARAMETERS, OBJECT> &factory, const OBJECT *&pObject) const;
+    StatusCode Create(const PARAMETERS &parameters, const OBJECT *&pObject, const ObjectFactory<PARAMETERS, OBJECT> &factory) const;
 
 
     /* Accessors for plugins and global settings */

@@ -37,7 +37,7 @@ const MCParticle *Track::GetMainMCParticle() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-Track::Track(const PandoraApi::Track::Parameters &parameters, const float bField) :
+Track::Track(const PandoraApi::Track::Parameters &parameters) :
     m_d0(parameters.m_d0.Get()),
     m_z0(parameters.m_z0.Get()),
     m_particleId(parameters.m_particleId.Get()),
@@ -65,7 +65,7 @@ Track::Track(const PandoraApi::Track::Parameters &parameters, const float bField
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
     // Obtain helix fit to track state at calorimeter
-    m_pHelixFitAtCalorimeter = new Helix(m_trackStateAtCalorimeter.GetPosition(), m_trackStateAtCalorimeter.GetMomentum(), static_cast<float>(m_charge), bField);
+    m_pHelixFitAtCalorimeter = new Helix(m_trackStateAtCalorimeter.GetPosition(), m_trackStateAtCalorimeter.GetMomentum(), static_cast<float>(m_charge), parameters.m_bField.Get());
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

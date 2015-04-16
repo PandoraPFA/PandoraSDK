@@ -17,6 +17,10 @@
 namespace pandora
 {
 
+template<typename T, typename S> class PandoraObjectFactory;
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 /**
  *  @brief  SubDetector class
  */
@@ -158,7 +162,7 @@ public:
      */
     const SubDetectorLayerList &GetSubDetectorLayerList() const;
 
-private:
+protected:
     /**
      *  @brief  Constructor
      * 
@@ -186,6 +190,7 @@ private:
     SubDetectorLayerList    m_subDetectorLayerList; ///< The list of layer parameters for the sub detector section
 
     friend class GeometryManager;
+    friend class PandoraObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

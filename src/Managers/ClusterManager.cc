@@ -26,7 +26,8 @@ ClusterManager::~ClusterManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ClusterManager::Create(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster)
+StatusCode ClusterManager::Create(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster,
+    const ObjectFactory<PandoraContentApi::Cluster::Parameters, Cluster> &factory)
 {
     pCluster = NULL;
 
@@ -40,7 +41,7 @@ StatusCode ClusterManager::Create(const PandoraContentApi::Cluster::Parameters &
         if (m_nameToListMap.end() == iter)
              throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
-        pCluster = new Cluster(parameters);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pCluster));
 
         if (NULL == pCluster)
              throw StatusCodeException(STATUS_CODE_FAILURE);

@@ -41,8 +41,10 @@ private:
      * 
      *  @param  parameters the particle flow object parameters
      *  @param  pPfo to receive the address of the particle flow object created
+     *  @param  factory the factory that performs the object allocation
      */
-    StatusCode Create(const PandoraContentApi::ParticleFlowObject::Parameters &parameters, const ParticleFlowObject *&pPfo);
+    StatusCode Create(const PandoraContentApi::ParticleFlowObject::Parameters &parameters, const ParticleFlowObject *&pPfo,
+        const ObjectFactory<PandoraContentApi::ParticleFlowObject::Parameters, ParticleFlowObject> &factory);
 
     /**
      *  @brief  Alter the metadata information stored in a particle flow object

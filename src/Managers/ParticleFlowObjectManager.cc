@@ -28,7 +28,8 @@ ParticleFlowObjectManager::~ParticleFlowObjectManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObjectManager::Create(const PandoraContentApi::ParticleFlowObject::Parameters &parameters, const ParticleFlowObject *&pPfo)
+StatusCode ParticleFlowObjectManager::Create(const PandoraContentApi::ParticleFlowObject::Parameters &parameters, const ParticleFlowObject *&pPfo,
+    const ObjectFactory<PandoraContentApi::ParticleFlowObject::Parameters, ParticleFlowObject> &factory)
 {
     pPfo = NULL;
 
@@ -42,7 +43,7 @@ StatusCode ParticleFlowObjectManager::Create(const PandoraContentApi::ParticleFl
         if (m_nameToListMap.end() == iter)
              throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
-        pPfo = new ParticleFlowObject(parameters);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pPfo));
 
         if (NULL == pPfo)
              throw StatusCodeException(STATUS_CODE_FAILURE);

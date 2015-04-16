@@ -46,37 +46,37 @@ CaloHit::CaloHit(const PandoraApi::CaloHit::Parameters &parameters) :
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-CaloHit::CaloHit(const CaloHit *const pCaloHit, const float weight) :
-    m_positionVector(pCaloHit->m_positionVector),
-    m_expectedDirection(pCaloHit->m_expectedDirection),
-    m_cellNormalVector(pCaloHit->m_cellNormalVector),
-    m_cellGeometry(pCaloHit->m_cellGeometry),
-    m_cellSize0(pCaloHit->m_cellSize0),
-    m_cellSize1(pCaloHit->m_cellSize1),
-    m_cellThickness(pCaloHit->m_cellThickness),
-    m_nCellRadiationLengths(pCaloHit->m_nCellRadiationLengths),
-    m_nCellInteractionLengths(pCaloHit->m_nCellInteractionLengths),
-    m_time(pCaloHit->m_time),
-    m_inputEnergy(weight * pCaloHit->m_inputEnergy),
-    m_mipEquivalentEnergy(weight * pCaloHit->m_mipEquivalentEnergy),
-    m_electromagneticEnergy(weight * pCaloHit->m_electromagneticEnergy),
-    m_hadronicEnergy(weight * pCaloHit->m_hadronicEnergy),
-    m_isDigital(pCaloHit->m_isDigital),
-    m_hitType(pCaloHit->m_hitType),
-    m_hitRegion(pCaloHit->m_hitRegion),
-    m_layer(pCaloHit->m_layer),
-    m_pseudoLayer(pCaloHit->m_pseudoLayer),
-    m_isInOuterSamplingLayer(pCaloHit->m_isInOuterSamplingLayer),
-    m_cellLengthScale(pCaloHit->m_cellLengthScale),
-    m_isPossibleMip(pCaloHit->m_isPossibleMip),
-    m_isIsolated(pCaloHit->m_isIsolated),
-    m_isAvailable(pCaloHit->m_isAvailable),
-    m_weight(weight * pCaloHit->m_weight),
-    m_mcParticleWeightMap(pCaloHit->m_mcParticleWeightMap),
-    m_pParentAddress(pCaloHit->m_pParentAddress)
+CaloHit::CaloHit(const PandoraContentApi::FragmentParameters &parameters) :
+    m_positionVector(parameters.m_pOriginalCaloHit->m_positionVector),
+    m_expectedDirection(parameters.m_pOriginalCaloHit->m_expectedDirection),
+    m_cellNormalVector(parameters.m_pOriginalCaloHit->m_cellNormalVector),
+    m_cellGeometry(parameters.m_pOriginalCaloHit->m_cellGeometry),
+    m_cellSize0(parameters.m_pOriginalCaloHit->m_cellSize0),
+    m_cellSize1(parameters.m_pOriginalCaloHit->m_cellSize1),
+    m_cellThickness(parameters.m_pOriginalCaloHit->m_cellThickness),
+    m_nCellRadiationLengths(parameters.m_pOriginalCaloHit->m_nCellRadiationLengths),
+    m_nCellInteractionLengths(parameters.m_pOriginalCaloHit->m_nCellInteractionLengths),
+    m_time(parameters.m_pOriginalCaloHit->m_time),
+    m_inputEnergy(parameters.m_weight.Get() * parameters.m_pOriginalCaloHit->m_inputEnergy),
+    m_mipEquivalentEnergy(parameters.m_weight.Get() * parameters.m_pOriginalCaloHit->m_mipEquivalentEnergy),
+    m_electromagneticEnergy(parameters.m_weight.Get() * parameters.m_pOriginalCaloHit->m_electromagneticEnergy),
+    m_hadronicEnergy(parameters.m_weight.Get() * parameters.m_pOriginalCaloHit->m_hadronicEnergy),
+    m_isDigital(parameters.m_pOriginalCaloHit->m_isDigital),
+    m_hitType(parameters.m_pOriginalCaloHit->m_hitType),
+    m_hitRegion(parameters.m_pOriginalCaloHit->m_hitRegion),
+    m_layer(parameters.m_pOriginalCaloHit->m_layer),
+    m_pseudoLayer(parameters.m_pOriginalCaloHit->m_pseudoLayer),
+    m_isInOuterSamplingLayer(parameters.m_pOriginalCaloHit->m_isInOuterSamplingLayer),
+    m_cellLengthScale(parameters.m_pOriginalCaloHit->m_cellLengthScale),
+    m_isPossibleMip(parameters.m_pOriginalCaloHit->m_isPossibleMip),
+    m_isIsolated(parameters.m_pOriginalCaloHit->m_isIsolated),
+    m_isAvailable(parameters.m_pOriginalCaloHit->m_isAvailable),
+    m_weight(parameters.m_weight.Get() * parameters.m_pOriginalCaloHit->m_weight),
+    m_mcParticleWeightMap(parameters.m_pOriginalCaloHit->m_mcParticleWeightMap),
+    m_pParentAddress(parameters.m_pOriginalCaloHit->m_pParentAddress)
 {
     for (MCParticleWeightMap::iterator iter = m_mcParticleWeightMap.begin(), iterEnd = m_mcParticleWeightMap.end(); iter != iterEnd; ++iter)
-        iter->second = iter->second * weight;
+        iter->second = iter->second * parameters.m_weight.Get();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

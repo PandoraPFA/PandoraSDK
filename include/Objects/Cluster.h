@@ -21,6 +21,7 @@ namespace pandora
 
 class Pandora;
 template<typename T> class AlgorithmObjectManager;
+template<typename T, typename S> class PandoraObjectFactory;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -258,7 +259,7 @@ public:
      */
     float GetShowerProfileDiscrepancy(const Pandora &pandora) const;
 
-private:
+protected:
     /**
      *  @brief  Constructor
      * 
@@ -453,6 +454,7 @@ private:
 
     friend class ClusterManager;
     friend class AlgorithmObjectManager<Cluster>;
+    friend class PandoraObjectFactory<PandoraContentApi::Cluster::Parameters, Cluster>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

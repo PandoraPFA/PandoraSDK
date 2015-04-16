@@ -10,14 +10,6 @@
 #include "Api/PandoraApiImpl.h"
 
 template <typename PARAMETERS, typename OBJECT>
-pandora::StatusCode PandoraApi::ObjectCreationHelper<PARAMETERS, OBJECT>::Create(const pandora::Pandora &pandora, const Parameters &parameters)
-{
-    return pandora.GetPandoraApiImpl()->Create(parameters);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template <typename PARAMETERS, typename OBJECT>
 pandora::StatusCode PandoraApi::ObjectCreationHelper<PARAMETERS, OBJECT>::Create(const pandora::Pandora &pandora, const Parameters &parameters,
     const pandora::ObjectFactory<PARAMETERS, OBJECT> &factory)
 {
