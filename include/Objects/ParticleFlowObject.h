@@ -146,7 +146,7 @@ private:
     /**
      *  @brief  Destructor
      */
-    ~ParticleFlowObject();
+    virtual ~ParticleFlowObject();
 
     /**
      *  @brief  Alter particle flow object metadata parameters

@@ -46,7 +46,17 @@ private:
      *  @param  parameters the calo hit parameters
      *  @param  pCaloHit to receive the address of the calo hit
      */
-    StatusCode Create(const PandoraContentApi::CaloHit::Parameters &parameters, const CaloHit *&pCaloHit);
+    StatusCode Create(const PandoraApi::CaloHit::Parameters &parameters, const CaloHit *&pCaloHit);
+
+    /**
+     *  @brief  Create calo hit from a user calo hit factory
+     *
+     *  @param  factory the user factory that perform the calo hit instantiation
+     *  @param  parameters the parameters to pass to the calo hit factory
+     *  @param  pCaloHit to receive the address of the calo hit
+     */
+    template <typename PARAMETERS>
+    StatusCode Create(const PARAMETERS &parameters, const ObjectFactory<PARAMETERS, CaloHit> &factory, const CaloHit *&pCaloHit);
 
     /**
      *  @brief  Alter the metadata information stored in a calo hit
@@ -115,6 +125,19 @@ private:
         const CaloHit *&pDaughterCaloHit2);
 
     /**
+     *  @brief  Fragment a calo hit into two daughter calo hits, with a specified energy division
+     *
+     *  @param  pOriginalCaloHit address of the original calo hit, which will be deleted
+     *  @param  fraction1 the fraction of energy to be assigned to daughter fragment 1
+     *  @param  factory to create the calo hit fragments
+     *  @param  pDaughterCaloHit1 to receive the address of daughter fragment 1
+     *  @param  pDaughterCaloHit2 to receive the address of daughter fragment 2
+     */
+    StatusCode FragmentCaloHit(const CaloHit *const pOriginalCaloHit, const float fraction1,
+        const ObjectFactory<PandoraContentApi::FragmentParameters, CaloHit> &factory, const CaloHit *&pDaughterCaloHit1,
+        const CaloHit *&pDaughterCaloHit2);
+
+    /**
      *  @brief  Merge two calo hit fragments, originally from the same parent hit, to form a new calo hit
      *
      *  @param  pFragmentCaloHit1 address of calo hit fragment 1, which will be deleted
@@ -122,6 +145,17 @@ private:
      *  @param  pMergedCaloHit to receive the address of the merged calo hit
      */
     StatusCode MergeCaloHitFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2, const CaloHit *&pMergedCaloHit);
+
+    /**
+     *  @brief  Merge two calo hit fragments, originally from the same parent hit, to form a new calo hit
+     *
+     *  @param  pFragmentCaloHit1 address of calo hit fragment 1, which will be deleted
+     *  @param  pFragmentCaloHit2 address of calo hit fragment 2, which will be deleted
+     *  @param  pMergedCaloHit to receive the address of the merged calo hit
+     *  @param  factory to create the merged calo hit
+     */
+    StatusCode MergeCaloHitFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2,
+        const ObjectFactory<PandoraContentApi::FragmentParameters, CaloHit> &factory, const CaloHit *&pMergedCaloHit);
 
     /**
      *  @brief  Whether a calo hit can be fragmented into two daughter calo hits with the specified energy division

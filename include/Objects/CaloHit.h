@@ -232,7 +232,7 @@ private:
     /**
      *  @brief  Destructor
      */
-    ~CaloHit();
+    virtual ~CaloHit();
 
     /**
      *  @brief  Set the mc pseudo layer for the calo hit

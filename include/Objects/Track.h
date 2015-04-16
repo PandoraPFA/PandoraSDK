@@ -212,7 +212,7 @@ private:
     /**
      *  @brief  Destructor
      */
-    ~Track();
+    virtual ~Track();
 
     /**
      *  @brief  Set the mc particles associated with the track

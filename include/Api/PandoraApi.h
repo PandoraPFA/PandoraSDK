@@ -12,6 +12,8 @@
 #include "Pandora/PandoraInputTypes.h"
 
 namespace pandora { class AlgorithmFactory; class AlgorithmToolFactory; }
+namespace pandora { class CaloHit; class MCParticle; class Track; class SubDetector; class BoxGap; class ConcentricGap; }
+namespace pandora { template <typename PARAMETERS, typename OBJECT> class ObjectFactory; }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -26,11 +28,12 @@ public:
      * 
      *  @param  PARAMETERS the type of object parameters
      */
-    template <typename PARAMETERS>
+    template <typename PARAMETERS, typename OBJECT>
     class ObjectCreationHelper
     {
     public:
         typedef PARAMETERS Parameters;
+        typedef OBJECT Object;
 
         /**
          *  @brief  Create a new object
@@ -39,6 +42,16 @@ public:
          *  @param  parameters the object parameters
          */
         static pandora::StatusCode Create(const pandora::Pandora &pandora, const Parameters &parameters);
+
+        /**
+         *  @brief  Create a new object from a user factory
+         *
+         *  @param  pandora the pandora instance to create the new object object
+         *  @param  parameters the object parameters
+         *  @param  factory the user factory that performs the object allocation
+         */
+        static pandora::StatusCode Create(const pandora::Pandora &pandora, const Parameters &parameters,
+            const pandora::ObjectFactory<PARAMETERS, OBJECT> &factory);
     };
 
     /**
@@ -175,14 +188,14 @@ public:
             pandora::InputUInt              m_outerSymmetryOrder;       ///< Order of symmetry of the outermost edge of gap
         };
 
-        typedef ObjectCreationHelper<SubDetectorParameters> SubDetector;
-        typedef ObjectCreationHelper<BoxGapParameters> BoxGap;
-        typedef ObjectCreationHelper<ConcentricGapParameters> ConcentricGap;
+        typedef ObjectCreationHelper<SubDetectorParameters, pandora::SubDetector> SubDetector;
+        typedef ObjectCreationHelper<BoxGapParameters, pandora::BoxGap> BoxGap;
+        typedef ObjectCreationHelper<ConcentricGapParameters, pandora::ConcentricGap> ConcentricGap;
     };
 
-    typedef ObjectCreationHelper<MCParticleParameters> MCParticle;
-    typedef ObjectCreationHelper<TrackParameters> Track;
-    typedef ObjectCreationHelper<CaloHitParameters> CaloHit;
+    typedef ObjectCreationHelper<CaloHitParameters, pandora::CaloHit> CaloHit;
+    typedef ObjectCreationHelper<MCParticleParameters, pandora::MCParticle> MCParticle;
+    typedef ObjectCreationHelper<TrackParameters, pandora::Track> Track;
 
     /**
      *  @brief  Process an event

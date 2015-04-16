@@ -269,7 +269,7 @@ private:
     /**
      *  @brief  Destructor
      */
-    ~Cluster();
+    virtual ~Cluster();
 
     /**
      *  @brief  Alter the metadata information stored in a cluster

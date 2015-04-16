@@ -169,7 +169,7 @@ private:
     /**
      *  @brief  Destructor
      */
-    ~SubDetector();
+    virtual ~SubDetector();
 
     std::string             m_subDetectorName;      ///< The sub detector name, must uniquely specify a single sub detector
     SubDetectorType         m_subDetectorType;      ///< The sub detector type, e.g. ECAL_BARREL, HCAL_ENDCAP, TPC, etc.

@@ -12,6 +12,7 @@
 #include "Objects/Cluster.h"
 
 #include "Pandora/Pandora.h"
+#include "Pandora/ObjectFactory.h"
 
 #include "Plugins/PseudoLayerPlugin.h"
 
@@ -44,6 +45,39 @@ StatusCode CaloHitManager::Create(const PandoraApi::CaloHit::Parameters &paramet
     try
     {
         pCaloHit = new CaloHit(parameters);
+
+        if (NULL == pCaloHit)
+            throw StatusCodeException(STATUS_CODE_FAILURE);
+
+        const unsigned int pseudoLayer(m_pPandora->GetPlugins()->GetPseudoLayerPlugin()->GetPseudoLayer(pCaloHit->GetPositionVector()));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pCaloHit)->SetPseudoLayer(pseudoLayer));
+
+        NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
+
+        if ((m_nameToListMap.end() == inputIter) || !inputIter->second->insert(pCaloHit).second)
+            throw StatusCodeException(STATUS_CODE_FAILURE);
+
+        return STATUS_CODE_SUCCESS;
+    }
+    catch (StatusCodeException &statusCodeException)
+    {
+        std::cout << "Failed to create calo hit: " << statusCodeException.ToString() << std::endl;
+        delete pCaloHit;
+        pCaloHit = NULL;
+        return statusCodeException.GetStatusCode();
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename PARAMETERS>
+StatusCode CaloHitManager::Create(const PARAMETERS &parameters, const ObjectFactory<PARAMETERS, CaloHit> &factory, const CaloHit *&pCaloHit)
+{
+    pCaloHit = NULL;
+
+    try
+    {
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pCaloHit));
 
         if (NULL == pCaloHit)
             throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -236,15 +270,91 @@ StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit, const float fraction1,
+    const ObjectFactory<PandoraContentApi::FragmentParameters, CaloHit> &factory, const CaloHit *&pDaughterCaloHit1, const CaloHit *&pDaughterCaloHit2)
+{
+    pDaughterCaloHit1 = NULL; pDaughterCaloHit2 = NULL;
+
+    if (!this->CanFragmentCaloHit(pOriginalCaloHit, fraction1))
+        return STATUS_CODE_NOT_ALLOWED;
+
+    PandoraContentApi::FragmentParameters parameters1;
+    parameters1.m_pOriginalCaloHit = pOriginalCaloHit;
+    parameters1.m_energyWeight = fraction1;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters1, pDaughterCaloHit1));
+
+    PandoraContentApi::FragmentParameters parameters2;
+    parameters2.m_pOriginalCaloHit = pOriginalCaloHit;
+    parameters2.m_energyWeight = 1.f - fraction1;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters2, pDaughterCaloHit2));
+
+    if ((NULL == pDaughterCaloHit1) || (NULL == pDaughterCaloHit2))
+        return STATUS_CODE_FAILURE;
+
+    CaloHitReplacement caloHitReplacement;
+    caloHitReplacement.m_oldCaloHits.insert(pOriginalCaloHit);
+    caloHitReplacement.m_newCaloHits.insert(pDaughterCaloHit1); caloHitReplacement.m_newCaloHits.insert(pDaughterCaloHit2);
+
+    if (m_nReclusteringProcesses > 0)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->Update(caloHitReplacement));
+    }
+    else
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Update(caloHitReplacement));
+    }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode CaloHitManager::MergeCaloHitFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2, const CaloHit *&pMergedCaloHit)
 {
     pMergedCaloHit = NULL;
 
-    if (!this->CanMergeCaloHitFragments(pFragmentCaloHit1, pFragmentCaloHit2))
+    if (!this->CanMergeCaloHitFragments(pFragmentCaloHit1, pFragmentCaloHit2) || (pFragmentCaloHit1->GetCellGeometry() != pFragmentCaloHit2->GetCellGeometry()))
         return STATUS_CODE_NOT_ALLOWED;
 
     const float newWeight((pFragmentCaloHit1->GetWeight() + pFragmentCaloHit2->GetWeight()) / pFragmentCaloHit1->GetWeight());
+
     pMergedCaloHit = new CaloHit(pFragmentCaloHit1, newWeight);
+
+    if (NULL == pMergedCaloHit)
+        return STATUS_CODE_FAILURE;
+
+    CaloHitReplacement caloHitReplacement;
+    caloHitReplacement.m_newCaloHits.insert(pMergedCaloHit);
+    caloHitReplacement.m_oldCaloHits.insert(pFragmentCaloHit1); caloHitReplacement.m_oldCaloHits.insert(pFragmentCaloHit2);
+
+    if (m_nReclusteringProcesses > 0)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->Update(caloHitReplacement));
+    }
+    else
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Update(caloHitReplacement));
+    }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode CaloHitManager::MergeCaloHitFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2,
+    const ObjectFactory<PandoraContentApi::FragmentParameters, CaloHit> &factory, const CaloHit *&pMergedCaloHit)
+{
+    pMergedCaloHit = NULL;
+
+    if (!this->CanMergeCaloHitFragments(pFragmentCaloHit1, pFragmentCaloHit2) || (pFragmentCaloHit1->GetCellGeometry() != pFragmentCaloHit2->GetCellGeometry()))
+        return STATUS_CODE_NOT_ALLOWED;
+
+    const float newWeight((pFragmentCaloHit1->GetWeight() + pFragmentCaloHit2->GetWeight()) / pFragmentCaloHit1->GetWeight());
+
+    PandoraContentApi::FragmentParameters parameters;
+    parameters.m_pOriginalCaloHit = pFragmentCaloHit1;
+    parameters.m_energyWeight = newWeight;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pMergedCaloHit));
 
     if (NULL == pMergedCaloHit)
         return STATUS_CODE_FAILURE;
@@ -461,5 +571,9 @@ StatusCode CaloHitManager::Update(CaloHitList *const pCaloHitList, const CaloHit
 
     return STATUS_CODE_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template StatusCode CaloHitManager::Create<PandoraApi::CaloHit::Parameters>(const PandoraApi::CaloHit::Parameters &, const ObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit> &, const CaloHit *&);
 
 } // namespace pandora

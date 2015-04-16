@@ -141,7 +141,7 @@ private:
     /**
      *  @brief  Destructor
      */
-    ~MCParticle();
+    virtual ~MCParticle();
 
     /**
      *  @brief  Add daughter particle

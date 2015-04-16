@@ -64,7 +64,7 @@ private:
     /**
      *  @brief  Destructor
      */
-    ~Vertex();
+    virtual ~Vertex();
 
     /**
      *  @brief  Alter the metadata information stored in a vertex
