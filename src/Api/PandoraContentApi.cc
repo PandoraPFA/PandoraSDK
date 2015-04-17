@@ -256,35 +256,19 @@ pandora::StatusCode PandoraContentApi::RemoveIsolatedFromCluster(const pandora::
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 pandora::StatusCode PandoraContentApi::Fragment(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pOriginalCaloHit,
-    const float fraction1, const pandora::CaloHit *&pDaughterCaloHit1, const pandora::CaloHit *&pDaughterCaloHit2)
+    const float fraction1, const pandora::CaloHit *&pDaughterCaloHit1, const pandora::CaloHit *&pDaughterCaloHit2,
+    const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory)
 {
-    return algorithm.GetPandora().GetPandoraContentApiImpl()->Fragment(pOriginalCaloHit, fraction1, pDaughterCaloHit1, pDaughterCaloHit2);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-pandora::StatusCode PandoraContentApi::Fragment(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pOriginalCaloHit,
-    const float fraction1, const pandora::ObjectFactory<FragmentParameters, pandora::CaloHit> &factory,
-    const pandora::CaloHit *&pDaughterCaloHit1, const pandora::CaloHit *&pDaughterCaloHit2)
-{
-    return algorithm.GetPandora().GetPandoraContentApiImpl()->Fragment(pOriginalCaloHit, fraction1, factory, pDaughterCaloHit1, pDaughterCaloHit2);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->Fragment(pOriginalCaloHit, fraction1, pDaughterCaloHit1, pDaughterCaloHit2, factory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 pandora::StatusCode PandoraContentApi::MergeFragments(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pFragmentCaloHit1,
-    const pandora::CaloHit *const pFragmentCaloHit2, const pandora::CaloHit *&pMergedCaloHit)
+    const pandora::CaloHit *const pFragmentCaloHit2, const pandora::CaloHit *&pMergedCaloHit,
+    const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory)
 {
-    return algorithm.GetPandora().GetPandoraContentApiImpl()->MergeFragments(pFragmentCaloHit1, pFragmentCaloHit2, pMergedCaloHit);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-pandora::StatusCode PandoraContentApi::MergeFragments(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pFragmentCaloHit1,
-    const pandora::CaloHit *const pFragmentCaloHit2, const pandora::ObjectFactory<FragmentParameters, pandora::CaloHit> &factory,
-    const pandora::CaloHit *&pMergedCaloHit)
-{
-    return algorithm.GetPandora().GetPandoraContentApiImpl()->MergeFragments(pFragmentCaloHit1, pFragmentCaloHit2, factory, pMergedCaloHit);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->MergeFragments(pFragmentCaloHit1, pFragmentCaloHit2, pMergedCaloHit, factory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

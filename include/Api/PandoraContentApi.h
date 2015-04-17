@@ -141,22 +141,38 @@ public:
         pandora::InputCartesianVector   m_position;             ///< The vertex position
     };
 
-    /**
-     *  @brief  CaloHit fragment creation class
-     */
-    class FragmentParameters : public pandora::ObjectParameters
-    {
-    public:
-        const pandora::CaloHit         *m_pOriginalCaloHit;     ///< The address of the original calo hit
-        pandora::InputFloat             m_weight;               ///< The weight to be assigned to the fragment
-    };
-
     typedef ObjectCreationHelper<PandoraApi::CaloHit::Parameters, CaloHitMetadata, pandora::CaloHit> CaloHit;
     typedef ObjectCreationHelper<ClusterParameters, ClusterMetadata, pandora::Cluster> Cluster;
     typedef ObjectCreationHelper<ParticleFlowObjectParameters, ParticleFlowObjectMetadata, pandora::ParticleFlowObject> ParticleFlowObject;
     typedef ObjectCreationHelper<VertexParameters, VertexMetadata, pandora::Vertex> Vertex;
     typedef ObjectCreationHelper<PandoraApi::MCParticle::Parameters, void, pandora::MCParticle> MCParticle;
     typedef ObjectCreationHelper<PandoraApi::Track::Parameters, void, pandora::Track> Track;
+
+    /**
+     *  @brief  Type definition helper class
+     * 
+     *  @param  PARAMETERS the type of object parameters
+     *  @param  OBJECT the type of object
+     */
+    template <typename PARAMETERS, typename OBJECT>
+    class TypedefHelper
+    {
+    public:
+        typedef PARAMETERS Parameters;
+        typedef OBJECT Object;
+    };
+
+    /**
+     *  @brief  CaloHit fragment creation class
+     */
+    class CaloHitFragmentParameters : public pandora::ObjectParameters
+    {
+    public:
+        const pandora::CaloHit         *m_pOriginalCaloHit;     ///< The address of the original calo hit
+        pandora::InputFloat             m_weight;               ///< The weight to be assigned to the fragment
+    };
+
+    typedef TypedefHelper<CaloHitFragmentParameters, pandora::CaloHit> CaloHitFragment;
 
 
     /* Accessors for plugins and global settings */
@@ -470,23 +486,11 @@ public:
      *  @param  fraction1 the fraction of energy to be assigned to daughter fragment 1
      *  @param  pDaughterCaloHit1 to receive the address of daughter fragment 1
      *  @param  pDaughterCaloHit2 to receive the address of daughter fragment 2
-     */
-    static pandora::StatusCode Fragment(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pOriginalCaloHit,
-        const float fraction1, const pandora::CaloHit *&pDaughterCaloHit1, const pandora::CaloHit *&pDaughterCaloHit2);
-
-    /**
-     *  @brief  Fragment a calo hit into two daughter calo hits, with a specified energy division
-     *
-     *  @param  algorithm the algorithm calling this function
-     *  @param  pOriginalCaloHit address of the original calo hit, which will be deleted
-     *  @param  fraction1 the fraction of energy to be assigned to daughter fragment 1
      *  @param  factory to create the fragmented calo hits
-     *  @param  pDaughterCaloHit1 to receive the address of daughter fragment 1
-     *  @param  pDaughterCaloHit2 to receive the address of daughter fragment 2
      */
     static pandora::StatusCode Fragment(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pOriginalCaloHit,
-        const float fraction1, const pandora::ObjectFactory<PandoraContentApi::FragmentParameters, pandora::CaloHit> &factory,
-        const pandora::CaloHit *&pDaughterCaloHit1, const pandora::CaloHit *&pDaughterCaloHit2);
+        const float fraction1, const pandora::CaloHit *&pDaughterCaloHit1, const pandora::CaloHit *&pDaughterCaloHit2,
+        const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory = pandora::PandoraObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit>());
 
     /**
      *  @brief  Merge two calo hit fragments, originally from the same parent hit, to form a new calo hit
@@ -495,22 +499,12 @@ public:
      *  @param  pFragmentCaloHit1 address of calo hit fragment 1, which will be deleted
      *  @param  pFragmentCaloHit2 address of calo hit fragment 2, which will be deleted
      *  @param  pMergedCaloHit to receive the address of the merged calo hit
+     *  @param  factory to create the fragmented calo hits
      */
     static pandora::StatusCode MergeFragments(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pFragmentCaloHit1,
-        const pandora::CaloHit *const pFragmentCaloHit2, const pandora::CaloHit *&pMergedCaloHit);
+        const pandora::CaloHit *const pFragmentCaloHit2, const pandora::CaloHit *&pMergedCaloHit,
+        const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory = pandora::PandoraObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit>());
 
-    /**
-     *  @brief  Merge two calo hit fragments, originally from the same parent hit, to form a new calo hit
-     *
-     *  @param  algorithm the algorithm calling this function
-     *  @param  pFragmentCaloHit1 address of calo hit fragment 1, which will be deleted
-     *  @param  pFragmentCaloHit2 address of calo hit fragment 2, which will be deleted
-     *  @param  factory to create the merged calo hit
-     *  @param  pMergedCaloHit to receive the address of the merged calo hit
-     */
-    static pandora::StatusCode MergeFragments(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pFragmentCaloHit1,
-        const pandora::CaloHit *const pFragmentCaloHit2, const pandora::ObjectFactory<PandoraContentApi::FragmentParameters, pandora::CaloHit> &factory,
-        const pandora::CaloHit *&pMergedCaloHit);
 
     /* Track-related functions */
 

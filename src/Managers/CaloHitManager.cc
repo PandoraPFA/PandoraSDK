@@ -207,58 +207,20 @@ StatusCode CaloHitManager::RemoveAllMCParticleRelationships()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit, const float fraction1, const CaloHit *&pDaughterCaloHit1, const CaloHit *&pDaughterCaloHit2)
+StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit, const float fraction1, const CaloHit *&pDaughterCaloHit1,
+    const CaloHit *&pDaughterCaloHit2, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory)
 {
     pDaughterCaloHit1 = NULL; pDaughterCaloHit2 = NULL;
 
     if (!this->CanFragmentCaloHit(pOriginalCaloHit, fraction1))
         return STATUS_CODE_NOT_ALLOWED;
 
-    PandoraContentApi::FragmentParameters parameters1;
-    parameters1.m_pOriginalCaloHit = pOriginalCaloHit;
-    parameters1.m_weight = fraction1;
-    pDaughterCaloHit1 = new CaloHit(parameters1);
-
-    PandoraContentApi::FragmentParameters parameters2;
-    parameters2.m_pOriginalCaloHit = pOriginalCaloHit;
-    parameters2.m_weight = 1.f - fraction1;
-    pDaughterCaloHit2 = new CaloHit(parameters2);
-
-    if ((NULL == pDaughterCaloHit1) || (NULL == pDaughterCaloHit2))
-        return STATUS_CODE_FAILURE;
-
-    CaloHitReplacement caloHitReplacement;
-    caloHitReplacement.m_oldCaloHits.insert(pOriginalCaloHit);
-    caloHitReplacement.m_newCaloHits.insert(pDaughterCaloHit1); caloHitReplacement.m_newCaloHits.insert(pDaughterCaloHit2);
-
-    if (m_nReclusteringProcesses > 0)
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->Update(caloHitReplacement));
-    }
-    else
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Update(caloHitReplacement));
-    }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit, const float fraction1,
-    const ObjectFactory<PandoraContentApi::FragmentParameters, CaloHit> &factory, const CaloHit *&pDaughterCaloHit1, const CaloHit *&pDaughterCaloHit2)
-{
-    pDaughterCaloHit1 = NULL; pDaughterCaloHit2 = NULL;
-
-    if (!this->CanFragmentCaloHit(pOriginalCaloHit, fraction1))
-        return STATUS_CODE_NOT_ALLOWED;
-
-    PandoraContentApi::FragmentParameters parameters1;
+    PandoraContentApi::CaloHitFragment::Parameters parameters1;
     parameters1.m_pOriginalCaloHit = pOriginalCaloHit;
     parameters1.m_weight = fraction1;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters1, pDaughterCaloHit1));
 
-    PandoraContentApi::FragmentParameters parameters2;
+    PandoraContentApi::CaloHitFragment::Parameters parameters2;
     parameters2.m_pOriginalCaloHit = pOriginalCaloHit;
     parameters2.m_weight = 1.f - fraction1;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters2, pDaughterCaloHit2));
@@ -284,43 +246,8 @@ StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHitManager::MergeCaloHitFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2, const CaloHit *&pMergedCaloHit)
-{
-    pMergedCaloHit = NULL;
-
-    if (!this->CanMergeCaloHitFragments(pFragmentCaloHit1, pFragmentCaloHit2) || (pFragmentCaloHit1->GetCellGeometry() != pFragmentCaloHit2->GetCellGeometry()))
-        return STATUS_CODE_NOT_ALLOWED;
-
-    const float newWeight((pFragmentCaloHit1->GetWeight() + pFragmentCaloHit2->GetWeight()) / pFragmentCaloHit1->GetWeight());
-
-    PandoraContentApi::FragmentParameters parameters;
-    parameters.m_pOriginalCaloHit = pFragmentCaloHit1;
-    parameters.m_weight = newWeight;
-    pMergedCaloHit = new CaloHit(parameters);
-
-    if (NULL == pMergedCaloHit)
-        return STATUS_CODE_FAILURE;
-
-    CaloHitReplacement caloHitReplacement;
-    caloHitReplacement.m_newCaloHits.insert(pMergedCaloHit);
-    caloHitReplacement.m_oldCaloHits.insert(pFragmentCaloHit1); caloHitReplacement.m_oldCaloHits.insert(pFragmentCaloHit2);
-
-    if (m_nReclusteringProcesses > 0)
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->Update(caloHitReplacement));
-    }
-    else
-    {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Update(caloHitReplacement));
-    }
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 StatusCode CaloHitManager::MergeCaloHitFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2,
-    const ObjectFactory<PandoraContentApi::FragmentParameters, CaloHit> &factory, const CaloHit *&pMergedCaloHit)
+    const CaloHit *&pMergedCaloHit, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory)
 {
     pMergedCaloHit = NULL;
 
@@ -329,7 +256,7 @@ StatusCode CaloHitManager::MergeCaloHitFragments(const CaloHit *const pFragmentC
 
     const float newWeight((pFragmentCaloHit1->GetWeight() + pFragmentCaloHit2->GetWeight()) / pFragmentCaloHit1->GetWeight());
 
-    PandoraContentApi::FragmentParameters parameters;
+    PandoraContentApi::CaloHitFragment::Parameters parameters;
     parameters.m_pOriginalCaloHit = pFragmentCaloHit1;
     parameters.m_weight = newWeight;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pMergedCaloHit));

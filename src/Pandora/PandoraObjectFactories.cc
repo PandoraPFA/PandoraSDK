@@ -45,7 +45,7 @@ StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Create(const PARAMETERS &pa
 }
 
 template class PandoraObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit>;
-template class PandoraObjectFactory<PandoraContentApi::FragmentParameters, CaloHit>;
+template class PandoraObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit>;
 template class PandoraObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle>;
 template class PandoraObjectFactory<PandoraApi::Track::Parameters, Track>;
 template class PandoraObjectFactory<PandoraContentApi::Cluster::Parameters, Cluster>;

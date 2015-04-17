@@ -394,34 +394,17 @@ StatusCode PandoraContentApiImpl::RemoveIsolatedFromCluster(const Cluster *const
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode PandoraContentApiImpl::Fragment(const CaloHit *const pOriginalCaloHit, const float fraction1, const CaloHit *&pDaughterCaloHit1,
-    const CaloHit *&pDaughterCaloHit2) const
+    const CaloHit *&pDaughterCaloHit2, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory) const
 {
-    return m_pPandora->m_pCaloHitManager->FragmentCaloHit(pOriginalCaloHit, fraction1, pDaughterCaloHit1, pDaughterCaloHit2);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode PandoraContentApiImpl::Fragment(const CaloHit *const pOriginalCaloHit, const float fraction1,
-    const ObjectFactory<PandoraContentApi::FragmentParameters, CaloHit> &factory, const CaloHit *&pDaughterCaloHit1,
-    const CaloHit *&pDaughterCaloHit2) const
-{
-    return m_pPandora->m_pCaloHitManager->FragmentCaloHit(pOriginalCaloHit, fraction1, factory, pDaughterCaloHit1, pDaughterCaloHit2);
+    return m_pPandora->m_pCaloHitManager->FragmentCaloHit(pOriginalCaloHit, fraction1, pDaughterCaloHit1, pDaughterCaloHit2, factory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode PandoraContentApiImpl::MergeFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2,
-    const CaloHit *&pMergedCaloHit) const
+    const CaloHit *&pMergedCaloHit, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory) const
 {
-    return m_pPandora->m_pCaloHitManager->MergeCaloHitFragments(pFragmentCaloHit1, pFragmentCaloHit2, pMergedCaloHit);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode PandoraContentApiImpl::MergeFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2,
-    const ObjectFactory<PandoraContentApi::FragmentParameters, CaloHit> &factory, const CaloHit *&pMergedCaloHit) const
-{
-    return m_pPandora->m_pCaloHitManager->MergeCaloHitFragments(pFragmentCaloHit1, pFragmentCaloHit2, factory, pMergedCaloHit);
+    return m_pPandora->m_pCaloHitManager->MergeCaloHitFragments(pFragmentCaloHit1, pFragmentCaloHit2, pMergedCaloHit, factory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

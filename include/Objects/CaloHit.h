@@ -227,7 +227,7 @@ protected:
      * 
      *  @param  parameters the calo hit fragmentation parameters
      */
-    CaloHit(const PandoraContentApi::FragmentParameters &parameters);
+    CaloHit(const PandoraContentApi::CaloHitFragment::Parameters &parameters);
 
     /**
      *  @brief  Destructor
@@ -333,7 +333,7 @@ protected:
     friend class CaloHitManager;
     friend class InputObjectManager<CaloHit>;
     friend class PandoraObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit>;
-    friend class PandoraObjectFactory<PandoraContentApi::FragmentParameters, CaloHit>;
+    friend class PandoraObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit>;
 };
 
 /**

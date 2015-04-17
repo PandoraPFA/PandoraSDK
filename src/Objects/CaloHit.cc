@@ -46,7 +46,7 @@ CaloHit::CaloHit(const PandoraApi::CaloHit::Parameters &parameters) :
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-CaloHit::CaloHit(const PandoraContentApi::FragmentParameters &parameters) :
+CaloHit::CaloHit(const PandoraContentApi::CaloHitFragment::Parameters &parameters) :
     m_positionVector(parameters.m_pOriginalCaloHit->m_positionVector),
     m_expectedDirection(parameters.m_pOriginalCaloHit->m_expectedDirection),
     m_cellNormalVector(parameters.m_pOriginalCaloHit->m_cellNormalVector),
