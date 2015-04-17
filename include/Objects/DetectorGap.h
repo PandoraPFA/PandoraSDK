@@ -93,7 +93,7 @@ protected:
     const CartesianVector   m_side2;                ///< Cartesian vector describing second side meeting vertex, units mm
     const CartesianVector   m_side3;                ///< Cartesian vector describing third side meeting vertex, units mm
 
-    friend class GeometryManager; // TODO remove
+    friend class GeometryManager;
     friend class PandoraObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap>;
 };
 

@@ -10,6 +10,7 @@
 
 #include "Api/PandoraApi.h"
 
+#include "Pandora/ObjectParameters.h"
 #include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraInternal.h"
 #include "Pandora/PandoraObjectFactories.h"
@@ -112,7 +113,7 @@ public:
     /**
      *  @brief  ClusterParameters class. To build a cluster must provide at least one hit (which may be isolated) or a track address.
      */
-    class ClusterParameters
+    class ClusterParameters : public pandora::ObjectParameters
     {
     public:
         pandora::CaloHitList            m_caloHitList;          ///< The calo hit(s) to include
@@ -123,7 +124,7 @@ public:
     /**
      *  @brief  ParticleFlowObjectParameters class
      */
-    class ParticleFlowObjectParameters : public ParticleFlowObjectMetadata
+    class ParticleFlowObjectParameters : public ParticleFlowObjectMetadata, public pandora::ObjectParameters
     {
     public:
         pandora::ClusterList            m_clusterList;          ///< The clusters in the particle flow object
@@ -134,7 +135,7 @@ public:
     /**
      *  @brief  Vertex creation class
      */
-    class VertexParameters : public VertexMetadata
+    class VertexParameters : public VertexMetadata, public pandora::ObjectParameters
     {
     public:
         pandora::InputCartesianVector   m_position;             ///< The vertex position
@@ -143,7 +144,7 @@ public:
     /**
      *  @brief  CaloHit fragment creation class
      */
-    class FragmentParameters
+    class FragmentParameters : public pandora::ObjectParameters
     {
     public:
         const pandora::CaloHit         *m_pOriginalCaloHit;     ///< The address of the original calo hit

@@ -13,18 +13,13 @@
 namespace pandora
 {
 
-class PandoraApiImpl;
-class PandoraContentApiImpl;
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 /**
  *  @brief  PandoraObjectFactory class
  */
 template <typename PARAMETERS, typename OBJECT>
 class PandoraObjectFactory : public ObjectFactory<PARAMETERS, OBJECT>
 {
-private:
+public:
     /**
      *  @brief  Create an object with the given parameters
      *
@@ -32,9 +27,6 @@ private:
      *  @param  pObject to receive the address of the object created
      */
     StatusCode Create(const PARAMETERS &parameters, const OBJECT *&pObject) const;
-
-    friend class PandoraApiImpl;
-    friend class PandoraContentApiImpl;
 };
 
 } // namespace pandora

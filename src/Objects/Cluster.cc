@@ -13,6 +13,7 @@
 #include "Objects/Track.h"
 
 #include "Pandora/Pandora.h"
+#include "Pandora/PdgTable.h"
 
 #include "Plugins/EnergyCorrectionsPlugin.h"
 #include "Plugins/ParticleIdPlugin.h"

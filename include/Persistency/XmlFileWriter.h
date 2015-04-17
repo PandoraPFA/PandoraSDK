@@ -15,6 +15,8 @@
 
 #include "Persistency/FileWriter.h"
 
+#include "Xml/tinyxml.h"
+
 namespace pandora
 {
 

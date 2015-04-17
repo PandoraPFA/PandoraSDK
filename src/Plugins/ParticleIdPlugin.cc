@@ -10,6 +10,8 @@
 
 #include "Objects/Cluster.h"
 
+#include "Pandora/PdgTable.h"
+
 #include "Plugins/ParticleIdPlugin.h"
 
 #include <cstdlib>

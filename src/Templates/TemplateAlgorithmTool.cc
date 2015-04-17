@@ -1,26 +1,27 @@
 /**
- *  @file   PandoraSDK/src/Pandora/TemplateAlgorithm.cc
+ *  @file   PandoraSDK/src/Templates/TemplateAlgorithmTool.cc
  * 
- *  @brief  Implementation of the template algorithm class.
+ *  @brief  Implementation of the template algorithm tool class.
  * 
  *  $Log: $
  */
 
 #include "Pandora/AlgorithmHeaders.h"
-#include "Pandora/TemplateAlgorithm.h"
+
+#include "Templates/TemplateAlgorithmTool.h"
 
 using namespace pandora;
 
-StatusCode TemplateAlgorithm::Run()
+StatusCode TemplateAlgorithmTool::Run()
 {
-    // Algorithm code here
+    // Algorithm tool code here
 
     return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode TemplateAlgorithm::ReadSettings(const TiXmlHandle /*xmlHandle*/)
+StatusCode TemplateAlgorithmTool::ReadSettings(const TiXmlHandle /*xmlHandle*/)
 {
     // Read settings from xml file here
 

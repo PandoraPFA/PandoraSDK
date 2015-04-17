@@ -12,6 +12,7 @@
 
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraSettings.h"
+#include "Pandora/PdgTable.h"
 
 namespace pandora
 {

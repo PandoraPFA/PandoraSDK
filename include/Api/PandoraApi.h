@@ -8,6 +8,7 @@
 #ifndef PANDORA_API_H
 #define PANDORA_API_H 1
 
+#include "Pandora/ObjectParameters.h"
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraObjectFactories.h"
@@ -48,7 +49,7 @@ public:
     /**
      *  @brief  MCParticleParameters class
      */
-    class MCParticleParameters
+    class MCParticleParameters : public pandora::ObjectParameters
     {
     public:
         pandora::InputFloat                 m_energy;                   ///< The energy of the MC particle, units GeV
@@ -63,7 +64,7 @@ public:
     /**
      *  @brief  TrackParameters class
      */
-    class TrackParameters
+    class TrackParameters : public pandora::ObjectParameters
     {
     public:
         pandora::InputFloat                 m_bField;                   ///< The b-field used to perform a helix fit, units T // TODO remove this!
@@ -87,7 +88,7 @@ public:
     /**
      *  @brief  CaloHitParameters class
      */
-    class CaloHitParameters
+    class CaloHitParameters : public pandora::ObjectParameters
     {
     public:
         pandora::InputCartesianVector       m_positionVector;           ///< Position vector of center of calorimeter cell, units mm
@@ -121,7 +122,7 @@ public:
         /**
          *  @brief  LayerParameters class
          */
-        class LayerParameters
+        class LayerParameters : public pandora::ObjectParameters
         {
         public:
             pandora::InputFloat             m_closestDistanceToIp;      ///< Closest distance of the layer from the interaction point, units mm
@@ -134,7 +135,7 @@ public:
         /**
          *  @brief  SubDetectorParameters class
          */
-        class SubDetectorParameters
+        class SubDetectorParameters : public pandora::ObjectParameters
         {
         public:
             pandora::InputString            m_subDetectorName;          ///< The sub detector name, must uniquely specify a single sub detector
@@ -155,7 +156,7 @@ public:
         /**
          *  @brief  BoxGapParameters class
          */
-        class BoxGapParameters
+        class BoxGapParameters : public pandora::ObjectParameters
         {
         public:
             pandora::InputCartesianVector   m_vertex;                   ///< Cartesian coordinates of a gap vertex, units mm
@@ -167,7 +168,7 @@ public:
         /**
          *  @brief  ConcentricGapParameters class
          */
-        class ConcentricGapParameters
+        class ConcentricGapParameters : public pandora::ObjectParameters
         {
         public:
             pandora::InputFloat             m_minZCoordinate;           ///< Min cylindrical polar z coordinate, origin interaction point, units mm

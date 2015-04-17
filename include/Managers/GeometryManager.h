@@ -10,7 +10,7 @@
 
 #include "Api/PandoraApi.h"
 
-#include "Pandora/PandoraInputTypes.h"
+#include "Pandora/PandoraEnumeratedTypes.h"
 
 namespace pandora
 {

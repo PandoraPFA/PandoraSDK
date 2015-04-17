@@ -8,8 +8,8 @@
 #ifndef PANDORA_ENERGY_CORRECTIONS_PLUGIN_H
 #define PANDORA_ENERGY_CORRECTIONS_PLUGIN_H 1
 
+#include "Pandora/PandoraEnumeratedTypes.h"
 #include "Pandora/PandoraInternal.h"
-#include "Pandora/PandoraInputTypes.h"
 #include "Pandora/Process.h"
 
 namespace pandora

@@ -32,8 +32,11 @@
 #include "Objects/Vertex.h"
 
 #include "Pandora/AlgorithmTool.h"
+#include "Pandora/PandoraEnumeratedTypes.h"
 #include "Pandora/PandoraInternal.h"
+#include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraSettings.h"
+#include "Pandora/PdgTable.h"
 
 #include "Plugins/BFieldPlugin.h"
 #include "Plugins/EnergyCorrectionsPlugin.h"
