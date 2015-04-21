@@ -10,6 +10,7 @@
 #include "Managers/PluginManager.h"
 
 #include "Objects/Cluster.h"
+#include "Objects/CaloHit.h"
 
 #include "Pandora/Pandora.h"
 #include "Pandora/ObjectFactory.h"

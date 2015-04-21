@@ -10,6 +10,7 @@
 
 #include "Objects/MCParticle.h"
 
+#include "Pandora/ObjectFactory.h"
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraSettings.h"
 #include "Pandora/PdgTable.h"

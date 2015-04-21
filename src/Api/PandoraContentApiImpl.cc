@@ -18,6 +18,8 @@
 #include "Managers/TrackManager.h"
 #include "Managers/VertexManager.h"
 
+#include "Objects/CaloHit.h"
+#include "Objects/Cluster.h"
 #include "Objects/ParticleFlowObject.h"
 
 #include "Pandora/Algorithm.h"

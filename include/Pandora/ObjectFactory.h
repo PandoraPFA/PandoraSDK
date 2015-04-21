@@ -19,7 +19,7 @@ namespace pandora
 template <typename PARAMETERS, typename OBJECT>
 class ObjectFactory
 {
-public:
+protected:
     typedef PARAMETERS Parameters;
     typedef OBJECT Object;
 
@@ -30,6 +30,14 @@ public:
      *  @param  pObject to receive the address of the object created
      */
     virtual StatusCode Create(const Parameters &parameters, const Object *&pObject) const = 0;
+
+    friend class CaloHitManager;
+    friend class TrackManager;
+    friend class MCManager;
+    friend class ClusterManager;
+    friend class VertexManager;
+    friend class ParticleFlowObjectManager;
+    friend class GeometryManager;
 };
 
 } // namespace pandora

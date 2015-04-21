@@ -10,6 +10,8 @@
 
 #include "Objects/ParticleFlowObject.h"
 
+#include "Pandora/ObjectFactory.h"
+
 namespace pandora
 {
 

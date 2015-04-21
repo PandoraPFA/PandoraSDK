@@ -14,8 +14,6 @@
 #include "Managers/InputObjectManager.h"
 #include "Managers/Metadata.h"
 
-#include "Objects/CaloHit.h"
-
 #include "Pandora/PandoraInternal.h"
 
 namespace pandora

@@ -8,6 +8,10 @@
 
 #include "Managers/ClusterManager.h"
 
+#include "Objects/Cluster.h"
+
+#include "Pandora/ObjectFactory.h"
+
 namespace pandora
 {
 

@@ -12,8 +12,6 @@
 
 #include "Managers/AlgorithmObjectManager.h"
 
-#include "Objects/Cluster.h"
-
 #include "Pandora/PandoraInternal.h"
 
 namespace pandora

@@ -6,12 +6,11 @@
  *  $Log: $
  */
 
-#include "Managers/PluginManager.h"
 #include "Managers/TrackManager.h"
 
 #include "Objects/Track.h"
 
-#include "Plugins/BFieldPlugin.h"
+#include "Pandora/ObjectFactory.h"
 
 namespace pandora
 {

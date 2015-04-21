@@ -11,6 +11,8 @@
 #include "Objects/DetectorGap.h"
 #include "Objects/SubDetector.h"
 
+#include "Pandora/ObjectFactory.h"
+
 namespace pandora
 {
 

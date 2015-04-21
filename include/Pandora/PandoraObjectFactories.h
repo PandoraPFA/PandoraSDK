@@ -19,7 +19,7 @@ namespace pandora
 template <typename PARAMETERS, typename OBJECT>
 class PandoraObjectFactory : public ObjectFactory<PARAMETERS, OBJECT>
 {
-public:
+private:
     /**
      *  @brief  Create an object with the given parameters
      *

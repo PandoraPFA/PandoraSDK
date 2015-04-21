@@ -13,12 +13,12 @@
 
 #include "Objects/CaloHit.h"
 #include "Objects/Cluster.h"
+#include "Objects/DetectorGap.h"
 #include "Objects/MCParticle.h"
+#include "Objects/ParticleFlowObject.h"
+#include "Objects/SubDetector.h"
 #include "Objects/Track.h"
 #include "Objects/Vertex.h"
-#include "Objects/ParticleFlowObject.h"
-#include "Objects/DetectorGap.h"
-#include "Objects/SubDetector.h"
 
 namespace pandora
 {
@@ -46,11 +46,11 @@ StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Create(const PARAMETERS &pa
 
 template class PandoraObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit>;
 template class PandoraObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit>;
-template class PandoraObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle>;
 template class PandoraObjectFactory<PandoraApi::Track::Parameters, Track>;
+template class PandoraObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle>;
 template class PandoraObjectFactory<PandoraContentApi::Cluster::Parameters, Cluster>;
-template class PandoraObjectFactory<PandoraContentApi::Vertex::Parameters, Vertex>;
 template class PandoraObjectFactory<PandoraContentApi::ParticleFlowObject::Parameters, ParticleFlowObject>;
+template class PandoraObjectFactory<PandoraContentApi::Vertex::Parameters, Vertex>;
 template class PandoraObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector>;
 template class PandoraObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap>;
 template class PandoraObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap>;
