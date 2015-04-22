@@ -11,6 +11,7 @@
 #include "Pandora/StatusCodes.h"
 
 #include "Persistency/PandoraIO.h"
+#include "Persistency/Persistency.h"
 
 #include <string>
 
@@ -24,7 +25,7 @@ class Pandora;
 /**
  *  @brief  FileWriter class
  */
-class FileWriter
+class FileWriter : public Persistency
 {
 public:
     /**
@@ -115,10 +116,6 @@ protected:
      *  @param  address2 second address to write
      */
     virtual StatusCode WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight = 1.f) = 0;
-
-    const Pandora *const            m_pPandora;             ///< Address of pandora instance to be used alongside the file writer
-    ContainerId                     m_containerId;          ///< The type of container currently being written to file
-    std::string                     m_fileName;             ///< The file name
 
 private:
     /**

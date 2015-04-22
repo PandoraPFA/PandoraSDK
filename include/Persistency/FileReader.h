@@ -11,6 +11,7 @@
 #include "Pandora/StatusCodes.h"
 
 #include "Persistency/PandoraIO.h"
+#include "Persistency/Persistency.h"
 
 #include <string>
 
@@ -24,7 +25,7 @@ class Pandora;
 /**
  *  @brief  FileReader class
  */
-class FileReader
+class FileReader : public Persistency
 {
 public:
     /**
@@ -101,10 +102,6 @@ protected:
      *  @brief  Read the next pandora event component from the current position in the file, recreating the stored component
      */
     virtual StatusCode ReadNextEventComponent() = 0;
-
-    const Pandora *const            m_pPandora;             ///< Address of pandora instance to be used alongside the file reader
-    ContainerId                     m_containerId;          ///< The type of container currently being read from file
-    std::string                     m_fileName;             ///< The file name
 };
 
 } // namespace pandora

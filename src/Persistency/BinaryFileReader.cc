@@ -216,6 +216,9 @@ StatusCode BinaryFileReader::ReadSubDetector(bool checkComponentId)
             return STATUS_CODE_FAILURE;
     }
 
+    PandoraApi::Geometry::SubDetector::Parameters parameters;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pSubDetectorFactory->Read(parameters, *this));
+
     std::string subDetectorName;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(subDetectorName));
     SubDetectorType subDetectorType(SUB_DETECTOR_OTHER);
@@ -241,7 +244,6 @@ StatusCode BinaryFileReader::ReadSubDetector(bool checkComponentId)
     unsigned int nLayers(0);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(nLayers));
 
-    PandoraApi::Geometry::SubDetector::Parameters parameters;
     parameters.m_subDetectorName = subDetectorName;
     parameters.m_subDetectorType = subDetectorType;
     parameters.m_innerRCoordinate = innerRCoordinate;
@@ -292,6 +294,9 @@ StatusCode BinaryFileReader::ReadBoxGap(bool checkComponentId)
             return STATUS_CODE_FAILURE;
     }
 
+    PandoraApi::Geometry::BoxGap::Parameters parameters;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBoxGapFactory->Read(parameters, *this));
+
     CartesianVector vertex(0.f, 0.f, 0.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(vertex));
     CartesianVector side1(0.f, 0.f, 0.f);
@@ -301,7 +306,6 @@ StatusCode BinaryFileReader::ReadBoxGap(bool checkComponentId)
     CartesianVector side3(0.f, 0.f, 0.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(side3));
 
-    PandoraApi::Geometry::BoxGap::Parameters parameters;
     parameters.m_vertex = vertex;
     parameters.m_side1 = side1;
     parameters.m_side2 = side2;
@@ -327,6 +331,9 @@ StatusCode BinaryFileReader::ReadConcentricGap(bool checkComponentId)
                 return STATUS_CODE_FAILURE;
     }
 
+    PandoraApi::Geometry::ConcentricGap::Parameters parameters;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pConcentricGapFactory->Read(parameters, *this));
+
     float minZCoordinate(0.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(minZCoordinate));
     float maxZCoordinate(0.f);
@@ -344,7 +351,6 @@ StatusCode BinaryFileReader::ReadConcentricGap(bool checkComponentId)
     unsigned int outerSymmetryOrder(0);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(outerSymmetryOrder));
 
-    PandoraApi::Geometry::ConcentricGap::Parameters parameters;
     parameters.m_minZCoordinate = minZCoordinate;
     parameters.m_maxZCoordinate = maxZCoordinate;
     parameters.m_innerRCoordinate = innerRCoordinate;
@@ -373,6 +379,9 @@ StatusCode BinaryFileReader::ReadCaloHit(bool checkComponentId)
         if (CALO_HIT != componentId)
             return STATUS_CODE_FAILURE;
     }
+
+    PandoraApi::CaloHit::Parameters parameters;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Read(parameters, *this));
 
     CellGeometry cellGeometry(RECTANGULAR);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(cellGeometry));
@@ -415,7 +424,6 @@ StatusCode BinaryFileReader::ReadCaloHit(bool checkComponentId)
     float cellSize1(0.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(cellSize1));
 
-    PandoraApi::CaloHit::Parameters parameters;
     parameters.m_positionVector = positionVector;
     parameters.m_expectedDirection = expectedDirection;
     parameters.m_cellNormalVector = cellNormalVector;
@@ -457,6 +465,9 @@ StatusCode BinaryFileReader::ReadTrack(bool checkComponentId)
             return STATUS_CODE_FAILURE;
     }
 
+    PandoraApi::Track::Parameters parameters;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pTrackFactory->Read(parameters, *this));
+
     float d0(0.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(d0));
     float z0(0.f);
@@ -488,7 +499,6 @@ StatusCode BinaryFileReader::ReadTrack(bool checkComponentId)
     const void *pParentAddress(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(pParentAddress));
 
-    PandoraApi::Track::Parameters parameters;
     parameters.m_d0 = d0;
     parameters.m_z0 = z0;
     parameters.m_particleId = particleId;
@@ -525,6 +535,9 @@ StatusCode BinaryFileReader::ReadMCParticle(bool checkComponentId)
             return STATUS_CODE_FAILURE;
     }
 
+    PandoraApi::MCParticle::Parameters parameters;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pMCParticleFactory->Read(parameters, *this));
+
     float energy(0.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(energy));
     CartesianVector momentum(0.f, 0.f, 0.f);
@@ -540,7 +553,6 @@ StatusCode BinaryFileReader::ReadMCParticle(bool checkComponentId)
     const void *pParentAddress(NULL);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(pParentAddress));
 
-    PandoraApi::MCParticle::Parameters parameters;
     parameters.m_energy = energy;
     parameters.m_momentum = momentum;
     parameters.m_vertex = vertex;
