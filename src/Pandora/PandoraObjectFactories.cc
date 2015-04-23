@@ -24,6 +24,30 @@ namespace pandora
 {
 
 template <typename PARAMETERS, typename OBJECT>
+typename PandoraObjectFactory<PARAMETERS, OBJECT>::Parameters *PandoraObjectFactory<PARAMETERS, OBJECT>::NewParameters() const
+{
+    return (new Parameters);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename PARAMETERS, typename OBJECT>
+StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Read(Parameters &/*parameters*/, FileReader &/*fileReader*/) const
+{
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename PARAMETERS, typename OBJECT>
+StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Write(const Object *const /*pObject*/, FileWriter &/*fileWriter*/) const
+{
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename PARAMETERS, typename OBJECT>
 StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Create(const PARAMETERS &parameters, const OBJECT *&pObject) const
 {
     pObject = NULL;
@@ -43,6 +67,9 @@ StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Create(const PARAMETERS &pa
 
     return STATUS_CODE_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
 
 template class PandoraObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit>;
 template class PandoraObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit>;

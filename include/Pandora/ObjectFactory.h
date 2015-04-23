@@ -39,12 +39,19 @@ public:
     virtual ~ObjectFactory();
 
     /**
+     *  @brief  Create new parameters instance on the heap (memory-management to be controlled by user)
+     * 
+     *  @return the address of the new parameters instance
+     */
+    virtual Parameters *NewParameters() const = 0;
+
+    /**
      *  @brief  Read any additional (derived class only) object parameters from file using the specified file reader
      *
      *  @param  parameters the parameters to pass in constructor
      *  @param  fileReader the file reader, used to extract any additional parameters from file
      */
-    virtual StatusCode Read(Parameters &parameters, FileReader &fileReader) const;
+    virtual StatusCode Read(Parameters &parameters, FileReader &fileReader) const = 0;
 
     /**
      *  @brief  Persist any additional (derived class only) object parameters using the specified file writer
@@ -52,7 +59,7 @@ public:
      *  @param  pObject the address of the object to persist
      *  @param  fileWriter the file writer
      */
-    virtual StatusCode Write(const Object *const pObject, FileWriter &fileWriter) const;
+    virtual StatusCode Write(const Object *const pObject, FileWriter &fileWriter) const = 0;
 
 protected:
     /**
@@ -84,22 +91,6 @@ inline ObjectFactory<PARAMETERS, OBJECT>::ObjectFactory()
 template <typename PARAMETERS, typename OBJECT>
 inline ObjectFactory<PARAMETERS, OBJECT>::~ObjectFactory()
 {
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template <typename PARAMETERS, typename OBJECT>
-inline StatusCode ObjectFactory<PARAMETERS, OBJECT>::Read(Parameters &/*parameters*/, FileReader &/*fileReader*/) const
-{
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template <typename PARAMETERS, typename OBJECT>
-inline StatusCode ObjectFactory<PARAMETERS, OBJECT>::Write(const Object *const /*pObject*/, FileWriter &/*fileWriter*/) const
-{
-    return STATUS_CODE_SUCCESS;
 }
 
 } // namespace pandora

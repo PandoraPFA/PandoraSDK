@@ -19,14 +19,16 @@ namespace pandora
 template <typename PARAMETERS, typename OBJECT>
 class PandoraObjectFactory : public ObjectFactory<PARAMETERS, OBJECT>
 {
+public:
+    typedef PARAMETERS Parameters;
+    typedef OBJECT Object;
+
+    Parameters *NewParameters() const;
+    StatusCode Read(Parameters &parameters, FileReader &fileReader) const;
+    StatusCode Write(const Object *const pObject, FileWriter &fileWriter) const;
+
 private:
-    /**
-     *  @brief  Create an object with the given parameters
-     *
-     *  @param  parameters the parameters to pass in constructor
-     *  @param  pObject to receive the address of the object created
-     */
-    StatusCode Create(const PARAMETERS &parameters, const OBJECT *&pObject) const;
+    StatusCode Create(const Parameters &parameters, const Object *&pObject) const;
 };
 
 } // namespace pandora
