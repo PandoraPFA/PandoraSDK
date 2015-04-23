@@ -19,6 +19,7 @@ BinaryFileReader::BinaryFileReader(const pandora::Pandora &pandora, const std::s
     m_containerPosition(0),
     m_containerSize(0)
 {
+    m_fileType = BINARY;
     m_fileStream.open(fileName.c_str(), std::ios::in | std::ios::binary);
 
     if (!m_fileStream.is_open() || !m_fileStream.good())
@@ -273,7 +274,7 @@ StatusCode BinaryFileReader::ReadSubDetector(bool checkComponentId)
         parameters.m_layerParametersList.push_back(layerParameters);
     }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::SubDetector::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::SubDetector::Create(*m_pPandora, parameters, *m_pSubDetectorFactory));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -310,7 +311,7 @@ StatusCode BinaryFileReader::ReadBoxGap(bool checkComponentId)
     parameters.m_side1 = side1;
     parameters.m_side2 = side2;
     parameters.m_side3 = side3;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::BoxGap::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::BoxGap::Create(*m_pPandora, parameters, *m_pBoxGapFactory));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -359,7 +360,7 @@ StatusCode BinaryFileReader::ReadConcentricGap(bool checkComponentId)
     parameters.m_outerRCoordinate = outerRCoordinate;
     parameters.m_outerPhiCoordinate = outerPhiCoordinate;
     parameters.m_outerSymmetryOrder = outerSymmetryOrder;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::ConcentricGap::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::ConcentricGap::Create(*m_pPandora, parameters, *m_pConcentricGapFactory));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -444,7 +445,7 @@ StatusCode BinaryFileReader::ReadCaloHit(bool checkComponentId)
     parameters.m_layer = layer;
     parameters.m_isInOuterSamplingLayer = isInOuterSamplingLayer;
     parameters.m_pParentAddress = pParentAddress;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::CaloHit::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::CaloHit::Create(*m_pPandora, parameters, *m_pCaloHitFactory));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -514,7 +515,7 @@ StatusCode BinaryFileReader::ReadTrack(bool checkComponentId)
     parameters.m_canFormPfo = canFormPfo;
     parameters.m_canFormClusterlessPfo = canFormClusterlessPfo;
     parameters.m_pParentAddress = pParentAddress;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Track::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Track::Create(*m_pPandora, parameters, *m_pTrackFactory));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -560,7 +561,7 @@ StatusCode BinaryFileReader::ReadMCParticle(bool checkComponentId)
     parameters.m_particleId = particleId;
     parameters.m_mcParticleType = mcParticleType;
     parameters.m_pParentAddress = pParentAddress;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::MCParticle::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::MCParticle::Create(*m_pPandora, parameters, *m_pMCParticleFactory));
 
     return STATUS_CODE_SUCCESS;
 }

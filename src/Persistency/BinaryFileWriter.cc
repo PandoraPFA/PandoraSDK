@@ -23,6 +23,8 @@ namespace pandora
 BinaryFileWriter::BinaryFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode) :
     FileWriter(pandora, fileName)
 {
+    m_fileType = BINARY;
+
     if (APPEND == fileMode)
     {
         m_fileStream.open(fileName.c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::ate);

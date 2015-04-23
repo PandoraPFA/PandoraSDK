@@ -16,8 +16,9 @@ namespace pandora
 
 Persistency::Persistency(const pandora::Pandora &pandora, const std::string &fileName) :
     m_pPandora(&pandora),
-    m_containerId(UNKNOWN_CONTAINER),
     m_fileName(fileName),
+    m_fileType(UNKNOWN_FILE_TYPE),
+    m_containerId(UNKNOWN_CONTAINER),
     m_pCaloHitFactory(new PandoraObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit>()),
     m_pTrackFactory(new PandoraObjectFactory<PandoraApi::Track::Parameters, Track>()),
     m_pMCParticleFactory(new PandoraObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle>()),

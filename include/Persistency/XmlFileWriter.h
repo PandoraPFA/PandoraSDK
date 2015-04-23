@@ -40,6 +40,14 @@ public:
      */
     ~XmlFileWriter();
 
+    /**
+     *  @brief  Write a variable to the file
+     * 
+     *  @param  xmlKey the xml key
+     */
+    template<typename T>
+    StatusCode WriteVariable(const std::string &xmlKey, const T &t);
+
 private:
     StatusCode WriteHeader(const ContainerId containerId);
     StatusCode WriteFooter();
@@ -50,17 +58,9 @@ private:
     StatusCode WriteMCParticle(const MCParticle *const pMCParticle);
     StatusCode WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight);
 
-    /**
-     *  @brief  Write a variable to the file
-     * 
-     *  @param  xmlKey the xml key
-     */
-    template<typename T>
-    StatusCode WriteVariable(const std::string &xmlKey, const T &t);
-
-    TiXmlDocument                  *m_pXmlDocument;         ///< The xml document
-    TiXmlElement                   *m_pContainerXmlElement; ///< The container xml element
-    TiXmlElement                   *m_pCurrentXmlElement;   ///< The current xml element
+    TiXmlDocument      *m_pXmlDocument;         ///< The xml document
+    TiXmlElement       *m_pContainerXmlElement; ///< The container xml element
+    TiXmlElement       *m_pCurrentXmlElement;   ///< The current xml element
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -68,6 +68,9 @@ private:
 template<typename T>
 inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const T &t)
 {
+    if (!m_pCurrentXmlElement)
+        return STATUS_CODE_FAILURE;
+
     TiXmlElement *const pTiXmlElement = new TiXmlElement(xmlKey);
     pTiXmlElement->LinkEndChild(new TiXmlText(TypeToString(t)));
     m_pCurrentXmlElement->LinkEndChild(pTiXmlElement);

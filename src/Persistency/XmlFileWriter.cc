@@ -25,6 +25,8 @@ XmlFileWriter::XmlFileWriter(const pandora::Pandora &pandora, const std::string 
     m_pContainerXmlElement(NULL),
     m_pCurrentXmlElement(NULL)
 {
+    m_fileType = XML;
+
     if (APPEND == fileMode)
     {
         m_pXmlDocument = new TiXmlDocument(fileName);
@@ -126,6 +128,7 @@ StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector
     }
 
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
+    m_pCurrentXmlElement = NULL;
 
     return STATUS_CODE_SUCCESS;
 }
@@ -154,6 +157,7 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side3", pBoxGap->GetSide3()));
 
         m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
+        m_pCurrentXmlElement = NULL;
     }
     else if (NULL != pConcentricGap)
     {
@@ -170,6 +174,7 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterSymmetryOrder", pConcentricGap->GetOuterSymmetryOrder()));
 
         m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
+        m_pCurrentXmlElement = NULL;
     }
     else
     {
@@ -212,6 +217,7 @@ StatusCode XmlFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CellSize1", pCaloHit->GetCellSize1()));
 
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
+    m_pCurrentXmlElement = NULL;
 
     return STATUS_CODE_SUCCESS;
 }
@@ -243,6 +249,7 @@ StatusCode XmlFileWriter::WriteTrack(const Track *const pTrack)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ParentTrackAddress", pTrack->GetParentTrackAddress()));
 
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
+    m_pCurrentXmlElement = NULL;
 
     return STATUS_CODE_SUCCESS;
 }
@@ -266,6 +273,7 @@ StatusCode XmlFileWriter::WriteMCParticle(const MCParticle *const pMCParticle)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Uid", pMCParticle->GetUid()));
 
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
+    m_pCurrentXmlElement = NULL;
 
     return STATUS_CODE_SUCCESS;
 }
@@ -285,6 +293,7 @@ StatusCode XmlFileWriter::WriteRelationship(const RelationshipId relationshipId,
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Weight", weight));
 
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
+    m_pCurrentXmlElement = NULL;
 
     return STATUS_CODE_SUCCESS;
 }

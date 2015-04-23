@@ -6,8 +6,6 @@
  *  $Log: $
  */
 
-#include "Helpers/XmlHelper.h"
-
 #include "Objects/CaloHit.h"
 #include "Objects/Track.h"
 
@@ -22,6 +20,7 @@ XmlFileReader::XmlFileReader(const pandora::Pandora &pandora, const std::string 
     m_pCurrentXmlElement(NULL),
     m_isAtFileStart(true)
 {
+    m_fileType = XML;
     m_pXmlDocument = new TiXmlDocument(fileName);
 
     if (!m_pXmlDocument->LoadFile())
@@ -229,36 +228,34 @@ StatusCode XmlFileReader::ReadSubDetector()
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
-
     PandoraApi::Geometry::SubDetector::Parameters parameters;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pSubDetectorFactory->Read(parameters, *this));
 
     std::string subDetectorName;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "SubDetectorName", subDetectorName));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("SubDetectorName", subDetectorName));
     unsigned int subDetectorTypeInput(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "SubDetectorType", subDetectorTypeInput));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("SubDetectorType", subDetectorTypeInput));
     const SubDetectorType subDetectorType(static_cast<SubDetectorType>(subDetectorTypeInput));
     float innerRCoordinate(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "InnerRCoordinate", innerRCoordinate));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("InnerRCoordinate", innerRCoordinate));
     float innerZCoordinate(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "InnerZCoordinate", innerZCoordinate));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("InnerZCoordinate", innerZCoordinate));
     float innerPhiCoordinate(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "InnerPhiCoordinate", innerPhiCoordinate));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("InnerPhiCoordinate", innerPhiCoordinate));
     unsigned int innerSymmetryOrder(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "InnerSymmetryOrder", innerSymmetryOrder));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("InnerSymmetryOrder", innerSymmetryOrder));
     float outerRCoordinate(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "OuterRCoordinate", outerRCoordinate));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("OuterRCoordinate", outerRCoordinate));
     float outerZCoordinate(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "OuterZCoordinate", outerZCoordinate));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("OuterZCoordinate", outerZCoordinate));
     float outerPhiCoordinate(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "OuterPhiCoordinate", outerPhiCoordinate));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("OuterPhiCoordinate", outerPhiCoordinate));
     unsigned int outerSymmetryOrder(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "OuterSymmetryOrder", outerSymmetryOrder));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("OuterSymmetryOrder", outerSymmetryOrder));
     bool isMirroredInZ(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "IsMirroredInZ", isMirroredInZ));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("IsMirroredInZ", isMirroredInZ));
     unsigned int nLayers(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "NLayers", nLayers));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("NLayers", nLayers));
 
     parameters.m_subDetectorName = subDetectorName;
     parameters.m_subDetectorType = subDetectorType;
@@ -276,9 +273,9 @@ StatusCode XmlFileReader::ReadSubDetector()
     if (nLayers > 0)
     {
         FloatVector closestDistanceToIp, nRadiationLengths, nInteractionLengths;
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, "ClosestDistanceToIp", closestDistanceToIp));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, "NRadiationLengths", nRadiationLengths));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, "NInteractionLengths", nInteractionLengths));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("ClosestDistanceToIp", closestDistanceToIp));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("NRadiationLengths", nRadiationLengths));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("NInteractionLengths", nInteractionLengths));
 
         if ((closestDistanceToIp.size() != nLayers) || (nRadiationLengths.size() != nLayers) || (nInteractionLengths.size() != nLayers))
             return STATUS_CODE_FAILURE;
@@ -293,7 +290,7 @@ StatusCode XmlFileReader::ReadSubDetector()
         }
     }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::SubDetector::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::SubDetector::Create(*m_pPandora, parameters, *m_pSubDetectorFactory));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -305,25 +302,23 @@ StatusCode XmlFileReader::ReadBoxGap()
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
-
     PandoraApi::Geometry::BoxGap::Parameters parameters;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBoxGapFactory->Read(parameters, *this));
 
     CartesianVector vertex(0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Vertex", vertex));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Vertex", vertex));
     CartesianVector side1(0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Side1", side1));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Side1", side1));
     CartesianVector side2(0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Side2", side2));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Side2", side2));
     CartesianVector side3(0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Side3", side3));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Side3", side3));
 
     parameters.m_vertex = vertex;
     parameters.m_side1 = side1;
     parameters.m_side2 = side2;
     parameters.m_side3 = side3;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::BoxGap::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::BoxGap::Create(*m_pPandora, parameters, *m_pBoxGapFactory));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -335,27 +330,25 @@ StatusCode XmlFileReader::ReadConcentricGap()
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
-
     PandoraApi::Geometry::ConcentricGap::Parameters parameters;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pConcentricGapFactory->Read(parameters, *this));
 
     float minZCoordinate(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "MinZCoordinate", minZCoordinate));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("MinZCoordinate", minZCoordinate));
     float maxZCoordinate(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "MaxZCoordinate", maxZCoordinate));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("MaxZCoordinate", maxZCoordinate));
     float innerRCoordinate(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "InnerRCoordinate", innerRCoordinate));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("InnerRCoordinate", innerRCoordinate));
     float innerPhiCoordinate(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "InnerPhiCoordinate", innerPhiCoordinate));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("InnerPhiCoordinate", innerPhiCoordinate));
     unsigned int innerSymmetryOrder(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "InnerSymmetryOrder", innerSymmetryOrder));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("InnerSymmetryOrder", innerSymmetryOrder));
     float outerRCoordinate(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "OuterRCoordinate", outerRCoordinate));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("OuterRCoordinate", outerRCoordinate));
     float outerPhiCoordinate(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "OuterPhiCoordinate", outerPhiCoordinate));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("OuterPhiCoordinate", outerPhiCoordinate));
     unsigned int outerSymmetryOrder(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "OuterSymmetryOrder", outerSymmetryOrder));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("OuterSymmetryOrder", outerSymmetryOrder));
 
     parameters.m_minZCoordinate = minZCoordinate;
     parameters.m_maxZCoordinate = maxZCoordinate;
@@ -365,7 +358,7 @@ StatusCode XmlFileReader::ReadConcentricGap()
     parameters.m_outerRCoordinate = outerRCoordinate;
     parameters.m_outerPhiCoordinate = outerPhiCoordinate;
     parameters.m_outerSymmetryOrder = outerSymmetryOrder;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::ConcentricGap::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::ConcentricGap::Create(*m_pPandora, parameters, *m_pConcentricGapFactory));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -377,54 +370,52 @@ StatusCode XmlFileReader::ReadCaloHit()
     if (EVENT != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
-
     PandoraApi::CaloHit::Parameters parameters;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Read(parameters, *this));
 
     unsigned int cellGeometryInput(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "CellGeometry", cellGeometryInput));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("CellGeometry", cellGeometryInput));
     const CellGeometry cellGeometry(static_cast<CellGeometry>(cellGeometryInput));
     CartesianVector positionVector(0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "PositionVector", positionVector));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("PositionVector", positionVector));
     CartesianVector expectedDirection(0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "ExpectedDirection", expectedDirection));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("ExpectedDirection", expectedDirection));
     CartesianVector cellNormalVector(0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "CellNormalVector", cellNormalVector));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("CellNormalVector", cellNormalVector));
     float cellThickness(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "CellThickness", cellThickness));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("CellThickness", cellThickness));
     float nCellRadiationLengths(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "NCellRadiationLengths", nCellRadiationLengths));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("NCellRadiationLengths", nCellRadiationLengths));
     float nCellInteractionLengths(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "NCellInteractionLengths", nCellInteractionLengths));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("NCellInteractionLengths", nCellInteractionLengths));
     float time(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Time", time));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Time", time));
     float inputEnergy(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "InputEnergy", inputEnergy));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("InputEnergy", inputEnergy));
     float mipEquivalentEnergy(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "MipEquivalentEnergy", mipEquivalentEnergy));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("MipEquivalentEnergy", mipEquivalentEnergy));
     float electromagneticEnergy(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "ElectromagneticEnergy", electromagneticEnergy));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("ElectromagneticEnergy", electromagneticEnergy));
     float hadronicEnergy(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "HadronicEnergy", hadronicEnergy));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("HadronicEnergy", hadronicEnergy));
     bool isDigital(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "IsDigital", isDigital));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("IsDigital", isDigital));
     unsigned int hitTypeInput(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "HitType", hitTypeInput));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("HitType", hitTypeInput));
     const HitType hitType(static_cast<HitType>(hitTypeInput));
     unsigned int hitRegionInput(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "HitRegion", hitRegionInput));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("HitRegion", hitRegionInput));
     const HitRegion hitRegion(static_cast<HitRegion>(hitRegionInput));
     unsigned int layer(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Layer", layer));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Layer", layer));
     bool isInOuterSamplingLayer(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "IsInOuterSamplingLayer", isInOuterSamplingLayer));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("IsInOuterSamplingLayer", isInOuterSamplingLayer));
     const void *pParentAddress(NULL);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "ParentCaloHitAddress", pParentAddress));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("ParentCaloHitAddress", pParentAddress));
     float cellSize0(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "CellSize0", cellSize0));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("CellSize0", cellSize0));
     float cellSize1(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "CellSize1", cellSize1));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("CellSize1", cellSize1));
 
     parameters.m_positionVector = positionVector;
     parameters.m_expectedDirection = expectedDirection;
@@ -446,7 +437,7 @@ StatusCode XmlFileReader::ReadCaloHit()
     parameters.m_layer = layer;
     parameters.m_isInOuterSamplingLayer = isInOuterSamplingLayer;
     parameters.m_pParentAddress = pParentAddress;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::CaloHit::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::CaloHit::Create(*m_pPandora, parameters, *m_pCaloHitFactory));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -458,41 +449,39 @@ StatusCode XmlFileReader::ReadTrack()
     if (EVENT != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
-
     PandoraApi::Track::Parameters parameters;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pTrackFactory->Read(parameters, *this));
 
     float d0(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "D0", d0));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("D0", d0));
     float z0(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Z0", z0));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Z0", z0));
     int particleId(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "ParticleId", particleId));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("ParticleId", particleId));
     int charge(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Charge", charge));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Charge", charge));
     float mass(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Mass", mass));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Mass", mass));
     CartesianVector momentumAtDca(0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "MomentumAtDca", momentumAtDca));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("MomentumAtDca", momentumAtDca));
     TrackState trackStateAtStart(0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "TrackStateAtStart", trackStateAtStart));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("TrackStateAtStart", trackStateAtStart));
     TrackState trackStateAtEnd(0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "TrackStateAtEnd", trackStateAtEnd));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("TrackStateAtEnd", trackStateAtEnd));
     TrackState trackStateAtCalorimeter(0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "TrackStateAtCalorimeter", trackStateAtCalorimeter));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("TrackStateAtCalorimeter", trackStateAtCalorimeter));
     float timeAtCalorimeter(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "TimeAtCalorimeter", timeAtCalorimeter));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("TimeAtCalorimeter", timeAtCalorimeter));
     bool reachesCalorimeter(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "ReachesCalorimeter", reachesCalorimeter));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("ReachesCalorimeter", reachesCalorimeter));
     bool isProjectedToEndCap(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "IsProjectedToEndCap", isProjectedToEndCap));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("IsProjectedToEndCap", isProjectedToEndCap));
     bool canFormPfo(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "CanFormPfo", canFormPfo));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("CanFormPfo", canFormPfo));
     bool canFormClusterlessPfo(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "CanFormClusterlessPfo", canFormClusterlessPfo));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("CanFormClusterlessPfo", canFormClusterlessPfo));
     const void *pParentAddress(NULL);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "ParentTrackAddress", pParentAddress));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("ParentTrackAddress", pParentAddress));
 
     parameters.m_d0 = d0;
     parameters.m_z0 = z0;
@@ -509,7 +498,7 @@ StatusCode XmlFileReader::ReadTrack()
     parameters.m_canFormPfo = canFormPfo;
     parameters.m_canFormClusterlessPfo = canFormClusterlessPfo;
     parameters.m_pParentAddress = pParentAddress;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Track::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Track::Create(*m_pPandora, parameters, *m_pTrackFactory));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -521,26 +510,24 @@ StatusCode XmlFileReader::ReadMCParticle()
     if (EVENT != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
-
     PandoraApi::MCParticle::Parameters parameters;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pMCParticleFactory->Read(parameters, *this));
 
     float energy(0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Energy", energy));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Energy", energy));
     CartesianVector momentum(0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Momentum", momentum));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Momentum", momentum));
     CartesianVector vertex(0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Vertex", vertex));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Vertex", vertex));
     CartesianVector endpoint(0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Endpoint", endpoint));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Endpoint", endpoint));
     int particleId(-std::numeric_limits<int>::max());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "ParticleId", particleId));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("ParticleId", particleId));
     unsigned int mcParticleTypeInput(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "MCParticleType", mcParticleTypeInput));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("MCParticleType", mcParticleTypeInput));
     const MCParticleType mcParticleType(static_cast<MCParticleType>(mcParticleTypeInput));
     const void *pParentAddress(NULL);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Uid", pParentAddress));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Uid", pParentAddress));
 
     parameters.m_energy = energy;
     parameters.m_momentum = momentum;
@@ -549,7 +536,7 @@ StatusCode XmlFileReader::ReadMCParticle()
     parameters.m_particleId = particleId;
     parameters.m_mcParticleType = mcParticleType;
     parameters.m_pParentAddress = pParentAddress;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::MCParticle::Create(*m_pPandora, parameters));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::MCParticle::Create(*m_pPandora, parameters, *m_pMCParticleFactory));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -561,17 +548,15 @@ StatusCode XmlFileReader::ReadRelationship()
     if (EVENT != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    const TiXmlHandle xmlHandle(m_pCurrentXmlElement);
-
     unsigned int relationshipIdInput(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "RelationshipId", relationshipIdInput));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("RelationshipId", relationshipIdInput));
     const RelationshipId relationshipId(static_cast<RelationshipId>(relationshipIdInput));
     const void *address1(NULL);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Address1", address1));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Address1", address1));
     const void *address2(NULL);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Address2", address2));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Address2", address2));
     float weight(1.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "Weight", weight));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Weight", weight));
 
     switch (relationshipId)
     {

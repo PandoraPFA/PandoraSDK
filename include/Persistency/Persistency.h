@@ -15,6 +15,8 @@
 
 #include "Persistency/PandoraIO.h"
 
+#include <string>
+
 namespace pandora
 {
 
@@ -37,6 +39,20 @@ public:
      *  @brief  Destructor
      */
     virtual ~Persistency();
+
+    /**
+     *  @brief  Get the file name
+     * 
+     *  @return the file name
+     */
+    const std::string &GetFileName() const;
+
+    /**
+     *  @brief  Get the file type
+     * 
+     *  @return the file type
+     */
+    FileType GetFileType() const;
 
     /**
      *  @brief  Set the calo hit factory to use for all instantiations and parameter persistence
@@ -82,8 +98,9 @@ public:
 
 protected:
     const Pandora *const        m_pPandora;             ///< Address of pandora instance to be used alongside the file writer
-    ContainerId                 m_containerId;          ///< The type of container currently being written to file
     std::string                 m_fileName;             ///< The file name
+    FileType                    m_fileType;             ///< The file type
+    ContainerId                 m_containerId;          ///< The type of container currently being written to file
 
     ObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit>                        *m_pCaloHitFactory;       ///< Address of the calo hit factory
     ObjectFactory<PandoraApi::Track::Parameters, Track>                            *m_pTrackFactory;         ///< Address of the track factory
@@ -92,6 +109,20 @@ protected:
     ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap>                *m_pBoxGapFactory;        ///< Address of the box gap factory
     ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap>  *m_pConcentricGapFactory; ///< Address of the concentric gap factory
 };
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const std::string &Persistency::GetFileName() const
+{
+    return m_fileName;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline FileType Persistency::GetFileType() const
+{
+    return m_fileType;
+}
 
 } // namespace pandora
 
