@@ -11,6 +11,8 @@
 #include "Objects/DetectorGap.h"
 #include "Objects/SubDetector.h"
 
+#include "Pandora/ObjectFactory.h"
+
 namespace pandora
 {
 
@@ -69,13 +71,14 @@ Granularity GeometryManager::GetHitTypeGranularity(const HitType hitType) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode GeometryManager::CreateSubDetector(const PandoraApi::Geometry::SubDetector::Parameters &inputParameters)
+StatusCode GeometryManager::CreateSubDetector(const PandoraApi::Geometry::SubDetector::Parameters &inputParameters,
+    const ObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector> &factory)
 {
     const SubDetector *pSubDetector = NULL;
 
     try
     {
-        pSubDetector = new SubDetector(inputParameters);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(inputParameters, pSubDetector));
 
         if (!m_subDetectorMap.insert(SubDetectorMap::value_type(pSubDetector->GetSubDetectorName(), pSubDetector)).second)
             throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -95,13 +98,14 @@ StatusCode GeometryManager::CreateSubDetector(const PandoraApi::Geometry::SubDet
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode GeometryManager::CreateBoxGap(const PandoraApi::Geometry::BoxGap::Parameters &gapParameters)
+StatusCode GeometryManager::CreateBoxGap(const PandoraApi::Geometry::BoxGap::Parameters &gapParameters,
+    const ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> &factory)
 {
-    const DetectorGap *pDetectorGap = NULL;
+    const BoxGap *pDetectorGap = NULL;
 
     try
     {
-        pDetectorGap = new BoxGap(gapParameters);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(gapParameters, pDetectorGap));
 
         if (NULL == pDetectorGap)
             return STATUS_CODE_FAILURE;
@@ -120,13 +124,14 @@ StatusCode GeometryManager::CreateBoxGap(const PandoraApi::Geometry::BoxGap::Par
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode GeometryManager::CreateConcentricGap(const PandoraApi::Geometry::ConcentricGap::Parameters &gapParameters)
+StatusCode GeometryManager::CreateConcentricGap(const PandoraApi::Geometry::ConcentricGap::Parameters &gapParameters,
+    const ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> &factory)
 {
-    const DetectorGap *pDetectorGap = NULL;
+    const ConcentricGap *pDetectorGap = NULL;
 
     try
     {
-        pDetectorGap = new ConcentricGap(gapParameters);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(gapParameters, pDetectorGap));
 
         if (NULL == pDetectorGap)
             return STATUS_CODE_FAILURE;

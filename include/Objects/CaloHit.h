@@ -17,6 +17,7 @@ namespace pandora
 {
 
 template<typename T> class InputObjectManager;
+template<typename T, typename S> class PandoraObjectFactory;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -213,7 +214,7 @@ public:
      */
     void GetCellCorners(CartesianPointList &cartesianPointList) const;
 
-private:
+protected:
     /**
      *  @brief  Constructor
      * 
@@ -224,15 +225,14 @@ private:
     /**
      *  @brief  Weighted copy constructor
      * 
-     *  @param  pCaloHit address of the calo hit to copy
-     *  @param  weight the weight to apply to energy depositions
+     *  @param  parameters the calo hit fragmentation parameters
      */
-    CaloHit(const CaloHit *const pCaloHit, const float weight);
+    CaloHit(const PandoraContentApi::CaloHitFragment::Parameters &parameters);
 
     /**
      *  @brief  Destructor
      */
-    ~CaloHit();
+    virtual ~CaloHit();
 
     /**
      *  @brief  Set the mc pseudo layer for the calo hit
@@ -332,6 +332,8 @@ private:
     friend class CaloHitMetadata;
     friend class CaloHitManager;
     friend class InputObjectManager<CaloHit>;
+    friend class PandoraObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit>;
+    friend class PandoraObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit>;
 };
 
 /**

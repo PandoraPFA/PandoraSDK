@@ -8,6 +8,8 @@
 #ifndef PANDORA_XML_FILE_READER_H
 #define PANDORA_XML_FILE_READER_H 1
 
+#include "Helpers/XmlHelper.h"
+
 #include "Objects/CartesianVector.h"
 #include "Objects/TrackState.h"
 
@@ -35,7 +37,15 @@ public:
     /**
      *  @brief  Destructor
      */
-    virtual ~XmlFileReader();
+    ~XmlFileReader();
+
+    /**
+     *  @brief  Read a variable from the file
+     * 
+     *  @param  xmlKey the xml key
+     */
+    template<typename T>
+    StatusCode ReadVariable(const std::string &xmlKey, T &t);
 
 private:
     StatusCode ReadHeader();
@@ -86,6 +96,35 @@ private:
     TiXmlElement                   *m_pCurrentXmlElement;   ///< The current xml element
     bool                            m_isAtFileStart;        ///< Whether reader is at file start
 };
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template<typename T>
+inline StatusCode XmlFileReader::ReadVariable(const std::string &xmlKey, T &t)
+{
+    if (!m_pCurrentXmlElement)
+        return STATUS_CODE_FAILURE;
+
+    return XmlHelper::ReadValue(TiXmlHandle(m_pCurrentXmlElement), xmlKey, t);
+}
+
+template<>
+inline StatusCode XmlFileReader::ReadVariable(const std::string &xmlKey, IntVector &t)
+{
+    if (!m_pCurrentXmlElement)
+        return STATUS_CODE_FAILURE;
+
+    return XmlHelper::ReadVectorOfValues(TiXmlHandle(m_pCurrentXmlElement), xmlKey, t);
+}
+
+template<>
+inline StatusCode XmlFileReader::ReadVariable(const std::string &xmlKey, FloatVector &t)
+{
+    if (!m_pCurrentXmlElement)
+        return STATUS_CODE_FAILURE;
+
+    return XmlHelper::ReadVectorOfValues(TiXmlHandle(m_pCurrentXmlElement), xmlKey, t);
+}
 
 } // namespace pandora
 

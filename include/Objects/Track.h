@@ -16,6 +16,7 @@ namespace pandora
 {
 
 template<typename T> class InputObjectManager;
+template<typename T, typename S> class PandoraObjectFactory;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -131,13 +132,6 @@ public:
     bool CanFormClusterlessPfo() const;
 
     /**
-     *  @brief  Get the helix fit to the calorimeter track state
-     * 
-     *  @return address of the helix fit to the calorimeter track state
-     */
-    const Helix *GetHelixFitAtCalorimeter() const;
-
-    /**
      *  @brief  Whether the track has an associated cluster
      * 
      *  @return boolean
@@ -200,19 +194,18 @@ public:
      */
     bool IsAvailable() const;
 
-private:
+protected:
     /**
      *  @brief  Constructor
      * 
      *  @param  parameters the calo hit parameters
-     *  @param  the bField strength to be used in a helix fit to the track
      */
-    Track(const PandoraApi::Track::Parameters &parameters, const float bField);
+    Track(const PandoraApi::Track::Parameters &parameters);
 
     /**
      *  @brief  Destructor
      */
-    ~Track();
+    virtual ~Track();
 
     /**
      *  @brief  Set the mc particles associated with the track
@@ -289,8 +282,6 @@ private:
     const bool              m_canFormPfo;               ///< Whether track should form a pfo, if it has an associated cluster
     const bool              m_canFormClusterlessPfo;    ///< Whether track should form a pfo, even if it has no associated cluster
 
-    const Helix            *m_pHelixFitAtCalorimeter;   ///< Helix fit to the calorimeter track state
-
     const Cluster          *m_pAssociatedCluster;       ///< The address of an associated cluster
     MCParticleWeightMap     m_mcParticleWeightMap;      ///< The mc particle weight map
     const void             *m_pParentAddress;           ///< The address of the parent track in the user framework
@@ -303,6 +294,7 @@ private:
 
     friend class TrackManager;
     friend class InputObjectManager<Track>;
+    friend class PandoraObjectFactory<PandoraApi::Track::Parameters, Track>;
 };
 
 /**
@@ -416,13 +408,6 @@ inline bool Track::CanFormPfo() const
 inline bool Track::CanFormClusterlessPfo() const
 {
     return m_canFormClusterlessPfo;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline const Helix *Track::GetHelixFitAtCalorimeter() const
-{
-    return m_pHelixFitAtCalorimeter;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

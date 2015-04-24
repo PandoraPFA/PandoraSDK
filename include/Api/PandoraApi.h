@@ -8,8 +8,10 @@
 #ifndef PANDORA_API_H
 #define PANDORA_API_H 1
 
+#include "Pandora/ObjectParameters.h"
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraInputTypes.h"
+#include "Pandora/PandoraObjectFactories.h"
 
 namespace pandora { class AlgorithmFactory; class AlgorithmToolFactory; }
 
@@ -26,25 +28,28 @@ public:
      * 
      *  @param  PARAMETERS the type of object parameters
      */
-    template <typename PARAMETERS>
+    template <typename PARAMETERS, typename OBJECT>
     class ObjectCreationHelper
     {
     public:
         typedef PARAMETERS Parameters;
+        typedef OBJECT Object;
 
         /**
-         *  @brief  Create a new object
-         * 
-         *  @param  pandora the pandora instance to create the new object
+         *  @brief  Create a new object from a user factory
+         *
+         *  @param  pandora the pandora instance to create the new object object
          *  @param  parameters the object parameters
+         *  @param  factory the factory that performs the object allocation
          */
-        static pandora::StatusCode Create(const pandora::Pandora &pandora, const Parameters &parameters);
+        static pandora::StatusCode Create(const pandora::Pandora &pandora, const Parameters &parameters,
+            const pandora::ObjectFactory<Parameters, Object> &factory = pandora::PandoraObjectFactory<Parameters, Object>());
     };
 
     /**
      *  @brief  MCParticleParameters class
      */
-    class MCParticleParameters
+    class MCParticleParameters : public pandora::ObjectParameters
     {
     public:
         pandora::InputFloat                 m_energy;                   ///< The energy of the MC particle, units GeV
@@ -59,7 +64,7 @@ public:
     /**
      *  @brief  TrackParameters class
      */
-    class TrackParameters
+    class TrackParameters : public pandora::ObjectParameters
     {
     public:
         pandora::InputFloat                 m_d0;                       ///< The 2D impact parameter wrt (0,0), units mm
@@ -82,7 +87,7 @@ public:
     /**
      *  @brief  CaloHitParameters class
      */
-    class CaloHitParameters
+    class CaloHitParameters : public pandora::ObjectParameters
     {
     public:
         pandora::InputCartesianVector       m_positionVector;           ///< Position vector of center of calorimeter cell, units mm
@@ -116,7 +121,7 @@ public:
         /**
          *  @brief  LayerParameters class
          */
-        class LayerParameters
+        class LayerParameters : public pandora::ObjectParameters
         {
         public:
             pandora::InputFloat             m_closestDistanceToIp;      ///< Closest distance of the layer from the interaction point, units mm
@@ -129,7 +134,7 @@ public:
         /**
          *  @brief  SubDetectorParameters class
          */
-        class SubDetectorParameters
+        class SubDetectorParameters : public pandora::ObjectParameters
         {
         public:
             pandora::InputString            m_subDetectorName;          ///< The sub detector name, must uniquely specify a single sub detector
@@ -150,7 +155,7 @@ public:
         /**
          *  @brief  BoxGapParameters class
          */
-        class BoxGapParameters
+        class BoxGapParameters : public pandora::ObjectParameters
         {
         public:
             pandora::InputCartesianVector   m_vertex;                   ///< Cartesian coordinates of a gap vertex, units mm
@@ -162,7 +167,7 @@ public:
         /**
          *  @brief  ConcentricGapParameters class
          */
-        class ConcentricGapParameters
+        class ConcentricGapParameters : public pandora::ObjectParameters
         {
         public:
             pandora::InputFloat             m_minZCoordinate;           ///< Min cylindrical polar z coordinate, origin interaction point, units mm
@@ -175,14 +180,14 @@ public:
             pandora::InputUInt              m_outerSymmetryOrder;       ///< Order of symmetry of the outermost edge of gap
         };
 
-        typedef ObjectCreationHelper<SubDetectorParameters> SubDetector;
-        typedef ObjectCreationHelper<BoxGapParameters> BoxGap;
-        typedef ObjectCreationHelper<ConcentricGapParameters> ConcentricGap;
+        typedef ObjectCreationHelper<SubDetectorParameters, pandora::SubDetector> SubDetector;
+        typedef ObjectCreationHelper<BoxGapParameters, pandora::BoxGap> BoxGap;
+        typedef ObjectCreationHelper<ConcentricGapParameters, pandora::ConcentricGap> ConcentricGap;
     };
 
-    typedef ObjectCreationHelper<MCParticleParameters> MCParticle;
-    typedef ObjectCreationHelper<TrackParameters> Track;
-    typedef ObjectCreationHelper<CaloHitParameters> CaloHit;
+    typedef ObjectCreationHelper<CaloHitParameters, pandora::CaloHit> CaloHit;
+    typedef ObjectCreationHelper<MCParticleParameters, pandora::MCParticle> MCParticle;
+    typedef ObjectCreationHelper<TrackParameters, pandora::Track> Track;
 
     /**
      *  @brief  Process an event

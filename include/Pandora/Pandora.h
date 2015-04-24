@@ -8,8 +8,6 @@
 #ifndef PANDORA_MAIN_H
 #define PANDORA_MAIN_H 1
 
-#include "Pandora/PandoraInternal.h"
-#include "Pandora/PandoraInputTypes.h"
 #include "Pandora/StatusCodes.h"
 
 namespace pandora

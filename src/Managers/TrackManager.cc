@@ -6,12 +6,11 @@
  *  $Log: $
  */
 
-#include "Managers/PluginManager.h"
 #include "Managers/TrackManager.h"
 
 #include "Objects/Track.h"
 
-#include "Plugins/BFieldPlugin.h"
+#include "Pandora/ObjectFactory.h"
 
 namespace pandora
 {
@@ -31,13 +30,14 @@ TrackManager::~TrackManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode TrackManager::Create(const PandoraApi::Track::Parameters &parameters, const Track *&pTrack)
+StatusCode TrackManager::Create(const PandoraApi::Track::Parameters &parameters, const Track *&pTrack,
+    const ObjectFactory<PandoraApi::Track::Parameters, Track> &factory)
 {
     pTrack = NULL;
 
     try
     {
-        pTrack = new Track(parameters, m_pPandora->GetPlugins()->GetBFieldPlugin()->GetBField(CartesianVector(0.f, 0.f, 0.f)));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pTrack));
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
 

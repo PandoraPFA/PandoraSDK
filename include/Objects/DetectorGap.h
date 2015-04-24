@@ -14,6 +14,7 @@ namespace pandora
 {
 
 typedef std::vector<CartesianVector> VertexPointList;
+template<typename T, typename S> class PandoraObjectFactory;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -79,7 +80,7 @@ public:
      */
     const CartesianVector &GetSide3() const;
 
-private:
+protected:
     /**
      *  @brief  Constructor
      * 
@@ -93,6 +94,7 @@ private:
     const CartesianVector   m_side3;                ///< Cartesian vector describing third side meeting vertex, units mm
 
     friend class GeometryManager;
+    friend class PandoraObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -161,7 +163,7 @@ public:
      */
     unsigned int GetOuterSymmetryOrder() const;
 
-private:
+protected:
     /**
      *  @brief  Constructor
      * 
@@ -205,6 +207,7 @@ private:
     VertexPointList         m_outerVertexPointList; ///< The vertex points of the outer polygon
 
     friend class GeometryManager;
+    friend class PandoraObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

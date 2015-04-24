@@ -12,8 +12,6 @@
 
 #include "Managers/AlgorithmObjectManager.h"
 
-#include "Objects/Cluster.h"
-
 #include "Pandora/PandoraInternal.h"
 
 namespace pandora
@@ -43,8 +41,10 @@ private:
      * 
      *  @param  parameters the cluster parameters
      *  @param  pCluster to receive the address of the cluster created
+     *  @param  factory the factory that performs the object allocation
      */
-    StatusCode Create(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster);
+    StatusCode Create(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster,
+        const ObjectFactory<PandoraContentApi::Cluster::Parameters, Cluster> &factory);
 
     /**
      *  @brief  Alter the metadata information stored in a cluster

@@ -18,12 +18,15 @@
 #include "Managers/TrackManager.h"
 #include "Managers/VertexManager.h"
 
+#include "Objects/CaloHit.h"
+#include "Objects/Cluster.h"
 #include "Objects/ParticleFlowObject.h"
 
 #include "Pandora/Algorithm.h"
 #include "Pandora/AlgorithmTool.h"
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraSettings.h"
+#include "Pandora/ObjectFactory.h"
 
 namespace pandora
 {
@@ -69,18 +72,19 @@ StatusCode PandoraContentApiImpl::AlterMetadata(const OBJECT *const pObject, con
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename PARAMETERS, typename OBJECT>
-StatusCode PandoraContentApiImpl::Create(const PARAMETERS &parameters, const OBJECT *&pObject) const
+StatusCode PandoraContentApiImpl::Create(const PARAMETERS &parameters, const OBJECT *&pObject, const pandora::ObjectFactory<PARAMETERS, OBJECT> &factory) const
 {
-    return this->GetManager<OBJECT>()->Create(parameters, pObject);
+    return this->GetManager<OBJECT>()->Create(parameters, pObject, factory);
 }
 
 template <>
-StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster) const
+StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster,
+    const pandora::ObjectFactory<PandoraContentApi::Cluster::Parameters, Cluster> &factory) const
 {
     if (!m_pPandora->m_pCaloHitManager->IsAvailable(&parameters.m_caloHitList))
         return STATUS_CODE_NOT_ALLOWED;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->Create(parameters, pCluster));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->Create(parameters, pCluster, factory));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->SetAvailability(&parameters.m_caloHitList, false));
 
     return STATUS_CODE_SUCCESS;
@@ -88,7 +92,7 @@ StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::Cluster::Param
 
 template <>
 StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::ParticleFlowObject::Parameters &pfoParameters,
-    const ParticleFlowObject *&pPfo) const
+    const ParticleFlowObject *&pPfo, const pandora::ObjectFactory<PandoraContentApi::ParticleFlowObject::Parameters, ParticleFlowObject> &factory) const
 {
     if (!m_pPandora->m_pClusterManager->IsAvailable(&pfoParameters.m_clusterList) ||
         !m_pPandora->m_pTrackManager->IsAvailable(&pfoParameters.m_trackList) ||
@@ -97,7 +101,7 @@ StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::ParticleFlowOb
         return STATUS_CODE_NOT_ALLOWED;
     }
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->Create(pfoParameters, pPfo));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->Create(pfoParameters, pPfo, factory));
     m_pPandora->m_pClusterManager->SetAvailability(&pfoParameters.m_clusterList, false);
     m_pPandora->m_pTrackManager->SetAvailability(&pfoParameters.m_trackList, false);
     m_pPandora->m_pVertexManager->SetAvailability(&pfoParameters.m_vertexList, false);
@@ -392,17 +396,17 @@ StatusCode PandoraContentApiImpl::RemoveIsolatedFromCluster(const Cluster *const
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode PandoraContentApiImpl::Fragment(const CaloHit *const pOriginalCaloHit, const float fraction1, const CaloHit *&pDaughterCaloHit1,
-    const CaloHit *&pDaughterCaloHit2) const
+    const CaloHit *&pDaughterCaloHit2, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory) const
 {
-    return m_pPandora->m_pCaloHitManager->FragmentCaloHit(pOriginalCaloHit, fraction1, pDaughterCaloHit1, pDaughterCaloHit2);
+    return m_pPandora->m_pCaloHitManager->FragmentCaloHit(pOriginalCaloHit, fraction1, pDaughterCaloHit1, pDaughterCaloHit2, factory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode PandoraContentApiImpl::MergeFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2,
-    const CaloHit *&pMergedCaloHit) const
+    const CaloHit *&pMergedCaloHit, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory) const
 {
-    return m_pPandora->m_pCaloHitManager->MergeCaloHitFragments(pFragmentCaloHit1, pFragmentCaloHit2, pMergedCaloHit);
+    return m_pPandora->m_pCaloHitManager->MergeCaloHitFragments(pFragmentCaloHit1, pFragmentCaloHit2, pMergedCaloHit, factory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -804,10 +808,10 @@ template StatusCode PandoraContentApiImpl::AlterMetadata(const Cluster *const, c
 template StatusCode PandoraContentApiImpl::AlterMetadata(const ParticleFlowObject *const, const PandoraContentApi::ParticleFlowObject::Metadata &) const;
 template StatusCode PandoraContentApiImpl::AlterMetadata(const Vertex *const, const PandoraContentApi::Vertex::Metadata &) const;
 
-template StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::CaloHit::Parameters &, const CaloHit *&) const;
-template StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::Track::Parameters &, const Track *&) const;
-template StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::MCParticle::Parameters &, const MCParticle *&) const;
-template StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::Vertex::Parameters &, const Vertex *&) const;
+template StatusCode PandoraContentApiImpl::Create(const PandoraApi::CaloHit::Parameters &, const CaloHit *&, const ObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit> &) const;
+template StatusCode PandoraContentApiImpl::Create(const PandoraApi::Track::Parameters &, const Track *&, const ObjectFactory<PandoraApi::Track::Parameters, Track> &) const;
+template StatusCode PandoraContentApiImpl::Create(const PandoraApi::MCParticle::Parameters &, const MCParticle *&, const ObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle> &) const;
+template StatusCode PandoraContentApiImpl::Create(const PandoraContentApi::Vertex::Parameters &, const Vertex *&, const ObjectFactory<PandoraContentApi::Vertex::Parameters, Vertex> &) const;
 
 template StatusCode PandoraContentApiImpl::GetCurrentList<CaloHitList>(const CaloHitList *&, std::string &) const;
 template StatusCode PandoraContentApiImpl::GetCurrentList<TrackList>(const TrackList *&, std::string &) const;

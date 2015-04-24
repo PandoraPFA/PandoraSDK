@@ -34,6 +34,8 @@ class CaloHit;
 class CartesianVector;
 class Cluster;
 class DetectorGap;
+class BoxGap;
+class ConcentricGap;
 class EnergyCorrectionPlugin;
 class Helix;
 class Histogram;

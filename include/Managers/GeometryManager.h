@@ -10,7 +10,7 @@
 
 #include "Api/PandoraApi.h"
 
-#include "Pandora/PandoraInputTypes.h"
+#include "Pandora/PandoraEnumeratedTypes.h"
 
 namespace pandora
 {
@@ -80,22 +80,28 @@ private:
      *  @brief  Create sub detector
      * 
      *  @param  subDetectorParameters the sub detector parameters
+     *  @param  factory the factory that performs the object allocation
      */
-    StatusCode CreateSubDetector(const PandoraApi::Geometry::SubDetector::Parameters &subDetectorParameters);
+    StatusCode CreateSubDetector(const PandoraApi::Geometry::SubDetector::Parameters &subDetectorParameters,
+        const ObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector> &factory);
 
     /**
      *  @brief  Create box gap
      * 
      *  @param  gapParameters the gap parameters
+     *  @param  factory the factory that performs the object allocation
      */
-    StatusCode CreateBoxGap(const PandoraApi::Geometry::BoxGap::Parameters &gapParameters);
+    StatusCode CreateBoxGap(const PandoraApi::Geometry::BoxGap::Parameters &gapParameters,
+        const ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> &factory);
 
     /**
      *  @brief  Create concentric gap
      * 
      *  @param  gapParameters the gap parameters
+     *  @param  factory the factory that performs the object allocation
      */
-    StatusCode CreateConcentricGap(const PandoraApi::Geometry::ConcentricGap::Parameters &gapParameters);
+    StatusCode CreateConcentricGap(const PandoraApi::Geometry::ConcentricGap::Parameters &gapParameters,
+        const ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> &factory);
 
     /**
      *  @brief  Erase all geometry manager content

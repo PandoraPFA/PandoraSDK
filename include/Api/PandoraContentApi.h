@@ -10,8 +10,10 @@
 
 #include "Api/PandoraApi.h"
 
+#include "Pandora/ObjectParameters.h"
 #include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraInternal.h"
+#include "Pandora/PandoraObjectFactories.h"
 
 namespace pandora { class Algorithm; class AlgorithmTool; class TiXmlElement; }
 namespace pandora { class CaloHit; class Cluster; class MCParticle; class ParticleFlowObject; class Track; class Vertex; }
@@ -97,19 +99,21 @@ public:
         typedef OBJECT Object;
 
         /**
-         *  @brief  Create a new object
-         * 
+         *  @brief  Create a new object from a user factory
+         *
          *  @param  algorithm the algorithm calling this function
          *  @param  parameters the object parameters
          *  @param  pObject to receive the address of the object created
+         *  @param  factory the factory that performs the object allocation
          */
-        static pandora::StatusCode Create(const pandora::Algorithm &algorithm, const Parameters &parameters, const Object *&pObject);
+        static pandora::StatusCode Create(const pandora::Algorithm &algorithm, const Parameters &parameters,
+            const Object *&pObject, const pandora::ObjectFactory<Parameters, Object> &factory = pandora::PandoraObjectFactory<Parameters, Object>());
     };
 
     /**
      *  @brief  ClusterParameters class. To build a cluster must provide at least one hit (which may be isolated) or a track address.
      */
-    class ClusterParameters
+    class ClusterParameters : public pandora::ObjectParameters
     {
     public:
         pandora::CaloHitList            m_caloHitList;          ///< The calo hit(s) to include
@@ -120,7 +124,7 @@ public:
     /**
      *  @brief  ParticleFlowObjectParameters class
      */
-    class ParticleFlowObjectParameters : public ParticleFlowObjectMetadata
+    class ParticleFlowObjectParameters : public ParticleFlowObjectMetadata, public pandora::ObjectParameters
     {
     public:
         pandora::ClusterList            m_clusterList;          ///< The clusters in the particle flow object
@@ -131,18 +135,44 @@ public:
     /**
      *  @brief  Vertex creation class
      */
-    class VertexParameters : public VertexMetadata
+    class VertexParameters : public VertexMetadata, public pandora::ObjectParameters
     {
     public:
         pandora::InputCartesianVector   m_position;             ///< The vertex position
     };
 
-    typedef ObjectCreationHelper<ClusterParameters, ClusterMetadata, const pandora::Cluster> Cluster;
-    typedef ObjectCreationHelper<ParticleFlowObjectParameters, ParticleFlowObjectMetadata, const pandora::ParticleFlowObject> ParticleFlowObject;
-    typedef ObjectCreationHelper<VertexParameters, VertexMetadata, const pandora::Vertex> Vertex;
-    typedef ObjectCreationHelper<PandoraApi::MCParticle::Parameters, void, const pandora::MCParticle> MCParticle;
-    typedef ObjectCreationHelper<PandoraApi::Track::Parameters, void, const pandora::Track> Track;
-    typedef ObjectCreationHelper<PandoraApi::CaloHit::Parameters, CaloHitMetadata, const pandora::CaloHit> CaloHit;
+    typedef ObjectCreationHelper<PandoraApi::CaloHit::Parameters, CaloHitMetadata, pandora::CaloHit> CaloHit;
+    typedef ObjectCreationHelper<ClusterParameters, ClusterMetadata, pandora::Cluster> Cluster;
+    typedef ObjectCreationHelper<ParticleFlowObjectParameters, ParticleFlowObjectMetadata, pandora::ParticleFlowObject> ParticleFlowObject;
+    typedef ObjectCreationHelper<VertexParameters, VertexMetadata, pandora::Vertex> Vertex;
+    typedef ObjectCreationHelper<PandoraApi::MCParticle::Parameters, void, pandora::MCParticle> MCParticle;
+    typedef ObjectCreationHelper<PandoraApi::Track::Parameters, void, pandora::Track> Track;
+
+    /**
+     *  @brief  Type definition helper class
+     * 
+     *  @param  PARAMETERS the type of object parameters
+     *  @param  OBJECT the type of object
+     */
+    template <typename PARAMETERS, typename OBJECT>
+    class TypedefHelper
+    {
+    public:
+        typedef PARAMETERS Parameters;
+        typedef OBJECT Object;
+    };
+
+    /**
+     *  @brief  CaloHit fragment creation class
+     */
+    class CaloHitFragmentParameters : public pandora::ObjectParameters
+    {
+    public:
+        const pandora::CaloHit         *m_pOriginalCaloHit;     ///< The address of the original calo hit
+        pandora::InputFloat             m_weight;               ///< The weight to be assigned to the fragment
+    };
+
+    typedef TypedefHelper<CaloHitFragmentParameters, pandora::CaloHit> CaloHitFragment;
 
 
     /* Accessors for plugins and global settings */
@@ -456,9 +486,11 @@ public:
      *  @param  fraction1 the fraction of energy to be assigned to daughter fragment 1
      *  @param  pDaughterCaloHit1 to receive the address of daughter fragment 1
      *  @param  pDaughterCaloHit2 to receive the address of daughter fragment 2
+     *  @param  factory to create the fragmented calo hits
      */
     static pandora::StatusCode Fragment(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pOriginalCaloHit,
-        const float fraction1, const pandora::CaloHit *&pDaughterCaloHit1, const pandora::CaloHit *&pDaughterCaloHit2);
+        const float fraction1, const pandora::CaloHit *&pDaughterCaloHit1, const pandora::CaloHit *&pDaughterCaloHit2,
+        const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory = pandora::PandoraObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit>());
 
     /**
      *  @brief  Merge two calo hit fragments, originally from the same parent hit, to form a new calo hit
@@ -467,9 +499,11 @@ public:
      *  @param  pFragmentCaloHit1 address of calo hit fragment 1, which will be deleted
      *  @param  pFragmentCaloHit2 address of calo hit fragment 2, which will be deleted
      *  @param  pMergedCaloHit to receive the address of the merged calo hit
+     *  @param  factory to create the fragmented calo hits
      */
     static pandora::StatusCode MergeFragments(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pFragmentCaloHit1,
-        const pandora::CaloHit *const pFragmentCaloHit2, const pandora::CaloHit *&pMergedCaloHit);
+        const pandora::CaloHit *const pFragmentCaloHit2, const pandora::CaloHit *&pMergedCaloHit,
+        const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory = pandora::PandoraObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit>());
 
 
     /* Track-related functions */

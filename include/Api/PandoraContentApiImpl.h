@@ -64,9 +64,10 @@ private:
      * 
      *  @param  parameters the object parameters
      *  @param  pObject to receive the address of the object created
+     *  @param  factory the factory that performs the object allocation
      */
     template <typename PARAMETERS, typename OBJECT>
-    StatusCode Create(const PARAMETERS &parameters, const OBJECT *&pObject) const;
+    StatusCode Create(const PARAMETERS &parameters, const OBJECT *&pObject, const ObjectFactory<PARAMETERS, OBJECT> &factory) const;
 
 
     /* Accessors for plugins and global settings */
@@ -338,8 +339,10 @@ private:
      *  @param  fraction1 the fraction of energy to be assigned to daughter fragment 1
      *  @param  pDaughterCaloHit1 to receive the address of daughter fragment 1
      *  @param  pDaughterCaloHit2 to receive the address of daughter fragment 2
+     *  @param  factory to create the fragmented calo hits
      */
-    StatusCode Fragment(const CaloHit *const pOriginalCaloHit, const float fraction1, const CaloHit *&pDaughterCaloHit1, const CaloHit *&pDaughterCaloHit2) const;
+    StatusCode Fragment(const CaloHit *const pOriginalCaloHit, const float fraction1, const CaloHit *&pDaughterCaloHit1,
+        const CaloHit *&pDaughterCaloHit2, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory) const;
 
     /**
      *  @brief  Merge two calo hit fragments, originally from the same parent hit, to form a new calo hit
@@ -347,8 +350,10 @@ private:
      *  @param  pFragmentCaloHit1 address of calo hit fragment 1, which will be deleted
      *  @param  pFragmentCaloHit2 address of calo hit fragment 2, which will be deleted
      *  @param  pMergedCaloHit to receive the address of the merged calo hit
+     *  @param  factory to create the merged calo hit fragment
      */
-    StatusCode MergeFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2, const CaloHit *&pMergedCaloHit) const;
+    StatusCode MergeFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2,
+        const CaloHit *&pMergedCaloHit, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory) const;
 
 
     /* Track-related functions */

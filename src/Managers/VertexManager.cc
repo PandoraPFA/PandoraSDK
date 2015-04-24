@@ -10,6 +10,8 @@
 
 #include "Objects/Vertex.h"
 
+#include "Pandora/ObjectFactory.h"
+
 namespace pandora
 {
 
@@ -28,7 +30,8 @@ VertexManager::~VertexManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode VertexManager::Create(const PandoraContentApi::Vertex::Parameters &parameters, const Vertex *&pVertex)
+StatusCode VertexManager::Create(const PandoraContentApi::Vertex::Parameters &parameters, const Vertex *&pVertex,
+    const ObjectFactory<PandoraContentApi::Vertex::Parameters, Vertex> &factory)
 {
     pVertex = NULL;
 
@@ -42,7 +45,7 @@ StatusCode VertexManager::Create(const PandoraContentApi::Vertex::Parameters &pa
         if (m_nameToListMap.end() == iter)
              throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
-        pVertex = new Vertex(parameters);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pVertex));
 
         if (NULL == pVertex)
              throw StatusCodeException(STATUS_CODE_FAILURE);

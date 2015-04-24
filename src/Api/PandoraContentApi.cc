@@ -11,6 +11,7 @@
 
 #include "Pandora/Algorithm.h"
 #include "Pandora/Pandora.h"
+#include "Pandora/ObjectFactory.h"
 
 template <typename OBJECT, typename METADATA>
 pandora::StatusCode PandoraContentApi::AlterMetadata(const pandora::Algorithm &algorithm, const OBJECT *const pObject, const METADATA &metadata)
@@ -19,14 +20,16 @@ pandora::StatusCode PandoraContentApi::AlterMetadata(const pandora::Algorithm &a
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename PARAMETERS, typename METADATA, typename OBJECT>
 pandora::StatusCode PandoraContentApi::ObjectCreationHelper<PARAMETERS, METADATA, OBJECT>::Create(const pandora::Algorithm &algorithm,
-    const Parameters &parameters, const Object *&pObject)
+    const PARAMETERS &parameters, const OBJECT *&pObject, const pandora::ObjectFactory<PARAMETERS, OBJECT> &factory)
 {
-    return algorithm.GetPandora().GetPandoraContentApiImpl()->Create(parameters, pObject);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->Create(parameters, pObject, factory);
 }
 
+//------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 const pandora::PandoraSettings *PandoraContentApi::GetSettings(const pandora::Algorithm &algorithm)
@@ -253,17 +256,19 @@ pandora::StatusCode PandoraContentApi::RemoveIsolatedFromCluster(const pandora::
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 pandora::StatusCode PandoraContentApi::Fragment(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pOriginalCaloHit,
-    const float fraction1, const pandora::CaloHit *&pDaughterCaloHit1, const pandora::CaloHit *&pDaughterCaloHit2)
+    const float fraction1, const pandora::CaloHit *&pDaughterCaloHit1, const pandora::CaloHit *&pDaughterCaloHit2,
+    const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory)
 {
-    return algorithm.GetPandora().GetPandoraContentApiImpl()->Fragment(pOriginalCaloHit, fraction1, pDaughterCaloHit1, pDaughterCaloHit2);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->Fragment(pOriginalCaloHit, fraction1, pDaughterCaloHit1, pDaughterCaloHit2, factory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 pandora::StatusCode PandoraContentApi::MergeFragments(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pFragmentCaloHit1,
-    const pandora::CaloHit *const pFragmentCaloHit2, const pandora::CaloHit *&pMergedCaloHit)
+    const pandora::CaloHit *const pFragmentCaloHit2, const pandora::CaloHit *&pMergedCaloHit,
+    const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory)
 {
-    return algorithm.GetPandora().GetPandoraContentApiImpl()->MergeFragments(pFragmentCaloHit1, pFragmentCaloHit2, pMergedCaloHit);
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->MergeFragments(pFragmentCaloHit1, pFragmentCaloHit2, pMergedCaloHit, factory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -391,12 +396,12 @@ template pandora::StatusCode PandoraContentApi::AlterMetadata<pandora::Cluster, 
 template pandora::StatusCode PandoraContentApi::AlterMetadata<pandora::ParticleFlowObject, PandoraContentApi::ParticleFlowObject::Metadata>(const pandora::Algorithm &, const pandora::ParticleFlowObject *, const PandoraContentApi::ParticleFlowObject::Metadata &);
 template pandora::StatusCode PandoraContentApi::AlterMetadata<pandora::Vertex, PandoraContentApi::Vertex::Metadata>(const pandora::Algorithm &, const pandora::Vertex *, const PandoraContentApi::Vertex::Metadata &);
 
-template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::Cluster::Parameters, PandoraContentApi::Cluster::Metadata, const pandora::Cluster>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::ParticleFlowObject::Parameters, PandoraContentApi::ParticleFlowObject::Metadata, const pandora::ParticleFlowObject>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::Vertex::Parameters, PandoraContentApi::Vertex::Metadata, const pandora::Vertex>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraApi::MCParticle::Parameters, void, const pandora::MCParticle>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraApi::Track::Parameters, void, const pandora::Track>;
-template class PandoraContentApi::ObjectCreationHelper<PandoraApi::CaloHit::Parameters, PandoraContentApi::CaloHit::Metadata, const pandora::CaloHit>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraApi::CaloHit::Parameters, PandoraContentApi::CaloHit::Metadata, PandoraContentApi::CaloHit::Object>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::Cluster::Parameters, PandoraContentApi::Cluster::Metadata, PandoraContentApi::Cluster::Object>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::ParticleFlowObject::Parameters, PandoraContentApi::ParticleFlowObject::Metadata, PandoraContentApi::ParticleFlowObject::Object>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraContentApi::Vertex::Parameters, PandoraContentApi::Vertex::Metadata, PandoraContentApi::Vertex::Object>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraApi::MCParticle::Parameters, void, PandoraContentApi::MCParticle::Object>;
+template class PandoraContentApi::ObjectCreationHelper<PandoraApi::Track::Parameters, void, PandoraContentApi::Track::Object>;
 
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::CaloHitList>(const pandora::Algorithm &, const pandora::CaloHitList *&);
 template pandora::StatusCode PandoraContentApi::GetCurrentList<pandora::TrackList>(const pandora::Algorithm &, const pandora::TrackList *&);

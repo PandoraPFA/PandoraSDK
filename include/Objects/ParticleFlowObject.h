@@ -14,6 +14,7 @@ namespace pandora
 {
 
 template<typename T> class AlgorithmObjectManager;
+template<typename T, typename S> class PandoraObjectFactory;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -135,7 +136,7 @@ public:
      */
     unsigned int GetNDaughterPfos() const;
 
-private:
+protected:
     /**
      *  @brief  Constructor
      * 
@@ -146,7 +147,7 @@ private:
     /**
      *  @brief  Destructor
      */
-    ~ParticleFlowObject();
+    virtual ~ParticleFlowObject();
 
     /**
      *  @brief  Alter particle flow object metadata parameters
@@ -214,6 +215,7 @@ private:
 
     friend class ParticleFlowObjectManager;
     friend class AlgorithmObjectManager<ParticleFlowObject>;
+    friend class PandoraObjectFactory<PandoraContentApi::ParticleFlowObject::Parameters, ParticleFlowObject>;
 };
 
 typedef ParticleFlowObject Pfo;                         ///< The ParticleFlowObject to Pfo typedef

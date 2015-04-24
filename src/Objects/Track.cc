@@ -6,7 +6,6 @@
  *  $Log: $
  */
 
-#include "Objects/Helix.h"
 #include "Objects/Track.h"
 
 #include <cmath>
@@ -37,7 +36,7 @@ const MCParticle *Track::GetMainMCParticle() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-Track::Track(const PandoraApi::Track::Parameters &parameters, const float bField) :
+Track::Track(const PandoraApi::Track::Parameters &parameters) :
     m_d0(parameters.m_d0.Get()),
     m_z0(parameters.m_z0.Get()),
     m_particleId(parameters.m_particleId.Get()),
@@ -63,17 +62,12 @@ Track::Track(const PandoraApi::Track::Parameters &parameters, const float bField
 
     if (0 == m_charge)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
-
-    // Obtain helix fit to track state at calorimeter
-    m_pHelixFitAtCalorimeter = new Helix(m_trackStateAtCalorimeter.GetPosition(), m_trackStateAtCalorimeter.GetMomentum(), static_cast<float>(m_charge), bField);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 Track::~Track()
 {
-    delete m_pHelixFitAtCalorimeter;
-
     m_parentTrackList.clear();
     m_siblingTrackList.clear();
     m_daughterTrackList.clear();

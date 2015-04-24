@@ -16,6 +16,7 @@ namespace pandora
 {
 
 template<typename T> class AlgorithmObjectManager;
+template<typename T, typename S> class PandoraObjectFactory;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -53,7 +54,7 @@ public:
      */
     bool IsAvailable() const;
 
-private:
+protected:
     /**
      *  @brief  Constructor
      * 
@@ -64,7 +65,7 @@ private:
     /**
      *  @brief  Destructor
      */
-    ~Vertex();
+    virtual ~Vertex();
 
     /**
      *  @brief  Alter the metadata information stored in a vertex
@@ -85,8 +86,9 @@ private:
     VertexType              m_vertexType;               ///< The vertex type (3d, view u, v, w, etc.)
     bool                    m_isAvailable;              ///< Whether the track is available to be added to a particle flow object
 
-    friend class AlgorithmObjectManager<Vertex>;
     friend class VertexManager;
+    friend class AlgorithmObjectManager<Vertex>;
+    friend class PandoraObjectFactory<PandoraContentApi::Vertex::Parameters, Vertex>;
 };
 
 /**

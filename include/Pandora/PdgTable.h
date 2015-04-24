@@ -8,6 +8,10 @@
 #ifndef PANDORA_PDG_TABLE_H
 #define PANDORA_PDG_TABLE_H 1
 
+#include "Pandora/StatusCodes.h"
+
+#include <string>
+
 namespace pandora
 {
 

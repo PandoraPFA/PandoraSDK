@@ -41,8 +41,10 @@ private:
      * 
      *  @param  parameters the vertex parameters
      *  @param  pVertex to receive the address of the vertex created
+     *  @param  factory the factory that performs the object allocation
      */
-    StatusCode Create(const PandoraContentApi::Vertex::Parameters &parameters, const Vertex *&pVertex);
+    StatusCode Create(const PandoraContentApi::Vertex::Parameters &parameters, const Vertex *&pVertex,
+        const ObjectFactory<PandoraContentApi::Vertex::Parameters, Vertex> &factory);
 
     /**
      *  @brief  Alter the metadata information stored in a vertex

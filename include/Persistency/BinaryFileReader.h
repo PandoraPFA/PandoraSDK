@@ -37,7 +37,13 @@ public:
     /**
      *  @brief  Destructor
      */
-    virtual ~BinaryFileReader();
+    ~BinaryFileReader();
+
+    /**
+     *  @brief  Read a variable from the file
+     */
+    template<typename T>
+    StatusCode ReadVariable(T &t);
 
 private:
     StatusCode ReadHeader();
@@ -96,12 +102,6 @@ private:
      *  @param  checkComponentId whether to check the component id before deserializing
      */
     StatusCode ReadRelationship(bool checkComponentId = true);
-
-    /**
-     *  @brief  Read a variable from the file
-     */
-    template<typename T>
-    StatusCode ReadVariable(T &t);
 
     std::ifstream::pos_type         m_containerPosition;    ///< Position of start of the current event/geometry container object in file
     std::ifstream::pos_type         m_containerSize;        ///< Size of the current event/geometry container object in the file

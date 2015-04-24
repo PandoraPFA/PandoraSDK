@@ -16,6 +16,7 @@ namespace pandora
 {
 
 template<typename T> class InputObjectManager;
+template<typename T, typename S> class PandoraObjectFactory;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -130,7 +131,7 @@ public:
      */
     const MCParticleList &GetDaughterList() const;
 
-private:
+protected:
     /**
      *  @brief  Constructor
      * 
@@ -141,7 +142,7 @@ private:
     /**
      *  @brief  Destructor
      */
-    ~MCParticle();
+    virtual ~MCParticle();
 
     /**
      *  @brief  Add daughter particle
@@ -201,6 +202,7 @@ private:
 
     friend class MCManager;
     friend class InputObjectManager<MCParticle>;
+    friend class PandoraObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

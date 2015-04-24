@@ -17,6 +17,10 @@
 namespace pandora
 {
 
+template<typename T, typename S> class PandoraObjectFactory;
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 /**
  *  @brief  SubDetector class
  */
@@ -158,7 +162,7 @@ public:
      */
     const SubDetectorLayerList &GetSubDetectorLayerList() const;
 
-private:
+protected:
     /**
      *  @brief  Constructor
      * 
@@ -169,7 +173,7 @@ private:
     /**
      *  @brief  Destructor
      */
-    ~SubDetector();
+    virtual ~SubDetector();
 
     std::string             m_subDetectorName;      ///< The sub detector name, must uniquely specify a single sub detector
     SubDetectorType         m_subDetectorType;      ///< The sub detector type, e.g. ECAL_BARREL, HCAL_ENDCAP, TPC, etc.
@@ -186,6 +190,7 @@ private:
     SubDetectorLayerList    m_subDetectorLayerList; ///< The list of layer parameters for the sub detector section
 
     friend class GeometryManager;
+    friend class PandoraObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

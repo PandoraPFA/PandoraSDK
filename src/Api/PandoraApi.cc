@@ -9,10 +9,11 @@
 #include "Api/PandoraApi.h"
 #include "Api/PandoraApiImpl.h"
 
-template <typename PARAMETERS>
-pandora::StatusCode PandoraApi::ObjectCreationHelper<PARAMETERS>::Create(const pandora::Pandora &pandora, const Parameters &parameters)
+template <typename PARAMETERS, typename OBJECT>
+pandora::StatusCode PandoraApi::ObjectCreationHelper<PARAMETERS, OBJECT>::Create(const pandora::Pandora &pandora, const Parameters &parameters,
+    const pandora::ObjectFactory<PARAMETERS, OBJECT> &factory)
 {
-    return pandora.GetPandoraApiImpl()->Create(parameters);
+    return pandora.GetPandoraApiImpl()->Create(parameters, factory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -156,9 +157,9 @@ pandora::StatusCode PandoraApi::Reset(const pandora::Pandora &pandora)
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template class PandoraApi::ObjectCreationHelper<PandoraApi::MCParticle::Parameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::Track::Parameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::CaloHit::Parameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::SubDetector::Parameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::BoxGap::Parameters>;
-template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::ConcentricGap::Parameters>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::CaloHit::Parameters, PandoraApi::CaloHit::Object>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::Track::Parameters, PandoraApi::Track::Object>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::MCParticle::Parameters, PandoraApi::MCParticle::Object>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::SubDetector::Parameters, PandoraApi::Geometry::SubDetector::Object>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::BoxGap::Parameters, PandoraApi::Geometry::BoxGap::Object>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::ConcentricGap::Parameters, PandoraApi::Geometry::ConcentricGap::Object>;

@@ -14,9 +14,7 @@ namespace pandora
 {
 
 FileReader::FileReader(const pandora::Pandora &pandora, const std::string &fileName) :
-    m_pPandora(&pandora),
-    m_containerId(UNKNOWN_CONTAINER),
-    m_fileName(fileName)
+    Persistency(pandora, fileName)
 {
 }
 

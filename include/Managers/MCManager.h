@@ -41,8 +41,10 @@ private:
      * 
      *  @param  parameters the mc particle parameters
      *  @param  pMCParticle address of the mc particle
+     *  @param  factory the factory that performs the object allocation
      */
-    StatusCode Create(const PandoraApi::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle);
+    StatusCode Create(const PandoraApi::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle,
+        const ObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle> &factory);
 
     /**
      *  @brief  Erase all mc manager content
