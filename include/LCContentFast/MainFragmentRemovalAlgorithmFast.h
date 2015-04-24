@@ -10,9 +10,11 @@
 
 #include "Pandora/Algorithm.h"
 
-#include "LCContentFast/FragmentRemovalHelperFast.h"
 #include "LCContentFast/KDTreeLinkerAlgoT.h"
 
+#include "LCHelpers/FragmentRemovalHelper.h"
+
+#include <memory>
 #include <unordered_map>
 
 namespace lc_content_fast
@@ -33,7 +35,7 @@ typedef std::unordered_map<const pandora::Cluster*, bool> IdCache;
 /**
  *  @brief  ChargedClusterContact class, describing the interactions and proximity between parent and daughter candidate clusters
  */
-class ChargedClusterContact : public ClusterContact
+class ChargedClusterContact : public lc_content::ClusterContact
 {
 public:
     /**
@@ -62,18 +64,6 @@ public:
      */
     ChargedClusterContact(const pandora::Pandora &pandora, const pandora::Cluster *const pDaughterCluster,
         const pandora::Cluster *const pParentCluster, const Parameters &parameters);
-
-    /**
-     *  @brief  Constructor
-     * 
-     *  @param  pandora the associated pandora instance
-     *  @param  pDaughterCluster address of the daughter candidate cluster
-     *  @param  pParentCluster address of the parent candidate cluster
-     *  @param  parameters the cluster contact parameters
-     *  @param  hit_tree
-     */
-    ChargedClusterContact(const pandora::Pandora &pandora, const pandora::Cluster *const pDaughterCluster,
-        const pandora::Cluster *const pParentCluster, const Parameters &parameters, const std::unique_ptr<HitKDTree> &hit_tree);
 
     /**
      *  @brief  Get the sum of energies of tracks associated with parent cluster

@@ -53,6 +53,8 @@ StatusCode LoopingTrackAssociationAlgorithm::Run()
     const ClusterList *pClusterList = NULL;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pClusterList));
 
+    const float bField(PandoraContentApi::GetPlugins(*this)->GetBFieldPlugin()->GetBField(CartesianVector(0.f, 0.f, 0.f)));
+
     // Loop over all unassociated tracks in the current track list
     for (TrackVector::const_iterator iterT = trackVector.begin(), iterTEnd = trackVector.end(); iterT != iterTEnd; ++iterT)
     {
@@ -72,15 +74,15 @@ StatusCode LoopingTrackAssociationAlgorithm::Run()
         const float trackCalorimeterZPosition(pTrack->GetTrackStateAtCalorimeter().GetPosition().GetZ());
 
         // Extract information from the track
-        const Helix *const pHelix(pTrack->GetHelixFitAtCalorimeter());
-        const float helixOmega(pHelix->GetOmega());
+        const Helix helix(pTrack->GetTrackStateAtCalorimeter().GetPosition(), pTrack->GetTrackStateAtCalorimeter().GetMomentum(), pTrack->GetCharge(), bField);
+        const float helixOmega(helix.GetOmega());
 
         if (std::fabs(helixOmega) < std::numeric_limits<float>::epsilon())
             continue;
 
         const float helixRadius(1.f / helixOmega);
-        const float helixTanLambda(pHelix->GetTanLambda());
-        const float helixPhi0(pHelix->GetPhi0());
+        const float helixTanLambda(helix.GetTanLambda());
+        const float helixPhi0(helix.GetPhi0());
 
         const float pi_2(0.5f * std::acos(-1.f));
         const float helixXCentre(helixRadius * std::cos(helixPhi0 - pi_2));

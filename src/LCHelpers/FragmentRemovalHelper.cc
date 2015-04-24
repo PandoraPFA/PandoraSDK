@@ -150,7 +150,7 @@ float FragmentRemovalHelper::GetFractionOfHitsInCone(const Cluster *const pClust
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-unsigned int FragmentRemovalHelper::GetNLayersCrossed(const Pandora &pandora, const Helix *const pHelix, const float zStart,
+unsigned int FragmentRemovalHelper::GetNLayersCrossed(const Pandora &pandora, const Helix &helix, const float zStart,
     const float zEnd, const unsigned int nSamplingPoints)
 {
     if ((0 == nSamplingPoints) || (1000 < nSamplingPoints))
@@ -162,8 +162,8 @@ unsigned int FragmentRemovalHelper::GetNLayersCrossed(const Pandora &pandora, co
         return 0;
 
     CartesianVector intersectionPoint(0.f, 0.f, 0.f);
-    const CartesianVector &referencePoint(pHelix->GetReferencePoint());
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, != , pHelix->GetPointInZ(zStart, referencePoint, intersectionPoint));
+    const CartesianVector &referencePoint(helix.GetReferencePoint());
+    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, != , helix.GetPointInZ(zStart, referencePoint, intersectionPoint));
 
     const PseudoLayerPlugin *const pPseudoLayerPlugin(pandora.GetPlugins()->GetPseudoLayerPlugin());
     const unsigned int MAX_LAYER(std::numeric_limits<unsigned int>::max());
@@ -182,7 +182,7 @@ unsigned int FragmentRemovalHelper::GetNLayersCrossed(const Pandora &pandora, co
 
     for (float z = zStart; std::fabs(z) < std::fabs(zEnd + 0.5 * deltaZ); z += deltaZ)
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, != , pHelix->GetPointInZ(z, referencePoint, intersectionPoint));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, != , helix.GetPointInZ(z, referencePoint, intersectionPoint));
 
         try
         {
@@ -205,7 +205,7 @@ unsigned int FragmentRemovalHelper::GetNLayersCrossed(const Pandora &pandora, co
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode FragmentRemovalHelper::GetClusterHelixDistance(const Cluster *const pCluster, const Helix *const pHelix, const unsigned int startLayer,
+StatusCode FragmentRemovalHelper::GetClusterHelixDistance(const Cluster *const pCluster, const Helix &helix, const unsigned int startLayer,
     const unsigned int endLayer, const unsigned int maxOccupiedLayers, float &closestDistanceToHit, float &meanDistanceToHits)
 {
     if (startLayer > endLayer)
@@ -228,7 +228,7 @@ StatusCode FragmentRemovalHelper::GetClusterHelixDistance(const Cluster *const p
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
             CartesianVector distanceVector(0.f, 0.f, 0.f);
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pHelix->GetDistanceToPoint((*hitIter)->GetPositionVector(), distanceVector));
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, helix.GetDistanceToPoint((*hitIter)->GetPositionVector(), distanceVector));
 
             const float distance(distanceVector.GetZ());
 
@@ -355,7 +355,7 @@ float FragmentRemovalHelper::GetEMEnergyWeightedLayerSeparation(const Cluster *c
         if (!isDistanceFound)
             continue;
 
-        // TODO Consider whether to use both clusters I and J for energy weighting per-layer
+        // ATTN only uses cluster J for energy weighting per-layer
         energySum += clusterJLayerEnergy;
         weightedDistance += std::sqrt(closestDistanceSquared) * clusterJLayerEnergy;
     }

@@ -49,11 +49,11 @@ private:
     /**
      *  @brief  Get the coordinates of the point at which a helix enters the muon detectors
      * 
-     *  @param  pHelix address of the helix
+     *  @param  helix the helix
      *  @param  isPositiveZ whether to project the helix to the muon endcap with positive or negative z coordiante
      *  @param  muonEntryPoint to receive the muon entry point
      */
-    pandora::StatusCode GetMuonEntryPoint(const pandora::Helix *const pHelix, const bool isPositiveZ, pandora::CartesianVector &muonEntryPoint) const;
+    pandora::StatusCode GetMuonEntryPoint(const pandora::Helix &helix, const bool isPositiveZ, pandora::CartesianVector &muonEntryPoint) const;
 
     /**
      *  @brief  Add appropriate calo hits in the ecal/hcal to the muon clusters

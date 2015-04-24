@@ -19,6 +19,7 @@
 using namespace pandora;
 
 using lc_content::ClusterHelper;
+using lc_content::FragmentRemovalHelper;
 using lc_content::ReclusterHelper;
 
 namespace lc_content_fast
@@ -695,19 +696,6 @@ ChargedClusterContact::ChargedClusterContact(const Pandora &pandora, const Clust
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-ChargedClusterContact::ChargedClusterContact(const Pandora &pandora, const Cluster *const pDaughterCluster, const Cluster *const pParentCluster,
-        const Parameters &parameters, const std::unique_ptr<HitKDTree> &hit_tree) :
-    ClusterContact(pandora, pDaughterCluster, pParentCluster, parameters, hit_tree),
-    m_coneFraction2(FragmentRemovalHelper::GetFractionOfHitsInCone(pandora, pDaughterCluster, pParentCluster, parameters.m_coneCosineHalfAngle2)),
-    m_coneFraction3(FragmentRemovalHelper::GetFractionOfHitsInCone(pandora, pDaughterCluster, pParentCluster, parameters.m_coneCosineHalfAngle3)),
-    m_meanDistanceToHelix(std::numeric_limits<float>::max()),
-    m_closestDistanceToHelix(std::numeric_limits<float>::max())
-{
-    this->ClusterHelixComparison(pandora, pDaughterCluster, pParentCluster, parameters);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 void ChargedClusterContact::ClusterHelixComparison(const Pandora &pandora, const Cluster *const pDaughterCluster, const Cluster *const pParentCluster,
     const Parameters &parameters)
 {
@@ -725,13 +713,16 @@ void ChargedClusterContact::ClusterHelixComparison(const Pandora &pandora, const
     // Calculate closest distance between daughter cluster and helix fits to parent associated tracks
     float trackEnergySum(0.);
     const TrackList &parentTrackList(pParentCluster->GetAssociatedTrackList());
+    const float bField(pandora.GetPlugins()->GetBFieldPlugin()->GetBField(CartesianVector(0.f, 0.f, 0.f)));
 
     for (TrackList::const_iterator iter = parentTrackList.begin(), iterEnd = parentTrackList.end(); iter != iterEnd; ++iter)
     {
+        const Track *const pTrack(*iter);
+
         // Extract track information
-        trackEnergySum += (*iter)->GetEnergyAtDca();
-        const Helix *const pHelix = (*iter)->GetHelixFitAtCalorimeter();
-        const float trackCalorimeterZPosition((*iter)->GetTrackStateAtCalorimeter().GetPosition().GetZ());
+        trackEnergySum += pTrack->GetEnergyAtDca();
+        const Helix helix(pTrack->GetTrackStateAtCalorimeter().GetPosition(), pTrack->GetTrackStateAtCalorimeter().GetMomentum(), pTrack->GetCharge(), bField);
+        const float trackCalorimeterZPosition(pTrack->GetTrackStateAtCalorimeter().GetPosition().GetZ());
 
         // Check proximity of track projection and cluster
         if ((std::fabs(trackCalorimeterZPosition) > (std::fabs(clusterZPosition) + parameters.m_maxTrackClusterDeltaZ)) ||
@@ -741,7 +732,7 @@ void ChargedClusterContact::ClusterHelixComparison(const Pandora &pandora, const
         }
 
         // Check number of layers crossed by helix
-        const unsigned int nLayersCrossed(FragmentRemovalHelper::GetNLayersCrossed(pandora, pHelix, trackCalorimeterZPosition, clusterZPosition));
+        const unsigned int nLayersCrossed(FragmentRemovalHelper::GetNLayersCrossed(pandora, helix, trackCalorimeterZPosition, clusterZPosition));
 
         if (nLayersCrossed > parameters.m_maxLayersCrossedByHelix)
             continue;
@@ -749,7 +740,7 @@ void ChargedClusterContact::ClusterHelixComparison(const Pandora &pandora, const
         // Calculate distance to helix
         float meanDistanceToHelix(std::numeric_limits<float>::max()), closestDistanceToHelix(std::numeric_limits<float>::max());
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, FragmentRemovalHelper::GetClusterHelixDistance(pDaughterCluster, pHelix,
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, FragmentRemovalHelper::GetClusterHelixDistance(pDaughterCluster, helix,
             startLayer, endLayer, maxOccupiedLayers, closestDistanceToHelix, meanDistanceToHelix));
 
         if (closestDistanceToHelix < m_closestDistanceToHelix)

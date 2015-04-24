@@ -42,12 +42,14 @@ StatusCode ForcedClusteringAlgorithm::Run()
 
     // Make new track-seeded clusters and populate track distance info vector
     TrackDistanceInfoVector trackDistanceInfoVector;
+    const float bField(PandoraContentApi::GetPlugins(*this)->GetBFieldPlugin()->GetBField(CartesianVector(0.f, 0.f, 0.f)));
 
     for (TrackList::const_iterator iter = pTrackList->begin(), iterEnd = pTrackList->end(); iter != iterEnd; ++iter)
     {
         const Track *const pTrack = *iter;
-        const Helix *const pHelix(pTrack->GetHelixFitAtCalorimeter());
+
         const float trackEnergy(pTrack->GetEnergyAtDca());
+        const Helix helix(pTrack->GetTrackStateAtCalorimeter().GetPosition(), pTrack->GetTrackStateAtCalorimeter().GetMomentum(), pTrack->GetCharge(), bField);
 
         const Cluster *pCluster = NULL;
         PandoraContentApi::Cluster::Parameters parameters;
@@ -61,7 +63,7 @@ StatusCode ForcedClusteringAlgorithm::Run()
             if ((m_shouldClusterIsolatedHits || !pCaloHit->IsIsolated()) && PandoraContentApi::IsAvailable(*this, pCaloHit))
             {
                 CartesianVector helixSeparation(0.f, 0.f, 0.f);
-                PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pHelix->GetDistanceToPoint(pCaloHit->GetPositionVector(), helixSeparation));
+                PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, helix.GetDistanceToPoint(pCaloHit->GetPositionVector(), helixSeparation));
 
                 trackDistanceInfoVector.push_back(TrackDistanceInfo(pCaloHit, pCluster, trackEnergy, helixSeparation.GetMagnitude()));
             }
