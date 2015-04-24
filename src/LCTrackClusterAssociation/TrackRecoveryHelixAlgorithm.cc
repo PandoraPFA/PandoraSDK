@@ -55,6 +55,8 @@ StatusCode TrackRecoveryHelixAlgorithm::GetTrackAssociationInfoMap(TrackAssociat
     const ClusterList *pClusterList = NULL;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pClusterList));
 
+    const float bField(PandoraContentApi::GetPlugins(*this)->GetBFieldPlugin()->GetBField(CartesianVector(0.f, 0.f, 0.f)));
+
     // Loop over all unassociated tracks in the current track list
     for (TrackList::const_iterator iterT = pTrackList->begin(), iterTEnd = pTrackList->end(); iterT != iterTEnd; ++iterT)
     {
@@ -68,7 +70,7 @@ StatusCode TrackRecoveryHelixAlgorithm::GetTrackAssociationInfoMap(TrackAssociat
             continue;
 
         // Extract track information
-        const Helix *const pHelix(pTrack->GetHelixFitAtCalorimeter());
+        const Helix helix(pTrack->GetTrackStateAtCalorimeter().GetPosition(), pTrack->GetTrackStateAtCalorimeter().GetMomentum(), pTrack->GetCharge(), bField);
         const float trackEnergy(pTrack->GetEnergyAtDca());
         const float trackCalorimeterZPosition(pTrack->GetTrackStateAtCalorimeter().GetPosition().GetZ());
 
@@ -96,7 +98,7 @@ StatusCode TrackRecoveryHelixAlgorithm::GetTrackAssociationInfoMap(TrackAssociat
                 continue;
 
             // Cut on number of layers crossed by track helix in its motion between calorimeter projection and the cluster
-            const unsigned int nLayersCrossed(FragmentRemovalHelper::GetNLayersCrossed(this->GetPandora(), pHelix, trackCalorimeterZPosition, clusterZPosition));
+            const unsigned int nLayersCrossed(FragmentRemovalHelper::GetNLayersCrossed(this->GetPandora(), helix, trackCalorimeterZPosition, clusterZPosition));
 
             if (nLayersCrossed > m_maxLayersCrossed)
                 continue;
@@ -114,7 +116,7 @@ StatusCode TrackRecoveryHelixAlgorithm::GetTrackAssociationInfoMap(TrackAssociat
             float closestDistanceToHit(std::numeric_limits<float>::max());
             float meanDistanceToHits(std::numeric_limits<float>::max());
 
-            if (STATUS_CODE_SUCCESS != FragmentRemovalHelper::GetClusterHelixDistance(pCluster, pHelix, innerLayer,
+            if (STATUS_CODE_SUCCESS != FragmentRemovalHelper::GetClusterHelixDistance(pCluster, helix, innerLayer,
                 innerLayer + m_helixComparisonNLayers, m_helixComparisonMaxOccupiedLayers, closestDistanceToHit, meanDistanceToHits))
             {
                 closestDistanceToHit = std::numeric_limits<float>::max();

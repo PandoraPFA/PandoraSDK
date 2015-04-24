@@ -187,28 +187,28 @@ public:
      *  @brief  Get the number of pseudo layers crossed by helix in specified range of z coordinates
      * 
      *  @param  pandora the associated pandora instance
-     *  @param  pHelix address of the helix
+     *  @param  helix the helix
      *  @param  zStart start z coordinate
      *  @param  zEnd end z coordinate
      *  @param  nSamplingPoints number of points at which to sample the helix in the z interval
      * 
      *  @return The number of pseudo layers crossed
      */
-    static unsigned int GetNLayersCrossed(const pandora::Pandora &pandora, const pandora::Helix *const pHelix, const float zStart,
+    static unsigned int GetNLayersCrossed(const pandora::Pandora &pandora, const pandora::Helix &helix, const float zStart,
         const float zEnd, const unsigned int nSamplingPoints = 100);
 
     /**
      *  @brief  Get the distance between hits in a cluster and a helix, typically the result of a fit to a track
      * 
      *  @param  pCluster address of the cluster
-     *  @param  pHelix address of the helix
+     *  @param  helix the helix
      *  @param  startLayer the first pseudo layer of the cluster to examine
      *  @param  endLayer the last pseudo layer of the cluster to examine
      *  @param  maxOccupiedLayers the maximum number of occupied cluster pseudo layers to examine
      *  @param  closestDistanceToHit to receive the closest distance between the helix and a hit in the specified range of the cluster
      *  @param  meanDistanceToHits to receive the mean distance between the helix and hits in the specified range of the cluster
      */
-    static pandora::StatusCode GetClusterHelixDistance(const pandora::Cluster *const pCluster, const pandora::Helix *const pHelix,
+    static pandora::StatusCode GetClusterHelixDistance(const pandora::Cluster *const pCluster, const pandora::Helix &helix,
         const unsigned int startLayer, const unsigned int endLayer, const unsigned int maxOccupiedLayers, float &closestDistanceToHit,
         float &meanDistanceToHits);
 

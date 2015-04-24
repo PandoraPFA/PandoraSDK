@@ -38,6 +38,7 @@ private:
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
 
     typedef std::map<const pandora::Track *, const pandora::Cluster *> TrackToClusterMap;
+    typedef std::map<const pandora::Track *, const pandora::Helix> TrackToHelixMap;
 
     unsigned int    m_minTrackAssociations;         ///< The minimum number of track associations to forcibly resolve
 };

@@ -27,6 +27,8 @@ StatusCode ForceSplitTrackAssociationsAlg::Run()
     const ClusterList *pClusterList = NULL;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pClusterList));
 
+    const float bField(PandoraContentApi::GetPlugins(*this)->GetBFieldPlugin()->GetBField(CartesianVector(0.f, 0.f, 0.f)));
+
     // Loop over clusters in the algorithm input list, looking for those with excess track associations
     for (ClusterList::const_iterator iter = pClusterList->begin(); iter != pClusterList->end();)
     {
@@ -51,11 +53,14 @@ StatusCode ForceSplitTrackAssociationsAlg::Run()
 
         // Remove original track-cluster associations and create new track-seeded clusters for each track
         TrackToClusterMap trackToClusterMap;
+        TrackToHelixMap trackToHelixMap;
 
         for (TrackList::const_iterator trackIter = trackList.begin(), trackIterEnd = trackList.end(); trackIter != trackIterEnd;
             ++trackIter)
         {
             const Track *const pTrack = *trackIter;
+            const Helix helix(pTrack->GetTrackStateAtCalorimeter().GetPosition(), pTrack->GetTrackStateAtCalorimeter().GetMomentum(), pTrack->GetCharge(), bField);
+
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::RemoveTrackClusterAssociation(*this, pTrack, pOriginalCluster));
 
             const Cluster *pCluster = NULL;
@@ -63,7 +68,8 @@ StatusCode ForceSplitTrackAssociationsAlg::Run()
             parameters.m_pTrack = pTrack;
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, parameters, pCluster));
 
-            if (!trackToClusterMap.insert(TrackToClusterMap::value_type(pTrack, pCluster)).second)
+            if (!trackToClusterMap.insert(TrackToClusterMap::value_type(pTrack, pCluster)).second ||
+                !trackToHelixMap.insert(TrackToHelixMap::value_type(pTrack, helix)).second)
             {
                 return STATUS_CODE_FAILURE;
             }
@@ -87,18 +93,26 @@ StatusCode ForceSplitTrackAssociationsAlg::Run()
                 for (TrackToClusterMap::const_iterator mapIter = trackToClusterMap.begin(), mapIterEnd = trackToClusterMap.end();
                     mapIter != mapIterEnd; ++mapIter)
                 {
-                    const Helix *const pHelix(mapIter->first->GetHelixFitAtCalorimeter());
+                    const Track *const pTrack(mapIter->first);
+                    const Cluster *const pCluster(mapIter->second);
+
+                    TrackToHelixMap::const_iterator helixIter = trackToHelixMap.find(pTrack);
+
+                    if (trackToHelixMap.end() == helixIter)
+                        return STATUS_CODE_FAILURE;
+
+                    const Helix &helix(helixIter->second);
 
                     CartesianVector helixSeparation(0.f, 0.f, 0.f);
-                    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pHelix->GetDistanceToPoint(hitPosition, helixSeparation));
+                    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, helix.GetDistanceToPoint(hitPosition, helixSeparation));
 
                     const float distanceToTrack(helixSeparation.GetMagnitude());
-                    const float clusterEnergy(mapIter->second->GetHadronicEnergy());
+                    const float clusterEnergy(pCluster->GetHadronicEnergy());
 
                     if ((distanceToTrack < minDistanceToTrack) || ((distanceToTrack == minDistanceToTrack) && (clusterEnergy > bestClusterEnergy)))
                     {
                         minDistanceToTrack = distanceToTrack;
-                        pBestCluster = mapIter->second;
+                        pBestCluster = pCluster;
                         bestClusterEnergy = clusterEnergy;
                     }
                 }

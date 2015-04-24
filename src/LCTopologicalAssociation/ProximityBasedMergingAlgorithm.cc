@@ -267,13 +267,16 @@ bool ProximityBasedMergingAlgorithm::IsClusterFragment(const Cluster *const pPar
     const unsigned int daughterInnerLayer(pDaughterCluster->GetInnerPseudoLayer());
     const float daughterZCoordinate(pDaughterCluster->GetCentroid(daughterInnerLayer).GetZ());
     const TrackList &parentTrackList(pParentCluster->GetAssociatedTrackList());
+    const float bField(PandoraContentApi::GetPlugins(*this)->GetBFieldPlugin()->GetBField(CartesianVector(0.f, 0.f, 0.f)));
 
     for (TrackList::const_iterator trackIter = parentTrackList.begin(), trackIterEnd = parentTrackList.end(); trackIter != trackIterEnd; ++trackIter)
     {
         // First sanity check helix pathlength from calorimeter surface to daughter cluster candidate
-        const Helix *const pHelix((*trackIter)->GetHelixFitAtCalorimeter());
-        const CartesianVector &momentum(pHelix->GetMomentum());
-        const float deltaZ(std::fabs(pHelix->GetReferencePoint().GetZ() - daughterZCoordinate));
+        const Track *const pTrack(*trackIter);
+        const Helix helix(pTrack->GetTrackStateAtCalorimeter().GetPosition(), pTrack->GetTrackStateAtCalorimeter().GetMomentum(), pTrack->GetCharge(), bField);
+
+        const CartesianVector &momentum(helix.GetMomentum());
+        const float deltaZ(std::fabs(helix.GetReferencePoint().GetZ() - daughterZCoordinate));
 
         if ((std::fabs(momentum.GetZ()) < std::numeric_limits<float>::epsilon()) || ((momentum.GetMagnitude() / momentum.GetZ()) * deltaZ > m_maxHelixPathlengthToDaughter))
         {
@@ -283,7 +286,7 @@ bool ProximityBasedMergingAlgorithm::IsClusterFragment(const Cluster *const pPar
         // Then check average distance between helix projection and daughter cluster
         float closestDistanceToHit(std::numeric_limits<float>::max()), meanDistanceToHits(std::numeric_limits<float>::max());
 
-        if (STATUS_CODE_SUCCESS != FragmentRemovalHelper::GetClusterHelixDistance(pDaughterCluster, pHelix, daughterInnerLayer,
+        if (STATUS_CODE_SUCCESS != FragmentRemovalHelper::GetClusterHelixDistance(pDaughterCluster, helix, daughterInnerLayer,
             daughterInnerLayer + m_helixDistanceNLayers, m_helixDistanceMaxOccupiedLayers, closestDistanceToHit, meanDistanceToHits))
         {
             continue;
