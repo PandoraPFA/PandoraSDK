@@ -6,7 +6,6 @@
  *  $Log: $
  */
 
-#include "Objects/Helix.h"
 #include "Objects/Track.h"
 
 #include <cmath>
@@ -63,17 +62,12 @@ Track::Track(const PandoraApi::Track::Parameters &parameters) :
 
     if (0 == m_charge)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
-
-    // Obtain helix fit to track state at calorimeter
-    m_pHelixFitAtCalorimeter = new Helix(m_trackStateAtCalorimeter.GetPosition(), m_trackStateAtCalorimeter.GetMomentum(), static_cast<float>(m_charge), parameters.m_bField.Get());
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 Track::~Track()
 {
-    delete m_pHelixFitAtCalorimeter;
-
     m_parentTrackList.clear();
     m_siblingTrackList.clear();
     m_daughterTrackList.clear();

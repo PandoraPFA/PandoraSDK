@@ -67,7 +67,6 @@ public:
     class TrackParameters : public pandora::ObjectParameters
     {
     public:
-        pandora::InputFloat                 m_bField;                   ///< The b-field used to perform a helix fit, units T // TODO remove this!
         pandora::InputFloat                 m_d0;                       ///< The 2D impact parameter wrt (0,0), units mm
         pandora::InputFloat                 m_z0;                       ///< The z coordinate at the 2D distance of closest approach, units mm
         pandora::InputInt                   m_particleId;               ///< The PDG code of the tracked particle

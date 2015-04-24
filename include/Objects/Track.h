@@ -132,13 +132,6 @@ public:
     bool CanFormClusterlessPfo() const;
 
     /**
-     *  @brief  Get the helix fit to the calorimeter track state
-     * 
-     *  @return address of the helix fit to the calorimeter track state
-     */
-    const Helix *GetHelixFitAtCalorimeter() const;
-
-    /**
      *  @brief  Whether the track has an associated cluster
      * 
      *  @return boolean
@@ -289,8 +282,6 @@ protected:
     const bool              m_canFormPfo;               ///< Whether track should form a pfo, if it has an associated cluster
     const bool              m_canFormClusterlessPfo;    ///< Whether track should form a pfo, even if it has no associated cluster
 
-    const Helix            *m_pHelixFitAtCalorimeter;   ///< Helix fit to the calorimeter track state
-
     const Cluster          *m_pAssociatedCluster;       ///< The address of an associated cluster
     MCParticleWeightMap     m_mcParticleWeightMap;      ///< The mc particle weight map
     const void             *m_pParentAddress;           ///< The address of the parent track in the user framework
@@ -417,13 +408,6 @@ inline bool Track::CanFormPfo() const
 inline bool Track::CanFormClusterlessPfo() const
 {
     return m_canFormClusterlessPfo;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline const Helix *Track::GetHelixFitAtCalorimeter() const
-{
-    return m_pHelixFitAtCalorimeter;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
