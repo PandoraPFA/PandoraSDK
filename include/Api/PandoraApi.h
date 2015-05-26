@@ -27,6 +27,7 @@ public:
      *  @brief  Object creation helper class
      * 
      *  @param  PARAMETERS the type of object parameters
+     *  @param  OBJECT the type of object
      */
     template <typename PARAMETERS, typename OBJECT>
     class ObjectCreationHelper
@@ -38,7 +39,7 @@ public:
         /**
          *  @brief  Create a new object from a user factory
          *
-         *  @param  pandora the pandora instance to create the new object object
+         *  @param  pandora the pandora instance to create the new object
          *  @param  parameters the object parameters
          *  @param  factory the factory that performs the object allocation
          */
