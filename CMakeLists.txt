@@ -72,7 +72,12 @@ IF( NOT COMPILER_SUPPORTS_CXX_FLAGS )
     UNSET( CMAKE_CXX_FLAGS )
 ENDIF()
 
+if( APPLE )
+#fg: the clang linker(!) does not like -ansi ...
+SET( CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -pedantic -Wno-long-long -Wno-sign-compare -Wshadow -fno-strict-aliasing ${CMAKE_CXX_FLAGS}" )
+else()
 SET( CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -ansi -pedantic -Wno-long-long -Wno-sign-compare -Wshadow -fno-strict-aliasing ${CMAKE_CXX_FLAGS}" )
+endif()
 
 
 ### DEPENDENCIES ############################################################
