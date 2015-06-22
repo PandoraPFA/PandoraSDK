@@ -281,7 +281,7 @@ StatusCode XmlFileReader::ReadSubDetector()
             PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("NInteractionLengths", nInteractionLengths));
 
             if ((closestDistanceToIp.size() != nLayers) || (nRadiationLengths.size() != nLayers) || (nInteractionLengths.size() != nLayers))
-                return STATUS_CODE_FAILURE;
+                throw StatusCodeException(STATUS_CODE_FAILURE);
 
             for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
             {
