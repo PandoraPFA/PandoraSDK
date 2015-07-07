@@ -608,8 +608,9 @@ StatusCode PandoraContentApiImpl::PrepareForDeletion(const PfoList *const pPfoLi
     for (PfoList::const_iterator iter = pPfoList->begin(), iterEnd = pPfoList->end(); iter != iterEnd; ++iter)
     {
         const ParticleFlowObject *const pPfo = *iter;
-        m_pPandora->m_pTrackManager->SetAvailability(&pPfo->GetTrackList(), true);
         m_pPandora->m_pClusterManager->SetAvailability(&pPfo->GetClusterList(), true);
+        m_pPandora->m_pTrackManager->SetAvailability(&pPfo->GetTrackList(), true);
+        m_pPandora->m_pVertexManager->SetAvailability(&pPfo->GetVertexList(), true);
 
         const PfoList parentList(pPfo->GetParentPfoList());
         const PfoList daughterList(pPfo->GetDaughterPfoList());
