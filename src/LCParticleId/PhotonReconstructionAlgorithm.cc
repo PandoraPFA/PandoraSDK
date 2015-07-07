@@ -451,7 +451,7 @@ float PhotonReconstructionAlgorithm::GetHistogramContent(const Histogram *const 
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
     }
 
-    const int binNumber(std::max(0, std::min(pHistogram->GetNBinsX() - 1, static_cast<int>(value / binWidth))));
+    const int binNumber(std::max(0, std::min(pHistogram->GetNBinsX() - 1, static_cast<int>((value - pHistogram->GetXLow()) / binWidth))));
     return pHistogram->GetBinContent(binNumber);
 }
 
