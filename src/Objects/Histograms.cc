@@ -29,6 +29,10 @@ Histogram::Histogram(const unsigned int nBinsX, const float xLow, const float xH
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
     m_xBinWidth = (xHigh - xLow) / static_cast<float>(nBinsX);
+
+    // ATTN Protect against cast to int wrapping to negative numbers if there are very many bins
+    if (static_cast<int>((m_xHigh - m_xLow) / m_xBinWidth) < 0)
+        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -59,7 +63,7 @@ Histogram::Histogram(const TiXmlHandle *const pXmlHandle, const std::string &xml
     if (orderedBinContents.size() != static_cast<unsigned int>(m_nBinsX) + 2)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
-    for (int binX = -1, endBinX = m_nBinsX; binX <= endBinX; ++binX)
+    for (int binX = this->GetUnderflowBinNumber(), endBinX = this->GetOverflowBinNumber(); binX <= endBinX; ++binX)
     {
         const float value(orderedBinContents[binX + 1]);
 
@@ -93,11 +97,29 @@ float Histogram::GetBinContent(const int binX) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+int Histogram::GetBinNumber(const float valueX) const
+{
+    if (m_xHigh < valueX)
+    {
+        return this->GetOverflowBinNumber();
+    }
+    else if (m_xLow > valueX)
+    {
+        return this->GetUnderflowBinNumber();
+    }
+    else
+    {
+        return static_cast<int>((valueX - m_xLow) / m_xBinWidth);
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 float Histogram::GetCumulativeSum(const int xLowBin, const int xHighBin) const
 {
     float sumEntries(0.f);
 
-    for (int xBin = std::max(0, xLowBin), xBinEnd = std::min(xHighBin, m_nBinsX - 1); xBin <= xBinEnd; ++xBin)
+    for (int xBin = std::max(this->GetUnderflowBinNumber(), xLowBin), xBinEnd = std::min(xHighBin, this->GetOverflowBinNumber()); xBin <= xBinEnd; ++xBin)
     {
         HistogramMap::const_iterator iterX = m_histogramMap.find(xBin);
 
@@ -114,10 +136,10 @@ float Histogram::GetCumulativeSum(const int xLowBin, const int xHighBin) const
 
 void Histogram::GetMaximum(const int xLowBin, const int xHighBin, float &maximumValue, int &maximumBinX) const
 {
-    maximumBinX = -1;
     maximumValue = 0.f;
+    maximumBinX = this->GetUnderflowBinNumber();
 
-    for (int xBin = std::max(0, xLowBin), xBinEnd = std::min(xHighBin, m_nBinsX - 1); xBin <= xBinEnd; ++xBin)
+    for (int xBin = std::max(this->GetUnderflowBinNumber(), xLowBin), xBinEnd = std::min(xHighBin, this->GetOverflowBinNumber()); xBin <= xBinEnd; ++xBin)
     {
         HistogramMap::const_iterator iterX = m_histogramMap.find(xBin);
 
@@ -141,7 +163,7 @@ float Histogram::GetMeanX(const int xLowBin, const int xHighBin) const
     float sumEntries(0.f), sumXEntries(0.f);
     const float firstBinCenter(m_xLow + (0.5f * m_xBinWidth));
 
-    for (int xBin = std::max(0, xLowBin), xBinEnd = std::min(xHighBin, m_nBinsX - 1); xBin <= xBinEnd; ++xBin)
+    for (int xBin = std::max(this->GetMinBinNumber(), xLowBin), xBinEnd = std::min(xHighBin, this->GetMaxBinNumber()); xBin <= xBinEnd; ++xBin)
     {
         HistogramMap::const_iterator iterX = m_histogramMap.find(xBin);
 
@@ -168,7 +190,7 @@ float Histogram::GetStandardDeviationX(const int xLowBin, const int xHighBin) co
     float sumEntries(0.f), sumXEntries(0.f), sumXXEntries(0.f);
     const float firstBinCenter(m_xLow + (0.5f * m_xBinWidth));
 
-    for (int xBin = std::max(0, xLowBin), xBinEnd = std::min(xHighBin, m_nBinsX - 1); xBin <= xBinEnd; ++xBin)
+    for (int xBin = std::max(this->GetMinBinNumber(), xLowBin), xBinEnd = std::min(xHighBin, this->GetMaxBinNumber()); xBin <= xBinEnd; ++xBin)
     {
         HistogramMap::const_iterator iterX = m_histogramMap.find(xBin);
 
@@ -196,7 +218,7 @@ float Histogram::GetStandardDeviationX(const int xLowBin, const int xHighBin) co
 
 void Histogram::SetBinContent(const int binX, const float value)
 {
-    if ((binX < -1) || (binX > m_nBinsX))
+    if ((binX < this->GetUnderflowBinNumber()) || (binX > this->GetOverflowBinNumber()))
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
     m_histogramMap[binX] = value;
@@ -206,7 +228,7 @@ void Histogram::SetBinContent(const int binX, const float value)
 
 void Histogram::Fill(const float valueX, const float weight)
 {
-    const int binX(std::max(-1, std::min(m_nBinsX, static_cast<int>((valueX - m_xLow) / m_xBinWidth)) ));
+    const int binX(this->GetBinNumber(valueX));
 
     HistogramMap::iterator iter = m_histogramMap.find(binX);
 
@@ -250,7 +272,7 @@ void Histogram::WriteToXml(TiXmlDocument *const pTiXmlDocument, const std::strin
     pHistogramElement->LinkEndChild(pXHighElement);
 
     std::string binContentsString;
-    for (int binX = -1; binX <= m_nBinsX; ++binX)
+    for (int binX = this->GetUnderflowBinNumber(), endBinX = this->GetOverflowBinNumber(); binX <= endBinX; ++binX)
     {
         binContentsString += TypeToString(this->GetBinContent(binX)) + " ";
     }
@@ -274,15 +296,15 @@ TwoDHistogram::TwoDHistogram(const unsigned int nBinsX, const float xLow, const 
     m_yLow(yLow),
     m_yHigh(yHigh)
 {
-    if ((0 >= nBinsX) || (xHigh - xLow < std::numeric_limits<float>::epsilon()))
+    if ((0 >= nBinsX) || (xHigh - xLow < std::numeric_limits<float>::epsilon()) || (0 >= nBinsY) || (yHigh - yLow < std::numeric_limits<float>::epsilon()))
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
     m_xBinWidth = (xHigh - xLow) / static_cast<float>(nBinsX);
-
-    if ((0 >= nBinsY) || (yHigh - yLow < std::numeric_limits<float>::epsilon()))
-        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
-
     m_yBinWidth = (yHigh - yLow) / static_cast<float>(nBinsY);
+
+    // ATTN Protect against cast to int wrapping to negative numbers if there are very many bins
+    if ((static_cast<int>((m_xHigh - m_xLow) / m_xBinWidth) < 0) || (static_cast<int>((m_yHigh - m_yLow) / m_yBinWidth) < 0))
+        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -323,14 +345,14 @@ TwoDHistogram::TwoDHistogram(const TiXmlHandle *const pXmlHandle, const std::str
     if (histogramEntryList.size() != static_cast<unsigned int>(m_nBinsY) + 2)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
-    for (int binY = -1, endBinY = m_nBinsY; binY <= endBinY; ++binY)
+    for (int binY = this->GetUnderflowBinNumberY(), endBinY = this->GetOverflowBinNumberY(); binY <= endBinY; ++binY)
     {
         const FloatVector &orderedBinContents(histogramEntryList[binY + 1]);
 
         if (orderedBinContents.size() != static_cast<unsigned int>(m_nBinsX) + 2)
             throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
-        for (int binX = -1, endBinX = m_nBinsX; binX <= endBinX; ++binX)
+        for (int binX = this->GetUnderflowBinNumberX(), endBinX = this->GetOverflowBinNumberX(); binX <= endBinX; ++binX)
         {
             const float value(orderedBinContents[binX + 1]);
             if (std::fabs(value) > std::numeric_limits<float>::epsilon())
@@ -374,6 +396,40 @@ float TwoDHistogram::GetBinContent(const int binX, const int binY) const
 
     return iterXY->second;
 }
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+int TwoDHistogram::GetBinNumberX(const float valueX) const
+{
+    if (m_xHigh < valueX)
+    {
+        return this->GetOverflowBinNumberX();
+    }
+    else if (m_xLow > valueX)
+    {
+        return this->GetUnderflowBinNumberX();
+    }
+    else
+    {
+        return static_cast<int>((valueX - m_xLow) / m_xBinWidth);
+    }
+}
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+int TwoDHistogram::GetBinNumberY(const float valueY) const
+{
+    if (m_yHigh < valueY)
+    {
+        return this->GetOverflowBinNumberY();
+    }
+    else if (m_yLow > valueY)
+    {
+        return this->GetUnderflowBinNumberY();
+    }
+    else
+    {
+        return static_cast<int>((valueY - m_yLow) / m_yBinWidth);
+    }
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -381,14 +437,14 @@ float TwoDHistogram::GetCumulativeSum(const int xLowBin, const int xHighBin, con
 {
     float sumEntries(0.f);
 
-    for (int yBin = std::max(0, yLowBin), yBinEnd = std::min(yHighBin, m_nBinsY - 1); yBin <= yBinEnd; ++yBin)
+    for (int yBin = std::max(this->GetUnderflowBinNumberY(), yLowBin), yBinEnd = std::min(yHighBin, this->GetOverflowBinNumberY()); yBin <= yBinEnd; ++yBin)
     {
         TwoDHistogramMap::const_iterator iterY = m_yxHistogramMap.find(yBin);
 
         if (m_yxHistogramMap.end() == iterY)
             continue;
 
-        for (int xBin = std::max(0, xLowBin), xBinEnd = std::min(xHighBin, m_nBinsX - 1); xBin <= xBinEnd; ++xBin)
+        for (int xBin = std::max(this->GetUnderflowBinNumberX(), xLowBin), xBinEnd = std::min(xHighBin, this->GetOverflowBinNumberX()); xBin <= xBinEnd; ++xBin)
         {
             HistogramMap::const_iterator iterX = iterY->second.find(xBin);
 
@@ -408,16 +464,16 @@ void TwoDHistogram::GetMaximum(const int xLowBin, const int xHighBin, const int 
     int &maximumBinX, int &maximumBinY) const
 {
     maximumValue = 0.f;
-    maximumBinX = -1; maximumBinY = -1;
+    maximumBinX = this->GetUnderflowBinNumberX(); maximumBinY = this->GetUnderflowBinNumberY();
 
-    for (int yBin = std::max(0, yLowBin), yBinEnd = std::min(yHighBin, m_nBinsY - 1); yBin <= yBinEnd; ++yBin)
+    for (int yBin = std::max(this->GetUnderflowBinNumberY(), yLowBin), yBinEnd = std::min(yHighBin, this->GetOverflowBinNumberY()); yBin <= yBinEnd; ++yBin)
     {
         TwoDHistogramMap::const_iterator iterY = m_yxHistogramMap.find(yBin);
 
         if (m_yxHistogramMap.end() == iterY)
             continue;
 
-        for (int xBin = std::max(0, xLowBin), xBinEnd = std::min(xHighBin, m_nBinsX - 1); xBin <= xBinEnd; ++xBin)
+        for (int xBin = std::max(this->GetUnderflowBinNumberX(), xLowBin), xBinEnd = std::min(xHighBin, this->GetOverflowBinNumberX()); xBin <= xBinEnd; ++xBin)
         {
             HistogramMap::const_iterator iterX = iterY->second.find(xBin);
 
@@ -443,14 +499,14 @@ float TwoDHistogram::GetMeanX(const int xLowBin, const int xHighBin, const int y
     float sumEntries(0.f), sumXEntries(0.f);
     const float firstBinXCenter(m_xLow + (0.5f * m_xBinWidth));
 
-    for (int yBin = std::max(0, yLowBin), yBinEnd = std::min(yHighBin, m_nBinsY - 1); yBin <= yBinEnd; ++yBin)
+    for (int yBin = std::max(this->GetMinBinNumberY(), yLowBin), yBinEnd = std::min(yHighBin, this->GetMaxBinNumberY()); yBin <= yBinEnd; ++yBin)
     {
         TwoDHistogramMap::const_iterator iterY = m_yxHistogramMap.find(yBin);
 
         if (m_yxHistogramMap.end() == iterY)
             continue;
 
-        for (int xBin = std::max(0, xLowBin), xBinEnd = std::min(xHighBin, m_nBinsX - 1); xBin <= xBinEnd; ++xBin)
+        for (int xBin = std::max(this->GetMinBinNumberX(), xLowBin), xBinEnd = std::min(xHighBin, this->GetMaxBinNumberX()); xBin <= xBinEnd; ++xBin)
         {
             HistogramMap::const_iterator iterX = iterY->second.find(xBin);
 
@@ -478,14 +534,14 @@ float TwoDHistogram::GetStandardDeviationX(const int xLowBin, const int xHighBin
     float sumEntries(0.f), sumXEntries(0.f), sumXXEntries(0.f);
     const float firstBinXCenter(m_xLow + (0.5f * m_xBinWidth));
 
-    for (int yBin = std::max(0, yLowBin), yBinEnd = std::min(yHighBin, m_nBinsY - 1); yBin <= yBinEnd; ++yBin)
+    for (int yBin = std::max(this->GetMinBinNumberY(), yLowBin), yBinEnd = std::min(yHighBin, this->GetMaxBinNumberY()); yBin <= yBinEnd; ++yBin)
     {
         TwoDHistogramMap::const_iterator iterY = m_yxHistogramMap.find(yBin);
 
         if (m_yxHistogramMap.end() == iterY)
             continue;
 
-        for (int xBin = std::max(0, xLowBin), xBinEnd = std::min(xHighBin, m_nBinsX - 1); xBin <= xBinEnd; ++xBin)
+        for (int xBin = std::max(this->GetMinBinNumberX(), xLowBin), xBinEnd = std::min(xHighBin, this->GetMaxBinNumberX()); xBin <= xBinEnd; ++xBin)
         {
             HistogramMap::const_iterator iterX = iterY->second.find(xBin);
 
@@ -517,14 +573,14 @@ float TwoDHistogram::GetMeanY(const int xLowBin, const int xHighBin, const int y
     float sumEntries(0.f), sumYEntries(0.f);
     const float firstBinYCenter(m_yLow + (0.5f * m_yBinWidth));
 
-    for (int xBin = std::max(0, xLowBin), xBinEnd = std::min(xHighBin, m_nBinsX - 1); xBin <= xBinEnd; ++xBin)
+    for (int xBin = std::max(this->GetMinBinNumberX(), xLowBin), xBinEnd = std::min(xHighBin, this->GetMaxBinNumberX()); xBin <= xBinEnd; ++xBin)
     {
         TwoDHistogramMap::const_iterator iterX = m_xyHistogramMap.find(xBin);
 
         if (m_xyHistogramMap.end() == iterX)
             continue;
 
-        for (int yBin = std::max(0, yLowBin), yBinEnd = std::min(yHighBin, m_nBinsY - 1); yBin <= yBinEnd; ++yBin)
+        for (int yBin = std::max(this->GetMinBinNumberY(), yLowBin), yBinEnd = std::min(yHighBin, this->GetMaxBinNumberY()); yBin <= yBinEnd; ++yBin)
         {
             HistogramMap::const_iterator iterY = iterX->second.find(yBin);
 
@@ -552,14 +608,14 @@ float TwoDHistogram::GetStandardDeviationY(const int xLowBin, const int xHighBin
     float sumEntries(0.f), sumYEntries(0.f), sumYYEntries(0.f);
     const float firstBinYCenter(m_yLow + (0.5f * m_yBinWidth));
 
-    for (int xBin = std::max(0, xLowBin), xBinEnd = std::min(xHighBin, m_nBinsX - 1); xBin <= xBinEnd; ++xBin)
+    for (int xBin = std::max(this->GetMinBinNumberX(), xLowBin), xBinEnd = std::min(xHighBin, this->GetMaxBinNumberX()); xBin <= xBinEnd; ++xBin)
     {
         TwoDHistogramMap::const_iterator iterX = m_xyHistogramMap.find(xBin);
 
         if (m_xyHistogramMap.end() == iterX)
             continue;
 
-        for (int yBin = std::max(0, yLowBin), yBinEnd = std::min(yHighBin, m_nBinsY - 1); yBin <= yBinEnd; ++yBin)
+        for (int yBin = std::max(this->GetMinBinNumberY(), yLowBin), yBinEnd = std::min(yHighBin, this->GetMaxBinNumberY()); yBin <= yBinEnd; ++yBin)
         {
             HistogramMap::const_iterator iterY = iterX->second.find(yBin);
 
@@ -588,7 +644,7 @@ float TwoDHistogram::GetStandardDeviationY(const int xLowBin, const int xHighBin
 
 void TwoDHistogram::SetBinContent(const int binX, const int binY, const float value)
 {
-    if ((binX < -1) || (binX > m_nBinsX) || (binY < -1) || (binY > m_nBinsY))
+    if ((binX < this->GetUnderflowBinNumberX()) || (binX > this->GetOverflowBinNumberX()) || (binY < this->GetUnderflowBinNumberY()) || (binY > this->GetOverflowBinNumberY()))
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
     m_xyHistogramMap[binX][binY] = value;
@@ -599,8 +655,8 @@ void TwoDHistogram::SetBinContent(const int binX, const int binY, const float va
 
 void TwoDHistogram::Fill(const float valueX, const float valueY, const float weight)
 {
-    const int binX(std::max(-1, std::min(m_nBinsX, static_cast<int>((valueX - m_xLow) / m_xBinWidth)) ));
-    const int binY(std::max(-1, std::min(m_nBinsY, static_cast<int>((valueY - m_yLow) / m_yBinWidth)) ));
+    const int binX(this->GetBinNumberX(valueX));
+    const int binY(this->GetBinNumberY(valueY));
 
     HistogramMap &yHistogramMap(m_xyHistogramMap[binX]);
     HistogramMap::iterator iter = yHistogramMap.find(binY);
@@ -671,11 +727,11 @@ void TwoDHistogram::WriteToXml(TiXmlDocument *const pTiXmlDocument, const std::s
 
     TiXmlElement *const pBinContentsElement = new TiXmlElement("BinContents");
 
-    for (int binY = -1; binY <= m_nBinsY; ++binY)
+    for (int binY = this->GetUnderflowBinNumberY(), endBinY = this->GetOverflowBinNumberY(); binY <= endBinY; ++binY)
     {
         std::string binContentsString;
 
-        for (int binX = -1; binX <= m_nBinsX; ++binX)
+        for (int binX = this->GetUnderflowBinNumberX(), endBinX = this->GetOverflowBinNumberX(); binX <= endBinX; ++binX)
         {
             binContentsString += TypeToString(this->GetBinContent(binX, binY)) + " ";
         }
