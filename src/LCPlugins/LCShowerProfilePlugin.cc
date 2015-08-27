@@ -139,16 +139,9 @@ void LCShowerProfilePlugin::CalculateLongitudinalProfile(const Cluster *const pC
     const CartesianVector &clusterDirection(pCluster->GetFitToAllHitsResult().IsFitSuccessful() ?
         pCluster->GetFitToAllHitsResult().GetDirection() : pCluster->GetInitialDirection());
 
-    // Initialize profile
-    FloatVector profile;
-    for (unsigned int iBin = 0; iBin < m_longProfileNBins; ++iBin)
-    {
-        profile.push_back(0.f);
-    }
-
     // Examine layers to construct profile
+    FloatVector profile(m_longProfileNBins, 0.f);
     float eCalEnergy(0.f), nRadiationLengths(0.f), nRadiationLengthsInLastLayer(0.f);
-    unsigned int profileEndBin(0);
 
     const OrderedCaloHitList &orderedCaloHitList(pCluster->GetOrderedCaloHitList());
     const unsigned int innerPseudoLayer(pCluster->GetInnerPseudoLayer());
@@ -166,8 +159,7 @@ void LCShowerProfilePlugin::CalculateLongitudinalProfile(const Cluster *const pC
 
         // Extract information from calo hits
         bool isFineGranularity(true);
-        float energyInLayer(0.f);
-        float nRadiationLengthsInLayer(0.f);
+        float energyInLayer(0.f), nRadiationLengthsInLayer(0.f);
 
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
@@ -177,11 +169,9 @@ void LCShowerProfilePlugin::CalculateLongitudinalProfile(const Cluster *const pC
                 break;
             }
 
-            float cosOpeningAngle(std::fabs((*hitIter)->GetCellNormalVector().GetCosOpeningAngle(clusterDirection)));
-            cosOpeningAngle = std::max(cosOpeningAngle, m_longProfileMinCosAngle);
-
             energyInLayer += (*hitIter)->GetElectromagneticEnergy();
-            nRadiationLengthsInLayer += (*hitIter)->GetNCellRadiationLengths() / cosOpeningAngle;
+            const float cosOpeningAngle(std::fabs((*hitIter)->GetCellNormalVector().GetCosOpeningAngle(clusterDirection)));
+            nRadiationLengthsInLayer += (*hitIter)->GetNCellRadiationLengths() / std::max(cosOpeningAngle, m_longProfileMinCosAngle);
         }
 
         if (!isFineGranularity)
@@ -222,9 +212,9 @@ void LCShowerProfilePlugin::CalculateLongitudinalProfile(const Cluster *const pC
         }
     }
 
-    profileEndBin = std::min(static_cast<unsigned int>(nRadiationLengths / m_longProfileBinWidth), m_longProfileNBins);
+    const unsigned int profileEndBin(std::min(static_cast<unsigned int>(nRadiationLengths / m_longProfileBinWidth), m_longProfileNBins));
 
-    if (eCalEnergy < std::numeric_limits<float>::epsilon())
+    if ((0 == profileEndBin) || (eCalEnergy < std::numeric_limits<float>::epsilon()))
         throw StatusCodeException(STATUS_CODE_FAILURE);
 
     // 2. Construct expected cluster profile
