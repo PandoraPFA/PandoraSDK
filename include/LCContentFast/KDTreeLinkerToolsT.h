@@ -323,6 +323,12 @@ inline const pandora::CartesianVector &kdtree_type_adaptor<const pandora::CaloHi
     return t->GetPositionVector(); 
 }
 
+template<>
+inline const pandora::CartesianVector &kdtree_type_adaptor<const pandora::CartesianVector>::position(const pandora::CartesianVector *const t)
+{
+    return *t;
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<typename T>
