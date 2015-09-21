@@ -1,4 +1,11 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
+TAG v02-00-01
+--------------------------------------------------------------------------------------------------------------------------------------------
+Enabled use of KD-tree findNearestNeighbour functionality.
+Improved error handling in LCShowerProfile plugin and some cosmetic modifications.
+Altered likelihood histogram bin lookup in photon reconstruction algorithm.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
 TAG v02-00-00
 --------------------------------------------------------------------------------------------------------------------------------------------
 Update for PandoraSDK breaking change: Cached helix fit no longer available from track object.
