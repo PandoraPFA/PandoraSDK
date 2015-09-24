@@ -15,7 +15,7 @@ PROJECT( ${LC_CONTENT_LIBRARY_NAME} )
 # project version
 SET( ${PROJECT_NAME}_VERSION_MAJOR 02 )
 SET( ${PROJECT_NAME}_VERSION_MINOR 00 )
-SET( ${PROJECT_NAME}_VERSION_PATCH 01 )
+SET( ${PROJECT_NAME}_VERSION_PATCH 02 )
 
 
 ### CMAKE ###################################################################
