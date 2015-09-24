@@ -1,0 +1,69 @@
+##############################################################################
+# cmake configuration file for LCPandoraContent
+#
+# requires:
+#   MacroCheckPackageLibs.cmake for checking package libraries
+#
+# returns following variables:
+#
+#   LCPandoraContent_FOUND      : set to TRUE if LCPandoraContent found
+#       if FIND_PACKAGE called with REQUIRED and COMPONENTS arguments
+#       LCPandoraContent_FOUND is only set to TRUE if ALL components are also found
+#       if REQUIRED is NOT set components may or may not be available
+#
+#   LCPandoraContent_ROOT       : path to this LCPandoraContent installation
+#   LCPandoraContent_VERSION    : package version
+#   LCPandoraContent_LIBRARIES  : list of LCPandoraContent libraries (NOT including COMPONENTS)
+#   LCPandoraContent_INCLUDE_DIRS  : list of paths to be used with INCLUDE_DIRECTORIES
+#   LCPandoraContent_LIBRARY_DIRS  : list of paths to be used with LINK_DIRECTORIES
+#   LCPandoraContent_COMPONENT_LIBRARIES      : list of LCPandoraContent component libraries
+#   LCPandoraContent_${COMPONENT}_FOUND       : set to TRUE or FALSE for each library
+#   LCPandoraContent_${COMPONENT}_LIBRARY     : path to individual libraries
+#   LCPandoraContent_${COMPONENT}_LIB_DEPENDS : individual library dependencies
+#
+# @author Jan Engels, Desy
+##############################################################################
+
+SET( LCPandoraContent_ROOT "@CMAKE_INSTALL_PREFIX@" )
+SET( LCPandoraContent_VERSION "@LCPandoraContent_VERSION@" )
+
+
+# ---------- include dirs -----------------------------------------------------
+# do not store find results in cache
+SET( LCPandoraContent_INCLUDE_DIRS LCPandoraContent_INCLUDE_DIRS-NOTFOUND )
+MARK_AS_ADVANCED( LCPandoraContent_INCLUDE_DIRS )
+
+FIND_PATH( LCPandoraContent_INCLUDE_DIRS
+	NAMES LCClustering/ClusteringParentAlgorithm.h
+	PATHS ${LCPandoraContent_ROOT}/include
+	NO_DEFAULT_PATH
+)
+
+
+
+# ---------- libraries --------------------------------------------------------
+INCLUDE( "@ILCSOFT_CMAKE_MODULES_ROOT@/MacroCheckPackageLibs.cmake" )
+
+# only standard libraries should be passed as arguments to CHECK_PACKAGE_LIBS
+# additional components are set by cmake in variable PKG_FIND_COMPONENTS
+# first argument should be the package name
+CHECK_PACKAGE_LIBS( LCPandoraContent LCPandoraContent )
+
+
+
+
+# ---------- libraries dependencies -------------------------------------------
+# this sets LCPandoraContent_${COMPONENT}_LIB_DEPENDS variables
+INCLUDE( "${LCPandoraContent_ROOT}/lib/cmake/LCPandoraContentLibDeps.cmake" )
+ 
+
+
+
+# ---------- final checking ---------------------------------------------------
+INCLUDE( FindPackageHandleStandardArgs )
+# set LCPANDORACONTENTNEW_FOUND to TRUE if all listed variables are TRUE and not empty
+# LCPandoraContent_COMPONENT_VARIABLES will be set if FIND_PACKAGE is called with REQUIRED argument
+FIND_PACKAGE_HANDLE_STANDARD_ARGS( LCPandoraContent DEFAULT_MSG LCPandoraContent_ROOT LCPandoraContent_INCLUDE_DIRS LCPandoraContent_LIBRARIES ${LCPandoraContent_COMPONENT_VARIABLES} )
+
+SET( LCPandoraContent_FOUND ${LCPANDORACONTENTNEW_FOUND} )
+

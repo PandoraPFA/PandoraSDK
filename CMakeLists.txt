@@ -6,13 +6,16 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.2 FATAL_ERROR)
 
 
 # project name
-PROJECT( LCContent )
+IF( NOT LC_CONTENT_LIBRARY_NAME STREQUAL "LCPandoraContent" )
+    SET( LC_CONTENT_LIBRARY_NAME "LCContent" )
+ENDIF()
+PROJECT( ${LC_CONTENT_LIBRARY_NAME} )
 
 
 # project version
-SET( LCContent_VERSION_MAJOR 02 )
-SET( LCContent_VERSION_MINOR 00 )
-SET( LCContent_VERSION_PATCH 01 )
+SET( ${PROJECT_NAME}_VERSION_MAJOR 02 )
+SET( ${PROJECT_NAME}_VERSION_MINOR 00 )
+SET( ${PROJECT_NAME}_VERSION_PATCH 01 )
 
 
 ### CMAKE ###################################################################
@@ -116,13 +119,13 @@ ENDIF()
 ### LIBRARY #################################################################
 
 # add library
-ADD_SHARED_LIBRARY( LCContent ${LCContent_SRCS} )
+ADD_SHARED_LIBRARY( ${PROJECT_NAME} ${LCContent_SRCS} )
 
 
 ### INSTALL #################################################################
 
 # install library
-INSTALL_SHARED_LIBRARY( LCContent DESTINATION lib )
+INSTALL_SHARED_LIBRARY( ${PROJECT_NAME} DESTINATION lib )
 
 # install header files
 INSTALL_DIRECTORY( ./include DESTINATION . )
@@ -131,4 +134,4 @@ INSTALL_DIRECTORY( ./include DESTINATION . )
 DISPLAY_STD_VARIABLES()
 
 # generate and install cmake configuration files
-GENERATE_PACKAGE_CONFIGURATION_FILES( LCContentConfig.cmake LCContentConfigVersion.cmake LCContentLibDeps.cmake )
+GENERATE_PACKAGE_CONFIGURATION_FILES( ${PROJECT_NAME}Config.cmake ${PROJECT_NAME}ConfigVersion.cmake ${PROJECT_NAME}LibDeps.cmake )
