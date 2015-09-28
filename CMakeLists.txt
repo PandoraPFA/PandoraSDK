@@ -6,12 +6,14 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(FATAL_ERROR "PandoraSDK requires an out-of-source build.")
 endif()
 
+# project name
 project(PandoraSDK)
 
+# project version
 set(${PROJECT_NAME}_VERSION_MAJOR 02)
-set(${PROJECT_NAME}_VERSION_MINOR 00)
-set(${PROJECT_NAME}_VERSION_PATCH 02)
-set(${PROJECT_NAME}_VERSION "${PandoraSDK_VERSION_MAJOR}.${PandoraSDK_VERSION_MINOR}.${PandoraSDK_VERSION_PATCH}")
+set(${PROJECT_NAME}_VERSION_MINOR 01)
+set(${PROJECT_NAME}_VERSION_PATCH 00)
+set(${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}")
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
 # Dependencies
