@@ -7,28 +7,28 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 # project name
-if (NOT LC_CONTENT_LIBRARY_NAME)
+if(NOT LC_CONTENT_LIBRARY_NAME STREQUAL "LCPandoraContent")
     set(LC_CONTENT_LIBRARY_NAME "LCContent")
 endif()
 project(${LC_CONTENT_LIBRARY_NAME})
 
 # project version
 set(${PROJECT_NAME}_VERSION_MAJOR 02)
-set(${PROJECT_NAME}_VERSION_MINOR 00)
-set(${PROJECT_NAME}_VERSION_PATCH 03)
+set(${PROJECT_NAME}_VERSION_MINOR 01)
+set(${PROJECT_NAME}_VERSION_PATCH 00)
 set(${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}")
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
 # Dependencies
 include(PandoraCMakeSettings)
 
-find_package(PandoraSDK 02.00.02 REQUIRED)
+find_package(PandoraSDK 02.01.00 REQUIRED)
 include_directories(${PandoraSDK_INCLUDE_DIRS})
 link_libraries(${PandoraSDK_LIBRARIES})
 add_definitions(${PandoraSDK_DEFINITIONS})
 
 if(PANDORA_MONITORING)
-    find_package(PandoraMonitoring 02.00.01 REQUIRED)
+    find_package(PandoraMonitoring 02.01.00 REQUIRED)
     include_directories(${PandoraMonitoring_INCLUDE_DIRS})
     link_libraries(${PandoraMonitoring_LIBRARIES})
     add_definitions(${PandoraMonitoring_DEFINITIONS})
