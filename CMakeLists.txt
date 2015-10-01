@@ -15,7 +15,7 @@ project(${LC_CONTENT_LIBRARY_NAME})
 # project version
 set(${PROJECT_NAME}_VERSION_MAJOR 02)
 set(${PROJECT_NAME}_VERSION_MINOR 01)
-set(${PROJECT_NAME}_VERSION_PATCH 00)
+set(${PROJECT_NAME}_VERSION_PATCH 01)
 set(${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}")
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -69,6 +69,14 @@ include_directories(include)
 
 # - Collect sources - not ideal because you have to keep running CMake to pick up changes
 file(GLOB_RECURSE LC_CONTENT_SRCS RELATIVE ${PROJECT_SOURCE_DIR} "src/*.cc")
+
+unset(COMPILER_SUPPORTS_CXX11 CACHE)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+if(NOT COMPILER_SUPPORTS_CXX11)
+    message(STATUS "The compiler ${CMAKE_CXX_COMPILER} does not support c++11 - will build with reduced functionality")
+    file(GLOB_RECURSE LC_CONTENT_CXX11_SRCS RELATIVE ${PROJECT_SOURCE_DIR} "src/LCContentFast/*.cc")
+    list(REMOVE_ITEM LC_CONTENT_SRCS ${LC_CONTENT_CXX11_SRCS})
+endif()
 
 # - Add library and properties
 add_library(${PROJECT_NAME} SHARED ${LC_CONTENT_SRCS})
