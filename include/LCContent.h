@@ -59,6 +59,7 @@
 #include "LCTopologicalAssociation/BackscatteredTracks2Algorithm.h"
 #include "LCTopologicalAssociation/BrokenTracksAlgorithm.h"
 #include "LCTopologicalAssociation/ConeBasedMergingAlgorithm.h"
+#include "LCTopologicalAssociation/HighEnergyPhotonRecoveryAlgorithm.h"
 #include "LCTopologicalAssociation/IsolatedHitMergingAlgorithm.h"
 #include "LCTopologicalAssociation/LoopingTracksAlgorithm.h"
 #include "LCTopologicalAssociation/MipPhotonSeparationAlgorithm.h"
@@ -129,6 +130,7 @@ public:
         d("BackscatteredTracks2",                   lc_content::BackscatteredTracks2Algorithm::Factory)                         \
         d("BrokenTracks",                           lc_content::BrokenTracksAlgorithm::Factory)                                 \
         d("ConeBasedMerging",                       lc_content::ConeBasedMergingAlgorithm::Factory)                             \
+        d("HighEnergyPhotonRecovery",               lc_content::HighEnergyPhotonRecoveryAlgorithm::Factory)                     \
         d("IsolatedHitMerging",                     lc_content::IsolatedHitMergingAlgorithm::Factory)                           \
         d("LoopingTracks",                          lc_content::LoopingTracksAlgorithm::Factory)                                \
         d("MipPhotonSeparation",                    lc_content::MipPhotonSeparationAlgorithm::Factory)                          \
