@@ -22,7 +22,8 @@ namespace lc_content
 {
 
 PhotonFragmentMergingBaseAlgorithm::PhotonFragmentMergingBaseAlgorithm() :
-    m_transProfileMaxLayer(30),
+    m_transProfileEcalOnly(true),
+    m_transProfileMaxLayer(0),
     m_minWeightedLayerSeparation(0.f),
     m_maxWeightedLayerSeparation(80.f),
     m_lowEnergyOfCandidateClusterThreshold(1.f),
@@ -67,6 +68,12 @@ PhotonFragmentMergingBaseAlgorithm::PhotonFragmentMergingBaseAlgorithm() :
 
 StatusCode PhotonFragmentMergingBaseAlgorithm::Run()
 {
+    // ATTN Implicit assumption that individual physical layers in the ECAL will always correspond to individual pseudo layers
+    // Also ECAL BARRAL has same layer as ECAL ENDCAP and ecal is the first inner detector
+    if (m_transProfileEcalOnly && m_transProfileMaxLayer <= 0 )
+        m_transProfileMaxLayer = PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp() + 
+            PandoraContentApi::GetGeometry(*this)->GetSubDetector(ECAL_BARREL).GetNLayers();
+    
     const ClusterList *pClusterList = NULL;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetAffectedClusterList(pClusterList));
 
@@ -245,7 +252,6 @@ StatusCode PhotonFragmentMergingBaseAlgorithm::GetEvidenceForMerging(const Clust
     ShowerProfilePlugin::ShowerPeakList showerPeakList;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetShowerPeakList(pParentCluster, pDaughterCluster, showerPeakList));
 
-    ClusterFitResult parentFitResult, daughterFitResult;
     ClusterFitResult parentFitResult =  (pParentCluster->GetFitToAllHitsResult());
     ClusterFitResult daughterFitResult =  (pDaughterCluster->GetFitToAllHitsResult());
     const CartesianVector parentCentroid(FragmentRemovalHelper::GetEMEnergyWeightedPosition(pParentCluster));
@@ -254,8 +260,20 @@ StatusCode PhotonFragmentMergingBaseAlgorithm::GetEvidenceForMerging(const Clust
     parameters.m_weightedLayerSeparation = clusterSeparation;
     parameters.m_energyOfMainCluster = pParentCluster->GetElectromagneticEnergy();
     parameters.m_energyOfCandidateCluster = pDaughterCluster->GetElectromagneticEnergy();
-    parameters.m_energyOfMainPeak = (showerPeakList.size() > 0) ? showerPeakList.at(0).GetPeakEnergy() : 0.f;
-    parameters.m_energyOfCandidatePeak = (showerPeakList.size() > 1) ? showerPeakList.at(1).GetPeakEnergy() : 0.f;
+    
+    parameters.m_energyOfMainPeak = 0.f;
+    if (showerPeakList.size() > 0)
+    {
+        for(CaloHitList::const_iterator iter = showerPeakList.at(0).GetPeakCaloHitList().begin(); iter !=  showerPeakList.at(0).GetPeakCaloHitList().end(); ++iter)
+            parameters.m_energyOfMainPeak += (*iter)->GetElectromagneticEnergy();
+    }
+    parameters.m_energyOfCandidatePeak = 0.f;
+    if (showerPeakList.size() > 1)
+    {
+        for(CaloHitList::const_iterator iter = showerPeakList.at(1).GetPeakCaloHitList().begin(); iter !=  showerPeakList.at(1).GetPeakCaloHitList().end(); ++iter)
+            parameters.m_energyOfCandidatePeak += (*iter)->GetElectromagneticEnergy();
+    }
+    std::cout<<parameters.m_energyOfMainPeak<<":"<<parameters.m_energyOfCandidatePeak<<":"<<parameters.m_energyOfMainCluster<<":"<<parameters.m_energyOfCandidateCluster<<std::endl;
     parameters.m_hitSeparation = ClusterHelper::GetDistanceToClosestHit(pDaughterCluster, pParentCluster);
     parameters.m_centroidSeparation = (parentCentroid - daughterCentroid).GetMagnitude();
     parameters.m_nCaloHitsMain = pParentCluster->GetNCaloHits();
@@ -288,7 +306,7 @@ StatusCode PhotonFragmentMergingBaseAlgorithm::GetShowerPeakList(const Cluster *
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, clusterParameters, pTempCluster));
 
     const ShowerProfilePlugin *const pShowerProfilePlugin(PandoraContentApi::GetPlugins(*this)->GetShowerProfilePlugin());
-    pShowerProfilePlugin->CalculateTransverseProfile(pTempCluster, m_transProfileMaxLayer, showerPeakList);
+    pShowerProfilePlugin->CalculateTracklessTransverseProfile(pTempCluster, m_transProfileMaxLayer, showerPeakList, true);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::EndFragmentation(*this, originalClusterListName, peakClusterListName));
 
     return STATUS_CODE_SUCCESS;
@@ -298,6 +316,9 @@ StatusCode PhotonFragmentMergingBaseAlgorithm::GetShowerPeakList(const Cluster *
 
 StatusCode PhotonFragmentMergingBaseAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "TransProfileEcalOnly", m_transProfileEcalOnly));
+        
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TransProfileMaxLayer", m_transProfileMaxLayer));
 

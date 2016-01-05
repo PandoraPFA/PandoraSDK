@@ -27,8 +27,6 @@ LCShowerProfilePlugin::LCShowerProfilePlugin() :
     m_longProfileMaxDifference(0.1f),
     m_transProfileNBins(41),
     m_transProfilePeakThreshold(std::numeric_limits<float>::epsilon()),
-    m_transProfileNearbyEnergyRatio(2.f),
-    m_transProfileMaxPeaksToFind(3),
     m_transProfilePeakFindingMetric(0),
     m_transProfileMinNBinsCut(2),
     m_transProfileTrackNearbyNSlices(3),
@@ -271,14 +269,18 @@ void LCShowerProfilePlugin::CalculateLongitudinalProfile(const Cluster *const pC
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::CalculateTracklessTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList) const
+void LCShowerProfilePlugin::CalculateTracklessTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList, 
+    const bool inclusiveMode) const
 {
     // ATTN could combine trackless and tracked approach
     TwoDShowerProfile showerProfile;
     ShowerPeakObjectVector showerPeakObjectVector;
     this->CalculateTracklessTransverseShowers(pCluster, maxPseudoLayer, showerProfile, showerPeakObjectVector);
+    if (inclusiveMode)
+        this->AssociateUnavailableBinsToPeaks(showerProfile, showerPeakObjectVector);
     ShowerPeakList showerPeakListCharge;
-    this->ConvertBinsToShowerLists(showerProfile, showerPeakObjectVector, showerPeakList, showerPeakListCharge);
+    this->ConvertBinsToShowerLists(showerProfile, showerPeakObjectVector, showerPeakList, showerPeakListCharge, inclusiveMode);
+    showerPeakList = this->SortShowerPeakListByEnergy(showerPeakList);
     return;
 }
 
@@ -316,7 +318,9 @@ void LCShowerProfilePlugin::CalculateTrackNearbyTransverseProfile(const Cluster 
             showerPeakObjectVectorFirst = showerPeakObjectVectorNext;
         }
     }
-    this->ConvertBinsToShowerLists(showerProfileFirst, showerPeakObjectVectorFirst, showerPeakListPhoton, showerPeakListCharge);
+    this->ConvertBinsToShowerLists(showerProfileFirst, showerPeakObjectVectorFirst, showerPeakListPhoton, showerPeakListCharge, false);
+    showerPeakListPhoton = this->SortShowerPeakListByEnergy(showerPeakListPhoton);
+    showerPeakListCharge = this->SortShowerPeakListByEnergy(showerPeakListCharge);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -397,9 +401,6 @@ void LCShowerProfilePlugin::InitialiseTwoDShowerProfile(const Cluster *const pCl
     const int nOffsetBins(m_transProfileNBins / 2);
     for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
     {
-        if (iter->first > maxPseudoLayer)
-            break;
-
         for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
         {
             const CaloHit *const pCaloHit = *hitIter;
@@ -412,8 +413,20 @@ void LCShowerProfilePlugin::InitialiseTwoDShowerProfile(const Cluster *const pCl
             this->FindHitPositionProjection(pCaloHit->GetPositionVector(), innerLayerCentroid, uAxis, vAxis, nOffsetBins, cellLengthScale, uBin, vBin);
             if ((uBin >= 0) && (vBin >= 0) && (uBin < m_transProfileNBins) && (vBin < m_transProfileNBins))
             {
-                showerProfile[uBin][vBin].m_energy += pCaloHit->GetElectromagneticEnergy();
-                showerProfile[uBin][vBin].m_caloHitList.insert(pCaloHit);
+                if (iter->first > maxPseudoLayer)
+                {
+                    showerProfile[uBin][vBin].m_unusedCaloHitList.insert(pCaloHit);
+                }else
+                {
+                    showerProfile[uBin][vBin].m_energy += pCaloHit->GetElectromagneticEnergy();
+                    showerProfile[uBin][vBin].m_caloHitList.insert(pCaloHit);
+                }
+
+            }else
+            {
+                int uEdgeBin(0), vEdgeBin(0);
+                this->FindBoundaryBins(uBin, vBin, 0, m_transProfileNBins - 1, 0, m_transProfileNBins - 1, uEdgeBin, vEdgeBin);
+                showerProfile[uEdgeBin][vEdgeBin].m_unusedCaloHitList.insert(pCaloHit);
             }
         }
     }
@@ -496,6 +509,27 @@ void LCShowerProfilePlugin::FindRawPeaksInTwoDShowerProfile(TwoDShowerProfile &s
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+void LCShowerProfilePlugin::AssociateUnavailableBinsToPeaks(const TwoDShowerProfile &showerProfile, ShowerPeakObjectVector &showerPeakObjectVector) const
+{
+    for (int uBin = 0; uBin < m_transProfileNBins; ++uBin)
+    {
+        for (int vBin = 0; vBin < m_transProfileNBins; ++vBin)
+        {
+            if (showerProfile[uBin][vBin].m_isAvailable)
+                continue;
+            
+            ShowerPeakObject  * bestShowerPeakObject = NULL;;
+            this->CalculateBestPeakUsingMetric(showerPeakObjectVector, uBin, vBin, bestShowerPeakObject);
+            if (bestShowerPeakObject)
+            {
+                bestShowerPeakObject->m_associatedBins.push_back(std::make_pair(uBin,vBin));
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 void LCShowerProfilePlugin::AssociateBinsToPeaks(const TwoDShowerProfile &showerProfile, ShowerPeakObjectVector &showerPeakObjectVector) const
 {
     for (int uBin = 0; uBin < m_transProfileNBins; ++uBin)
@@ -505,7 +539,7 @@ void LCShowerProfilePlugin::AssociateBinsToPeaks(const TwoDShowerProfile &shower
             if (!showerProfile[uBin][vBin].m_isAvailable)
                 continue;
             
-            ShowerPeakObject  * bestShowerPeakObject = NULL;
+            ShowerPeakObject  * bestShowerPeakObject = NULL;;
             this->CalculateBestPeakUsingMetric(showerPeakObjectVector, uBin, vBin, bestShowerPeakObject);
             if (bestShowerPeakObject)
             {
@@ -612,6 +646,7 @@ void LCShowerProfilePlugin::MatchPeaksInTwoSlices(const ShowerPeakObjectVector &
 
 void LCShowerProfilePlugin::ProcessShowerProfile(TwoDShowerProfile &showerProfile, ShowerPeakObjectVector &showerPeakObjectVector) const
 {
+    
     this->MaskLowHeightRegions(showerProfile);
     this->FindRawPeaksInTwoDShowerProfile(showerProfile, showerPeakObjectVector);
     this->AssociateBinsToPeaks(showerProfile, showerPeakObjectVector);
@@ -634,10 +669,42 @@ void LCShowerProfilePlugin::FindHitPositionProjection(const CartesianVector &hit
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::ConvertBinsToShowerLists(const TwoDShowerProfile &showerProfile, const ShowerPeakObjectVector &showerPeakObjectVector, 
-   ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListCharge) const
+void LCShowerProfilePlugin::FindBoundaryBins(const int uBin, const int vBin, const int uEdgeLow, const int uEdgeHigh, const int vEdgeLow, const int vEdgeHigh, 
+    int &uEdgeBin, int &vEdgeBin) const
 {
-    //const int nOffsetBins(m_transProfileNBins / 2);
+    const int uCentralBin((uEdgeLow + uEdgeHigh) / 2);
+    const int vCentralBin((vEdgeLow + vEdgeHigh) / 2);
+    const int uDisToCentral(uBin - uCentralBin);
+    const int vDisToCentral(vBin - vCentralBin);
+    const float theta(std::atan2(static_cast<float>(vDisToCentral), static_cast<float>(uDisToCentral)));
+    const float quarterPi(std::atan2(1.f, 1.f));
+    if (theta >= -quarterPi && theta < quarterPi)
+    {
+        uEdgeBin = uEdgeHigh;
+        vEdgeBin = std::max(std::min(vCentralBin + static_cast<int>((uEdgeHigh - uCentralBin) * std::tan(theta)), vEdgeLow), vEdgeHigh);
+    }
+    else if (theta >= quarterPi && theta < 3 * quarterPi)
+    {
+        vEdgeBin = vEdgeHigh;
+        uEdgeBin = std::max(std::min(uCentralBin + static_cast<int>((vEdgeHigh - vCentralBin) / std::tan(theta)), uEdgeLow), uEdgeHigh);
+    }
+    else if (theta >= 3 *quarterPi && theta < 3 * -quarterPi)
+    {
+        uEdgeBin = uEdgeLow;
+        vEdgeBin = std::max(std::min(vCentralBin + static_cast<int>((uCentralBin - uEdgeLow) * std::tan(theta)), vEdgeLow), vEdgeHigh);
+    }
+    else if (theta >= 3 * -quarterPi && theta < -quarterPi)
+    {
+        vEdgeBin = vEdgeLow;
+        uEdgeBin = std::max(std::min(uCentralBin + static_cast<int>((vCentralBin - vEdgeLow) / std::tan(theta)), uEdgeLow), uEdgeHigh);
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void LCShowerProfilePlugin::ConvertBinsToShowerLists(const TwoDShowerProfile &showerProfile, const ShowerPeakObjectVector &showerPeakObjectVector, 
+   ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListCharge, const bool inclusiveMode) const
+{
     for (ShowerPeakObjectVector::const_iterator iter = showerPeakObjectVector.begin(), iterEnd = showerPeakObjectVector.end(); iter !=iterEnd; ++iter)
     {
         const ShowerPeakObject  &showerPeakObject(*iter);
@@ -659,6 +726,8 @@ void LCShowerProfilePlugin::ConvertBinsToShowerLists(const TwoDShowerProfile &sh
             uuBar += uBinDifference * uBinDifference * energy;
             vvBar += vBinDifference * vBinDifference * energy;
             caloHitList.insert(showerProfileEntry.m_caloHitList.begin(), showerProfileEntry.m_caloHitList.end());
+            if (inclusiveMode)
+                caloHitList.insert(showerProfileEntry.m_unusedCaloHitList.begin(), showerProfileEntry.m_unusedCaloHitList.end());
         }
         if (peakTotalEnergy < std::numeric_limits<float>::epsilon())
             throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -791,10 +860,9 @@ void LCShowerProfilePlugin::CalculateBestPeakUsingMetric(ShowerPeakObjectVector 
             bestShowerPeakObject = NULL;
             return;
         }
-        
         const int distance2((uBin-showerPeakObject->GetPeakUBin())*(uBin-showerPeakObject->GetPeakUBin()) + (vBin-showerPeakObject->GetPeakVBin())*(vBin-showerPeakObject->GetPeakVBin()));
         const float metric(this->CalculatePeakFindingMetric(std::sqrt(static_cast<float>(distance2)), showerPeakObject->GetPeakEnergy()));
-        if( metric<minMetric )
+        if (metric < minMetric)
         {
             minMetric = metric;
             bestShowerPeakObject = showerPeakObject;
@@ -815,6 +883,26 @@ bool LCShowerProfilePlugin::HasPhotonCandidate(const ShowerPeakObjectVector &sho
         }
     }
     return false;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+ShowerProfilePlugin::ShowerPeakList LCShowerProfilePlugin::SortShowerPeakListByEnergy(const ShowerPeakList &showerPeakList) const
+{
+    typedef std::multimap<float, ShowerPeak> FloatShowerPeakMap;
+    FloatShowerPeakMap energyShowerPeakMap;
+    for (ShowerPeakList::const_iterator iter = showerPeakList.begin(), iterEnd = showerPeakList.end(); iter !=iterEnd; ++iter)
+    {
+        const ShowerPeak &showerPeak(*iter);
+        energyShowerPeakMap.insert(FloatShowerPeakMap::value_type(showerPeak.GetPeakEnergy(), showerPeak));
+    }
+    ShowerPeakList sortedShowerPeakList;
+    for (FloatShowerPeakMap::reverse_iterator iter = energyShowerPeakMap.rbegin(), iterEnd = energyShowerPeakMap.rend(); iter !=iterEnd; ++iter)
+    {
+        const ShowerPeak &showerPeak(iter->second);
+        sortedShowerPeakList.push_back(showerPeak);
+    }
+    return sortedShowerPeakList;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -859,12 +947,6 @@ PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, 
 
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
                                    "TransProfilePeakThreshold", m_transProfilePeakThreshold));
-
-    PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "TransProfileNearbyEnergyRatio", m_transProfileNearbyEnergyRatio));
-
-    PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "TransProfileMaxPeaksToFind", m_transProfileMaxPeaksToFind));
                                    
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
                                    "TransProfilePeakFindingMetric", m_transProfilePeakFindingMetric));

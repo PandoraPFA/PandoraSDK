@@ -414,6 +414,7 @@ private:
     float                   m_parallelDistanceCut;          ///< Max allowed projection of track-hit separation along track direction
     float                   m_minTrackClusterCosAngle;      ///< Min cos(angle) between track and cluster initial direction
     float                   m_minDistanceToTrackDivisionCut;///< Minimum distance to track to separate clusters close to track or not
+    bool                    m_transProfileEcalOnly;         ///< Transverse profile shower calculator uses EcalOnly. Can be overridden by the m_transProfileMaxLayer
     unsigned int            m_transProfileMaxLayer;         ///< Maximum layer to consider in calculation of shower transverse profiles
     float                   m_minDistanceToTrackCutLow;     ///< Minimum distance to track to consider
     float                   m_minDistanceToTrackCutHigh;    ///< Maximum distance to track to consider

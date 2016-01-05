@@ -26,12 +26,13 @@ PhotonReconstructionAlgorithm::PhotonReconstructionAlgorithm() :
     m_maxPeakRms(5.f),
     m_maxRmsRatio(3.f),
     m_maxLongProfileStart(10.f),
-    m_maxLongProfileDiscrepancy(0.8f),//1//0.8
+    m_maxLongProfileDiscrepancy(0.8f),
     m_maxSearchLayer(9),
     m_parallelDistanceCut(100.f),
     m_minTrackClusterCosAngle(0.f),
     m_minDistanceToTrackDivisionCut(3.f),
-    m_transProfileMaxLayer(30),
+    m_transProfileEcalOnly(true),
+    m_transProfileMaxLayer(0),
     m_minDistanceToTrackCutLow(2.f),
     m_minDistanceToTrackCutHigh(200.f),
     m_energyCutForPid1(0.2f),
@@ -69,6 +70,13 @@ StatusCode PhotonReconstructionAlgorithm::Run()
     // for cluster close to track, do peak findings, do other stuff
     // for peak finding results, do likelihood test
     // Obtain current lists for later reference
+    
+    // ATTN Implicit assumption that individual physical layers in the ECAL will always correspond to individual pseudo layers
+    // Also ECAL BARRAL has same layer as ECAL ENDCAP and ecal is the first inner detector
+    if (m_transProfileEcalOnly && m_transProfileMaxLayer <= 0 )
+        m_transProfileMaxLayer = PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp() + 
+            PandoraContentApi::GetGeometry(*this)->GetSubDetector(ECAL_BARREL).GetNLayers();
+            
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitialiseInputClusterListName());
     
     ClusterVector clusterVector;
@@ -177,7 +185,7 @@ bool PhotonReconstructionAlgorithm::PassClusterQualityPreCut(const Cluster *cons
 StatusCode PhotonReconstructionAlgorithm::GetTracklessClusterShowerList(const Cluster *const pCluster, ShowerProfilePlugin::ShowerPeakList &showersPhoton) const
 {
     const ShowerProfilePlugin *const pShowerProfilePlugin(PandoraContentApi::GetPlugins(*this)->GetShowerProfilePlugin());
-    pShowerProfilePlugin->CalculateTracklessTransverseProfile(pCluster, m_transProfileMaxLayer, showersPhoton);
+    pShowerProfilePlugin->CalculateTracklessTransverseProfile(pCluster, m_transProfileMaxLayer, showersPhoton, false);
 
     return STATUS_CODE_SUCCESS;
 }
@@ -497,7 +505,10 @@ StatusCode PhotonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHand
         
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinDistanceToTrackDivisionCut", m_minDistanceToTrackDivisionCut));
-    
+
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "TransProfileEcalOnly", m_transProfileEcalOnly));
+        
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TransProfileMaxLayer", m_transProfileMaxLayer));
         

@@ -35,6 +35,7 @@
 #include "LCParticleId/MuonReconstructionAlgorithm.h"
 #include "LCParticleId/PhotonReconstructionAlgorithm.h"
 #include "LCParticleId/PhotonRecoveryAlgorithm.h"
+#include "LCParticleId/PhotonSplittingAlgorithm.h"
 
 #include "LCPfoConstruction/CLICPfoSelectionAlgorithm.h"
 #include "LCPfoConstruction/PfoCreationAlgorithm.h"
@@ -115,6 +116,7 @@ public:
         d("MuonReconstruction",                     lc_content::MuonReconstructionAlgorithm::Factory)                           \
         d("PhotonReconstruction",                   lc_content::PhotonReconstructionAlgorithm::Factory)                         \
         d("PhotonRecovery",                         lc_content::PhotonRecoveryAlgorithm::Factory)                               \
+        d("PhotonSplitting",                        lc_content::PhotonSplittingAlgorithm::Factory)                               \
         d("CLICPfoSelection",                       lc_content::CLICPfoSelectionAlgorithm::Factory)                             \
         d("PfoCreation",                            lc_content::PfoCreationAlgorithm::Factory)                                  \
         d("PfoCreationParent",                      lc_content::PfoCreationParentAlgorithm::Factory)                            \

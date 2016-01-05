@@ -27,7 +27,8 @@ public:
     void CalculateShowerStartLayer(const pandora::Cluster *const pCluster, unsigned int &showerStartLayer) const;
     void CalculateLongitudinalProfile(const pandora::Cluster *const pCluster, float &profileStart, float &profileDiscrepancy) const;    
     void CalculateTransverseProfile(const pandora::Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList) const;
-    void CalculateTracklessTransverseProfile(const pandora::Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList) const;
+    void CalculateTracklessTransverseProfile(const pandora::Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList,
+        const bool inclusiveMode) const;
     void CalculateTrackNearbyTransverseProfile(const pandora::Cluster *const pCluster, const unsigned int maxPseudoLayer, const pandora::Track *const pMinTrack, 
         const pandora::TrackVector &trackVector, ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListCharge) const;
 
@@ -47,6 +48,7 @@ private:
         float                       m_energy;               ///< The energy associated with the shower profile entry
         pandora::CaloHitList        m_caloHitList;          ///< The list of calo hits associated with the shower profile entry
         bool                        m_potentialPeak;        ///< Whether the shower profile is a potential peak (to speed up looping)
+        pandora::CaloHitList        m_unusedCaloHitList;    ///< The list of calo hits unused for shower peak finding, needed for inclusive mode
     };
 
     typedef std::pair<int,int>  TwoDBin;                    ///< The two dimentional bins typedef
@@ -206,6 +208,14 @@ private:
     void FindRawPeaksInTwoDShowerProfile(TwoDShowerProfile &showerProfile, ShowerPeakObjectVector &showerPeakObjectVector) const;
     
     /**
+     *  @brief  Associate unavailable bins to peaks, using TwoDShowerProfile, for inclusive modes
+     * 
+     *  @param  showerProfile two dimensional shower profile to consider
+     *  @param  showerPeakObjectVector the 2D peak object to receive
+     */
+    void AssociateUnavailableBinsToPeaks(const TwoDShowerProfile &showerProfile, ShowerPeakObjectVector &showerPeakObjectVector) const;
+    
+    /**
      *  @brief  Associate bins to peaks, using TwoDShowerProfile
      * 
      *  @param  showerProfile two dimensional shower profile to consider
@@ -269,9 +279,10 @@ private:
      *  @param  showerPeakObjectVector the 2D peak object vector to consider
      *  @param  showerPeakListPhoton shower peak list of photon candidates
      *  @param  showerPeakListCharge shower peak list of non photon candidates
+     *  @param  inclusiveMode inclusive mode to add all calo hits to peaks
      */
     void ConvertBinsToShowerLists(const TwoDShowerProfile &showerProfile, const ShowerPeakObjectVector &showerPeakObjectVector, 
-        ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListCharge) const;
+        ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListCharge, const bool inclusiveMode) const;
     
     /**
      *  @brief  Find projection of a 3D point
@@ -287,6 +298,20 @@ private:
      */
     void FindHitPositionProjection(const pandora::CartesianVector &hitPosition, const pandora::CartesianVector &innerLayerCentroid, const pandora::CartesianVector &uAxis, 
         const pandora::CartesianVector &vAxis, const int nOffsetBins, const int cellLengthScale, int &uBin, int &vBin) const;
+        
+    /**
+     *  @brief  Find the cloest boundary bin for a point outside the square
+     * 
+     *  @param  uBin u bin 
+     *  @param  vBin v bin
+     *  @param  uEdgeLow u bin low edge
+     *  @param  uEdgeHigh u bin high edge
+     *  @param  vEdgeLow v bin low edge
+     *  @param  vEdgeHigh v bin high edge
+     *  @param  uEdgeBin cloest edge u bin
+     *  @param  vEdgeBin cloest edge v bin
+     */
+    void FindBoundaryBins(const int uBin, const int vBin, const int uEdgeLow, const int uEdgeHigh, const int vEdgeLow, const int vEdgeHigh, int &uEdgeBin, int &vEdgeBin) const;
     
     /**
      *  @brief  True if the peak is a local maxima
@@ -350,6 +375,15 @@ private:
      */
     bool HasPhotonCandidate(const ShowerPeakObjectVector &showerPeakObjectVector) const;
     
+    /**
+     *  @brief  Sort shower peak list by desending energy
+     * 
+     *  @param  showerPeakList shower peak list
+     * 
+     *  @return Sorted shower peak list by desending energy
+     */
+    ShowerPeakList SortShowerPeakListByEnergy(const ShowerPeakList &showerPeakList) const;
+    
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
 
     float        m_showerStartMipFraction;                  ///< Max layer mip-fraction to declare layer as shower-like
@@ -364,9 +398,7 @@ private:
     float        m_longProfileMaxDifference;                ///< Max difference between current and best longitudinal profile comparisons
 
     int          m_transProfileNBins;                       ///< Number of bins used to construct transverse profile
-    float        m_transProfilePeakThreshold;               ///< Minimum electrogmagnetic energy for profile peak bin, units GeV
-    float        m_transProfileNearbyEnergyRatio;           ///< Max ratio of bin energy to nearby bin energy; used to identify peak extent
-    unsigned int m_transProfileMaxPeaksToFind;              ///< Maximum number of peaks to identify in transverse profile
+    float        m_transProfilePeakThreshold;               ///< Minimum energy for a bin to consider
     unsigned int m_transProfilePeakFindingMetric;           ///< The metric for peak association
     unsigned int m_transProfileMinNBinsCut;                 ///< The minimum number for bins of a substantial peak
     unsigned int m_transProfileTrackNearbyNSlices;          ///< The number of slices to analyse the EM shower
@@ -376,7 +408,7 @@ private:
 //------------------------------------------------------------------------------------------------------------------------------------------
 inline void LCShowerProfilePlugin::CalculateTransverseProfile(const pandora::Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList) const
 {
-    return CalculateTracklessTransverseProfile(pCluster, maxPseudoLayer, showerPeakList);
+    return CalculateTracklessTransverseProfile(pCluster, maxPseudoLayer, showerPeakList, false);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
