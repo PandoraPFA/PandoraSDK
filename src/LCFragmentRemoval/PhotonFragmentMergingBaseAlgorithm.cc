@@ -246,9 +246,8 @@ StatusCode PhotonFragmentMergingBaseAlgorithm::GetEvidenceForMerging(const Clust
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetShowerPeakList(pParentCluster, pDaughterCluster, showerPeakList));
 
     ClusterFitResult parentFitResult, daughterFitResult;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, ClusterFitHelper::FitFullCluster(pParentCluster, parentFitResult));
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_OUT_OF_RANGE, !=, ClusterFitHelper::FitFullCluster(pDaughterCluster, daughterFitResult) );
-
+    ClusterFitResult parentFitResult =  (pParentCluster->GetFitToAllHitsResult());
+    ClusterFitResult daughterFitResult =  (pDaughterCluster->GetFitToAllHitsResult());
     const CartesianVector parentCentroid(FragmentRemovalHelper::GetEMEnergyWeightedPosition(pParentCluster));
     const CartesianVector daughterCentroid(FragmentRemovalHelper::GetEMEnergyWeightedPosition(pDaughterCluster));
 

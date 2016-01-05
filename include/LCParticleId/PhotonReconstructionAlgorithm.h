@@ -10,6 +10,8 @@
 
 #include "Pandora/Algorithm.h"
 
+namespace pandora { class TiXmlDocument; }
+
 namespace lc_content
 {
 
@@ -94,7 +96,7 @@ private:
      *  @param  pCluster address of the cluster
      *  @param  showersPhoton shower peak list of photon candidates from the big cluster
      */
-    pandora::StatusCode GetTracklessClusterShowerList(const pandora::Cluster *const pCluster, BXShowerProfilePluginNew::ShowerPeakList &showersPhoton) const;
+    pandora::StatusCode GetTracklessClusterShowerList(const pandora::Cluster *const pCluster, pandora::ShowerProfilePlugin::ShowerPeakList &showersPhoton) const;
     
     /**
      *  @brief  Get individual showers(clusters) from the big cluster, for the cluster close to charged tracks projection. Main power horse
@@ -106,7 +108,7 @@ private:
      *  @param  showersCharged shower peak list of non photon candidates from the big cluster
      */
     pandora::StatusCode GetTrackClusterShowerList(const pandora::Cluster *const pCluster, const pandora::Track *const pMinTrack, const pandora::TrackVector trackVector,
-        BXShowerProfilePluginNew::ShowerPeakList &showersPhoton, BXShowerProfilePluginNew::ShowerPeakList &showersCharged) const;
+        pandora::ShowerProfilePlugin::ShowerPeakList &showersPhoton, pandora::ShowerProfilePlugin::ShowerPeakList &showersCharged) const;
     
     /**
      *  @brief  Creat photons by checking and setting photon id.
@@ -115,7 +117,7 @@ private:
      *  @param  showersPhoton shower peak list of photon candidates from the big cluster
      *  @param  isFromTrack true for a cluster close to a track
      */
-    pandora::StatusCode CreatePhotons(const pandora::Cluster *const pCluster, const BXShowerProfilePluginNew::ShowerPeakList &showersPhoton, const bool isFromTrack) const;
+    pandora::StatusCode CreatePhotons(const pandora::Cluster *const pCluster, const pandora::ShowerProfilePlugin::ShowerPeakList &showersPhoton, const bool isFromTrack) const;
     
     /**
      *  @brief  Initialise fragmentation.  
@@ -143,7 +145,7 @@ private:
      *  @param  usedCluster true for the cluster is a photon to receive
      *  @param  isFromTrack true for the cluster close to a track
      */
-    pandora::StatusCode CreateClustersAndSetPhotonID(const BXShowerProfilePluginNew::ShowerPeakList &showersPhoton, const float wholeClusuterEnergy, bool &usedCluster, const bool isFromTrack) const;
+    pandora::StatusCode CreateClustersAndSetPhotonID(const pandora::ShowerProfilePlugin::ShowerPeakList &showersPhoton, const float wholeClusuterEnergy, bool &usedCluster, const bool isFromTrack) const;
     
     /**
      *  @brief  Creat a photon by setting photon id.
@@ -151,7 +153,7 @@ private:
      *  @param  showerPeak shower peak list for photon candidate
      *  @param  pPeakCluster address of the photon to form
      */
-    pandora::StatusCode CreateCluster(const BXShowerProfilePluginNew::ShowerPeak &showerPeak, const pandora::Cluster *&pPeakCluster) const;
+    pandora::StatusCode CreateCluster(const pandora::ShowerProfilePlugin::ShowerPeak &showerPeak, const pandora::Cluster *&pPeakCluster) const;
     
     /**
      *  @brief  Check and set photon id for a cluster.
@@ -162,7 +164,8 @@ private:
      *  @param  isPhoton true for the cluster is a photon to receive
      *  @param  isFromTrack true for the cluster close to a track
      */
-    pandora::StatusCode CheckAndSetPhotonID(const BXShowerProfilePluginNew::ShowerPeak &showerPeak, const pandora::Cluster *const pPeakCluster, const float wholeClusuterEnergy, bool &isPhoton, const bool isFromTrack) const;
+    pandora::StatusCode CheckAndSetPhotonID(const pandora::ShowerProfilePlugin::ShowerPeak &showerPeak, const pandora::Cluster *const pPeakCluster, 
+        const float wholeClusuterEnergy, bool &isPhoton, const bool isFromTrack) const;
     
     /**
      *  @brief  Calculate quantities for checking photon id
@@ -172,7 +175,7 @@ private:
      *  @param  wholeClusuterEnergy the total energy of the big cluster where the shower peak comes from
      *  @param  hisVarQuantityMap a varible to value map to store quantities for checking photon id
      */
-    pandora::StatusCode CalculateForPhotonID(const BXShowerProfilePluginNew::ShowerPeak &showerPeak, const pandora::Cluster *const pPeakCluster, 
+    pandora::StatusCode CalculateForPhotonID(const pandora::ShowerProfilePlugin::ShowerPeak &showerPeak, const pandora::Cluster *const pPeakCluster, 
         const float wholeClusuterEnergy, HistVarQuantityMap &hisVarQuantityMap) const;
         
     /**
@@ -215,11 +218,12 @@ private:
      *  @brief  True for the metric of photon passing the cut
      * 
      *  @param  metric The metric of photon id
+     *  @param  clusterEnergy energy of the photon candidate
      *  @param  isFromTrack true for the cluster close to a track
      * 
      *  @return True for the metric of photon passing the cut
      */
-    bool    PassPhotonMetricCut(const float metric, const bool isFromTrack) const;
+    bool    PassPhotonMetricCut(const float metric, const float clusterEnergy, const bool isFromTrack) const;
     
     /**
      *  @brief  Delete cluster
@@ -338,7 +342,7 @@ private:
      *  @param  pCluster address of the cluster
      *  @param  showersPhoton shower peak list for photon candidate
      */
-    pandora::StatusCode CreatePhotonsForTraining(const pandora::Cluster *const pCluster, const BXShowerProfilePluginNew::ShowerPeakList &showersPhoton);
+    pandora::StatusCode CreatePhotonsForTraining(const pandora::Cluster *const pCluster, const pandora::ShowerProfilePlugin::ShowerPeakList &showersPhoton);
     
     /**
      *  @brief  Creat a photon and train photon likelihood id
@@ -346,7 +350,7 @@ private:
      *  @param  showersPhoton shower peak list for photon candidate
      *  @param  wholeClusuterEnergy the energy of the whole cluster
      */
-    pandora::StatusCode CreateClustersAndTrainPhotonID(const BXShowerProfilePluginNew::ShowerPeakList &showersPhoton, const float wholeClusuterEnergy);
+    pandora::StatusCode CreateClustersAndTrainPhotonID(const pandora::ShowerProfilePlugin::ShowerPeakList &showersPhoton, const float wholeClusuterEnergy);
     
     /**
      *  @brief  Train photon likelihood id
@@ -355,7 +359,7 @@ private:
      *  @param  pCluster the address of the photon candidate
      *  @param  wholeClusuterEnergy the energy of the whole cluster
      */
-    pandora::StatusCode TrainPhotonID(const BXShowerProfilePluginNew::ShowerPeak &showerPeak, const pandora::Cluster *const pCluster, const float wholeClusuterEnergy);
+    pandora::StatusCode TrainPhotonID(const pandora::ShowerProfilePlugin::ShowerPeak &showerPeak, const pandora::Cluster *const pCluster, const float wholeClusuterEnergy);
     
     /**
      *  @brief  Fill histogram
@@ -409,10 +413,15 @@ private:
     unsigned int            m_maxSearchLayer;               ///< Max pseudo layer to examine when calculating track-cluster distance
     float                   m_parallelDistanceCut;          ///< Max allowed projection of track-hit separation along track direction
     float                   m_minTrackClusterCosAngle;      ///< Min cos(angle) between track and cluster initial direction
-    float                   m_minDistanceToTrackCut;
+    float                   m_minDistanceToTrackDivisionCut;///< Minimum distance to track to separate clusters close to track or not
     unsigned int            m_transProfileMaxLayer;         ///< Maximum layer to consider in calculation of shower transverse profiles
-    float                   m_pidCut;                       ///< The pid cut to apply for photon cluster identification
-
+    float                   m_minDistanceToTrackCutLow;     ///< Minimum distance to track to consider
+    float                   m_minDistanceToTrackCutHigh;    ///< Maximum distance to track to consider
+    float                   m_energyCutForPid1;             ///< The energy cut for pid test range 1
+    float                   m_pidCut1;                      ///< The pid cut to apply for photon cluster identification for energy in range 1
+    float                   m_energyCutForPid2;             ///< The energy cut for pid test range 2
+    float                   m_pidCut2;                      ///< The pid cut to apply for photon cluster identification for energy in range 2
+    float                   m_pidCut3;                      ///< The pid cut to apply for photon cluster identification for energy in range 3
     // histogram settings
     std::string             m_histogramFile;                ///< The name of the file containing (or to contain) pdf histograms
     bool                    m_shouldMakePdfHistograms;      ///< Whether to create pdf histograms, rather than perform photon reconstruction
@@ -420,9 +429,9 @@ private:
 
     unsigned int            m_nEnergyBins;                  ///< Number of pdf energy bins
     pandora::FloatVector    m_energyBinLowerEdges;          ///< List of lower edges of the pdf energy bins
-    pandora::IntVector      m_nSignalEvents;                  ///< 
-    pandora::IntVector      m_nBackgroundEvents;                  ///< 
-    HistVarSglBkgHistMap    m_histVarSglBkgHistMap;
+    pandora::IntVector      m_nSignalEvents;                ///< Number of signal(photons) pfos in training
+    pandora::IntVector      m_nBackgroundEvents;            ///< Number of background pfos in training
+    HistVarSglBkgHistMap    m_histVarSglBkgHistMap;         ///< Histogram varible to signal background map
 };
     
 
