@@ -134,13 +134,14 @@ StatusCode RecoPhotonFragmentMergingAlgorithm::DeleteClusters(const ClusterVecto
 
 bool RecoPhotonFragmentMergingAlgorithm::IsPhotonFragmentInShowerProfile(const Parameters &parameters) const
 {
-    return (parameters.m_energyOfCandidatePeak > 0.f &&
-            parameters.m_energyOfCandidateCluster > 0.f &&
-            !parameters.m_hasCrossedGap &&
+    return (parameters.m_energyOfCandidateCluster > 0.f &&
             parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
             parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow1 &&
-            (parameters.m_energyOfCandidatePeak + parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
-            parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_energyRatioCandidatePeakToClusterPhotonThresholdLow1);
+            (parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
+            ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) || 
+            ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_smallCandidateFractionThresholdLow &&
+            parameters.m_energyOfMainPeak > parameters.m_energyOfMainCluster
+            ) ) ) ;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -178,31 +179,27 @@ bool RecoPhotonFragmentMergingAlgorithm::IsSmallPhotonFragment2(const Parameters
 bool RecoPhotonFragmentMergingAlgorithm::IsHighEnergyPhotonFragmentInShowerProfile(const Parameters &parameters) const
 {
     return (parameters.m_energyOfCandidateCluster > 0.f &&
-            parameters.m_energyOfMainCluster > 0.f &&
-            parameters.m_energyOfCandidatePeak > 0.f &&
-            parameters.m_energyOfMainPeak > 0.f &&
-            !parameters.m_hasCrossedGap &&
             parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdHigh1 &&
-            (parameters.m_energyOfCandidatePeak + parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
-            ( (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_energyRatioCandidatePeakToClusterPhotonThresholdHigh1 &&
-            parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster > m_energyRatioMainPeakToClusterPhotonThresholdHigh1 &&
-            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster + m_triangularEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1 * parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster) < m_triangularSumEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1) ||
-            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_linearEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1 &&
-            parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster > m_linearEnergyRatioMainPeakToClusterPhotonThresholdHigh1) ));
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow1 &&
+            (parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
+            ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) || 
+            ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_smallCandidateFractionThresholdLow &&
+            parameters.m_energyOfMainPeak > parameters.m_energyOfMainCluster
+            ))) ;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 bool RecoPhotonFragmentMergingAlgorithm::IsNeutralFragmentInShowerProfile(const Parameters &parameters) const
 {
-    return (parameters.m_energyOfCandidatePeak > 0.f &&
-            parameters.m_energyOfCandidateCluster > 0.f &&
-            !parameters.m_hasCrossedGap &&
+    return (parameters.m_energyOfCandidateCluster > 0.f &&
             parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            (parameters.m_energyOfCandidatePeak + parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
             parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdLow1 &&
-            parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_energyRatioCandidatePeakToClusterNeutralThresholdLow1);
+            (parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
+            ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) || 
+            ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_smallCandidateFractionThresholdLow &&
+            parameters.m_energyOfMainPeak > parameters.m_energyOfMainCluster
+            ))) ;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -231,20 +228,14 @@ bool RecoPhotonFragmentMergingAlgorithm::IsRelativeLowEnergyNeutralFragment(cons
 
 bool RecoPhotonFragmentMergingAlgorithm::IsHighEnergyNeutralFragmentInShowerProfile(const Parameters &parameters) const
 {
-    return (parameters.m_energyOfCandidateCluster > 0.f &&
-            parameters.m_energyOfMainCluster > 0.f &&
-            parameters.m_energyOfCandidatePeak > 0.f &&
-            parameters.m_energyOfMainPeak > 0.f &&
-            !parameters.m_hasCrossedGap &&
-            (parameters.m_energyOfCandidatePeak + parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
-            parameters.m_energyOfCandidateCluster / parameters.m_energyOfMainCluster < m_energyRatioCandidateToMainNeutralThresholdHigh1 &&
-            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdHigh1 &&
-            ( (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_energyRatioCandidatePeakToClusterNeutralThresholdHigh1 &&
-            parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster > m_energyRatioMainPeakToClusterNeutralThresholdHigh1 &&
-            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster + m_triangularEnergyRatioMainPeakToClusterNeutralThresholdHigh1 * parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster) < m_triangularSumEnergyRatioMainPeakToClusterNeutralThresholdHigh1) ||
-            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_squareEnergyRatioCandidatePeakToClusterNeutralThresholdHigh1 &&
-            parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster > m_squareEnergyRatioMainPeakToClusterNeutralThresholdHigh1) ));
+    return ( 
+            parameters.m_energyOfCandidateCluster > 0.f &&
+            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdLow1 &&
+            (parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
+            ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) || 
+            ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_smallCandidateFractionThresholdLow &&
+            parameters.m_energyOfMainPeak > parameters.m_energyOfMainCluster
+            ) ) ) ;
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 

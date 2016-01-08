@@ -39,33 +39,48 @@ public:
      *  @param  Destructor
      */
     ~PhotonReconstructionAlgorithm();
-
 private:
-    enum HistVar {PEAKRMS, RMSRATIO, LONGPROFILESTART, LONGPROFILEDISCREPANCY, PEAKENERGYFRACTION, MINDISTANCETOTRACK}; 
-    
-    class HistSglBkgObject
+    /**
+     *  @brief  pdf variables
+     */
+    enum PDFVar 
     {
-    public:
-        HistSglBkgObject(const std::string histName);
-        
-        std::string         m_histName;
-        int                 m_nBins;
-        float               m_lowValue;
-        float               m_highValue;
-        pandora::Histogram** m_pSglHistogram;
-        pandora::Histogram** m_pBkgHistogram;
+        PEAKRMS, 
+        RMSRATIO, 
+        LONGPROFILESTART, 
+        LONGPROFILEDISCREPANCY, 
+        PEAKENERGYFRACTION, 
+        MINDISTANCETOTRACK
     };
     
-    typedef std::map<HistVar, HistSglBkgObject> HistVarSglBkgHistMap;
-    typedef std::map<HistVar, float> HistVarQuantityMap;
+    /**
+     *  @brief  likelihood pdf obejct class
+     */
+    class LikelihoodPDFObject
+    {
+    public:
+        LikelihoodPDFObject(const std::string &pdfVarName);
+        
+        std::string             m_pdfVarName;           /// pdf variable name
+        int                     m_nBins;                /// number of bins
+        float                   m_lowValue;             /// The min value
+        float                   m_highValue;            /// The max value
+        pandora::Histogram**    m_pSignalPDF;           /// The signal pdf
+        pandora::Histogram**    m_pBackgroundPDF;       /// The background pdf
+    };
+    
+    typedef std::map<PDFVar, LikelihoodPDFObject>   PDFVarLikelihoodPDFMap;   /// The pdf variable to pdf object map
+    typedef std::map<PDFVar, float>                 PDFVarFloatMap;           /// The pdf variable to float object map
     
     pandora::StatusCode Run();
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
 
     /**
      *  @brief  Set input cluster list name
+     * 
+     *  @param  inputClusterListName input cluster list name
      */
-    pandora::StatusCode InitialiseInputClusterListName();
+    pandora::StatusCode InitialiseInputClusterListName(std::string &inputClusterListName) const;
     
     /**
      *  @brief  Create regions of interests 
@@ -75,7 +90,7 @@ private:
     pandora::StatusCode CreateClustersOfInterest(pandora::ClusterVector &clusterVector) const;
     
     /**
-     *  @brief  Get all tracks 
+     *  @brief  Get all tracks from event track list and put into a vector
      * 
      *  @param  trackVector all tracks in vector to receive
      */
@@ -111,7 +126,7 @@ private:
         pandora::ShowerProfilePlugin::ShowerPeakList &showersPhoton, pandora::ShowerProfilePlugin::ShowerPeakList &showersCharged) const;
     
     /**
-     *  @brief  Creat photons by checking and setting photon id.
+     *  @brief  Create photons by checking and setting photon id.
      * 
      *  @param  pCluster address of the cluster
      *  @param  showersPhoton shower peak list of photon candidates from the big cluster
@@ -138,7 +153,7 @@ private:
     pandora::StatusCode EndFragmentation(const bool usedCluster, const std::string &originalClusterListName, const std::string &peakClusterListName) const;
     
     /**
-     *  @brief  Creat a photon by checking and setting photon id.
+     *  @brief  Create a photon by checking and setting photon id.
      * 
      *  @param  showersPhoton shower peak list for photon candidate
      *  @param  wholeClusuterEnergy the total energy of the big cluster where the shower peak comes from
@@ -148,7 +163,7 @@ private:
     pandora::StatusCode CreateClustersAndSetPhotonID(const pandora::ShowerProfilePlugin::ShowerPeakList &showersPhoton, const float wholeClusuterEnergy, bool &usedCluster, const bool isFromTrack) const;
     
     /**
-     *  @brief  Creat a photon by setting photon id.
+     *  @brief  Create a photon and modify the particle id to photon
      * 
      *  @param  showerPeak shower peak list for photon candidate
      *  @param  pPeakCluster address of the photon to form
@@ -168,27 +183,27 @@ private:
         const float wholeClusuterEnergy, bool &isPhoton, const bool isFromTrack) const;
     
     /**
-     *  @brief  Calculate quantities for checking photon id
+     *  @brief  Calculate quantities for photon id pdf test
      * 
      *  @param  showerPeak shower peak list for photon candidate
      *  @param  pPeakCluster address of the photon candidate
      *  @param  wholeClusuterEnergy the total energy of the big cluster where the shower peak comes from
-     *  @param  hisVarQuantityMap a varible to value map to store quantities for checking photon id
+     *  @param  pdfVarFloatMap a varible to value map to store quantities for checking photon id
      */
     pandora::StatusCode CalculateForPhotonID(const pandora::ShowerProfilePlugin::ShowerPeak &showerPeak, const pandora::Cluster *const pPeakCluster, 
-        const float wholeClusuterEnergy, HistVarQuantityMap &hisVarQuantityMap) const;
+        const float wholeClusuterEnergy, PDFVarFloatMap &pdfVarFloatMap) const;
         
     /**
-     *  @brief  Use quantities to check photon id
+     *  @brief  Use likelihood pdf to check photon id
      * 
      *  @param  pPeakCluster address of the photon candidate
-     *  @param  hisVarQuantityMap a varible to value map to store quantities for checking photon id
+     *  @param  pdfVarFloatMap a varible to value map to store quantities for checking photon id
      *  @param  isFromTrack true for the cluster close to a track
      */
-    bool    isPhotonFromQuantities(const pandora::Cluster *const pPeakCluster, const HistVarQuantityMap &hisVarQuantityMap, const bool isFromTrack) const;
+    bool IsPhoton(const pandora::Cluster *const pPeakCluster, const PDFVarFloatMap &pdfVarFloatMap, const bool isFromTrack) const;
     
     /**
-     *  @brief  Set photon id
+     *  @brief  Set particle id to photon
      * 
      *  @param  pPeakCluster address of the photon candidate
      */
@@ -198,32 +213,32 @@ private:
      *  @brief  True for passing quality cuut
      * 
      *  @param  clusterEnergy energy of the photon candidate
-     *  @param  hisVarQuantityMap a varible to value map to store quantities for checking photon id
+     *  @param  pdfVarFloatMap a varible to value map to store quantities for checking photon id
      * 
      *  @return True for passing quality cuut
      */
-    bool PassPhotonQualityCut(const float clusterEnergy, const HistVarQuantityMap &hisVarQuantityMap) const;
+    bool PassPhotonQualityCut(const float clusterEnergy, const PDFVarFloatMap &pdfVarFloatMap) const;
     
     /**
-     *  @brief  Get the metric of photon id
+     *  @brief  Get the pid of photon id
      * 
      *  @param  clusterEnergy energy of the photon candidate
-     *  @param  hisVarQuantityMap a varible to value map to store quantities for checking photon id
+     *  @param  pdfVarFloatMap a varible to value map to store quantities for checking photon id
      * 
-     *  @return The metric of photon id
+     *  @return The pid of photon id
      */
-    float   GetMetricForPhotonID(const float clusterEnergy, const HistVarQuantityMap &hisVarQuantityMap) const;
+    float GetPIDForPhotonID(const float clusterEnergy, const PDFVarFloatMap &pdfVarFloatMap) const;
     
     /**
-     *  @brief  True for the metric of photon passing the cut
+     *  @brief  True for the pid of photon passing the cut
      * 
-     *  @param  metric The metric of photon id
+     *  @param  pid The pid of photon id
      *  @param  clusterEnergy energy of the photon candidate
      *  @param  isFromTrack true for the cluster close to a track
      * 
-     *  @return True for the metric of photon passing the cut
+     *  @return True for the pid of photon passing the cut
      */
-    bool    PassPhotonMetricCut(const float metric, const float clusterEnergy, const bool isFromTrack) const;
+    bool PassPhotonPIDCut(const float pid, const float clusterEnergy, const bool isFromTrack) const;
     
     /**
      *  @brief  Delete cluster
@@ -239,11 +254,13 @@ private:
     
     /**
      *  @brief  Revert to input cluster list
+     * 
+     *  @param  inputClusterListName input cluster list name
      */
-    pandora::StatusCode ReplaceInputClusterList() const;
+    pandora::StatusCode ReplaceInputClusterList(const std::string  &inputClusterListName) const;
     
     /**
-     *  @brief  Get minimum distance to the closest track to a cluster
+     *  @brief  Get minimum distance to the closest track to a cluster, use the ClusterHelper::GetTrackClusterDistance
      * 
      *  @param  pCluster the address of the cluster 
      *  @param  trackVector the vector that holds addresses of all tracks
@@ -276,9 +293,9 @@ private:
     pandora::StatusCode InitialiseHistogramReading();
     
     /**
-     *  @brief  Initialise histogram varible object map
+     *  @brief  Initialise pdf varible to likelihood pdf object map
      */
-    pandora::StatusCode InitialiseHistogramVarObjectMap();
+    pandora::StatusCode InitialisePDFVarLikelihoodPDFObjectMap();
     
     /**
      *  @brief  Get the number of energy bin 
@@ -305,10 +322,10 @@ private:
     pandora::StatusCode GetNSglBkgEvts(const pandora::TiXmlHandle xmlHandle, const std::string &nSignalEventsStr, const std::string &nBackgroundEventsStr);
     
     /**
-     *  @brief  Fill histogram varible object map parameters
+     *  @brief  Fill pdf varible to likelihood pdf object map parameters
      * 
      *  @param  xmlHandle xml handler
-     *  @param  histVar the varible to fill
+     *  @param  PDFVar the varible to fill
      *  @param  nBinStr the name of the varible
      *  @param  nBinDefault the value to fill
      *  @param  lowValueStr the string of the lower edge 
@@ -316,7 +333,7 @@ private:
      *  @param  highValueStr the string of the upper edge 
      *  @param  highValueDefault the value to the upper edge 
      */
-    pandora::StatusCode FillHistogramVarObjectMapParameters(const pandora::TiXmlHandle xmlHandle, const HistVar histVar, const std::string &nBinStr, 
+    pandora::StatusCode FillPDFVarLikelihoodPDFMapParameters(const pandora::TiXmlHandle xmlHandle, const PDFVar histVar, const std::string &nBinStr, 
         const int nBinDefault, const std::string &lowValueStr, const float lowValueDefault, const std::string &highValueStr, const float highValueDefault);
         
     /**
@@ -337,7 +354,7 @@ private:
     float GetHistogramContent(const pandora::Histogram *const pHistogram, const float value) const;
     
     /**
-     *  @brief  Creat a photon for training
+     *  @brief  Create a photon for training
      * 
      *  @param  pCluster address of the cluster
      *  @param  showersPhoton shower peak list for photon candidate
@@ -345,7 +362,7 @@ private:
     pandora::StatusCode CreatePhotonsForTraining(const pandora::Cluster *const pCluster, const pandora::ShowerProfilePlugin::ShowerPeakList &showersPhoton);
     
     /**
-     *  @brief  Creat a photon and train photon likelihood id
+     *  @brief  Create a photon and train photon likelihood id
      * 
      *  @param  showersPhoton shower peak list for photon candidate
      *  @param  wholeClusuterEnergy the energy of the whole cluster
@@ -365,9 +382,9 @@ private:
      *  @brief  Fill histogram
      * 
      *  @param  pCluster the address of the photon candidate
-     *  @param  hisVarQuantityMap a varible to value map to store quantities for checking photon id
+     *  @param  pdfVarFloatMap a varible to value map to store quantities for checking photon id
      */
-    pandora::StatusCode FillPdfHistograms(const pandora::Cluster *const pCluster, const HistVarQuantityMap &hisVarQuantityMap);
+    pandora::StatusCode FillPdfHistograms(const pandora::Cluster *const pCluster, const PDFVarFloatMap &pdfVarFloatMap);
     
     /**
      *  @brief  Normalizing member variable histograms 
@@ -401,8 +418,6 @@ private:
     std::string             m_clusterListName;              ///< The name of the output cluster list 
     bool                    m_replaceCurrentClusterList;    ///< Whether to subsequently use the new cluster list as the "current" list
     bool                    m_shouldDeleteNonPhotonClusters;///< Whether to delete clusters that are not reconstructed photons
-
-    std::string             m_inputClusterListName;   
     
     float                   m_minClusterEnergy;             ///< The minimum energy to consider a cluster
     float                   m_minPeakEnergy;                ///< The minimum energy to consider a transverse profile peak
@@ -432,7 +447,7 @@ private:
     pandora::FloatVector    m_energyBinLowerEdges;          ///< List of lower edges of the pdf energy bins
     pandora::IntVector      m_nSignalEvents;                ///< Number of signal(photons) pfos in training
     pandora::IntVector      m_nBackgroundEvents;            ///< Number of background pfos in training
-    HistVarSglBkgHistMap    m_histVarSglBkgHistMap;         ///< Histogram varible to signal background map
+    PDFVarLikelihoodPDFMap  m_pdfVarLikelihoodPDFMap;       ///< Histogram varible to signal background map
 };
     
 
@@ -445,13 +460,13 @@ inline pandora::Algorithm *PhotonReconstructionAlgorithm::Factory::CreateAlgorit
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline PhotonReconstructionAlgorithm::HistSglBkgObject::HistSglBkgObject(const std::string histName):
-    m_histName(histName),
+inline PhotonReconstructionAlgorithm::LikelihoodPDFObject::LikelihoodPDFObject(const std::string &pdfVarName):
+    m_pdfVarName(pdfVarName),
     m_nBins(0),
     m_lowValue(0.f),
     m_highValue(0.f),
-    m_pSglHistogram(NULL),
-    m_pBkgHistogram(NULL)
+    m_pSignalPDF(NULL),
+    m_pBackgroundPDF(NULL)
 {
 }
 

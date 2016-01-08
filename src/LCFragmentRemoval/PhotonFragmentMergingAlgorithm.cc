@@ -34,7 +34,7 @@ PhotonFragmentMergingAlgorithm::PhotonFragmentMergingAlgorithm() :
     m_energyRatioCandidateToMainPhotonThresholdLow6(0.01f),
     m_weightedLayerSeparationPhotonPhotonThresholdLow6(40.f),
     m_hitSeparationPhotonPhotonThresholdHigh2(20.f),
-    m_energyRatioCandidateToMainPhotonThresholdHigh2(0.005f),//0.02
+    m_energyRatioCandidateToMainPhotonThresholdHigh2(0.02f),
     m_weightedLayerSeparationPhotonPhotonThresholdHigh2(40.f)
 {
     // ATTN Different default values to those specified in the base class
@@ -63,13 +63,13 @@ bool PhotonFragmentMergingAlgorithm::GetPhotonPhotonMergingFlag(const Parameters
                 this->IsAbsoluteLowEnergyPhotonFragment(parameters) ||
                 this->IsSmallPhotonFragment1(parameters) ||
                 this->IsSmallForwardPhotonFragment(parameters) ||
-                this->IsSmallPhotonFragment2(parameters) /*||
-                this->IsRelativeLowEnergyPhotonFragment(parameters)*/);
+                this->IsSmallPhotonFragment2(parameters) ||
+                this->IsRelativeLowEnergyPhotonFragment(parameters));
     }
     else
     {
-        return (this->IsHighEnergyPhotonFragmentInShowerProfile(parameters) /*||
-                this->IsHighEnergyRelativeLowEnergyPhotonFragment(parameters)*/);
+        return (this->IsHighEnergyPhotonFragmentInShowerProfile(parameters) ||
+                this->IsHighEnergyRelativeLowEnergyPhotonFragment(parameters));
     }
 
     return false;
@@ -109,20 +109,13 @@ StatusCode PhotonFragmentMergingAlgorithm::DeleteClusters(const ClusterVector &/
 
 bool PhotonFragmentMergingAlgorithm::IsPhotonFragmentInShowerProfile(const Parameters &parameters) const
 {
-    /*return (parameters.m_energyOfCandidatePeak > 0.f &&
-            parameters.m_energyOfCandidateCluster > 0.f &&
-            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow1 &&
-            (parameters.m_energyOfCandidatePeak + parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
-            parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_energyRatioCandidatePeakToClusterPhotonThresholdLow1);*/
-            
     return ( 
             parameters.m_energyOfCandidateCluster > 0.f &&
             parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
             parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow1 &&
             (parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
             ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) || 
-            ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < 0.5 &&
+            ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_smallCandidateFractionThresholdLow &&
             parameters.m_energyOfMainPeak > parameters.m_energyOfMainCluster
             ) ) ) ;
 }
@@ -180,28 +173,13 @@ bool PhotonFragmentMergingAlgorithm::IsRelativeLowEnergyPhotonFragment(const Par
 
 bool PhotonFragmentMergingAlgorithm::IsHighEnergyPhotonFragmentInShowerProfile(const Parameters &parameters) const
 {
-    /*return (parameters.m_energyOfCandidateCluster > 0.f &&
-            parameters.m_energyOfMainCluster > 0.f &&
-            parameters.m_energyOfCandidatePeak > 0.f &&
-            parameters.m_energyOfMainPeak>0.f &&
-            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdHigh1 &&
-            (parameters.m_energyOfCandidatePeak + parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
-            ( (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_energyRatioCandidatePeakToClusterPhotonThresholdHigh1 &&
-            parameters.m_energyOfMainPeak/parameters.m_energyOfMainCluster > m_energyRatioMainPeakToClusterPhotonThresholdHigh1 &&
-            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster + m_triangularEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1 * parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster) < m_triangularSumEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1) ||
-            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_linearEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1 &&
-            parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster > m_linearEnergyRatioMainPeakToClusterPhotonThresholdHigh1) ));*/
-            
     return (parameters.m_energyOfCandidateCluster > 0.f &&
             parameters.m_energyOfMainCluster > 0.f &&
-            //parameters.m_energyOfCandidatePeak > 0.f &&
             parameters.m_energyOfMainPeak>0.f &&
             parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            //parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdHigh1 &&
             (parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
             ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::epsilon()) ||
-            ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < 0.5 &&
+            ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_smallCandidateFractionThresholdLow &&
             parameters.m_energyOfMainPeak > parameters.m_energyOfMainCluster
             ) ) ) ;
 }
@@ -253,31 +231,15 @@ bool PhotonFragmentMergingAlgorithm::IsRelativeLowEnergyNeutralFragment(const Pa
 
 bool PhotonFragmentMergingAlgorithm::IsHighEnergyNeutralFragmentInShowerProfile(const Parameters &parameters) const
 {
-    /*return (parameters.m_energyOfCandidateCluster > 0.f &&
-            parameters.m_energyOfMainCluster > 0.f &&
-            parameters.m_energyOfCandidatePeak > 0.f &&
-            parameters.m_energyOfMainPeak>0.f &&
-            parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdHigh1 &&
-            (parameters.m_energyOfCandidatePeak + parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
-            parameters.m_energyOfCandidateCluster/parameters.m_energyOfMainCluster<m_energyRatioCandidateToMainNeutralThresholdHigh1 &&
-            ( (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_energyRatioCandidatePeakToClusterNeutralThresholdHigh1 &&
-            parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster > m_energyRatioMainPeakToClusterNeutralThresholdHigh1 &&
-            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster + m_triangularEnergyRatioMainPeakToClusterNeutralThresholdHigh1 * parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster) < m_triangularSumEnergyRatioMainPeakToClusterNeutralThresholdHigh1) ||
-            (parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_squareEnergyRatioCandidatePeakToClusterNeutralThresholdHigh1 &&
-            parameters.m_energyOfMainPeak / parameters.m_energyOfMainCluster > m_squareEnergyRatioMainPeakToClusterNeutralThresholdHigh1) ));*/
-            
     return (parameters.m_energyOfCandidateCluster > 0.f &&
             parameters.m_energyOfMainCluster > 0.f &&
-            //parameters.m_energyOfCandidatePeak > 0.f &&
             parameters.m_energyOfMainPeak>0.f &&
             parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
-            //parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdHigh1 &&
             (parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
             ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) ||
-            ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < 0.5 &&
+            ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_smallCandidateFractionThresholdLow &&
             parameters.m_energyOfMainPeak > parameters.m_energyOfMainCluster
-            ) ) ) ;
+            ))) ;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

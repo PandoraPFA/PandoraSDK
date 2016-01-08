@@ -62,22 +62,14 @@ PhotonReconstructionAlgorithm::~PhotonReconstructionAlgorithm()
 
 StatusCode PhotonReconstructionAlgorithm::Run()
 {
-    // get initial lists
-    // get regions of interests
-    // get miminum distance to track
-    // divide cluster into 2 categories
-    // for clusters far from track, do peak findings
-    // for cluster close to track, do peak findings, do other stuff
-    // for peak finding results, do likelihood test
-    // Obtain current lists for later reference
-    
     // ATTN Implicit assumption that individual physical layers in the ECAL will always correspond to individual pseudo layers
     // Also ECAL BARRAL has same layer as ECAL ENDCAP and ecal is the first inner detector
     if (m_transProfileEcalOnly && m_transProfileMaxLayer <= 0 )
         m_transProfileMaxLayer = PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp() + 
             PandoraContentApi::GetGeometry(*this)->GetSubDetector(ECAL_BARREL).GetNLayers();
-            
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitialiseInputClusterListName());
+    
+    std::string inputClusterListName;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitialiseInputClusterListName(inputClusterListName));
     
     ClusterVector clusterVector;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateClustersOfInterest(clusterVector));
@@ -117,17 +109,17 @@ StatusCode PhotonReconstructionAlgorithm::Run()
     }
     
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RunNestedFragmentRemovalAlg());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReplaceInputClusterList());
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReplaceInputClusterList(inputClusterListName));
     
     return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonReconstructionAlgorithm::InitialiseInputClusterListName()
+StatusCode PhotonReconstructionAlgorithm::InitialiseInputClusterListName(std::string &inputClusterListName) const
 {
     const ClusterList *pInputClusterList = NULL;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pInputClusterList, m_inputClusterListName));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pInputClusterList, inputClusterListName));
     return STATUS_CODE_SUCCESS;
 }
 
@@ -185,7 +177,7 @@ bool PhotonReconstructionAlgorithm::PassClusterQualityPreCut(const Cluster *cons
 StatusCode PhotonReconstructionAlgorithm::GetTracklessClusterShowerList(const Cluster *const pCluster, ShowerProfilePlugin::ShowerPeakList &showersPhoton) const
 {
     const ShowerProfilePlugin *const pShowerProfilePlugin(PandoraContentApi::GetPlugins(*this)->GetShowerProfilePlugin());
-    pShowerProfilePlugin->CalculateTracklessTransverseProfile(pCluster, m_transProfileMaxLayer, showersPhoton, false);
+    pShowerProfilePlugin->CalculateTransverseProfile(pCluster, m_transProfileMaxLayer, showersPhoton, false);
 
     return STATUS_CODE_SUCCESS;
 }
@@ -196,7 +188,7 @@ StatusCode PhotonReconstructionAlgorithm::GetTrackClusterShowerList(const Cluste
     const TrackVector trackVector, ShowerProfilePlugin::ShowerPeakList &showersPhoton, ShowerProfilePlugin::ShowerPeakList &showersCharged) const
 {
     const ShowerProfilePlugin *const pShowerProfilePlugin(PandoraContentApi::GetPlugins(*this)->GetShowerProfilePlugin());
-    pShowerProfilePlugin->CalculateTrackNearbyTransverseProfile(pCluster, m_transProfileMaxLayer, pMinTrack, trackVector, showersPhoton, showersCharged);
+    pShowerProfilePlugin->CalculateTrackBasedTransverseProfile(pCluster, m_transProfileMaxLayer, pMinTrack, trackVector, showersPhoton, showersCharged);
     return STATUS_CODE_SUCCESS;
 }
 
@@ -284,9 +276,9 @@ StatusCode PhotonReconstructionAlgorithm::CreateCluster(const ShowerProfilePlugi
 StatusCode PhotonReconstructionAlgorithm::CheckAndSetPhotonID(const ShowerProfilePlugin::ShowerPeak &showerPeak, const Cluster *const pPeakCluster
     , const float wholeClusuterEnergy, bool &isPhoton, const bool isFromTrack) const
 {
-    HistVarQuantityMap hisVarQuantityMap;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CalculateForPhotonID(showerPeak, pPeakCluster, wholeClusuterEnergy, hisVarQuantityMap));
-    if (this->isPhotonFromQuantities(pPeakCluster, hisVarQuantityMap, isFromTrack))
+    PDFVarFloatMap pdfVarFloatMap;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CalculateForPhotonID(showerPeak, pPeakCluster, wholeClusuterEnergy, pdfVarFloatMap));
+    if (this->IsPhoton(pPeakCluster, pdfVarFloatMap, isFromTrack))
     {
         isPhoton = true;
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPhotonID(pPeakCluster));
@@ -297,10 +289,10 @@ StatusCode PhotonReconstructionAlgorithm::CheckAndSetPhotonID(const ShowerProfil
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode PhotonReconstructionAlgorithm::CalculateForPhotonID(const ShowerProfilePlugin::ShowerPeak &showerPeak, const Cluster *const pPeakCluster, 
-    const float wholeClusuterEnergy, HistVarQuantityMap &hisVarQuantityMap) const
+    const float wholeClusuterEnergy, PDFVarFloatMap &pdfVarFloatMap) const
 {
     const float peakRMS(showerPeak.GetPeakRms());
-    const float rmsRatio(showerPeak.GetRmsRatio());
+    const float rmsRatio(showerPeak.GetRmsXYRatio());
 
     const ShowerProfilePlugin *const pShowerProfilePlugin(PandoraContentApi::GetPlugins(*this)->GetShowerProfilePlugin());
     float profileStart(0.f), profileDiscrepancy(0.f);
@@ -314,12 +306,12 @@ StatusCode PhotonReconstructionAlgorithm::CalculateForPhotonID(const ShowerProfi
     float minDistance(std::numeric_limits<float>::max());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetMinDistanceToTrack(pPeakCluster, trackVector, minDistance, pMinTrack));
 
-    if ((!hisVarQuantityMap.insert(HistVarQuantityMap::value_type(PEAKRMS, peakRMS)).second) ||
-        (!hisVarQuantityMap.insert(HistVarQuantityMap::value_type(RMSRATIO, rmsRatio)).second) ||
-        (!hisVarQuantityMap.insert(HistVarQuantityMap::value_type(LONGPROFILESTART, longProfileStart)).second) ||
-        (!hisVarQuantityMap.insert(HistVarQuantityMap::value_type(LONGPROFILEDISCREPANCY, longProfileDiscrepancy)).second) ||
-        (!hisVarQuantityMap.insert(HistVarQuantityMap::value_type(PEAKENERGYFRACTION, energyFraction)).second) ||
-        (!hisVarQuantityMap.insert(HistVarQuantityMap::value_type(MINDISTANCETOTRACK, minDistance)).second))
+    if ((!pdfVarFloatMap.insert(PDFVarFloatMap::value_type(PEAKRMS, peakRMS)).second) ||
+        (!pdfVarFloatMap.insert(PDFVarFloatMap::value_type(RMSRATIO, rmsRatio)).second) ||
+        (!pdfVarFloatMap.insert(PDFVarFloatMap::value_type(LONGPROFILESTART, longProfileStart)).second) ||
+        (!pdfVarFloatMap.insert(PDFVarFloatMap::value_type(LONGPROFILEDISCREPANCY, longProfileDiscrepancy)).second) ||
+        (!pdfVarFloatMap.insert(PDFVarFloatMap::value_type(PEAKENERGYFRACTION, energyFraction)).second) ||
+        (!pdfVarFloatMap.insert(PDFVarFloatMap::value_type(MINDISTANCETOTRACK, minDistance)).second))
         return STATUS_CODE_FAILURE;
 
     return STATUS_CODE_SUCCESS;
@@ -327,11 +319,11 @@ StatusCode PhotonReconstructionAlgorithm::CalculateForPhotonID(const ShowerProfi
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool PhotonReconstructionAlgorithm::isPhotonFromQuantities(const pandora::Cluster *const pPeakCluster, const HistVarQuantityMap &hisVarQuantityMap, const bool isFromTrack) const
+bool PhotonReconstructionAlgorithm::IsPhoton(const pandora::Cluster *const pPeakCluster, const PDFVarFloatMap &pdfVarFloatMap, const bool isFromTrack) const
 {
     const float clusterEnergy(pPeakCluster->GetElectromagneticEnergy());
-    return (this->PassPhotonQualityCut(clusterEnergy, hisVarQuantityMap) &&
-        this->PassPhotonMetricCut(this->GetMetricForPhotonID(clusterEnergy, hisVarQuantityMap), clusterEnergy, isFromTrack));
+    return (this->PassPhotonQualityCut(clusterEnergy, pdfVarFloatMap) &&
+        this->PassPhotonPIDCut(this->GetPIDForPhotonID(clusterEnergy, pdfVarFloatMap), clusterEnergy, isFromTrack));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -346,31 +338,31 @@ StatusCode PhotonReconstructionAlgorithm::SetPhotonID(const Cluster *const pPeak
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool PhotonReconstructionAlgorithm::PassPhotonQualityCut(const float clusterEnergy, const HistVarQuantityMap &hisVarQuantityMap) const
+bool PhotonReconstructionAlgorithm::PassPhotonQualityCut(const float clusterEnergy, const PDFVarFloatMap &pdfVarFloatMap) const
 {
     return ( clusterEnergy > m_minPeakEnergy &&
-        hisVarQuantityMap.find(PEAKRMS)->second < m_maxPeakRms && 
-        hisVarQuantityMap.find(RMSRATIO)->second < m_maxRmsRatio && 
-        hisVarQuantityMap.find(LONGPROFILESTART)->second < m_maxLongProfileStart && 
-        hisVarQuantityMap.find(LONGPROFILEDISCREPANCY)->second < m_maxLongProfileDiscrepancy && 
-        hisVarQuantityMap.find(MINDISTANCETOTRACK)->second > m_minDistanceToTrackCutLow &&
-        hisVarQuantityMap.find(MINDISTANCETOTRACK)->second < m_minDistanceToTrackCutHigh);
+        pdfVarFloatMap.find(PEAKRMS)->second < m_maxPeakRms && 
+        pdfVarFloatMap.find(RMSRATIO)->second < m_maxRmsRatio && 
+        pdfVarFloatMap.find(LONGPROFILESTART)->second < m_maxLongProfileStart && 
+        pdfVarFloatMap.find(LONGPROFILEDISCREPANCY)->second < m_maxLongProfileDiscrepancy && 
+        pdfVarFloatMap.find(MINDISTANCETOTRACK)->second > m_minDistanceToTrackCutLow &&
+        pdfVarFloatMap.find(MINDISTANCETOTRACK)->second < m_minDistanceToTrackCutHigh);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-float PhotonReconstructionAlgorithm::GetMetricForPhotonID(const float clusterEnergy, const HistVarQuantityMap &hisVarQuantityMap) const
+float PhotonReconstructionAlgorithm::GetPIDForPhotonID(const float clusterEnergy, const PDFVarFloatMap &pdfVarFloatMap) const
 {
     double yes(1.f), no(1.f);
     const unsigned int energyBin(this->GetEnergyBin(clusterEnergy));
     
-    for (HistVarSglBkgHistMap::const_iterator iter = m_histVarSglBkgHistMap.begin(), iterEnd = m_histVarSglBkgHistMap.end(); iter != iterEnd; ++iter)
+    for (PDFVarLikelihoodPDFMap::const_iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
     {
-        const HistSglBkgObject &histSglBkgObject((*iter).second);
-        const HistVar &histVar((*iter).first);
+        const LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
+        const PDFVar &pdfVar((*iter).first);
         
-        yes *= this->GetHistogramContent(histSglBkgObject.m_pSglHistogram[energyBin], hisVarQuantityMap.find(histVar)->second);
-        no  *= this->GetHistogramContent(histSglBkgObject.m_pBkgHistogram[energyBin], hisVarQuantityMap.find(histVar)->second);
+        yes *= this->GetHistogramContent(likelihoodPDFObject.m_pSignalPDF[energyBin], pdfVarFloatMap.find(pdfVar)->second);
+        no  *= this->GetHistogramContent(likelihoodPDFObject.m_pBackgroundPDF[energyBin], pdfVarFloatMap.find(pdfVar)->second);
     }
     const double yesWeighted(yes * m_nSignalEvents[energyBin]), noWeighted(no * m_nBackgroundEvents[energyBin]);
     return ((yesWeighted + noWeighted) > std::numeric_limits<double>::epsilon() ? static_cast<float>(yesWeighted / (yesWeighted + noWeighted)) : 0.f);
@@ -378,20 +370,20 @@ float PhotonReconstructionAlgorithm::GetMetricForPhotonID(const float clusterEne
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool PhotonReconstructionAlgorithm::PassPhotonMetricCut(const float metric, const float clusterEnergy, const bool /*isFromTrack*/) const
+bool PhotonReconstructionAlgorithm::PassPhotonPIDCut(const float pid, const float clusterEnergy, const bool /*isFromTrack*/) const
 {
     // ATTN isFromTrack is left for future if someone wants to have different cut for cluster close to track or not
     if (clusterEnergy < m_energyCutForPid1)
     {
-        if (metric > m_pidCut1)
+        if (pid > m_pidCut1)
             return true;
     }else if (clusterEnergy < m_energyCutForPid2)
     {
-        if (metric > m_pidCut2 )
+        if (pid > m_pidCut2 )
             return true;
     }else
     {
-        if (metric > m_pidCut3 )
+        if (pid > m_pidCut3 )
             return true;
     }
     return false;
@@ -422,9 +414,9 @@ StatusCode PhotonReconstructionAlgorithm::RunNestedFragmentRemovalAlg() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonReconstructionAlgorithm::ReplaceInputClusterList() const
+StatusCode PhotonReconstructionAlgorithm::ReplaceInputClusterList(const std::string  &inputClusterListName) const
 {
-    const std::string replacementListName(m_replaceCurrentClusterList ? m_clusterListName : m_inputClusterListName);
+    const std::string replacementListName(m_replaceCurrentClusterList ? m_clusterListName : inputClusterListName);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<Cluster>(*this, replacementListName));
     return STATUS_CODE_SUCCESS;
 }
@@ -551,7 +543,7 @@ StatusCode PhotonReconstructionAlgorithm::ReadHistogramSettings(const TiXmlHandl
         return STATUS_CODE_INVALID_PARAMETER;
     }
     
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitialiseHistogramVarObjectMap());
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitialisePDFVarLikelihoodPDFObjectMap());
     
     if (m_shouldMakePdfHistograms)
     {
@@ -570,30 +562,30 @@ StatusCode PhotonReconstructionAlgorithm::InitialiseHistogramWriting(const pando
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetEnergyBinLowerEdges(xmlHandle, "EnergyBinLowerEdges"));
     
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillHistogramVarObjectMapParameters(xmlHandle, PEAKRMS, "PeakRmsNBins", 50, 
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, PEAKRMS, "PeakRmsNBins", 50, 
         "PeakRmsLowValue", 0.f, "PeakRmsHighValue", 5.f));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillHistogramVarObjectMapParameters(xmlHandle, RMSRATIO, "RmsRatioNBins", 30, 
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, RMSRATIO, "RmsRatioNBins", 30, 
         "RmsRatioLowValue", 1.f, "RmsRatioHighValue", 3.f));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillHistogramVarObjectMapParameters(xmlHandle, LONGPROFILESTART, "LongProfileStartNBins", 11, 
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, LONGPROFILESTART, "LongProfileStartNBins", 11, 
         "LongProfileStartLowValue", -0.5f, "LongProfileStartHighValue", 10.5f));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillHistogramVarObjectMapParameters(xmlHandle, LONGPROFILEDISCREPANCY, "LongProfileDiscrepancyNBins", 42, 
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, LONGPROFILEDISCREPANCY, "LongProfileDiscrepancyNBins", 42, 
         "LongProfileDiscrepancyLowValue", -0.02f, "LongProfileDiscrepancyHighValue", 0.82f));//52 -0.02 1.02
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillHistogramVarObjectMapParameters(xmlHandle, PEAKENERGYFRACTION, "PeakEnergyFractionNBins", 52, 
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, PEAKENERGYFRACTION, "PeakEnergyFractionNBins", 52, 
         "PeakEnergyFractionLowValue", -0.02f, "PeakEnergyFractionHighValue", 1.02f));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillHistogramVarObjectMapParameters(xmlHandle, MINDISTANCETOTRACK, "MinDistanceToTrackNBins", 40, 
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, MINDISTANCETOTRACK, "MinDistanceToTrackNBins", 40, 
         "MinDistanceToTrackLowValue", 0.f, "MinDistanceToTrackHighValue", 20.f));
 
-    for (HistVarSglBkgHistMap::iterator iter = m_histVarSglBkgHistMap.begin(), iterEnd = m_histVarSglBkgHistMap.end(); iter != iterEnd; ++iter)
+    for (PDFVarLikelihoodPDFMap::iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
     {
-        HistSglBkgObject &histSglBkgObject((*iter).second);
+        LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
         
-        histSglBkgObject.m_pSglHistogram = new Histogram*[m_nEnergyBins];
-        histSglBkgObject.m_pBkgHistogram = new Histogram*[m_nEnergyBins];
+        likelihoodPDFObject.m_pSignalPDF = new Histogram*[m_nEnergyBins];
+        likelihoodPDFObject.m_pBackgroundPDF = new Histogram*[m_nEnergyBins];
         
         for (unsigned int energyBin = 0; energyBin < m_nEnergyBins; ++energyBin)
         {
-            histSglBkgObject.m_pSglHistogram[energyBin] = new Histogram(histSglBkgObject.m_nBins, histSglBkgObject.m_lowValue, histSglBkgObject.m_highValue);
-            histSglBkgObject.m_pBkgHistogram[energyBin] = new Histogram(histSglBkgObject.m_nBins, histSglBkgObject.m_lowValue, histSglBkgObject.m_highValue);
+            likelihoodPDFObject.m_pSignalPDF[energyBin] = new Histogram(likelihoodPDFObject.m_nBins, likelihoodPDFObject.m_lowValue, likelihoodPDFObject.m_highValue);
+            likelihoodPDFObject.m_pBackgroundPDF[energyBin] = new Histogram(likelihoodPDFObject.m_nBins, likelihoodPDFObject.m_lowValue, likelihoodPDFObject.m_highValue);
         }
     }
     
@@ -621,17 +613,17 @@ StatusCode PhotonReconstructionAlgorithm::InitialiseHistogramReading()
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetEnergyBinLowerEdges(pdfXmlHandle, "EnergyBinLowerEdges"));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetNSglBkgEvts(pdfXmlHandle, "NSignalEvents", "NBackgroundEvents"));
     
-    for (HistVarSglBkgHistMap::iterator iter = m_histVarSglBkgHistMap.begin(), iterEnd = m_histVarSglBkgHistMap.end(); iter != iterEnd; ++iter)
+    for (PDFVarLikelihoodPDFMap::iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
     {
-        HistSglBkgObject &histSglBkgObject((*iter).second);
+        LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
         
-        histSglBkgObject.m_pSglHistogram = new Histogram*[m_nEnergyBins];
-        histSglBkgObject.m_pBkgHistogram = new Histogram*[m_nEnergyBins];
+        likelihoodPDFObject.m_pSignalPDF = new Histogram*[m_nEnergyBins];
+        likelihoodPDFObject.m_pBackgroundPDF = new Histogram*[m_nEnergyBins];
         
         for (unsigned int energyBin = 0; energyBin < m_nEnergyBins; ++energyBin)
         {
-            histSglBkgObject.m_pSglHistogram[energyBin] = new Histogram(&pdfXmlHandle, "PhotonSig" + histSglBkgObject.m_histName + "_" + TypeToString(energyBin));
-            histSglBkgObject.m_pBkgHistogram[energyBin] = new Histogram(&pdfXmlHandle, "PhotonBkg" + histSglBkgObject.m_histName + "_" + TypeToString(energyBin));
+            likelihoodPDFObject.m_pSignalPDF[energyBin] = new Histogram(&pdfXmlHandle, "PhotonSig" + likelihoodPDFObject.m_pdfVarName + "_" + TypeToString(energyBin));
+            likelihoodPDFObject.m_pBackgroundPDF[energyBin] = new Histogram(&pdfXmlHandle, "PhotonBkg" + likelihoodPDFObject.m_pdfVarName + "_" + TypeToString(energyBin));
         }
     }
     return STATUS_CODE_SUCCESS;
@@ -639,19 +631,19 @@ StatusCode PhotonReconstructionAlgorithm::InitialiseHistogramReading()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonReconstructionAlgorithm::InitialiseHistogramVarObjectMap()
+StatusCode PhotonReconstructionAlgorithm::InitialisePDFVarLikelihoodPDFObjectMap()
 {
-    if (false == m_histVarSglBkgHistMap.insert(HistVarSglBkgHistMap::value_type(PEAKRMS, HistSglBkgObject("PeakRms"))).second)
+    if (false == m_pdfVarLikelihoodPDFMap.insert(PDFVarLikelihoodPDFMap::value_type(PEAKRMS, LikelihoodPDFObject("PeakRms"))).second)
         return STATUS_CODE_FAILURE;
-    if (false == m_histVarSglBkgHistMap.insert(HistVarSglBkgHistMap::value_type(RMSRATIO, HistSglBkgObject("RmsRatio"))).second)
+    if (false == m_pdfVarLikelihoodPDFMap.insert(PDFVarLikelihoodPDFMap::value_type(RMSRATIO, LikelihoodPDFObject("RmsRatio"))).second)
         return STATUS_CODE_FAILURE;
-    if (false == m_histVarSglBkgHistMap.insert(HistVarSglBkgHistMap::value_type(LONGPROFILESTART, HistSglBkgObject("LongProfileStart"))).second)
+    if (false == m_pdfVarLikelihoodPDFMap.insert(PDFVarLikelihoodPDFMap::value_type(LONGPROFILESTART, LikelihoodPDFObject("LongProfileStart"))).second)
         return STATUS_CODE_FAILURE;
-    if (false == m_histVarSglBkgHistMap.insert(HistVarSglBkgHistMap::value_type(LONGPROFILEDISCREPANCY, HistSglBkgObject("LongProfileDiscrepancy"))).second)
+    if (false == m_pdfVarLikelihoodPDFMap.insert(PDFVarLikelihoodPDFMap::value_type(LONGPROFILEDISCREPANCY, LikelihoodPDFObject("LongProfileDiscrepancy"))).second)
         return STATUS_CODE_FAILURE;
-    if (false == m_histVarSglBkgHistMap.insert(HistVarSglBkgHistMap::value_type(PEAKENERGYFRACTION, HistSglBkgObject("PeakEnergyFraction"))).second)
+    if (false == m_pdfVarLikelihoodPDFMap.insert(PDFVarLikelihoodPDFMap::value_type(PEAKENERGYFRACTION, LikelihoodPDFObject("PeakEnergyFraction"))).second)
         return STATUS_CODE_FAILURE;
-    if (false == m_histVarSglBkgHistMap.insert(HistVarSglBkgHistMap::value_type(MINDISTANCETOTRACK, HistSglBkgObject("MinDistanceToTrack"))).second)
+    if (false == m_pdfVarLikelihoodPDFMap.insert(PDFVarLikelihoodPDFMap::value_type(MINDISTANCETOTRACK, LikelihoodPDFObject("MinDistanceToTrack"))).second)
         return STATUS_CODE_FAILURE;
     return STATUS_CODE_SUCCESS;
 }
@@ -690,22 +682,22 @@ StatusCode PhotonReconstructionAlgorithm::GetNSglBkgEvts(const TiXmlHandle xmlHa
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonReconstructionAlgorithm::FillHistogramVarObjectMapParameters(const TiXmlHandle xmlHandle, const HistVar histVar, const std::string &nBinStr, 
+StatusCode PhotonReconstructionAlgorithm::FillPDFVarLikelihoodPDFMapParameters(const TiXmlHandle xmlHandle, const PDFVar pdfVar, const std::string &nBinStr, 
     const int nBinDefault, const std::string &lowValueStr, const float lowValueDefault, const std::string &highValueStr, const float highValueDefault)
 {
-    HistSglBkgObject &histSglBkgObject(m_histVarSglBkgHistMap.find(histVar)->second);
+    LikelihoodPDFObject &likelihoodPDFObject(m_pdfVarLikelihoodPDFMap.find(pdfVar)->second);
     
-    histSglBkgObject.m_nBins = nBinDefault;
+    likelihoodPDFObject.m_nBins = nBinDefault;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        nBinStr, histSglBkgObject.m_nBins));
+        nBinStr, likelihoodPDFObject.m_nBins));
     
-    histSglBkgObject.m_lowValue = lowValueDefault;
+    likelihoodPDFObject.m_lowValue = lowValueDefault;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        lowValueStr, histSglBkgObject.m_lowValue));
+        lowValueStr, likelihoodPDFObject.m_lowValue));
 
-    histSglBkgObject.m_highValue = highValueDefault;
+    likelihoodPDFObject.m_highValue = highValueDefault;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        highValueStr, histSglBkgObject.m_highValue));
+        highValueStr, likelihoodPDFObject.m_highValue));
         
     return STATUS_CODE_SUCCESS;
 }
@@ -766,19 +758,19 @@ for (unsigned int iPeak = 0, iPeakEnd = showersPhoton.size(); iPeak < iPeakEnd; 
 
 StatusCode PhotonReconstructionAlgorithm::TrainPhotonID(const ShowerProfilePlugin::ShowerPeak &showerPeak, const Cluster *const pPeakCluster, const float wholeClusuterEnergy)
 {
-    HistVarQuantityMap hisVarQuantityMap;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CalculateForPhotonID(showerPeak, pPeakCluster, wholeClusuterEnergy, hisVarQuantityMap));
+    PDFVarFloatMap pdfVarFloatMap;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CalculateForPhotonID(showerPeak, pPeakCluster, wholeClusuterEnergy, pdfVarFloatMap));
     // ATTN when training the likelihood file, only write xml file. Do not read xml file
-    if (this->PassPhotonQualityCut(pPeakCluster->GetElectromagneticEnergy(), hisVarQuantityMap))
+    if (this->PassPhotonQualityCut(pPeakCluster->GetElectromagneticEnergy(), pdfVarFloatMap))
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPdfHistograms(pPeakCluster, hisVarQuantityMap));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPdfHistograms(pPeakCluster, pdfVarFloatMap));
     }
     return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonReconstructionAlgorithm::FillPdfHistograms(const pandora::Cluster *const pCluster, const HistVarQuantityMap &hisVarQuantityMap)
+StatusCode PhotonReconstructionAlgorithm::FillPdfHistograms(const pandora::Cluster *const pCluster, const PDFVarFloatMap &pdfVarFloatMap)
 {
     const MCParticle *pMCParticle(NULL);
     try
@@ -793,23 +785,23 @@ StatusCode PhotonReconstructionAlgorithm::FillPdfHistograms(const pandora::Clust
 
     if ((NULL != pMCParticle) && (PHOTON == pMCParticle->GetParticleId()))
     {
-        for (HistVarSglBkgHistMap::const_iterator iter = m_histVarSglBkgHistMap.begin(), iterEnd = m_histVarSglBkgHistMap.end(); iter != iterEnd; ++iter)
+        for (PDFVarLikelihoodPDFMap::const_iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
         {
-            const HistSglBkgObject &histSglBkgObject((*iter).second);
-            const HistVar &histVar((*iter).first);
+            const LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
+            const PDFVar &pdfVar((*iter).first);
             
-            histSglBkgObject.m_pSglHistogram[energyBin]->Fill(hisVarQuantityMap.find(histVar)->second);
+            likelihoodPDFObject.m_pSignalPDF[energyBin]->Fill(pdfVarFloatMap.find(pdfVar)->second);
         }
         m_nSignalEvents[energyBin]++;
     }
     else
     {
-        for (HistVarSglBkgHistMap::const_iterator iter = m_histVarSglBkgHistMap.begin(), iterEnd = m_histVarSglBkgHistMap.end(); iter != iterEnd; ++iter)
+        for (PDFVarLikelihoodPDFMap::const_iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
         {
-            const HistSglBkgObject &histSglBkgObject((*iter).second);
-            const HistVar &histVar((*iter).first);
+            const LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
+            const PDFVar &pdfVar((*iter).first);
             
-            histSglBkgObject.m_pBkgHistogram[energyBin]->Fill(hisVarQuantityMap.find(histVar)->second);
+            likelihoodPDFObject.m_pBackgroundPDF[energyBin]->Fill(pdfVarFloatMap.find(pdfVar)->second);
         }
         m_nBackgroundEvents[energyBin]++;
     }
@@ -845,13 +837,13 @@ void PhotonReconstructionAlgorithm::NormalizeAndWriteHistograms()
 {
     std::string energyBinLowerEdgesString, nSignalEventsString, nBackgroundEventsString;
     
-    for (HistVarSglBkgHistMap::iterator iter = m_histVarSglBkgHistMap.begin(), iterEnd = m_histVarSglBkgHistMap.end(); iter != iterEnd; ++iter)
+    for (PDFVarLikelihoodPDFMap::iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
     {
-        HistSglBkgObject &histSglBkgObject((*iter).second);
+        LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
         for (unsigned int energyBin = 0; energyBin < m_nEnergyBins; ++energyBin)
         {
-            this->NormalizeHistogram(histSglBkgObject.m_pSglHistogram[energyBin]);
-            this->NormalizeHistogram(histSglBkgObject.m_pBkgHistogram[energyBin]);
+            this->NormalizeHistogram(likelihoodPDFObject.m_pSignalPDF[energyBin]);
+            this->NormalizeHistogram(likelihoodPDFObject.m_pBackgroundPDF[energyBin]);
         }
     }
     for (unsigned int energyBin = 0; energyBin < m_nEnergyBins; ++energyBin)
@@ -866,13 +858,13 @@ void PhotonReconstructionAlgorithm::NormalizeAndWriteHistograms()
     this->WriteString(xmlDocument, "NSignalEvents", nSignalEventsString);
     this->WriteString(xmlDocument, "NBackgroundEvents", nBackgroundEventsString);
     
-    for (HistVarSglBkgHistMap::iterator iter = m_histVarSglBkgHistMap.begin(), iterEnd = m_histVarSglBkgHistMap.end(); iter != iterEnd; ++iter)
+    for (PDFVarLikelihoodPDFMap::iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
     {
-        HistSglBkgObject &histSglBkgObject((*iter).second);
+        LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
         for (unsigned int energyBin = 0; energyBin < m_nEnergyBins; ++energyBin)
         {
-            histSglBkgObject.m_pSglHistogram[energyBin]->WriteToXml(&xmlDocument, "PhotonSig" + histSglBkgObject.m_histName + "_" + TypeToString(energyBin));
-            histSglBkgObject.m_pBkgHistogram[energyBin]->WriteToXml(&xmlDocument, "PhotonBkg" + histSglBkgObject.m_histName + "_" + TypeToString(energyBin));
+            likelihoodPDFObject.m_pSignalPDF[energyBin]->WriteToXml(&xmlDocument, "PhotonSig" + likelihoodPDFObject.m_pdfVarName + "_" + TypeToString(energyBin));
+            likelihoodPDFObject.m_pBackgroundPDF[energyBin]->WriteToXml(&xmlDocument, "PhotonBkg" + likelihoodPDFObject.m_pdfVarName + "_" + TypeToString(energyBin));
         }
     }
     xmlDocument.SaveFile(m_histogramFile);
@@ -885,12 +877,12 @@ void PhotonReconstructionAlgorithm::DrawHistograms() const
     for (unsigned int energyBin = 0; energyBin < m_nEnergyBins; ++energyBin)
     {
         std::cout << "PDF EnergyBin " << energyBin << std::endl;
-        for (HistVarSglBkgHistMap::const_iterator iter = m_histVarSglBkgHistMap.begin(), iterEnd = m_histVarSglBkgHistMap.end(); iter != iterEnd; ++iter)
+        for (PDFVarLikelihoodPDFMap::const_iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
         {
-            const HistSglBkgObject &histSglBkgObject((*iter).second);    
-            std::cout << histSglBkgObject.m_histName << ", Signal, Background " << std::endl;
-            PANDORA_MONITORING_API(DrawPandoraHistogram(this->GetPandora(), *histSglBkgObject.m_pSglHistogram[energyBin]));
-            PANDORA_MONITORING_API(DrawPandoraHistogram(this->GetPandora(), *histSglBkgObject.m_pBkgHistogram[energyBin]));
+            const LikelihoodPDFObject &likelihoodPDFObject((*iter).second);    
+            std::cout << likelihoodPDFObject.m_pdfVarName << ", Signal, Background " << std::endl;
+            PANDORA_MONITORING_API(DrawPandoraHistogram(this->GetPandora(), *likelihoodPDFObject.m_pSignalPDF[energyBin]));
+            PANDORA_MONITORING_API(DrawPandoraHistogram(this->GetPandora(), *likelihoodPDFObject.m_pBackgroundPDF[energyBin]));
         }
     }
 }

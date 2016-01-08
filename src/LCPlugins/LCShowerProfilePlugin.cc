@@ -269,7 +269,7 @@ void LCShowerProfilePlugin::CalculateLongitudinalProfile(const Cluster *const pC
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::CalculateTracklessTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList, 
+void LCShowerProfilePlugin::CalculateTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList, 
     const bool inclusiveMode) const
 {
     // ATTN could combine trackless and tracked approach
@@ -286,7 +286,7 @@ void LCShowerProfilePlugin::CalculateTracklessTransverseProfile(const Cluster *c
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::CalculateTrackNearbyTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, const Track *const pMinTrack, 
+void LCShowerProfilePlugin::CalculateTrackBasedTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, const Track *const pMinTrack, 
     const TrackVector &trackVector, ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListCharge) const
 {
     // TODO convert maxPseudoLayer into radiation length. Then decide how many slices to consider

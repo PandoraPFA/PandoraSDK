@@ -28,7 +28,8 @@ PhotonSplittingAlgorithm::PhotonSplittingAlgorithm():
     m_minClusterEnergy2(10.f),
     m_minDaughterEnergy2(5.f),
     m_minClusterEnergy3(20.f),
-    m_minDaughterEnergy3(10.f)
+    m_minDaughterEnergy3(10.f),
+    m_maxNPeaks(5)
 {
 }
 
@@ -62,6 +63,8 @@ StatusCode PhotonSplittingAlgorithm::Run()
     for (ClusterVector::const_iterator iter = clusterVector.begin(), iterEnd = clusterVector.end(); iter != iterEnd; ++iter)
     {
         const Cluster *const pCluster = *iter;
+        if (pCluster->GetParticleIdFlag() != PHOTON) continue;
+        
         int nCloseTrack(0);
         for (TrackVector::const_iterator trackIter = trackVector.begin(), trackIterEnd = trackVector.end(); trackIter != trackIterEnd; ++trackIter)
         {
@@ -76,37 +79,33 @@ StatusCode PhotonSplittingAlgorithm::Run()
         }
 
         ShowerProfilePlugin::ShowerPeakList showersPhoton;
-        pShowerProfilePlugin->CalculateTracklessTransverseProfile(pCluster, m_transProfileMaxLayer, showersPhoton, true);
+        pShowerProfilePlugin->CalculateTransverseProfile(pCluster, m_transProfileMaxLayer, showersPhoton, true);
         
         bool split(false);
-       // float cutOffE(m_minClusterEnergy3), cutOffE2(m_minDaughterEnergy3);
-        //if (nCloseTrack == 0)
-        //{
-        //    cutOffE = m_minClusterEnergy1;
-        //    cutOffE2 = m_minDaughterEnergy1;
-        //}
-        //else if (nCloseTrack == 1)
-        //{
-        //    cutOffE = m_minClusterEnergy2;
-        //    cutOffE2 = m_minDaughterEnergy2;
-        //}
-        float cutOffE(0), cutOffE2(0);
-        
-        if (pCluster->GetElectromagneticEnergy() > cutOffE && showersPhoton.size() < 5)
+        float cutOffE(m_minClusterEnergy3), cutOffE2(m_minDaughterEnergy3);
+        if (nCloseTrack == 0)
+        {
+            cutOffE = m_minClusterEnergy1;
+            cutOffE2 = m_minDaughterEnergy1;
+        }
+        else if (nCloseTrack == 1)
+        {
+            cutOffE = m_minClusterEnergy2;
+            cutOffE2 = m_minDaughterEnergy2;
+        }
+        if (pCluster->GetElectromagneticEnergy() > cutOffE && showersPhoton.size() < m_maxNPeaks)
         {
             int energyCounter(0);
             for (ShowerProfilePlugin::ShowerPeakList::const_iterator jIter = showersPhoton.begin(), jIterEnd = showersPhoton.end(); jIter != jIterEnd; ++jIter)
             {
                 const ShowerProfilePlugin::ShowerPeak &showerPeak(*jIter);
-                if (showerPeak.GetPeakEnergy() > cutOffE2 && showerPeak.GetPeakEnergy() / pCluster->GetElectromagneticEnergy() > 0.5 )
+                if (showerPeak.GetPeakEnergy() > cutOffE2   )
                     ++energyCounter;
             }
-            if (energyCounter > 0)
+            if (energyCounter > 1)
                 split = true;
         }
-        std::cout<<pCluster<<" layer "<<PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp() + PandoraContentApi::GetGeometry(*this)->GetSubDetector(ECAL_BARREL).GetNLayers()
-        <<" nCalo "<<pCluster->GetNCaloHits()<<" e "<<pCluster->GetElectromagneticEnergy()<<" nIso "<<pCluster->GetNIsolatedCaloHits()<<" e "<<pCluster->GetIsolatedElectromagneticEnergy()<<std::endl;
-        if (showersPhoton.size() > 1 && split){
+        if (showersPhoton.size() > 1 && split ){
             ClusterList tempClusterList;
             tempClusterList.insert(pCluster);
             std::string originalClusterListName, tempClusterListName;
@@ -124,7 +123,6 @@ StatusCode PhotonSplittingAlgorithm::Run()
                 PandoraContentApi::Cluster::Metadata metadata;
                 metadata.m_particleId = PHOTON;
                 PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::AlterMetadata(*this, pNewCluster, metadata));
-                std::cout<<"split "<<pNewCluster<<" e "<<pNewCluster->GetElectromagneticEnergy()<<" nCalo "<<pNewCluster->GetNCaloHits()<<" nIso "<<pNewCluster->GetNIsolatedCaloHits()<<std::endl;
             }
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::EndFragmentation(*this, tempClusterListName,
                 originalClusterListName));
@@ -137,9 +135,45 @@ StatusCode PhotonSplittingAlgorithm::Run()
 
 StatusCode PhotonSplittingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    // TODO add more, delete this
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=,XmlHelper::ReadValue(xmlHandle,
+    "MaxSearchLayer", m_maxSearchLayer));
+    
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=,XmlHelper::ReadValue(xmlHandle,
+    "ParallelDistanceCut", m_parallelDistanceCut));
+    
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=,XmlHelper::ReadValue(xmlHandle,
+    "MinTrackClusterCosAngle", m_minTrackClusterCosAngle));
+    
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=,XmlHelper::ReadValue(xmlHandle,
+    "MaxDistanceToTrackCut", m_maxDistanceToTrackCut));
+    
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=,XmlHelper::ReadValue(xmlHandle,
     "TransProfileEcalOnly", m_transProfileEcalOnly));
+    
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=,XmlHelper::ReadValue(xmlHandle,
+    "TransProfileMaxLayer", m_transProfileMaxLayer));
+    
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=,XmlHelper::ReadValue(xmlHandle,
+    "MinClusterEnergy1", m_minClusterEnergy1));
+    
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=,XmlHelper::ReadValue(xmlHandle,
+    "MinDaughterEnergy1", m_minDaughterEnergy1));
+    
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=,XmlHelper::ReadValue(xmlHandle,
+    "MinClusterEnergy2", m_minClusterEnergy2));
+    
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=,XmlHelper::ReadValue(xmlHandle,
+    "MinDaughterEnergy2", m_minDaughterEnergy2));
+    
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=,XmlHelper::ReadValue(xmlHandle,
+    "MinClusterEnergy3", m_minClusterEnergy3));
+    
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=,XmlHelper::ReadValue(xmlHandle,
+    "MinDaughterEnergy3", m_minDaughterEnergy3));
+    
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=,XmlHelper::ReadValue(xmlHandle,
+    "MaxNPeaks", m_maxNPeaks));
+    
     return STATUS_CODE_SUCCESS;
 }
 }

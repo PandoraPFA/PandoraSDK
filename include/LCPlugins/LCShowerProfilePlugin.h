@@ -12,7 +12,6 @@
 
 namespace lc_content
 {
-
 /**
  *  @brief  LCShowerProfilePlugin class
  */
@@ -27,11 +26,10 @@ public:
     void CalculateShowerStartLayer(const pandora::Cluster *const pCluster, unsigned int &showerStartLayer) const;
     void CalculateLongitudinalProfile(const pandora::Cluster *const pCluster, float &profileStart, float &profileDiscrepancy) const;    
     void CalculateTransverseProfile(const pandora::Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList) const;
-    void CalculateTracklessTransverseProfile(const pandora::Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList,
+    void CalculateTransverseProfile(const pandora::Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList,
         const bool inclusiveMode) const;
-    void CalculateTrackNearbyTransverseProfile(const pandora::Cluster *const pCluster, const unsigned int maxPseudoLayer, const pandora::Track *const pMinTrack, 
+    void CalculateTrackBasedTransverseProfile(const pandora::Cluster *const pCluster, const unsigned int maxPseudoLayer, const pandora::Track *const pMinTrack, 
         const pandora::TrackVector &trackVector, ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListCharge) const;
-
 private:
     /**
      *  @brief  ShowerProfileEntry class
@@ -50,10 +48,13 @@ private:
         bool                        m_potentialPeak;        ///< Whether the shower profile is a potential peak (to speed up looping)
         pandora::CaloHitList        m_unusedCaloHitList;    ///< The list of calo hits unused for shower peak finding, needed for inclusive mode
     };
-
-    typedef std::pair<int,int>  TwoDBin;                    ///< The two dimentional bins typedef
-    typedef std::vector<TwoDBin > TwoDBinVector;            ///< The two dimentional bins forming a grid typedef
     
+    typedef std::pair<int,int>      TwoDBin;                ///< The two dimentional bins 
+    typedef std::vector<TwoDBin >   TwoDBinVector;          ///< The two dimentional bins forming a grid typedef
+    
+    /**
+     *  @brief  ShowerPeakObject class
+     */
     class ShowerPeakObject
     {
     public:
@@ -93,12 +94,9 @@ private:
         
     };
 
-
-    
-    typedef std::vector<ShowerProfileEntry> ShowerProfile;  ///< The shower profile typedef
-    typedef std::vector<ShowerProfile> TwoDShowerProfile;   ///< The two dimensional shower profile typedef
-
-    typedef std::vector<ShowerPeakObject> ShowerPeakObjectVector;   ///< Careful, it is descending.
+    typedef std::vector<ShowerProfileEntry> ShowerProfile;              ///< The shower profile typedef
+    typedef std::vector<ShowerProfile>      TwoDShowerProfile;          ///< The two dimensional shower profile typedef
+    typedef std::vector<ShowerPeakObject>   ShowerPeakObjectVector;     ///< The shower peak object vector
 
     /**
      *  @brief  Calculate transverse shower peak objects for a cluster and get the list of peaks identified in the profile, for clusters without tracks
@@ -167,7 +165,7 @@ private:
         pandora::CartesianVector &vAxis, const pandora::Track *const pMinTrack = NULL) const;   
     
     /**
-     *  @brief  Project cluster to 2D shower profile implementation
+     *  @brief  Initialise 2D shower profile implementation given porject axes
      * 
      *  @param  pCluster the address of the cluster
      *  @param  maxPseudoLayer the maximum pseudo layer to consider
@@ -232,7 +230,7 @@ private:
     void AssociateBinsToPeaks(const TwoDBinVector &twoDBinVector, ShowerPeakObjectVector &showerPeakObjectVector) const;
     
     /**
-     *  @brief  Apply quality cuts tp peaks
+     *  @brief  Apply quality cuts to peaks
      * 
      *  @param  showerPeakObjectVector the 2D peak object to modify
      *  @param  twoDBinVector the discared two dimensional bins to receive
@@ -408,7 +406,7 @@ private:
 //------------------------------------------------------------------------------------------------------------------------------------------
 inline void LCShowerProfilePlugin::CalculateTransverseProfile(const pandora::Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList) const
 {
-    return CalculateTracklessTransverseProfile(pCluster, maxPseudoLayer, showerPeakList, false);
+    return CalculateTransverseProfile(pCluster, maxPseudoLayer, showerPeakList, false);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -60,7 +60,8 @@ PhotonFragmentMergingBaseAlgorithm::PhotonFragmentMergingBaseAlgorithm() :
     m_triangularEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1(0.5f),
     m_triangularSumEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1(0.85f),
     m_linearEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1(0.1f),
-    m_linearEnergyRatioMainPeakToClusterPhotonThresholdHigh1(1.5f)
+    m_linearEnergyRatioMainPeakToClusterPhotonThresholdHigh1(1.5f),
+    m_smallCandidateFractionThresholdLow(0.5f)
 {
 }
 
@@ -273,7 +274,6 @@ StatusCode PhotonFragmentMergingBaseAlgorithm::GetEvidenceForMerging(const Clust
         for(CaloHitList::const_iterator iter = showerPeakList.at(1).GetPeakCaloHitList().begin(); iter !=  showerPeakList.at(1).GetPeakCaloHitList().end(); ++iter)
             parameters.m_energyOfCandidatePeak += (*iter)->GetElectromagneticEnergy();
     }
-    std::cout<<parameters.m_energyOfMainPeak<<":"<<parameters.m_energyOfCandidatePeak<<":"<<parameters.m_energyOfMainCluster<<":"<<parameters.m_energyOfCandidateCluster<<std::endl;
     parameters.m_hitSeparation = ClusterHelper::GetDistanceToClosestHit(pDaughterCluster, pParentCluster);
     parameters.m_centroidSeparation = (parentCentroid - daughterCentroid).GetMagnitude();
     parameters.m_nCaloHitsMain = pParentCluster->GetNCaloHits();
@@ -306,7 +306,7 @@ StatusCode PhotonFragmentMergingBaseAlgorithm::GetShowerPeakList(const Cluster *
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::Cluster::Create(*this, clusterParameters, pTempCluster));
 
     const ShowerProfilePlugin *const pShowerProfilePlugin(PandoraContentApi::GetPlugins(*this)->GetShowerProfilePlugin());
-    pShowerProfilePlugin->CalculateTracklessTransverseProfile(pTempCluster, m_transProfileMaxLayer, showerPeakList, true);
+    pShowerProfilePlugin->CalculateTransverseProfile(pTempCluster, m_transProfileMaxLayer, showerPeakList, true);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::EndFragmentation(*this, originalClusterListName, peakClusterListName));
 
     return STATUS_CODE_SUCCESS;

@@ -56,6 +56,7 @@ private:
     float                   m_minDaughterEnergy2;                    ///< Minimum daughter cluster energy for cluster close to 1 track
     float                   m_minClusterEnergy3;                     ///< Minimum cluster energy for cluster close to more than 1 track
     float                   m_minDaughterEnergy3;                    ///< Minimum daughter cluster energy for cluster to more than 1 track
+    unsigned int            m_maxNPeaks;                              ///< Max peaks to split
     
 };
 

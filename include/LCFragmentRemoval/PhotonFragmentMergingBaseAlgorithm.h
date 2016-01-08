@@ -130,6 +130,7 @@ protected:
     float           m_triangularSumEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1;   ///< Trangular sum ratio of energy of candidate peak to culster high energy photon 1
     float           m_linearEnergyRatioCandidatePeakToClusterPhotonThresholdHigh1;          ///< Linear coefficient ratio of energy of candidate peak to culster high energy photon 1
     float           m_linearEnergyRatioMainPeakToClusterPhotonThresholdHigh1;               ///< Linear coefficient ratio of energy of main peak to culster high energy photon 1
+    float           m_smallCandidateFractionThresholdLow;                                   ///< Candidate peak to candidate cluster energy fraction
 
 private:
     /**
