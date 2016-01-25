@@ -31,9 +31,10 @@ public:
          * 
          *  @param  peakEnergy the peak energy
          *  @param  peakRms the peak rms
+         *  @param  rmsXYRatio the rms x-y ratio
          *  @param  peakCaloHitList the peak calo hit list
          */
-        ShowerPeak(const float peakEnergy, const float peakRms, const CaloHitList &peakCaloHitList);
+        ShowerPeak(const float peakEnergy, const float peakRms, const float rmsXYRatio, const CaloHitList &peakCaloHitList);
 
         /**
          *  @brief  Get peak energy
@@ -50,6 +51,13 @@ public:
         float GetPeakRms() const;
 
         /**
+         *  @brief  Get rms x-y ratio
+         * 
+         *  @return the rms x-y ratio
+         */
+        float GetRmsXYRatio() const;
+
+        /**
          *  @brief  Get peak calo hit list
          * 
          *  @return the peak calo hit list
@@ -59,6 +67,7 @@ public:
     private:
         float           m_peakEnergy;                   ///< The peak energy
         float           m_peakRms;                      ///< The peak rms
+        float           m_rmsXYRatio;                   ///< The peak x-rms / y-rms ratio (larger rms over smaller rms)
         CaloHitList     m_peakCaloHitList;              ///< The peak calo hit list
     };
 
@@ -71,7 +80,7 @@ public:
      *  @param  pCluster address of the cluster
      *  @param  showerStartLayer to receive the shower start layer
      */
-    virtual void CalculateShowerStartLayer(const pandora::Cluster *const pCluster, unsigned int &showerStartLayer) const = 0;
+    virtual void CalculateShowerStartLayer(const Cluster *const pCluster, unsigned int &showerStartLayer) const = 0;
 
     /**
      *  @brief  Calculate longitudinal shower profile for a cluster and compare it with the expected profile for a photon
@@ -91,15 +100,40 @@ public:
      */
     virtual void CalculateTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList) const = 0;
 
+    /**
+     *  @brief  Calculate transverse shower profile for a cluster and get the list of peaks identified in the profile
+     * 
+     *  @param  pCluster the address of the cluster
+     *  @param  maxPseudoLayer the maximum pseudo layer to consider
+     *  @param  showerPeakList to receive the shower peak list
+     *  @param  inclusiveMode whether to operate inclusive shower peak finding
+     */
+    virtual void CalculateTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList,
+        const bool inclusiveMode) const = 0;
+
+    /**
+     *  @brief  Calculate transverse shower profile for a cluster and get the list of peaks identified in the profile, for clusters close to tracks
+     * 
+     *  @param  pCluster the address of the cluster
+     *  @param  maxPseudoLayer the maximum pseudo layer to consider
+     *  @param  pClosestTrack the address of the closest track
+     *  @param  trackVector the vector of nearby tracks
+     *  @param  showerPeakListPhoton to receive the shower peak list that are photon candidates
+     *  @param  showerPeakListNonPhoton to receive the shower peak list that are not photon candidates
+     */
+    virtual void CalculateTrackBasedTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, const Track *const pClosestTrack, 
+        const TrackVector &trackVector, ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListNonPhoton) const = 0;
+
 protected:
     friend class PluginManager;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline ShowerProfilePlugin::ShowerPeak::ShowerPeak(const float peakEnergy, const float peakRms, const CaloHitList &peakCaloHitList) :
+inline ShowerProfilePlugin::ShowerPeak::ShowerPeak(const float peakEnergy, const float peakRms, const float rmsXYRatio, const CaloHitList &peakCaloHitList) :
     m_peakEnergy(peakEnergy),
     m_peakRms(peakRms),
+    m_rmsXYRatio(rmsXYRatio),
     m_peakCaloHitList(peakCaloHitList)
 {
 }
@@ -116,6 +150,13 @@ inline float ShowerProfilePlugin::ShowerPeak::GetPeakEnergy() const
 inline float ShowerProfilePlugin::ShowerPeak::GetPeakRms() const
 {
     return m_peakRms;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float ShowerProfilePlugin::ShowerPeak::GetRmsXYRatio() const
+{
+    return m_rmsXYRatio;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
