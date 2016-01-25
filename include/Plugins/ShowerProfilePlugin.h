@@ -31,9 +31,10 @@ public:
          * 
          *  @param  peakEnergy the peak energy
          *  @param  peakRms the peak rms
+         *  @param  rmsXYRatio the rms x-y ratio
          *  @param  peakCaloHitList the peak calo hit list
          */
-        ShowerPeak(const float peakEnergy, const float peakRms, const float rmsRatio, const CaloHitList &peakCaloHitList);
+        ShowerPeak(const float peakEnergy, const float peakRms, const float rmsXYRatio, const CaloHitList &peakCaloHitList);
 
         /**
          *  @brief  Get peak energy
@@ -48,13 +49,14 @@ public:
          *  @return the peak rms
          */
         float GetPeakRms() const;
-        
+
         /**
-         *  @brief  Get rms ratio
+         *  @brief  Get rms x-y ratio
          * 
-         *  @return the rms ratio
+         *  @return the rms x-y ratio
          */
         float GetRmsXYRatio() const;
+
         /**
          *  @brief  Get peak calo hit list
          * 
@@ -63,10 +65,10 @@ public:
         const CaloHitList &GetPeakCaloHitList() const;
 
     private:
-        float                       m_peakEnergy;                    ///< The peak energy
-        float                       m_peakRms;                       ///< The peak rms
-        float                       m_rmsXYRatio;                    ///< The peak rms in X direction over Y direction (the bigger one over smaller one)
-        CaloHitList                 m_peakCaloHitList;               ///< The peak calo hit list
+        float           m_peakEnergy;                   ///< The peak energy
+        float           m_peakRms;                      ///< The peak rms
+        float           m_rmsXYRatio;                   ///< The peak x-rms / y-rms ratio (larger rms over smaller rms)
+        CaloHitList     m_peakCaloHitList;              ///< The peak calo hit list
     };
 
     typedef std::vector<ShowerPeak> ShowerPeakList;
@@ -90,8 +92,7 @@ public:
     virtual void CalculateLongitudinalProfile(const Cluster *const pCluster, float &profileStart, float &profileDiscrepancy) const = 0;
 
     /**
-     *  @brief  Calculate transverse shower profile for a cluster and get the list of peaks identified in the profile, for clusters without tracks
-     *          Default is exclusive mode
+     *  @brief  Calculate transverse shower profile for a cluster and get the list of peaks identified in the profile
      * 
      *  @param  pCluster the address of the cluster
      *  @param  maxPseudoLayer the maximum pseudo layer to consider
@@ -100,27 +101,29 @@ public:
     virtual void CalculateTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList) const = 0;
 
     /**
-     *  @brief  Calculate transverse shower profile for a cluster and get the list of peaks identified in the profile, for clusters without tracks
+     *  @brief  Calculate transverse shower profile for a cluster and get the list of peaks identified in the profile
      * 
      *  @param  pCluster the address of the cluster
      *  @param  maxPseudoLayer the maximum pseudo layer to consider
      *  @param  showerPeakList to receive the shower peak list
-     *  @param  inclusiveMode true for finding shower peaks inclusively
+     *  @param  inclusiveMode whether to operate inclusive shower peak finding
      */
     virtual void CalculateTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList,
         const bool inclusiveMode) const = 0;
-    
+
     /**
      *  @brief  Calculate transverse shower profile for a cluster and get the list of peaks identified in the profile, for clusters close to tracks
      * 
      *  @param  pCluster the address of the cluster
      *  @param  maxPseudoLayer the maximum pseudo layer to consider
+     *  @param  pClosestTrack the address of the closest track
+     *  @param  trackVector the vector of nearby tracks
      *  @param  showerPeakListPhoton to receive the shower peak list that are photon candidates
-     *  @param  showerPeakListCharge to receive the shower peak list that are not photon candidates
+     *  @param  showerPeakListNonPhoton to receive the shower peak list that are not photon candidates
      */
-    virtual void CalculateTrackBasedTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, const Track *const pMinTrack, 
-        const TrackVector &trackVector, ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListCharge) const = 0;
-        
+    virtual void CalculateTrackBasedTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, const Track *const pClosestTrack, 
+        const TrackVector &trackVector, ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListNonPhoton) const = 0;
+
 protected:
     friend class PluginManager;
 };
