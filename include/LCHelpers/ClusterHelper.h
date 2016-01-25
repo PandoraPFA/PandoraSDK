@@ -148,7 +148,7 @@ public:
      *          of times and the resulting position compared with registered gap regions.
      * 
      *  @param  pandora the associated pandora instance
-     *  @param  clusterFitResult the clsuter fit result
+     *  @param  clusterFitResult the cluster fit result
      *  @param  startPosition the propagation start position (adjusted to closest point on fit trajectory)
      *  @param  propagationDistance the propagation distance, which can be negative for propagation towards the ip
      *  @param  nSamplingPoints number of points at which to sample the fit within its propagation

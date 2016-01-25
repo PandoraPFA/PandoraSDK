@@ -1,8 +1,8 @@
 /**
  *  @file   LCContent/src/LCTopologicalAssociation/HighEnergyPhotonRecoveryAlgorithm.cc
- * 
+ *
  *  @brief  Implementation of the high energy photon recovery algorithm class.
- * 
+ *
  *  $Log: $
  */
 
@@ -50,23 +50,22 @@ StatusCode HighEnergyPhotonRecoveryAlgorithm::Run()
 
     // Then prepare clusters for this merging algorithm
     ClusterVector daughterVector,parentVector;
-    ////ClusterParametersMap parentClusterParametersMap;    
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PrepareClusters(clusterList,daughterVector, parentVector));
-    
+
     ClusterClusterMultiMap parentCandidateMultiMap;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PreSelectClusters(daughterVector, parentVector,parentCandidateMultiMap))
-    
+
     // important to check if it is empty
     if (parentCandidateMultiMap.empty())
         return STATUS_CODE_SUCCESS;
-        
+
     ClusterClusterMap daughterBestParentMap;
     for (ClusterVector::const_iterator iterI = daughterVector.begin(), iterIEnd = daughterVector.end(); iterI != iterIEnd; ++iterI)
     {
         // Daughter = HCal Fragments
         const Cluster *const pDaughterCluster = *iterI;
         const ClusterFitResult &daughterClusterFitResult(pDaughterCluster->GetFitToAllHitsResult());
-        ClusterFitResult daughterFirstLayerFitResult;            
+        ClusterFitResult daughterFirstLayerFitResult;
         if (STATUS_CODE_SUCCESS != ClusterFitHelper::FitStart(pDaughterCluster, m_numberContactLayers, daughterFirstLayerFitResult))
             continue;
         if (!daughterClusterFitResult.IsFitSuccessful() || !daughterFirstLayerFitResult.IsFitSuccessful())
@@ -76,22 +75,22 @@ StatusCode HighEnergyPhotonRecoveryAlgorithm::Run()
         const Cluster *pBestParentCluster(NULL);
 
         std::pair <ClusterClusterMultiMap::const_iterator, ClusterClusterMultiMap::const_iterator> parentCandidateRange;
-        parentCandidateRange = parentCandidateMultiMap.equal_range(pDaughterCluster);        
+        parentCandidateRange = parentCandidateMultiMap.equal_range(pDaughterCluster);
         for (ClusterClusterMultiMap::const_iterator iterJ = parentCandidateRange.first, iterJEnd = parentCandidateRange.second; iterJ != iterJEnd; ++iterJ)
         {
             const Cluster *const pParentCluster = iterJ->second;
 
             const ClusterFitResult &parentClusterFitResult(pParentCluster->GetFitToAllHitsResult());
-            ClusterFitResult parentLastLayerFitResult;            
+            ClusterFitResult parentLastLayerFitResult;
             if (STATUS_CODE_SUCCESS != ClusterFitHelper::FitEnd(pParentCluster, m_numberContactLayers, parentLastLayerFitResult))
                 continue;
             if (!parentClusterFitResult.IsFitSuccessful() || !parentLastLayerFitResult.IsFitSuccessful())
-                continue;  
+                continue;
 
             const float parentLastLayerRms(parentLastLayerFitResult.GetRms());
-            if (parentLastLayerRms<std::numeric_limits<float>::min()) 
+            if (parentLastLayerRms<std::numeric_limits<float>::min())
                 continue;
-            
+
             const float rmsRatio( daughterFirstLayerRms/parentLastLayerRms);
             if (rmsRatio>m_maxRmsRatioCut || rmsRatio<m_minRmsRatioCut ) continue;
 
@@ -102,9 +101,9 @@ StatusCode HighEnergyPhotonRecoveryAlgorithm::Run()
                 continue;
             if (fullClosestApproach>m_fullClosestApproachCut && contactClosestApproach>m_contactClosestApproachCut) continue;
 
-            const float daughterDistance2ToParentFit(this->GetHadEnergyWeightedDistance2ToLine(pDaughterCluster, parentClusterFitResult));            
+            const float daughterDistance2ToParentFit(this->GetHadEnergyWeightedDistance2ToLine(pDaughterCluster, parentClusterFitResult));
             if (daughterDistance2ToParentFit>m_daughterDistance2ToParentFitCut) continue;
-            
+
             float fractionInCone(GetFractionInCone(pParentCluster, pDaughterCluster, parentClusterFitResult) );
             if (fractionInCone>maxFractionInCone){
                 maxFractionInCone = fractionInCone;
@@ -117,7 +116,7 @@ StatusCode HighEnergyPhotonRecoveryAlgorithm::Run()
                 return STATUS_CODE_FAILURE;
         }
     }
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->MergeClusters(daughterBestParentMap, clusterListToNameMap));    
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->MergeClusters(daughterBestParentMap, clusterListToNameMap));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -140,7 +139,7 @@ StatusCode HighEnergyPhotonRecoveryAlgorithm::GetClusterListAndNameMap(ClusterLi
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::RunDaughterAlgorithm(*this, m_trackClusterAssociationAlgName));
         }
     }
-    
+
     for (StringVector::const_iterator iter = m_additionalClusterListNames.begin(), iterEnd = m_additionalClusterListNames.end(); iter != iterEnd; ++iter)
     {
         const ClusterList *pClusterList = NULL;
@@ -165,11 +164,11 @@ StatusCode HighEnergyPhotonRecoveryAlgorithm::PrepareClusters(const ClusterList 
     {
         const Cluster *pCluster = *clusterIter;
         if (PHOTON == pCluster->GetParticleIdFlag())
-        {               
+        {
             if (ECAL == pCluster->GetInnerLayerHitType()  && ECAL == pCluster->GetOuterLayerHitType() && pCluster->GetElectromagneticEnergy()>0.f)
             {
                 parentVector.push_back(pCluster);
-            }            
+            }
             continue;
         }
         if (!pCluster->GetAssociatedTrackList().empty())
@@ -190,7 +189,7 @@ StatusCode HighEnergyPhotonRecoveryAlgorithm::PrepareClusters(const ClusterList 
                 daughterVector.push_back(pCluster);
             continue;
         }
-    }     
+    }
     return STATUS_CODE_SUCCESS;
 }
 
@@ -200,7 +199,7 @@ StatusCode HighEnergyPhotonRecoveryAlgorithm::PreSelectClusters(const ClusterVec
     for (ClusterVector::const_iterator iterI = daughterVector.begin(), iterIEnd = daughterVector.end(); iterI != iterIEnd; ++iterI)
     {
         const Cluster *const pDaughterCluster = *iterI;
-        const unsigned int daughterInnerLayer(pDaughterCluster->GetInnerPseudoLayer());       
+        const unsigned int daughterInnerLayer(pDaughterCluster->GetInnerPseudoLayer());
         const CartesianVector &centroidDaughterFirstLayer(pDaughterCluster->GetCentroid(daughterInnerLayer));
         for (ClusterVector::const_iterator iterJ = parentVector.begin(), iterJEnd = parentVector.end(); iterJ != iterJEnd; ++iterJ)
         {
@@ -208,7 +207,7 @@ StatusCode HighEnergyPhotonRecoveryAlgorithm::PreSelectClusters(const ClusterVec
             const unsigned int parentOuterLayer(pParentCluster->GetOuterPseudoLayer());
             if (daughterInnerLayer!=parentOuterLayer+1) continue;
             if (pDaughterCluster->GetHadronicEnergy() / pParentCluster->GetElectromagneticEnergy() > m_energyRatioCut) continue;
-            
+
             const CartesianVector &centroidParentLastLayer(pParentCluster->GetCentroid(parentOuterLayer));
             const float centroidDistance2( (centroidParentLastLayer - centroidDaughterFirstLayer).GetMagnitudeSquared());
             if (centroidDistance2 > m_centroidDistance2Cut) continue;
@@ -325,10 +324,10 @@ float HighEnergyPhotonRecoveryAlgorithm::GetHadEnergyWeightedDistance2ToLine(con
 {
     float energySum(0.f);
     float weightedDistance2(0.f);
-    
+
     const CartesianVector &direction(clusterFitResult.GetDirection());
     const CartesianVector &intercept(clusterFitResult.GetIntercept());
-    
+
     const OrderedCaloHitList &orderedCaloHitList(pCluster->GetOrderedCaloHitList());
 
     for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
@@ -381,18 +380,17 @@ float HighEnergyPhotonRecoveryAlgorithm::GetDistance2ToLine(const CartesianVecto
     const float directionMag2(direction.GetMagnitudeSquared());
     const CartesianVector pointIntercept(intercept-point);
     const float pointInterceptMag2(pointIntercept.GetMagnitudeSquared());
-    const float pointInterceptDotDirection(pointIntercept.GetDotProduct(direction));    
-    
+    const float pointInterceptDotDirection(pointIntercept.GetDotProduct(direction));
+
     if (directionMag2 < std::numeric_limits<float>::epsilon())
         throw StatusCodeException(STATUS_CODE_NOT_FOUND);
-        
+
     return (pointInterceptMag2 - pointInterceptDotDirection * pointInterceptDotDirection / directionMag2);
 }
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode HighEnergyPhotonRecoveryAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "ShouldUseCurrentClusterList", m_shouldUseCurrentClusterList));
 
@@ -401,7 +399,7 @@ StatusCode HighEnergyPhotonRecoveryAlgorithm::ReadSettings(const TiXmlHandle xml
 
     if (m_shouldUseCurrentClusterList && m_updateCurrentTrackClusterAssociations)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ProcessFirstAlgorithm(*this, xmlHandle, 
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ProcessFirstAlgorithm(*this, xmlHandle,
             m_trackClusterAssociationAlgName));
     }
 
@@ -410,7 +408,7 @@ StatusCode HighEnergyPhotonRecoveryAlgorithm::ReadSettings(const TiXmlHandle xml
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "NumberContactLayers", m_numberContactLayers));
-        
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "CentroidDistance2Cut", m_centroidDistance2Cut));
 

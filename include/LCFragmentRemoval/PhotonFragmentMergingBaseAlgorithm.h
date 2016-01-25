@@ -52,6 +52,7 @@ protected:
         bool            m_hasCrossedGap;                        ///< Whether the two clusters have crossed a gap between subdetectors
     };
 
+    pandora::StatusCode Initialize();
     pandora::StatusCode Run();
 
     /**
@@ -91,7 +92,7 @@ protected:
 
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);
 
-    bool            m_transProfileEcalOnly;                                                 ///< Transverse profile shower calculator uses EcalOnly. Can be overridden by the m_transProfileMaxLayer
+    bool            m_transProfileEcalOnly;                                                 ///< Transverse profile shower calculator uses ecal only. Can be overridden by the m_transProfileMaxLayer
     int             m_transProfileMaxLayer;                                                 ///< Transverse profile shower calculator max layer 
     float           m_minWeightedLayerSeparation;                                           ///< Minimum distance weighted over layer between candidate and main to consider
     float           m_maxWeightedLayerSeparation;                                           ///< Max distance weighted over layer between candidate and main to consider

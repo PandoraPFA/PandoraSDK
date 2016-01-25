@@ -116,7 +116,7 @@ public:
         d("MuonReconstruction",                     lc_content::MuonReconstructionAlgorithm::Factory)                           \
         d("PhotonReconstruction",                   lc_content::PhotonReconstructionAlgorithm::Factory)                         \
         d("PhotonRecovery",                         lc_content::PhotonRecoveryAlgorithm::Factory)                               \
-        d("PhotonSplitting",                        lc_content::PhotonSplittingAlgorithm::Factory)                               \
+        d("PhotonSplitting",                        lc_content::PhotonSplittingAlgorithm::Factory)                              \
         d("CLICPfoSelection",                       lc_content::CLICPfoSelectionAlgorithm::Factory)                             \
         d("PfoCreation",                            lc_content::PfoCreationAlgorithm::Factory)                                  \
         d("PfoCreationParent",                      lc_content::PfoCreationParentAlgorithm::Factory)                            \

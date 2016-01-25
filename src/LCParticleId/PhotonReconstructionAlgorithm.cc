@@ -60,17 +60,26 @@ PhotonReconstructionAlgorithm::~PhotonReconstructionAlgorithm()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonReconstructionAlgorithm::Run()
+StatusCode PhotonReconstructionAlgorithm::Initialize()
 {
     // ATTN Implicit assumption that individual physical layers in the ECAL will always correspond to individual pseudo layers
-    // Also ECAL BARRAL has same layer as ECAL ENDCAP and ecal is the first inner detector
-    if (m_transProfileEcalOnly && m_transProfileMaxLayer <= 0 )
-        m_transProfileMaxLayer = PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp() + 
+    // Also ECAL BARREL has same layer as ECAL ENDCAP and ecal is the first inner detector
+    if (m_transProfileEcalOnly && m_transProfileMaxLayer <= 0)
+    {
+        m_transProfileMaxLayer = PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp() +
             PandoraContentApi::GetGeometry(*this)->GetSubDetector(ECAL_BARREL).GetNLayers();
-    
+    }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PhotonReconstructionAlgorithm::Run()
+{
     std::string inputClusterListName;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitialiseInputClusterListName(inputClusterListName));
-    
+
     ClusterVector clusterVector;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateClustersOfInterest(clusterVector));
     TrackVector trackVector;
@@ -80,7 +89,7 @@ StatusCode PhotonReconstructionAlgorithm::Run()
         const Cluster *const pCluster = *iter;
         if (!this->PassClusterQualityPreCut(pCluster))
             continue;
-            
+
         const Track *pMinTrack = NULL;
         float minDistance(std::numeric_limits<float>::max());
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetMinDistanceToTrack(pCluster, trackVector, minDistance, pMinTrack));
@@ -89,7 +98,7 @@ StatusCode PhotonReconstructionAlgorithm::Run()
         bool fromTrack(false);
         if (pMinTrack && minDistance < m_minDistanceToTrackDivisionCut)
         {
-            // cluster close to track            
+            // cluster close to track
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetTrackClusterShowerList(pCluster, pMinTrack, trackVector, showersPhoton, showersCharged));
             fromTrack = true;
         }
@@ -101,16 +110,16 @@ StatusCode PhotonReconstructionAlgorithm::Run()
         if (m_shouldMakePdfHistograms)
         {
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreatePhotonsForTraining(pCluster, showersPhoton));
-        }            
+        }
         else
         {
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreatePhotons(pCluster, showersPhoton, fromTrack));
         }
     }
-    
+
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RunNestedFragmentRemovalAlg());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReplaceInputClusterList(inputClusterListName));
-    
+
     return STATUS_CODE_SUCCESS;
 }
 
@@ -132,22 +141,22 @@ StatusCode PhotonReconstructionAlgorithm::CreateClustersOfInterest(ClusterVector
     std::string photonClusterListName;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::RunClusteringAlgorithm(*this, m_photonClusteringAlgName,
         pPhotonClusterList, photonClusterListName));
-        
+
     if (pPhotonClusterList->empty())
     {
         std::cout << "PhotonReconstructionAlgorithm::CreateRegionsOfInterests no photon candidates avaiable, no regions of interests are created" << std::endl;
         return STATUS_CODE_INVALID_PARAMETER;
     }
-    
+
     // Fragmentation can only proceed with reference to a saved cluster list, so save these temporary clusters
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::SaveList<Cluster>(*this, m_clusterListName));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::ReplaceCurrentList<Cluster>(*this, m_clusterListName));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pPhotonClusterList));
-    
+
     // Sort the clusters.
     clusterVector.assign(pPhotonClusterList->begin(), pPhotonClusterList->end());
     std::sort(clusterVector.begin(), clusterVector.end(), lc_content::SortingHelper::SortClustersByInnerLayer);
-    
+
     return STATUS_CODE_SUCCESS;
 }
 
@@ -184,7 +193,7 @@ StatusCode PhotonReconstructionAlgorithm::GetTracklessClusterShowerList(const Cl
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonReconstructionAlgorithm::GetTrackClusterShowerList(const Cluster *const pCluster, const Track *const pMinTrack, 
+StatusCode PhotonReconstructionAlgorithm::GetTrackClusterShowerList(const Cluster *const pCluster, const Track *const pMinTrack,
     const TrackVector trackVector, ShowerProfilePlugin::ShowerPeakList &showersPhoton, ShowerProfilePlugin::ShowerPeakList &showersCharged) const
 {
     const ShowerProfilePlugin *const pShowerProfilePlugin(PandoraContentApi::GetPlugins(*this)->GetShowerProfilePlugin());
@@ -205,9 +214,9 @@ StatusCode PhotonReconstructionAlgorithm::CreatePhotons(const Cluster *const pCl
     }
 
     std::string originalClusterListName, peakClusterListName;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitialiseFragmentation(pCluster, originalClusterListName, peakClusterListName));    
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitialiseFragmentation(pCluster, originalClusterListName, peakClusterListName));
     bool usedCluster(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateClustersAndSetPhotonID(showersPhoton, pCluster->GetElectromagneticEnergy(), usedCluster, isFromTrack));    
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateClustersAndSetPhotonID(showersPhoton, pCluster->GetElectromagneticEnergy(), usedCluster, isFromTrack));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->EndFragmentation(usedCluster, originalClusterListName, peakClusterListName));
     if (!usedCluster)
     {
@@ -221,9 +230,8 @@ StatusCode PhotonReconstructionAlgorithm::CreatePhotons(const Cluster *const pCl
 StatusCode PhotonReconstructionAlgorithm::InitialiseFragmentation(const Cluster *const pCluster, std::string &originalClusterListName, std::string &peakClusterListName) const
 {
     ClusterList clusterList;
-    clusterList.insert(pCluster);    
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::InitializeFragmentation(*this, clusterList,
-        originalClusterListName, peakClusterListName));
+    clusterList.insert(pCluster);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::InitializeFragmentation(*this, clusterList, originalClusterListName, peakClusterListName));
     return STATUS_CODE_SUCCESS;
 }
 
@@ -239,7 +247,7 @@ StatusCode PhotonReconstructionAlgorithm::EndFragmentation(const bool usedCluste
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonReconstructionAlgorithm::CreateClustersAndSetPhotonID(const ShowerProfilePlugin::ShowerPeakList &showersPhoton, const float wholeClusuterEnergy, 
+StatusCode PhotonReconstructionAlgorithm::CreateClustersAndSetPhotonID(const ShowerProfilePlugin::ShowerPeakList &showersPhoton, const float wholeClusuterEnergy,
     bool &usedCluster, const bool isFromTrack) const
 {
     for (unsigned int iPeak = 0, iPeakEnd = showersPhoton.size(); iPeak < iPeakEnd; ++iPeak)
@@ -273,8 +281,8 @@ StatusCode PhotonReconstructionAlgorithm::CreateCluster(const ShowerProfilePlugi
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonReconstructionAlgorithm::CheckAndSetPhotonID(const ShowerProfilePlugin::ShowerPeak &showerPeak, const Cluster *const pPeakCluster
-    , const float wholeClusuterEnergy, bool &isPhoton, const bool isFromTrack) const
+StatusCode PhotonReconstructionAlgorithm::CheckAndSetPhotonID(const ShowerProfilePlugin::ShowerPeak &showerPeak, const Cluster *const pPeakCluster,
+    const float wholeClusuterEnergy, bool &isPhoton, const bool isFromTrack) const
 {
     PDFVarFloatMap pdfVarFloatMap;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CalculateForPhotonID(showerPeak, pPeakCluster, wholeClusuterEnergy, pdfVarFloatMap));
@@ -288,7 +296,7 @@ StatusCode PhotonReconstructionAlgorithm::CheckAndSetPhotonID(const ShowerProfil
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonReconstructionAlgorithm::CalculateForPhotonID(const ShowerProfilePlugin::ShowerPeak &showerPeak, const Cluster *const pPeakCluster, 
+StatusCode PhotonReconstructionAlgorithm::CalculateForPhotonID(const ShowerProfilePlugin::ShowerPeak &showerPeak, const Cluster *const pPeakCluster,
     const float wholeClusuterEnergy, PDFVarFloatMap &pdfVarFloatMap) const
 {
     const float peakRMS(showerPeak.GetPeakRms());
@@ -307,7 +315,7 @@ StatusCode PhotonReconstructionAlgorithm::CalculateForPhotonID(const ShowerProfi
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetMinDistanceToTrack(pPeakCluster, trackVector, minDistance, pMinTrack));
 
     if ((!pdfVarFloatMap.insert(PDFVarFloatMap::value_type(PEAKRMS, peakRMS)).second) ||
-        (!pdfVarFloatMap.insert(PDFVarFloatMap::value_type(RMSRATIO, rmsRatio)).second) ||
+        (!pdfVarFloatMap.insert(PDFVarFloatMap::value_type(RMSXYRATIO, rmsRatio)).second) ||
         (!pdfVarFloatMap.insert(PDFVarFloatMap::value_type(LONGPROFILESTART, longProfileStart)).second) ||
         (!pdfVarFloatMap.insert(PDFVarFloatMap::value_type(LONGPROFILEDISCREPANCY, longProfileDiscrepancy)).second) ||
         (!pdfVarFloatMap.insert(PDFVarFloatMap::value_type(PEAKENERGYFRACTION, energyFraction)).second) ||
@@ -341,10 +349,10 @@ StatusCode PhotonReconstructionAlgorithm::SetPhotonID(const Cluster *const pPeak
 bool PhotonReconstructionAlgorithm::PassPhotonQualityCut(const float clusterEnergy, const PDFVarFloatMap &pdfVarFloatMap) const
 {
     return ( clusterEnergy > m_minPeakEnergy &&
-        pdfVarFloatMap.find(PEAKRMS)->second < m_maxPeakRms && 
-        pdfVarFloatMap.find(RMSRATIO)->second < m_maxRmsRatio && 
-        pdfVarFloatMap.find(LONGPROFILESTART)->second < m_maxLongProfileStart && 
-        pdfVarFloatMap.find(LONGPROFILEDISCREPANCY)->second < m_maxLongProfileDiscrepancy && 
+        pdfVarFloatMap.find(PEAKRMS)->second < m_maxPeakRms &&
+        pdfVarFloatMap.find(RMSXYRATIO)->second < m_maxRmsRatio &&
+        pdfVarFloatMap.find(LONGPROFILESTART)->second < m_maxLongProfileStart &&
+        pdfVarFloatMap.find(LONGPROFILEDISCREPANCY)->second < m_maxLongProfileDiscrepancy &&
         pdfVarFloatMap.find(MINDISTANCETOTRACK)->second > m_minDistanceToTrackCutLow &&
         pdfVarFloatMap.find(MINDISTANCETOTRACK)->second < m_minDistanceToTrackCutHigh);
 }
@@ -355,12 +363,12 @@ float PhotonReconstructionAlgorithm::GetPIDForPhotonID(const float clusterEnergy
 {
     double yes(1.f), no(1.f);
     const unsigned int energyBin(this->GetEnergyBin(clusterEnergy));
-    
+
     for (PDFVarLikelihoodPDFMap::const_iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
     {
         const LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
         const PDFVar &pdfVar((*iter).first);
-        
+
         yes *= this->GetHistogramContent(likelihoodPDFObject.m_pSignalPDF[energyBin], pdfVarFloatMap.find(pdfVar)->second);
         no  *= this->GetHistogramContent(likelihoodPDFObject.m_pBackgroundPDF[energyBin], pdfVarFloatMap.find(pdfVar)->second);
     }
@@ -428,7 +436,7 @@ StatusCode PhotonReconstructionAlgorithm::GetMinDistanceToTrack(const pandora::C
 {
     minDistance = std::numeric_limits<float>::max();
     float minEnergyDifference(std::numeric_limits<float>::max());
-    
+
     for (TrackVector::const_iterator trackIter = trackVector.begin(), trackIterEnd = trackVector.end(); trackIter != trackIterEnd; ++trackIter)
     {
         const Track *const pTrack = *trackIter;
@@ -447,7 +455,7 @@ StatusCode PhotonReconstructionAlgorithm::GetMinDistanceToTrack(const pandora::C
             }
         }
     }
-    
+
     return STATUS_CODE_SUCCESS;
 }
 
@@ -455,7 +463,6 @@ StatusCode PhotonReconstructionAlgorithm::GetMinDistanceToTrack(const pandora::C
 
 StatusCode PhotonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ProcessAlgorithm(*this, xmlHandle,
         "PhotonClusterFormation", m_photonClusteringAlgName));
 
@@ -473,13 +480,13 @@ StatusCode PhotonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHand
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinClusterEnergy", m_minClusterEnergy));
-        
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinPeakEnergy", m_minPeakEnergy));
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxPeakRms", m_maxPeakRms));
-        
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MaxLongProfileStart", m_maxLongProfileStart));
 
@@ -494,28 +501,28 @@ StatusCode PhotonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHand
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinTrackClusterCosAngle", m_minTrackClusterCosAngle));
-        
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinDistanceToTrackDivisionCut", m_minDistanceToTrackDivisionCut));
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TransProfileEcalOnly", m_transProfileEcalOnly));
-        
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TransProfileMaxLayer", m_transProfileMaxLayer));
-        
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinDistanceToTrackCutLow", m_minDistanceToTrackCutLow));
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "MinDistanceToTrackCutHigh", m_minDistanceToTrackCutHigh));
-        
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "EnergyCutForPid1", m_energyCutForPid1));
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PidCut1", m_pidCut1));
-        
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "EnergyCutForPid2", m_energyCutForPid2));
 
@@ -524,7 +531,7 @@ StatusCode PhotonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHand
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "PidCut3", m_pidCut3));
-        
+
     return this->ReadHistogramSettings(xmlHandle);
 }
 
@@ -532,19 +539,12 @@ StatusCode PhotonReconstructionAlgorithm::ReadSettings(const TiXmlHandle xmlHand
 
 StatusCode PhotonReconstructionAlgorithm::ReadHistogramSettings(const TiXmlHandle xmlHandle)
 {
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitialisePDFVarLikelihoodPDFObjectMap());
+
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "HistogramFile", m_histogramFile));
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle, "ShouldMakePdfHistograms", m_shouldMakePdfHistograms));
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle, "ShouldDrawPdfHistograms", m_shouldDrawPdfHistograms));        
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "NEnergyBins", m_nEnergyBins));
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle, "ShouldDrawPdfHistograms", m_shouldDrawPdfHistograms));
 
-    if (0 == m_nEnergyBins)
-    {
-        std::cout << "PhotonReconstructionAlgorithm::ReadHistogramSettings - Invalid number PDF energy bins specified." << std::endl;
-        return STATUS_CODE_INVALID_PARAMETER;
-    }
-    
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitialisePDFVarLikelihoodPDFObjectMap());
-    
     if (m_shouldMakePdfHistograms)
     {
         return this->InitialiseHistogramWriting(xmlHandle);
@@ -560,35 +560,41 @@ StatusCode PhotonReconstructionAlgorithm::ReadHistogramSettings(const TiXmlHandl
 
 StatusCode PhotonReconstructionAlgorithm::InitialiseHistogramWriting(const pandora::TiXmlHandle xmlHandle)
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetEnergyBinLowerEdges(xmlHandle, "EnergyBinLowerEdges"));
-    
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, PEAKRMS, "PeakRmsNBins", 50, 
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "NEnergyBins", m_nEnergyBins));
+    if (0 >= m_nEnergyBins)
+    {
+        std::cout << "PhotonReconstructionAlgorithm::ReadHistogramSettings - Invalid number PDF energy bins specified." << std::endl;
+        return STATUS_CODE_INVALID_PARAMETER;
+    }
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetEnergyBinLowerEdges(xmlHandle, "EnergyBinLowerEdges", m_energyBinLowerEdges));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, PEAKRMS, "PeakRmsNBins", 50,
         "PeakRmsLowValue", 0.f, "PeakRmsHighValue", 5.f));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, RMSRATIO, "RmsRatioNBins", 30, 
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, RMSXYRATIO, "RmsRatioNBins", 30,
         "RmsRatioLowValue", 1.f, "RmsRatioHighValue", 3.f));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, LONGPROFILESTART, "LongProfileStartNBins", 11, 
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, LONGPROFILESTART, "LongProfileStartNBins", 11,
         "LongProfileStartLowValue", -0.5f, "LongProfileStartHighValue", 10.5f));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, LONGPROFILEDISCREPANCY, "LongProfileDiscrepancyNBins", 42, 
-        "LongProfileDiscrepancyLowValue", -0.02f, "LongProfileDiscrepancyHighValue", 0.82f));//52 -0.02 1.02
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, PEAKENERGYFRACTION, "PeakEnergyFractionNBins", 52, 
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, LONGPROFILEDISCREPANCY, "LongProfileDiscrepancyNBins", 42,
+        "LongProfileDiscrepancyLowValue", -0.02f, "LongProfileDiscrepancyHighValue", 0.82f));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, PEAKENERGYFRACTION, "PeakEnergyFractionNBins", 52,
         "PeakEnergyFractionLowValue", -0.02f, "PeakEnergyFractionHighValue", 1.02f));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, MINDISTANCETOTRACK, "MinDistanceToTrackNBins", 40, 
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->FillPDFVarLikelihoodPDFMapParameters(xmlHandle, MINDISTANCETOTRACK, "MinDistanceToTrackNBins", 40,
         "MinDistanceToTrackLowValue", 0.f, "MinDistanceToTrackHighValue", 20.f));
 
     for (PDFVarLikelihoodPDFMap::iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
     {
         LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
-        
         likelihoodPDFObject.m_pSignalPDF = new Histogram*[m_nEnergyBins];
         likelihoodPDFObject.m_pBackgroundPDF = new Histogram*[m_nEnergyBins];
-        
+
         for (unsigned int energyBin = 0; energyBin < m_nEnergyBins; ++energyBin)
         {
             likelihoodPDFObject.m_pSignalPDF[energyBin] = new Histogram(likelihoodPDFObject.m_nBins, likelihoodPDFObject.m_lowValue, likelihoodPDFObject.m_highValue);
             likelihoodPDFObject.m_pBackgroundPDF[energyBin] = new Histogram(likelihoodPDFObject.m_nBins, likelihoodPDFObject.m_lowValue, likelihoodPDFObject.m_highValue);
         }
     }
-    
+
     for (unsigned int energyBin = 0; energyBin < m_nEnergyBins; ++energyBin)
     {
         m_nSignalEvents.push_back(0);
@@ -609,17 +615,18 @@ StatusCode PhotonReconstructionAlgorithm::InitialiseHistogramReading()
         return STATUS_CODE_INVALID_PARAMETER;
     }
     const TiXmlHandle pdfXmlHandle(&pdfXmlDocument);
-    
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetEnergyBinLowerEdges(pdfXmlHandle, "EnergyBinLowerEdges"));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetNSglBkgEvts(pdfXmlHandle, "NSignalEvents", "NBackgroundEvents"));
-    
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetNEnergyBins(pdfXmlHandle, "NEnergyBins", m_nEnergyBins));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetEnergyBinLowerEdges(pdfXmlHandle, "EnergyBinLowerEdges", m_energyBinLowerEdges));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetNSignalBackgroundEvts(pdfXmlHandle, "NSignalEvents", "NBackgroundEvents", m_nSignalEvents, m_nBackgroundEvents));
+
     for (PDFVarLikelihoodPDFMap::iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
     {
         LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
-        
+
         likelihoodPDFObject.m_pSignalPDF = new Histogram*[m_nEnergyBins];
         likelihoodPDFObject.m_pBackgroundPDF = new Histogram*[m_nEnergyBins];
-        
+
         for (unsigned int energyBin = 0; energyBin < m_nEnergyBins; ++energyBin)
         {
             likelihoodPDFObject.m_pSignalPDF[energyBin] = new Histogram(&pdfXmlHandle, "PhotonSig" + likelihoodPDFObject.m_pdfVarName + "_" + TypeToString(energyBin));
@@ -635,7 +642,7 @@ StatusCode PhotonReconstructionAlgorithm::InitialisePDFVarLikelihoodPDFObjectMap
 {
     if (false == m_pdfVarLikelihoodPDFMap.insert(PDFVarLikelihoodPDFMap::value_type(PEAKRMS, LikelihoodPDFObject("PeakRms"))).second)
         return STATUS_CODE_FAILURE;
-    if (false == m_pdfVarLikelihoodPDFMap.insert(PDFVarLikelihoodPDFMap::value_type(RMSRATIO, LikelihoodPDFObject("RmsRatio"))).second)
+    if (false == m_pdfVarLikelihoodPDFMap.insert(PDFVarLikelihoodPDFMap::value_type(RMSXYRATIO, LikelihoodPDFObject("RmsRatio"))).second)
         return STATUS_CODE_FAILURE;
     if (false == m_pdfVarLikelihoodPDFMap.insert(PDFVarLikelihoodPDFMap::value_type(LONGPROFILESTART, LikelihoodPDFObject("LongProfileStart"))).second)
         return STATUS_CODE_FAILURE;
@@ -650,11 +657,20 @@ StatusCode PhotonReconstructionAlgorithm::InitialisePDFVarLikelihoodPDFObjectMap
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonReconstructionAlgorithm::GetEnergyBinLowerEdges(const TiXmlHandle xmlHandle, const std::string &energyBinLowerEdgesStr)
+StatusCode PhotonReconstructionAlgorithm::GetNEnergyBins(const pandora::TiXmlHandle xmlHandle, const std::string &nEnergyBinsStr, unsigned int &nEnergyBins) const
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, energyBinLowerEdgesStr, m_energyBinLowerEdges));
-    std::sort(m_energyBinLowerEdges.begin(), m_energyBinLowerEdges.end());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ParameterElementNumberCheck(m_energyBinLowerEdges));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, nEnergyBinsStr, nEnergyBins));
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PhotonReconstructionAlgorithm::GetEnergyBinLowerEdges(const TiXmlHandle xmlHandle, const std::string &energyBinLowerEdgesStr,
+    pandora::FloatVector &energyBinLowerEdges) const
+{
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, energyBinLowerEdgesStr, energyBinLowerEdges));
+    std::sort(energyBinLowerEdges.begin(), energyBinLowerEdges.end());
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ParameterElementNumberCheck(energyBinLowerEdges));
     return STATUS_CODE_SUCCESS;
 }
 
@@ -673,24 +689,25 @@ StatusCode PhotonReconstructionAlgorithm::ParameterElementNumberCheck(FloatVecto
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonReconstructionAlgorithm::GetNSglBkgEvts(const TiXmlHandle xmlHandle, const std::string &nSignalEventsStr, const std::string &nBackgroundEventsStr)
+StatusCode PhotonReconstructionAlgorithm::GetNSignalBackgroundEvts(const pandora::TiXmlHandle xmlHandle, const std::string &nSignalEventsStr,
+    const std::string &nBackgroundEventsStr, pandora::IntVector &nSignalEvents, pandora::IntVector &nBackgroundEvents) const
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, nSignalEventsStr, m_nSignalEvents));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, nBackgroundEventsStr, m_nBackgroundEvents));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, nSignalEventsStr, nSignalEvents));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, nBackgroundEventsStr, nBackgroundEvents));
     return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonReconstructionAlgorithm::FillPDFVarLikelihoodPDFMapParameters(const TiXmlHandle xmlHandle, const PDFVar pdfVar, const std::string &nBinStr, 
+StatusCode PhotonReconstructionAlgorithm::FillPDFVarLikelihoodPDFMapParameters(const TiXmlHandle xmlHandle, const PDFVar pdfVar, const std::string &nBinStr,
     const int nBinDefault, const std::string &lowValueStr, const float lowValueDefault, const std::string &highValueStr, const float highValueDefault)
 {
     LikelihoodPDFObject &likelihoodPDFObject(m_pdfVarLikelihoodPDFMap.find(pdfVar)->second);
-    
+
     likelihoodPDFObject.m_nBins = nBinDefault;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         nBinStr, likelihoodPDFObject.m_nBins));
-    
+
     likelihoodPDFObject.m_lowValue = lowValueDefault;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         lowValueStr, likelihoodPDFObject.m_lowValue));
@@ -698,7 +715,7 @@ StatusCode PhotonReconstructionAlgorithm::FillPDFVarLikelihoodPDFMapParameters(c
     likelihoodPDFObject.m_highValue = highValueDefault;
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         highValueStr, likelihoodPDFObject.m_highValue));
-        
+
     return STATUS_CODE_SUCCESS;
 }
 
@@ -731,12 +748,12 @@ pandora::StatusCode PhotonReconstructionAlgorithm::CreatePhotonsForTraining(cons
         return STATUS_CODE_SUCCESS;
     }
     std::string originalClusterListName, peakClusterListName;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitialiseFragmentation(pCluster, originalClusterListName, peakClusterListName));    
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitialiseFragmentation(pCluster, originalClusterListName, peakClusterListName));
     bool usedCluster(false);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateClustersAndTrainPhotonID(showersPhoton, pCluster->GetElectromagneticEnergy()));  
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateClustersAndTrainPhotonID(showersPhoton, pCluster->GetElectromagneticEnergy()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->EndFragmentation(usedCluster, originalClusterListName, peakClusterListName));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->DeleteCluster(pCluster));
-    
+
     return STATUS_CODE_SUCCESS;
 }
 
@@ -789,7 +806,7 @@ StatusCode PhotonReconstructionAlgorithm::FillPdfHistograms(const pandora::Clust
         {
             const LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
             const PDFVar &pdfVar((*iter).first);
-            
+
             likelihoodPDFObject.m_pSignalPDF[energyBin]->Fill(pdfVarFloatMap.find(pdfVar)->second);
         }
         m_nSignalEvents[energyBin]++;
@@ -800,7 +817,7 @@ StatusCode PhotonReconstructionAlgorithm::FillPdfHistograms(const pandora::Clust
         {
             const LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
             const PDFVar &pdfVar((*iter).first);
-            
+
             likelihoodPDFObject.m_pBackgroundPDF[energyBin]->Fill(pdfVarFloatMap.find(pdfVar)->second);
         }
         m_nBackgroundEvents[energyBin]++;
@@ -836,7 +853,7 @@ void PhotonReconstructionAlgorithm::WriteString(TiXmlDocument &xmlDocument, cons
 void PhotonReconstructionAlgorithm::NormalizeAndWriteHistograms()
 {
     std::string energyBinLowerEdgesString, nSignalEventsString, nBackgroundEventsString;
-    
+
     for (PDFVarLikelihoodPDFMap::iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
     {
         LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
@@ -852,12 +869,13 @@ void PhotonReconstructionAlgorithm::NormalizeAndWriteHistograms()
         nSignalEventsString += TypeToString(m_nSignalEvents[energyBin]) + " ";
         nBackgroundEventsString += TypeToString(m_nBackgroundEvents[energyBin]) + " ";
     }
-    
-    TiXmlDocument xmlDocument;    
+
+    TiXmlDocument xmlDocument;
+    this->WriteString(xmlDocument, "NEnergyBins", TypeToString(m_nEnergyBins));
     this->WriteString(xmlDocument, "EnergyBinLowerEdges", energyBinLowerEdgesString);
     this->WriteString(xmlDocument, "NSignalEvents", nSignalEventsString);
     this->WriteString(xmlDocument, "NBackgroundEvents", nBackgroundEventsString);
-    
+
     for (PDFVarLikelihoodPDFMap::iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
     {
         LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
@@ -879,7 +897,7 @@ void PhotonReconstructionAlgorithm::DrawHistograms() const
         std::cout << "PDF EnergyBin " << energyBin << std::endl;
         for (PDFVarLikelihoodPDFMap::const_iterator iter = m_pdfVarLikelihoodPDFMap.begin(), iterEnd = m_pdfVarLikelihoodPDFMap.end(); iter != iterEnd; ++iter)
         {
-            const LikelihoodPDFObject &likelihoodPDFObject((*iter).second);    
+            const LikelihoodPDFObject &likelihoodPDFObject((*iter).second);
             std::cout << likelihoodPDFObject.m_pdfVarName << ", Signal, Background " << std::endl;
             PANDORA_MONITORING_API(DrawPandoraHistogram(this->GetPandora(), *likelihoodPDFObject.m_pSignalPDF[energyBin]));
             PANDORA_MONITORING_API(DrawPandoraHistogram(this->GetPandora(), *likelihoodPDFObject.m_pBackgroundPDF[energyBin]));

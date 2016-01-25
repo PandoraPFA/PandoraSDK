@@ -269,46 +269,48 @@ void LCShowerProfilePlugin::CalculateLongitudinalProfile(const Cluster *const pC
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::CalculateTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList, 
+void LCShowerProfilePlugin::CalculateTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, ShowerPeakList &showerPeakList,
     const bool inclusiveMode) const
 {
     // ATTN could combine trackless and tracked approach
     TwoDShowerProfile showerProfile;
     ShowerPeakObjectVector showerPeakObjectVector;
     this->CalculateTracklessTransverseShowers(pCluster, maxPseudoLayer, showerProfile, showerPeakObjectVector);
+
     if (inclusiveMode)
         this->AssociateUnavailableBinsToPeaks(showerProfile, showerPeakObjectVector);
-    ShowerPeakList showerPeakListCharge;
-    this->ConvertBinsToShowerLists(showerProfile, showerPeakObjectVector, showerPeakList, showerPeakListCharge, inclusiveMode);
-    showerPeakList = this->SortShowerPeakListByEnergy(showerPeakList);
-    return;
+
+    ShowerPeakList showerPeakListNonPhoton;
+    this->ConvertBinsToShowerLists(showerProfile, showerPeakObjectVector, showerPeakList, showerPeakListNonPhoton, inclusiveMode);
+    std::sort(showerPeakList.begin(), showerPeakList.end(), LCShowerProfilePlugin::SortShowerPeakListByEnergy);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::CalculateTrackBasedTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, const Track *const pMinTrack, 
-    const TrackVector &trackVector, ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListCharge) const
+void LCShowerProfilePlugin::CalculateTrackBasedTransverseProfile(const Cluster *const pCluster, const unsigned int maxPseudoLayer, const Track *const pMinTrack,
+    const TrackVector &trackVector, ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListNonPhoton) const
 {
     // TODO convert maxPseudoLayer into radiation length. Then decide how many slices to consider
     if (m_transProfileTrackNearbyNSlices > maxPseudoLayer || m_transProfileTrackNearbyNSlices == 0)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+
     const unsigned int pseudoLayerPerSlice(maxPseudoLayer / m_transProfileTrackNearbyNSlices);
-    
+
     // process first slice
     TwoDShowerProfile showerProfileFirst;
-    ShowerPeakObjectVector showerPeakObjectVectorFirst;    
+    ShowerPeakObjectVector showerPeakObjectVectorFirst;
     TwoDBinVector trackProjectionVector;
     this->CalculateTrackNearbyTransverseShowers(pCluster, pseudoLayerPerSlice, pMinTrack, trackVector, showerProfileFirst, showerPeakObjectVectorFirst, trackProjectionVector);
+
     if (m_transProfileTrackNearbyNSlices > 1)
     {
         for (unsigned int nIter = 1, nIterEnd = m_transProfileTrackNearbyNSlices; nIter != nIterEnd; ++nIter)
         {
             if (!this->HasPhotonCandidate(showerPeakObjectVectorFirst))
-            {
                 return;
-            }
+
             const unsigned int pseudoLayerEnd(nIter == m_transProfileTrackNearbyNSlices - 1 ? maxPseudoLayer : pseudoLayerPerSlice * (nIter + 1));
-            
+
             TwoDShowerProfile showerProfileNext;
             ShowerPeakObjectVector showerPeakObjectVectorNext;
             this->CalculateTracklessTransverseShowers(pCluster, pseudoLayerEnd, showerProfileNext, showerPeakObjectVectorNext);
@@ -318,14 +320,15 @@ void LCShowerProfilePlugin::CalculateTrackBasedTransverseProfile(const Cluster *
             showerPeakObjectVectorFirst = showerPeakObjectVectorNext;
         }
     }
-    this->ConvertBinsToShowerLists(showerProfileFirst, showerPeakObjectVectorFirst, showerPeakListPhoton, showerPeakListCharge, false);
-    showerPeakListPhoton = this->SortShowerPeakListByEnergy(showerPeakListPhoton);
-    showerPeakListCharge = this->SortShowerPeakListByEnergy(showerPeakListCharge);
+
+    this->ConvertBinsToShowerLists(showerProfileFirst, showerPeakObjectVectorFirst, showerPeakListPhoton, showerPeakListNonPhoton, false);
+    std::sort(showerPeakListPhoton.begin(), showerPeakListPhoton.end(), LCShowerProfilePlugin::SortShowerPeakListByEnergy);
+    std::sort(showerPeakListNonPhoton.begin(), showerPeakListNonPhoton.end(), LCShowerProfilePlugin::SortShowerPeakListByEnergy);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::CalculateTracklessTransverseShowers(const Cluster *const pCluster, const unsigned int maxPseudoLayer, TwoDShowerProfile &showerProfile, 
+void LCShowerProfilePlugin::CalculateTracklessTransverseShowers(const Cluster *const pCluster, const unsigned int maxPseudoLayer, TwoDShowerProfile &showerProfile,
     ShowerPeakObjectVector &showerPeakObjectVector) const
 {
     this->InitialiseTransverseProfile(pCluster, maxPseudoLayer, showerProfile);
@@ -334,7 +337,7 @@ void LCShowerProfilePlugin::CalculateTracklessTransverseShowers(const Cluster *c
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::CalculateTrackNearbyTransverseShowers(const Cluster *const pCluster, const unsigned int maxPseudoLayer, const Track *const pMinTrack, 
+void LCShowerProfilePlugin::CalculateTrackNearbyTransverseShowers(const Cluster *const pCluster, const unsigned int maxPseudoLayer, const Track *const pMinTrack,
     const TrackVector &trackVector, TwoDShowerProfile &showerProfile, ShowerPeakObjectVector &showerPeakObjectVector, TwoDBinVector &trackProjectionVector) const
 {
     this->InitialiseTransverseProfileWithTracks(pCluster, maxPseudoLayer, pMinTrack, trackVector, showerProfile, trackProjectionVector);
@@ -354,7 +357,7 @@ void LCShowerProfilePlugin::CreateEmptyTwoDShowerProfile(TwoDShowerProfile &twoD
 void LCShowerProfilePlugin::InitialiseTransverseProfile(const pandora::Cluster *const pCluster, const unsigned int maxPseudoLayer, TwoDShowerProfile &showerProfile) const
 {
     CartesianVector innerLayerCentroid(0.f, 0.f, 0.f), uAxis(0.f, 0.f, 0.f), vAxis(0.f, 0.f, 0.f);
-    this->CalculateProjectionAxes(pCluster, innerLayerCentroid, uAxis, vAxis);    
+    this->CalculateProjectionAxes(pCluster, innerLayerCentroid, uAxis, vAxis);
     this->InitialiseTwoDShowerProfile(pCluster, maxPseudoLayer, innerLayerCentroid, uAxis, vAxis, showerProfile);
 }
 
@@ -364,14 +367,14 @@ void LCShowerProfilePlugin::InitialiseTransverseProfileWithTracks(const pandora:
     const TrackVector &trackVector, TwoDShowerProfile &showerProfile, TwoDBinVector &trackProjectionVector) const
 {
     CartesianVector innerLayerCentroid(0.f, 0.f, 0.f), uAxis(0.f, 0.f, 0.f), vAxis(0.f, 0.f, 0.f);
-    this->CalculateProjectionAxes(pCluster, innerLayerCentroid, uAxis, vAxis, pMinTrack);    
+    this->CalculateProjectionAxes(pCluster, innerLayerCentroid, uAxis, vAxis, pMinTrack);
     this->FindTracksProjection(pCluster, trackVector, innerLayerCentroid, uAxis, vAxis, trackProjectionVector);
     this->InitialiseTwoDShowerProfile(pCluster, maxPseudoLayer, innerLayerCentroid, uAxis, vAxis, showerProfile);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::CalculateProjectionAxes(const Cluster *const pCluster, CartesianVector &innerLayerCentroid, CartesianVector &uAxis, 
+void LCShowerProfilePlugin::CalculateProjectionAxes(const Cluster *const pCluster, CartesianVector &innerLayerCentroid, CartesianVector &uAxis,
     CartesianVector &vAxis, const Track *const pMinTrack) const
 {
     innerLayerCentroid = pMinTrack ? (pMinTrack->GetTrackStateAtCalorimeter()).GetPosition() : pCluster->GetCentroid(pCluster->GetInnerPseudoLayer());
@@ -387,7 +390,7 @@ void LCShowerProfilePlugin::CalculateProjectionAxes(const Cluster *const pCluste
     else
     {
         uAxis = (CartesianVector(innerLayerCentroid.GetY(), -innerLayerCentroid.GetX(), 0.f).GetUnitVector());
-    }    
+    }
     vAxis = (uAxis.GetCrossProduct(innerLayerCentroid).GetUnitVector());
 }
 
@@ -434,7 +437,7 @@ void LCShowerProfilePlugin::InitialiseTwoDShowerProfile(const Cluster *const pCl
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::FindTracksProjection(const Cluster *const pCluster, const TrackVector &trackVector, const CartesianVector &innerLayerCentroid, 
+void LCShowerProfilePlugin::FindTracksProjection(const Cluster *const pCluster, const TrackVector &trackVector, const CartesianVector &innerLayerCentroid,
     const CartesianVector &uAxis, const CartesianVector &vAxis, TwoDBinVector &trackProjectionVector) const
 {
     // ATTN it is not robust against step change in ECAL
@@ -454,14 +457,14 @@ void LCShowerProfilePlugin::FindTracksProjection(const Cluster *const pCluster, 
         }
         if (setFlag) break;
     }
-    
+
     const int nOffsetBins(m_transProfileNBins / 2);
     for (TrackVector::const_iterator iter = trackVector.begin(), iterEnd = trackVector.end(); iter != iterEnd; ++iter)
     {
         const Track * pTrack = *iter;
         if (!pTrack->CanFormClusterlessPfo() && !pTrack->CanFormPfo()) continue;
         if (!(pTrack->GetDaughterTrackList()).empty()) continue;
-        
+
         int uBin(0), vBin(0);
         this->FindHitPositionProjection((pTrack->GetTrackStateAtCalorimeter()).GetPosition(), innerLayerCentroid, uAxis, vAxis, nOffsetBins, cellLengthScale, uBin, vBin);
         if ((uBin >= 0) && (vBin >= 0) && (uBin < m_transProfileNBins) && (vBin < m_transProfileNBins))
@@ -517,7 +520,7 @@ void LCShowerProfilePlugin::AssociateUnavailableBinsToPeaks(const TwoDShowerProf
         {
             if (showerProfile[uBin][vBin].m_isAvailable)
                 continue;
-            
+
             ShowerPeakObject  * bestShowerPeakObject = NULL;;
             this->CalculateBestPeakUsingMetric(showerPeakObjectVector, uBin, vBin, bestShowerPeakObject);
             if (bestShowerPeakObject)
@@ -538,7 +541,7 @@ void LCShowerProfilePlugin::AssociateBinsToPeaks(const TwoDShowerProfile &shower
         {
             if (!showerProfile[uBin][vBin].m_isAvailable)
                 continue;
-            
+
             ShowerPeakObject  * bestShowerPeakObject = NULL;;
             this->CalculateBestPeakUsingMetric(showerPeakObjectVector, uBin, vBin, bestShowerPeakObject);
             if (bestShowerPeakObject)
@@ -595,7 +598,7 @@ void LCShowerProfilePlugin::MarkPeaksCloseToTracks(const TwoDBinVector &trackPro
         ShowerPeakObject &showerPeakObject(*iter);
         if (!showerPeakObject.m_isAvailable)
             continue;
-        
+
         const float minTrackToPeakCut2(m_transProfileMinTrackToPeakCut * m_transProfileMinTrackToPeakCut);
         for (TwoDBinVector::const_iterator tIter = trackProjectionVector.begin(), tIterEnd = trackProjectionVector.end(); tIter!= tIterEnd; ++tIter )
         {
@@ -621,7 +624,7 @@ void LCShowerProfilePlugin::MatchPeaksInTwoSlices(const ShowerPeakObjectVector &
         ShowerPeakObject &showerPeakObjectNext(*iter);
         if (!showerPeakObjectNext.m_isAvailable || !showerPeakObjectNext.m_isPhotonCandidate)
             continue;
-        
+
         showerPeakObjectNext.m_isPhotonCandidate = false;
         const float minDisTrackMatch2(m_transProfileMinDisTrackMatch * m_transProfileMinDisTrackMatch);
         for (ShowerPeakObjectVector::const_iterator jIter = showerPeakObjectVectorFirst.begin(), jIterEnd = showerPeakObjectVectorFirst.end(); jIter !=jIterEnd; ++jIter)
@@ -629,7 +632,7 @@ void LCShowerProfilePlugin::MatchPeaksInTwoSlices(const ShowerPeakObjectVector &
             const ShowerPeakObject &showerPeakObjectFirst(*jIter);
             if (!showerPeakObjectFirst.m_isAvailable || !showerPeakObjectFirst.m_isPhotonCandidate)
                 continue;
-            
+
             const int uBinDistance(showerPeakObjectFirst.GetPeakUBin() - showerPeakObjectNext.GetPeakUBin());
             const int vBinDistance(showerPeakObjectFirst.GetPeakVBin() - showerPeakObjectNext.GetPeakVBin());
             const int distance2(uBinDistance * uBinDistance + vBinDistance * vBinDistance);
@@ -646,7 +649,6 @@ void LCShowerProfilePlugin::MatchPeaksInTwoSlices(const ShowerPeakObjectVector &
 
 void LCShowerProfilePlugin::ProcessShowerProfile(TwoDShowerProfile &showerProfile, ShowerPeakObjectVector &showerPeakObjectVector) const
 {
-    
     this->MaskLowHeightRegions(showerProfile);
     this->FindRawPeaksInTwoDShowerProfile(showerProfile, showerPeakObjectVector);
     this->AssociateBinsToPeaks(showerProfile, showerPeakObjectVector);
@@ -657,7 +659,7 @@ void LCShowerProfilePlugin::ProcessShowerProfile(TwoDShowerProfile &showerProfil
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::FindHitPositionProjection(const CartesianVector &hitPosition, const CartesianVector &innerLayerCentroid, const CartesianVector &uAxis, 
+void LCShowerProfilePlugin::FindHitPositionProjection(const CartesianVector &hitPosition, const CartesianVector &innerLayerCentroid, const CartesianVector &uAxis,
     const CartesianVector &vAxis, const int nOffsetBins, const int cellLengthScale, int &uBin, int &vBin) const
 {
     const CartesianVector hitCoordinates((hitPosition - innerLayerCentroid) * (1.f / cellLengthScale));
@@ -669,7 +671,7 @@ void LCShowerProfilePlugin::FindHitPositionProjection(const CartesianVector &hit
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::FindBoundaryBins(const int uBin, const int vBin, const int uEdgeLow, const int uEdgeHigh, const int vEdgeLow, const int vEdgeHigh, 
+void LCShowerProfilePlugin::FindBoundaryBins(const int uBin, const int vBin, const int uEdgeLow, const int uEdgeHigh, const int vEdgeLow, const int vEdgeHigh,
     int &uEdgeBin, int &vEdgeBin) const
 {
     const int uCentralBin((uEdgeLow + uEdgeHigh) / 2);
@@ -702,15 +704,15 @@ void LCShowerProfilePlugin::FindBoundaryBins(const int uBin, const int vBin, con
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::ConvertBinsToShowerLists(const TwoDShowerProfile &showerProfile, const ShowerPeakObjectVector &showerPeakObjectVector, 
-   ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListCharge, const bool inclusiveMode) const
+void LCShowerProfilePlugin::ConvertBinsToShowerLists(const TwoDShowerProfile &showerProfile, const ShowerPeakObjectVector &showerPeakObjectVector,
+   ShowerPeakList &showerPeakListPhoton, ShowerPeakList &showerPeakListNonPhoton, const bool inclusiveMode) const
 {
     for (ShowerPeakObjectVector::const_iterator iter = showerPeakObjectVector.begin(), iterEnd = showerPeakObjectVector.end(); iter !=iterEnd; ++iter)
     {
         const ShowerPeakObject  &showerPeakObject(*iter);
         if (!showerPeakObject.m_isAvailable)
             continue;
-        
+
         float peakTotalEnergy(0.f), uBar(0.f), vBar(0.f), uuBar(0.f), vvBar(0.f);
         CaloHitList caloHitList;
         for (TwoDBinVector::const_iterator bIter = showerPeakObject.m_associatedBins.begin(), bIterEnd = showerPeakObject.m_associatedBins.end(); bIter!= bIterEnd; ++bIter )
@@ -731,27 +733,27 @@ void LCShowerProfilePlugin::ConvertBinsToShowerLists(const TwoDShowerProfile &sh
         }
         if (peakTotalEnergy < std::numeric_limits<float>::epsilon())
             throw StatusCodeException(STATUS_CODE_FAILURE);
-            
+
         uBar /= peakTotalEnergy;
         vBar /= peakTotalEnergy;
         uuBar /= peakTotalEnergy;
         vvBar /= peakTotalEnergy;
         const float meanSquareDeviation(uuBar + vvBar - uBar * uBar - vBar * vBar);
         const float peakRms((meanSquareDeviation > 0.f) ? std::sqrt(meanSquareDeviation) : std::numeric_limits<float>::max());
-        
+
         const float meanSquareDeviationU(uuBar  - uBar * uBar );
         const float peakRmsU((meanSquareDeviationU > 0.f) ? std::sqrt(meanSquareDeviationU) : std::numeric_limits<float>::max());
         const float meanSquareDeviationV(vvBar  - vBar * vBar );
         const float peakRmsV((meanSquareDeviationV > 0.f) ? std::sqrt(meanSquareDeviationV) : std::numeric_limits<float>::max());
         const float rmsRatio(peakRmsU > peakRmsV ? peakRmsU / peakRmsV : peakRmsV / peakRmsU);
-        
+
         if (showerPeakObject.m_isPhotonCandidate)
         {
             showerPeakListPhoton.push_back(ShowerPeak(peakTotalEnergy, peakRms, rmsRatio, caloHitList));
         }
         else
         {
-            showerPeakListCharge.push_back(ShowerPeak(peakTotalEnergy, peakRms, rmsRatio, caloHitList));
+            showerPeakListNonPhoton.push_back(ShowerPeak(peakTotalEnergy, peakRms, rmsRatio, caloHitList));
         }
     }
 }
@@ -760,8 +762,8 @@ void LCShowerProfilePlugin::ConvertBinsToShowerLists(const TwoDShowerProfile &sh
 
 bool LCShowerProfilePlugin::IsPeak(TwoDShowerProfile &showerProfile, const int uBin, const int vBin ) const
 {
-    return ( (uBin<=1 || uBin >= m_transProfileNBins-2 || vBin<= 1 || vBin >= m_transProfileNBins-2) ? this->Check8NeighbourFull(showerProfile,uBin,vBin) : 
-        this->Check8NeighbourFast(showerProfile,uBin,vBin) ); 
+    return ( (uBin<=1 || uBin >= m_transProfileNBins-2 || vBin<= 1 || vBin >= m_transProfileNBins-2) ? this->Check8NeighbourFull(showerProfile,uBin,vBin) :
+        this->Check8NeighbourFast(showerProfile,uBin,vBin) );
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -778,7 +780,7 @@ bool LCShowerProfilePlugin::Check8NeighbourFull(TwoDShowerProfile &showerProfile
                 continue;
             if (!showerProfile[uBinStart][vBinStart].m_isAvailable)
                 continue;
-            
+
             if (showerProfile[uBinStart][vBinStart].m_energy >showerProfile[uBin][vBin].m_energy)
             {
                 showerProfile[uBin][vBin].m_potentialPeak = false;
@@ -805,7 +807,7 @@ bool LCShowerProfilePlugin::Check8NeighbourFast(TwoDShowerProfile &showerProfile
                 continue;
             if (!showerProfile[uBinStart][vBinStart].m_isAvailable)
                 continue;
-                
+
             if (showerProfile[uBinStart][vBinStart].m_energy >showerProfile[uBin][vBin].m_energy)
             {
                 showerProfile[uBin][vBin].m_potentialPeak = false;
@@ -822,7 +824,7 @@ bool LCShowerProfilePlugin::Check8NeighbourFast(TwoDShowerProfile &showerProfile
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-float LCShowerProfilePlugin::CalculatePeakFindingMetric(const float distance, const float energy)  const
+float LCShowerProfilePlugin::CalculatePeakFindingMetric(const float distance, const float energy) const
 {
     if (energy < std::numeric_limits<float>::epsilon())
         throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -836,7 +838,7 @@ float LCShowerProfilePlugin::CalculatePeakFindingMetric(const float distance, co
             return distance / energy;
         case 3:
             return distance / energy / energy;
-        default: 
+        default:
             std::cout << "LCShowerProfilePlugin::CalculatePeakFindingMetric invalid parameter for m_transProfilePeakFindingMetric: " << m_transProfilePeakFindingMetric << std::endl;
             throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
     }
@@ -844,7 +846,7 @@ float LCShowerProfilePlugin::CalculatePeakFindingMetric(const float distance, co
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void LCShowerProfilePlugin::CalculateBestPeakUsingMetric(ShowerPeakObjectVector &showerPeakObjectVector, const int uBin, const int vBin, 
+void LCShowerProfilePlugin::CalculateBestPeakUsingMetric(ShowerPeakObjectVector &showerPeakObjectVector, const int uBin, const int vBin,
     ShowerPeakObject  *&bestShowerPeakObject) const
 {
     float minMetric(std::numeric_limits<float>::max());
@@ -853,7 +855,7 @@ void LCShowerProfilePlugin::CalculateBestPeakUsingMetric(ShowerPeakObjectVector 
         ShowerPeakObject  *const showerPeakObject(&*iter);
         if (!showerPeakObject->m_isAvailable)
             continue;
-            
+
         if (uBin == showerPeakObject->GetPeakUBin() && vBin == showerPeakObject->GetPeakVBin())
         {
             // the candidate is a peak; Ignore it
@@ -887,82 +889,69 @@ bool LCShowerProfilePlugin::HasPhotonCandidate(const ShowerPeakObjectVector &sho
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-ShowerProfilePlugin::ShowerPeakList LCShowerProfilePlugin::SortShowerPeakListByEnergy(const ShowerPeakList &showerPeakList) const
+bool LCShowerProfilePlugin::SortShowerPeakListByEnergy(const ShowerPeak &lhs, const ShowerPeak &rhs)
 {
-    typedef std::multimap<float, ShowerPeak> FloatShowerPeakMap;
-    FloatShowerPeakMap energyShowerPeakMap;
-    for (ShowerPeakList::const_iterator iter = showerPeakList.begin(), iterEnd = showerPeakList.end(); iter !=iterEnd; ++iter)
-    {
-        const ShowerPeak &showerPeak(*iter);
-        energyShowerPeakMap.insert(FloatShowerPeakMap::value_type(showerPeak.GetPeakEnergy(), showerPeak));
-    }
-    ShowerPeakList sortedShowerPeakList;
-    for (FloatShowerPeakMap::reverse_iterator iter = energyShowerPeakMap.rbegin(), iterEnd = energyShowerPeakMap.rend(); iter !=iterEnd; ++iter)
-    {
-        const ShowerPeak &showerPeak(iter->second);
-        sortedShowerPeakList.push_back(showerPeak);
-    }
-    return sortedShowerPeakList;
+    return (lhs.GetPeakEnergy() > rhs.GetPeakEnergy());
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode LCShowerProfilePlugin::ReadSettings(const TiXmlHandle xmlHandle)
 {
-PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                    "ShowerStartMipFraction", m_showerStartMipFraction));
+    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "ShowerStartMipFraction", m_showerStartMipFraction));
 
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                    "ShowerStartNonMipLayers", m_showerStartNonMipLayers));
+        "ShowerStartNonMipLayers", m_showerStartNonMipLayers));
 
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "LongProfileBinWidth", m_longProfileBinWidth));
+       "LongProfileBinWidth", m_longProfileBinWidth));
 
     if (m_longProfileBinWidth < std::numeric_limits<float>::epsilon())
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "LongProfileNBins", m_longProfileNBins));
+       "LongProfileNBins", m_longProfileNBins));
 
     if (0 == m_longProfileNBins)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "LongProfileMinCosAngle", m_longProfileMinCosAngle));
+       "LongProfileMinCosAngle", m_longProfileMinCosAngle));
 
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "LongProfileCriticalEnergy", m_longProfileCriticalEnergy));
+       "LongProfileCriticalEnergy", m_longProfileCriticalEnergy));
 
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "LongProfileParameter0", m_longProfileParameter0));
+        "LongProfileParameter0", m_longProfileParameter0));
 
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "LongProfileParameter1", m_longProfileParameter1));
+        "LongProfileParameter1", m_longProfileParameter1));
 
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "LongProfileMaxDifference", m_longProfileMaxDifference));
+        "LongProfileMaxDifference", m_longProfileMaxDifference));
 
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "TransProfileNBins", m_transProfileNBins));
+        "TransProfileNBins", m_transProfileNBins));
 
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "TransProfilePeakThreshold", m_transProfilePeakThreshold));
-                                   
-    PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "TransProfilePeakFindingMetric", m_transProfilePeakFindingMetric));
-                                
-    PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "TransProfileMinNBinsCut", m_transProfileMinNBinsCut));
+        "TransProfilePeakThreshold", m_transProfilePeakThreshold));
 
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "TransProfileTrackNearbyNSlices", m_transProfileTrackNearbyNSlices));
+        "TransProfilePeakFindingMetric", m_transProfilePeakFindingMetric));
 
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "TransProfileMinTrackToPeakCut", m_transProfileMinTrackToPeakCut));
-                                   
+        "TransProfileMinNBinsCut", m_transProfileMinNBinsCut));
+
     PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-                                   "TransProfileMinDisTrackMatch", m_transProfileMinDisTrackMatch));
-                                   
+        "TransProfileTrackNearbyNSlices", m_transProfileTrackNearbyNSlices));
+
+    PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "TransProfileMinTrackToPeakCut", m_transProfileMinTrackToPeakCut));
+
+    PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
+        "TransProfileMinDisTrackMatch", m_transProfileMinDisTrackMatch));
+
     return STATUS_CODE_SUCCESS;
 }
 

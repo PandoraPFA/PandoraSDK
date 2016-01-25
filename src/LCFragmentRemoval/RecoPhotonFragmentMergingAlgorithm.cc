@@ -138,7 +138,7 @@ bool RecoPhotonFragmentMergingAlgorithm::IsPhotonFragmentInShowerProfile(const P
             parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
             parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow1 &&
             (parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
-            ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) || 
+            ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) ||
             ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_smallCandidateFractionThresholdLow &&
             parameters.m_energyOfMainPeak > parameters.m_energyOfMainCluster
             ) ) ) ;
@@ -182,7 +182,7 @@ bool RecoPhotonFragmentMergingAlgorithm::IsHighEnergyPhotonFragmentInShowerProfi
             parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
             parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonPhotonThresholdLow1 &&
             (parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
-            ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) || 
+            ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) ||
             ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_smallCandidateFractionThresholdLow &&
             parameters.m_energyOfMainPeak > parameters.m_energyOfMainCluster
             ))) ;
@@ -196,7 +196,7 @@ bool RecoPhotonFragmentMergingAlgorithm::IsNeutralFragmentInShowerProfile(const 
             parameters.m_weightedLayerSeparation > m_minWeightedLayerSeparation &&
             parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdLow1 &&
             (parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
-            ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) || 
+            ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) ||
             ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_smallCandidateFractionThresholdLow &&
             parameters.m_energyOfMainPeak > parameters.m_energyOfMainCluster
             ))) ;
@@ -228,11 +228,10 @@ bool RecoPhotonFragmentMergingAlgorithm::IsRelativeLowEnergyNeutralFragment(cons
 
 bool RecoPhotonFragmentMergingAlgorithm::IsHighEnergyNeutralFragmentInShowerProfile(const Parameters &parameters) const
 {
-    return ( 
-            parameters.m_energyOfCandidateCluster > 0.f &&
+    return (parameters.m_energyOfCandidateCluster > 0.f &&
             parameters.m_weightedLayerSeparation < m_weightedLayerSeparationPhotonNeutralThresholdLow1 &&
             (parameters.m_energyOfMainPeak) / (parameters.m_energyOfCandidateCluster + parameters.m_energyOfMainCluster) > m_minRatioTotalShowerPeakEnergyToTotalEnergyThreshold &&
-            ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) || 
+            ( (parameters.m_energyOfCandidatePeak < std::numeric_limits<float>::min()) ||
             ( parameters.m_energyOfCandidatePeak / parameters.m_energyOfCandidateCluster < m_smallCandidateFractionThresholdLow &&
             parameters.m_energyOfMainPeak > parameters.m_energyOfMainCluster
             ) ) ) ;

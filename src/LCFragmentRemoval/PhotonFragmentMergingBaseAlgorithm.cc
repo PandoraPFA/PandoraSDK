@@ -67,14 +67,23 @@ PhotonFragmentMergingBaseAlgorithm::PhotonFragmentMergingBaseAlgorithm() :
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PhotonFragmentMergingBaseAlgorithm::Run()
+StatusCode PhotonFragmentMergingBaseAlgorithm::Initialize()
 {
     // ATTN Implicit assumption that individual physical layers in the ECAL will always correspond to individual pseudo layers
-    // Also ECAL BARRAL has same layer as ECAL ENDCAP and ecal is the first inner detector
-    if (m_transProfileEcalOnly && m_transProfileMaxLayer <= 0 )
-        m_transProfileMaxLayer = PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp() + 
+    // Also ECAL BARREL has same layer as ECAL ENDCAP and ecal is the first inner detector
+    if (m_transProfileEcalOnly && m_transProfileMaxLayer <= 0)
+    {
+        m_transProfileMaxLayer = PandoraContentApi::GetPlugins(*this)->GetPseudoLayerPlugin()->GetPseudoLayerAtIp() +
             PandoraContentApi::GetGeometry(*this)->GetSubDetector(ECAL_BARREL).GetNLayers();
-    
+    }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PhotonFragmentMergingBaseAlgorithm::Run()
+{
     const ClusterList *pClusterList = NULL;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetAffectedClusterList(pClusterList));
 
@@ -261,7 +270,7 @@ StatusCode PhotonFragmentMergingBaseAlgorithm::GetEvidenceForMerging(const Clust
     parameters.m_weightedLayerSeparation = clusterSeparation;
     parameters.m_energyOfMainCluster = pParentCluster->GetElectromagneticEnergy();
     parameters.m_energyOfCandidateCluster = pDaughterCluster->GetElectromagneticEnergy();
-    
+
     parameters.m_energyOfMainPeak = 0.f;
     if (showerPeakList.size() > 0)
     {
@@ -318,7 +327,7 @@ StatusCode PhotonFragmentMergingBaseAlgorithm::ReadSettings(const TiXmlHandle xm
 {
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TransProfileEcalOnly", m_transProfileEcalOnly));
-        
+
     PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
         "TransProfileMaxLayer", m_transProfileMaxLayer));
 
