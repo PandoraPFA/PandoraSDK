@@ -19,6 +19,9 @@ set(${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_
 # Dependencies
 include(PandoraCMakeSettings)
 
+# Prefer local include directory to any paths to installed header files
+include_directories(include)
+
 #-------------------------------------------------------------------------------------------------------------------------------------------
 # Low level settings - compiler etc
 if(NOT CMAKE_CXX_FLAGS)
@@ -47,9 +50,6 @@ endif()
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
 # Build products
-
-#- include directories
-include_directories(include)
 
 # - Collect sources - not ideal because you have to keep running CMake to pick up changes
 file(GLOB_RECURSE PANDORA_SDK_SRCS RELATIVE ${PROJECT_SOURCE_DIR} "src/*.cc")
