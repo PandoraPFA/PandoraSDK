@@ -215,7 +215,7 @@ inline std::string StatusCodeToString(const StatusCode statusCode)
     switch (statusCode)
     {
         STATUS_CODE_TABLE(GET_STATUS_CODE_NAME_SWITCH)
-        default : throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+        default : return "UNKNOWN";
     }
 }
 
