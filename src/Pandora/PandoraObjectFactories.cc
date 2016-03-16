@@ -79,6 +79,7 @@ template class PandoraObjectFactory<PandoraContentApi::Cluster::Parameters, Clus
 template class PandoraObjectFactory<PandoraContentApi::ParticleFlowObject::Parameters, ParticleFlowObject>;
 template class PandoraObjectFactory<PandoraContentApi::Vertex::Parameters, Vertex>;
 template class PandoraObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector>;
+template class PandoraObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap>;
 template class PandoraObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap>;
 template class PandoraObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap>;
 

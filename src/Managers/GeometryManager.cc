@@ -98,14 +98,14 @@ StatusCode GeometryManager::CreateSubDetector(const PandoraApi::Geometry::SubDet
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode GeometryManager::CreateBoxGap(const PandoraApi::Geometry::BoxGap::Parameters &gapParameters,
-    const ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> &factory)
+template <typename PARAMETERS, typename OBJECT>
+StatusCode GeometryManager::CreateGap(const PARAMETERS &parameters, const ObjectFactory<PARAMETERS, OBJECT> &factory)
 {
-    const BoxGap *pDetectorGap = NULL;
+    const OBJECT *pDetectorGap = NULL;
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(gapParameters, pDetectorGap));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pDetectorGap));
 
         if (NULL == pDetectorGap)
             return STATUS_CODE_FAILURE;
@@ -115,33 +115,7 @@ StatusCode GeometryManager::CreateBoxGap(const PandoraApi::Geometry::BoxGap::Par
     }
     catch (StatusCodeException &statusCodeException)
     {
-        std::cout << "Failed to create box gap: " << statusCodeException.ToString() << std::endl;
-        delete pDetectorGap;
-        pDetectorGap = NULL;
-        return statusCodeException.GetStatusCode();
-    }
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode GeometryManager::CreateConcentricGap(const PandoraApi::Geometry::ConcentricGap::Parameters &gapParameters,
-    const ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> &factory)
-{
-    const ConcentricGap *pDetectorGap = NULL;
-
-    try
-    {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(gapParameters, pDetectorGap));
-
-        if (NULL == pDetectorGap)
-            return STATUS_CODE_FAILURE;
-
-        m_detectorGapList.insert(pDetectorGap);
-        return STATUS_CODE_SUCCESS;
-    }
-    catch (StatusCodeException &statusCodeException)
-    {
-        std::cout << "Failed to create concentric gap: " << statusCodeException.ToString() << std::endl;
+        std::cout << "Failed to create gap: " << statusCodeException.ToString() << std::endl;
         delete pDetectorGap;
         pDetectorGap = NULL;
         return statusCodeException.GetStatusCode();
@@ -204,5 +178,12 @@ StatusCode GeometryManager::SetHitTypeGranularity(const HitType hitType, const G
 
     return STATUS_CODE_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template StatusCode GeometryManager::CreateGap(const PandoraApi::Geometry::LineGap::Parameters &, const ObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap> &);
+template StatusCode GeometryManager::CreateGap(const PandoraApi::Geometry::BoxGap::Parameters &, const ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> &);
+template StatusCode GeometryManager::CreateGap(const PandoraApi::Geometry::ConcentricGap::Parameters &, const ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> &);
 
 } // namespace pandora

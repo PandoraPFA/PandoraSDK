@@ -140,13 +140,25 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
 
+    const LineGap *pLineGap = NULL;
+    pLineGap = dynamic_cast<const LineGap *>(pDetectorGap);
+
     const BoxGap *pBoxGap = NULL;
     pBoxGap = dynamic_cast<const BoxGap *>(pDetectorGap);
 
     const ConcentricGap *pConcentricGap = NULL;
     pConcentricGap = dynamic_cast<const ConcentricGap *>(pDetectorGap);
 
-    if (NULL != pBoxGap)
+    if (NULL != pLineGap)
+    {
+        m_pCurrentXmlElement = new TiXmlElement("LineGap");
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Write(pLineGap, *this));
+
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("HitType", pLineGap->GetHitType()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LineStartZ", pLineGap->GetLineStartZ()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LineEndZ", pLineGap->GetLineEndZ()));
+    }
+    else if (NULL != pBoxGap)
     {
         m_pCurrentXmlElement = new TiXmlElement("BoxGap");
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBoxGapFactory->Write(pBoxGap, *this));

@@ -156,6 +156,8 @@ StatusCode BinaryFileReader::ReadNextGeometryComponent()
     {
     case SUB_DETECTOR:
         return this->ReadSubDetector(false);
+    case LINE_GAP:
+        return this->ReadLineGap(false);
     case BOX_GAP:
         return this->ReadBoxGap(false);
     case CONCENTRIC_GAP:
@@ -278,6 +280,50 @@ StatusCode BinaryFileReader::ReadSubDetector(bool checkComponentId)
         }
 
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::SubDetector::Create(*m_pPandora, *pParameters, *m_pSubDetectorFactory));
+        delete pParameters;
+    }
+    catch (StatusCodeException &statusCodeException)
+    {
+        delete pParameters;
+        return statusCodeException.GetStatusCode();
+    }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode BinaryFileReader::ReadLineGap(bool checkComponentId)
+{
+    if (GEOMETRY != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    if (checkComponentId)
+    {
+        ComponentId componentId(UNKNOWN_COMPONENT);
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
+
+        if (LINE_GAP != componentId)
+            return STATUS_CODE_FAILURE;
+    }
+
+    PandoraApi::Geometry::LineGap::Parameters *pParameters = m_pLineGapFactory->NewParameters();
+
+    try
+    {
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Read(*pParameters, *this));
+
+        HitType hitType(ECAL);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(hitType));
+        float lineStartZ(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineStartZ));
+        float lineEndZ(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineEndZ));
+
+        pParameters->m_hitType = hitType;
+        pParameters->m_lineStartZ = lineStartZ;
+        pParameters->m_lineEndZ = lineEndZ;
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*m_pPandora, *pParameters, *m_pLineGapFactory));
         delete pParameters;
     }
     catch (StatusCodeException &statusCodeException)

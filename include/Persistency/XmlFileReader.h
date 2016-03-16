@@ -62,6 +62,11 @@ private:
     StatusCode ReadSubDetector();
 
     /**
+     *  @brief  Read a line gap from the current position in the file
+     */
+    StatusCode ReadLineGap();
+
+    /**
      *  @brief  Read a box gap from the current position in the file
      */
     StatusCode ReadBoxGap();

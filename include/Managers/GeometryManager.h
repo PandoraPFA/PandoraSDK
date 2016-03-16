@@ -86,22 +86,13 @@ private:
         const ObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector> &factory);
 
     /**
-     *  @brief  Create box gap
+     *  @brief  Create gap
      * 
-     *  @param  gapParameters the gap parameters
+     *  @param  parameters the gap parameters
      *  @param  factory the factory that performs the object allocation
      */
-    StatusCode CreateBoxGap(const PandoraApi::Geometry::BoxGap::Parameters &gapParameters,
-        const ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> &factory);
-
-    /**
-     *  @brief  Create concentric gap
-     * 
-     *  @param  gapParameters the gap parameters
-     *  @param  factory the factory that performs the object allocation
-     */
-    StatusCode CreateConcentricGap(const PandoraApi::Geometry::ConcentricGap::Parameters &gapParameters,
-        const ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> &factory);
+    template <typename PARAMETERS, typename OBJECT>
+    StatusCode CreateGap(const PARAMETERS &parameters, const ObjectFactory<PARAMETERS, OBJECT> &factory);
 
     /**
      *  @brief  Erase all geometry manager content

@@ -163,7 +163,11 @@ StatusCode XmlFileReader::ReadNextGeometryComponent()
     {
         return this->ReadSubDetector();
     }
-    if (std::string("BoxGap") == componentName)
+    if (std::string("LineGap") == componentName)
+    {
+        return this->ReadLineGap();
+    }
+    else if (std::string("BoxGap") == componentName)
     {
         return this->ReadBoxGap();
     }
@@ -294,6 +298,42 @@ StatusCode XmlFileReader::ReadSubDetector()
         }
 
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::SubDetector::Create(*m_pPandora, *pParameters, *m_pSubDetectorFactory));
+        delete pParameters;
+    }
+    catch (StatusCodeException &statusCodeException)
+    {
+        delete pParameters;
+        return statusCodeException.GetStatusCode();
+    }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode XmlFileReader::ReadLineGap()
+{
+    if (GEOMETRY != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    PandoraApi::Geometry::LineGap::Parameters *pParameters = m_pLineGapFactory->NewParameters();
+
+    try
+    {
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Read(*pParameters, *this));
+
+        unsigned int hitTypeInput(0);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("HitType", hitTypeInput));
+        const HitType hitType(static_cast<HitType>(hitTypeInput));
+        float lineStartZ(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("LineStartZ", lineStartZ));
+        float lineEndZ(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("LineEndZ", lineEndZ));
+
+        pParameters->m_hitType = hitType;
+        pParameters->m_lineStartZ = lineStartZ;
+        pParameters->m_lineEndZ = lineEndZ;
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*m_pPandora, *pParameters, *m_pLineGapFactory));
         delete pParameters;
     }
     catch (StatusCodeException &statusCodeException)
