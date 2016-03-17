@@ -39,8 +39,6 @@ public:
      *  @return boolean
      */
     virtual bool IsInGap(const CartesianVector &positionVector, const HitType hitType, const float gapTolerance = 0.f) const = 0;
-
-    friend class GeometryManager;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -86,7 +84,6 @@ protected:
     const float             m_lineStartZ;           ///< The line z start coordinate, units mm
     const float             m_lineEndZ;             ///< The line z end coordinate, units mm
 
-    friend class GeometryManager;
     friend class PandoraObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap>;
 };
 
@@ -141,7 +138,6 @@ protected:
     const CartesianVector   m_side2;                ///< Cartesian vector describing second side meeting vertex, units mm
     const CartesianVector   m_side3;                ///< Cartesian vector describing third side meeting vertex, units mm
 
-    friend class GeometryManager;
     friend class PandoraObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap>;
 };
 
@@ -254,7 +250,6 @@ protected:
     VertexPointList         m_innerVertexPointList; ///< The vertex points of the inner polygon
     VertexPointList         m_outerVertexPointList; ///< The vertex points of the outer polygon
 
-    friend class GeometryManager;
     friend class PandoraObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap>;
 };
 
