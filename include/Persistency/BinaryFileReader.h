@@ -62,6 +62,13 @@ private:
     StatusCode ReadSubDetector(bool checkComponentId = true);
 
     /**
+     *  @brief  Read a line gap from the current position in the file
+     * 
+     *  @param  checkComponentId whether to check the component id before deserializing
+     */
+    StatusCode ReadLineGap(bool checkComponentId = true);
+
+    /**
      *  @brief  Read a box gap from the current position in the file
      * 
      *  @param  checkComponentId whether to check the component id before deserializing

@@ -161,5 +161,6 @@ template class PandoraApi::ObjectCreationHelper<PandoraApi::CaloHit::Parameters,
 template class PandoraApi::ObjectCreationHelper<PandoraApi::Track::Parameters, PandoraApi::Track::Object>;
 template class PandoraApi::ObjectCreationHelper<PandoraApi::MCParticle::Parameters, PandoraApi::MCParticle::Object>;
 template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::SubDetector::Parameters, PandoraApi::Geometry::SubDetector::Object>;
+template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::LineGap::Parameters, PandoraApi::Geometry::LineGap::Object>;
 template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::BoxGap::Parameters, PandoraApi::Geometry::BoxGap::Object>;
 template class PandoraApi::ObjectCreationHelper<PandoraApi::Geometry::ConcentricGap::Parameters, PandoraApi::Geometry::ConcentricGap::Object>;

@@ -55,48 +55,22 @@ public:
     FileType GetFileType() const;
 
     /**
-     *  @brief  Set the calo hit factory to use for all instantiations and parameter persistence
+     *  @brief  Set the factory to use for all instantiations and parameter persistence
      * 
-     *  @param  pFactory address of the calo hit factory
+     *  @param  pFactory address of the factory
      */
-    StatusCode SetCaloHitFactory(ObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit> *const pFactory);
-
-    /**
-     *  @brief  Set the track factory to use for all instantiations and parameter persistence
-     * 
-     *  @param  pFactory address of the track factory
-     */
-    StatusCode SetTrackFactory(ObjectFactory<PandoraApi::Track::Parameters, Track> *const pFactory);
-
-    /**
-     *  @brief  Set the mc particle factory to use for all instantiations and parameter persistence
-     * 
-     *  @param  pFactory address of the mc particle factory
-     */
-    StatusCode SetMCParticleFactory(ObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle> *const pFactory);
-
-    /**
-     *  @brief  Set the sub detector factory to use for all instantiations and parameter persistence
-     * 
-     *  @param  pFactory address of the sub detector factory
-     */
-    StatusCode SetSubDetectorFactory(ObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector> *const pFactory);
-
-    /**
-     *  @brief  Set the box gap factory to use for all instantiations and parameter persistence
-     * 
-     *  @param  pFactory address of the box gap factory
-     */
-    StatusCode SetBoxGapFactory(ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> *const pFactory);
-
-    /**
-     *  @brief  Set the concentric gap factory to use for all instantiations and parameter persistence
-     * 
-     *  @param  pFactory address of the concentric gap factory
-     */
-    StatusCode SetConcentricGapFactory(ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> *const pFactory);
+    template <typename PARAMETERS, typename OBJECT>
+    StatusCode SetFactory(ObjectFactory<PARAMETERS, OBJECT> *const pFactory);
 
 protected:
+    /**
+     *  @brief  Replace the current factory with the provided instance
+     * 
+     *  @param  pFactory address of the factory
+     */
+    template <typename PARAMETERS, typename OBJECT>
+    void ReplaceCurrentFactory(ObjectFactory<PARAMETERS, OBJECT> *const pFactory);
+
     const Pandora *const        m_pPandora;             ///< Address of pandora instance to be used alongside the file writer
     std::string                 m_fileName;             ///< The file name
     FileType                    m_fileType;             ///< The file type
@@ -106,6 +80,7 @@ protected:
     ObjectFactory<PandoraApi::Track::Parameters, Track>                            *m_pTrackFactory;         ///< Address of the track factory
     ObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle>                  *m_pMCParticleFactory;    ///< Address of the mc particle factory
     ObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector>      *m_pSubDetectorFactory;   ///< Address of the sub detector factory
+    ObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap>              *m_pLineGapFactory;       ///< Address of the line gap factory
     ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap>                *m_pBoxGapFactory;        ///< Address of the box gap factory
     ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap>  *m_pConcentricGapFactory; ///< Address of the concentric gap factory
 };

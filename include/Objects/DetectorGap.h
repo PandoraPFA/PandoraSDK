@@ -33,24 +33,69 @@ public:
      *  @brief  Whether a specified position lies within the gap
      * 
      *  @param  positionVector the position vector
+     *  @param  hitType the hit type, providing context to aid interpretation of provided position vector
      *  @param  gapTolerance tolerance allowed when declaring a point to be "in" a gap region, units mm
      * 
      *  @return boolean
      */
-    virtual bool IsInGap(const CartesianVector &positionVector, const float gapTolerance = 0.f) const = 0;
-
-    friend class GeometryManager;
+    virtual bool IsInGap(const CartesianVector &positionVector, const HitType hitType, const float gapTolerance = 0.f) const = 0;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
- *  @brief  BoxGap class
+ *  @brief  LineGap class, associated only with 2D TPC hit types and applied only to the z coordinate when sampling position vectors
+ */
+class LineGap : public DetectorGap
+{
+public:
+    bool IsInGap(const CartesianVector &positionVector, const HitType hitType, const float gapTolerance) const;
+
+    /**
+     *  @brief  Get the hit type
+     * 
+     *  @param  the hit type
+     */
+    HitType GetHitType() const;
+
+    /**
+     *  @brief  Get the line start z coordinate
+     * 
+     *  @param  the line start z coordinate
+     */
+    float GetLineStartZ() const;
+
+    /**
+     *  @brief  Get the line end z coordinate
+     * 
+     *  @param  the line end z coordinate
+     */
+    float GetLineEndZ() const;
+
+protected:
+    /**
+     *  @brief  Constructor
+     * 
+     *  @param  parameters the gap parameters
+     */
+    LineGap(const PandoraApi::Geometry::LineGap::Parameters &parameters);
+
+    const HitType           m_hitType;              ///< The hit type associated with the line gap
+    const float             m_lineStartZ;           ///< The line z start coordinate, units mm
+    const float             m_lineEndZ;             ///< The line z end coordinate, units mm
+
+    friend class PandoraObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap>;
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ *  @brief  BoxGap class, associated with all 3D hit types
  */
 class BoxGap : public DetectorGap
 {
 public:
-    bool IsInGap(const CartesianVector &positionVector, const float gapTolerance) const;
+    bool IsInGap(const CartesianVector &positionVector, const HitType hitType, const float gapTolerance) const;
 
     /**
      *  @brief  Get the gap vertex
@@ -93,19 +138,18 @@ protected:
     const CartesianVector   m_side2;                ///< Cartesian vector describing second side meeting vertex, units mm
     const CartesianVector   m_side3;                ///< Cartesian vector describing third side meeting vertex, units mm
 
-    friend class GeometryManager;
     friend class PandoraObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
- *  @brief  ConcentricGap class
+ *  @brief  ConcentricGap class, associated with all 3D hit types
  */
 class ConcentricGap : public DetectorGap
 {
 public:
-    bool IsInGap(const CartesianVector &positionVector, const float gapTolerance) const;
+    bool IsInGap(const CartesianVector &positionVector, const HitType hitType, const float gapTolerance) const;
 
     /**
      *  @brief  Get the min cylindrical polar z coordinate, origin interaction point
@@ -206,7 +250,6 @@ protected:
     VertexPointList         m_innerVertexPointList; ///< The vertex points of the inner polygon
     VertexPointList         m_outerVertexPointList; ///< The vertex points of the outer polygon
 
-    friend class GeometryManager;
     friend class PandoraObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap>;
 };
 
@@ -215,6 +258,28 @@ protected:
 
 inline DetectorGap::~DetectorGap()
 {
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline HitType LineGap::GetHitType() const
+{
+    return m_hitType;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LineGap::GetLineStartZ() const
+{
+    return m_lineStartZ;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LineGap::GetLineEndZ() const
+{
+    return m_lineEndZ;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -11,6 +11,36 @@
 namespace pandora
 {
 
+LineGap::LineGap(const PandoraApi::Geometry::LineGap::Parameters &parameters) :
+    m_hitType(parameters.m_hitType.Get()),
+    m_lineStartZ(parameters.m_lineStartZ.Get()),
+    m_lineEndZ(parameters.m_lineEndZ.Get())
+{
+    if ((m_lineEndZ < m_lineStartZ) || !((TPC_VIEW_U == m_hitType) || (TPC_VIEW_V == m_hitType) || (TPC_VIEW_W == m_hitType)))
+        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool LineGap::IsInGap(const CartesianVector &positionVector, const HitType hitType, const float gapTolerance) const
+{
+    if (!((TPC_VIEW_U == hitType) || (TPC_VIEW_V == hitType) || (TPC_VIEW_W == hitType)))
+        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+
+    if (m_hitType != hitType)
+        return false;
+
+    const float positionZ(positionVector.GetZ());
+
+    if ((positionZ < m_lineStartZ - gapTolerance) || (positionZ > m_lineEndZ + gapTolerance))
+        return false;
+
+    return true;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 BoxGap::BoxGap(const PandoraApi::Geometry::BoxGap::Parameters &parameters) :
     m_vertex(parameters.m_vertex.Get()),
     m_side1(parameters.m_side1.Get()),
@@ -21,8 +51,11 @@ BoxGap::BoxGap(const PandoraApi::Geometry::BoxGap::Parameters &parameters) :
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool BoxGap::IsInGap(const CartesianVector &positionVector, const float gapTolerance) const
+bool BoxGap::IsInGap(const CartesianVector &positionVector, const HitType hitType, const float gapTolerance) const
 {
+    if ((TPC_VIEW_U == hitType) || (TPC_VIEW_V == hitType) || (TPC_VIEW_W == hitType))
+        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+
     const CartesianVector relativePosition(positionVector - m_vertex);
 
     const float projection1(relativePosition.GetDotProduct(m_side1.GetUnitVector()));
@@ -66,8 +99,11 @@ ConcentricGap::ConcentricGap(const PandoraApi::Geometry::ConcentricGap::Paramete
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool ConcentricGap::IsInGap(const CartesianVector &positionVector, const float gapTolerance) const
+bool ConcentricGap::IsInGap(const CartesianVector &positionVector, const HitType hitType, const float gapTolerance) const
 {
+    if ((TPC_VIEW_U == hitType) || (TPC_VIEW_V == hitType) || (TPC_VIEW_W == hitType))
+        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+
     const float z(positionVector.GetZ());
 
     if ((z < m_minZCoordinate - gapTolerance) || (z > m_maxZCoordinate + gapTolerance))

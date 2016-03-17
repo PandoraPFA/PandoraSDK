@@ -40,6 +40,7 @@ enum ComponentId
     SUB_DETECTOR,
     BOX_GAP,
     CONCENTRIC_GAP,
+    LINE_GAP,
     GEOMETRY_END,
     UNKNOWN_COMPONENT
 };

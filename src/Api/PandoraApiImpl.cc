@@ -58,18 +58,10 @@ StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::SubDetector::Param
     return m_pPandora->m_pGeometryManager->CreateSubDetector(parameters, factory);
 }
 
-template <>
-StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::BoxGap::Parameters &parameters,
-    const ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> &factory) const
+template <typename PARAMETERS, typename OBJECT>
+StatusCode PandoraApiImpl::Create(const PARAMETERS &parameters, const ObjectFactory<PARAMETERS, OBJECT> &factory) const
 {
-    return m_pPandora->m_pGeometryManager->CreateBoxGap(parameters, factory);
-}
-
-template <>
-StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::ConcentricGap::Parameters &parameters,
-    const ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> &factory) const
-{
-    return m_pPandora->m_pGeometryManager->CreateConcentricGap(parameters, factory);
+    return m_pPandora->m_pGeometryManager->CreateGap(parameters, factory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -207,5 +199,12 @@ PandoraApiImpl::PandoraApiImpl(Pandora *const pPandora) :
     m_pPandora(pPandora)
 {
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::LineGap::Parameters &, const ObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap> &) const;
+template StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::BoxGap::Parameters &, const ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> &) const;
+template StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::ConcentricGap::Parameters &, const ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> &) const;
 
 } // namespace pandora

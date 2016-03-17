@@ -154,6 +154,17 @@ public:
         };
 
         /**
+         *  @brief  LineGapParameters class
+         */
+        class LineGapParameters : public pandora::ObjectParameters
+        {
+        public:
+            pandora::InputHitType           m_hitType;                  ///< The hit type associated with the line gap
+            pandora::InputFloat             m_lineStartZ;               ///< The line start z coordinate, units mm
+            pandora::InputFloat             m_lineEndZ;                 ///< The line end z coordinate, units mm
+        };
+
+        /**
          *  @brief  BoxGapParameters class
          */
         class BoxGapParameters : public pandora::ObjectParameters
@@ -182,6 +193,7 @@ public:
         };
 
         typedef ObjectCreationHelper<SubDetectorParameters, pandora::SubDetector> SubDetector;
+        typedef ObjectCreationHelper<LineGapParameters, pandora::LineGap> LineGap;
         typedef ObjectCreationHelper<BoxGapParameters, pandora::BoxGap> BoxGap;
         typedef ObjectCreationHelper<ConcentricGapParameters, pandora::ConcentricGap> ConcentricGap;
     };

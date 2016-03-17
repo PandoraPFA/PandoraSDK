@@ -146,13 +146,25 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
 
+    const LineGap *pLineGap = NULL;
+    pLineGap = dynamic_cast<const LineGap *>(pDetectorGap);
+
     const BoxGap *pBoxGap = NULL;
     pBoxGap = dynamic_cast<const BoxGap *>(pDetectorGap);
 
     const ConcentricGap *pConcentricGap = NULL;
     pConcentricGap = dynamic_cast<const ConcentricGap *>(pDetectorGap);
 
-    if (NULL != pBoxGap)
+    if (NULL != pLineGap)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(LINE_GAP));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Write(pLineGap, *this));
+
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetHitType()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineStartZ()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineEndZ()));
+    }
+    else if (NULL != pBoxGap)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(BOX_GAP));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBoxGapFactory->Write(pBoxGap, *this));
