@@ -38,9 +38,9 @@ enum ComponentId
     RELATIONSHIP,
     EVENT_END,
     SUB_DETECTOR,
+    LINE_GAP,
     BOX_GAP,
     CONCENTRIC_GAP,
-    LINE_GAP,
     GEOMETRY_END,
     UNKNOWN_COMPONENT
 };
