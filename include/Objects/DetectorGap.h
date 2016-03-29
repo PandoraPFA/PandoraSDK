@@ -72,7 +72,7 @@ public:
      */
     float GetLineEndZ() const;
 
-protected:
+private:
     /**
      *  @brief  Constructor
      * 
@@ -125,7 +125,7 @@ public:
      */
     const CartesianVector &GetSide3() const;
 
-protected:
+private:
     /**
      *  @brief  Constructor
      * 
@@ -207,7 +207,7 @@ public:
      */
     unsigned int GetOuterSymmetryOrder() const;
 
-protected:
+private:
     /**
      *  @brief  Constructor
      * 
