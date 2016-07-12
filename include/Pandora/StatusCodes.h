@@ -170,7 +170,7 @@ inline StatusCodeException::StatusCodeException(const StatusCode statusCode) :
 
     m_backTrace = "\nBackTrace\n    ";
 
-    for (size_t i = 1; i < stackDepth; ++i)
+    for (size_t i = 0; i < stackDepth; ++i)
     {
         m_backTrace += stackStrings[i];
         m_backTrace += "\n    ";
