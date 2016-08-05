@@ -51,7 +51,7 @@ clean:
 
 install:
 ifdef INCLUDE_TARGET
-	rsync -r --exclude=.svn $(PROJECT_INCLUDE_DIR) ${INCLUDE_TARGET}
+	rsync -r --include '*/' --include '*.h' --exclude '*' --prune-empty-dirs $(PROJECT_DIR)/ ${INCLUDE_TARGET}
 endif
 ifdef LIB_TARGET
 	cp $(PROJECT_LIBRARY) ${LIB_TARGET}
