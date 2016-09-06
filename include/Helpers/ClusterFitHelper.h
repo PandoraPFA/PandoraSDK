@@ -74,6 +74,15 @@ public:
      */
     unsigned int GetPseudoLayer() const;
 
+    /**
+     *  @brief  operator< to define an ordering for cluster fit points
+     * 
+     *  @param  rhs the cluster fit point for comparison
+     * 
+     *  @return boolean
+     */
+    bool operator<(const ClusterFitPoint &rhs) const;
+
 private:
     CartesianVector         m_position;              ///< The position vector of the fit point
     CartesianVector         m_cellNormalVector;      ///< The unit normal vector to the cell in which the point was recorded
@@ -259,19 +268,27 @@ public:
      *  @param  clusterFitPointList list of cluster fit points
      *  @param  clusterFitResult to receive the cluster fit result
      */
-    static StatusCode FitPoints(const ClusterFitPointList &clusterFitPointList, ClusterFitResult &clusterFitResult);
+    static StatusCode FitPoints(ClusterFitPointList &clusterFitPointList, ClusterFitResult &clusterFitResult);
+
+    /**
+     *  @brief  Sort calo hits using the prescription applied to cluster fit points
+     *
+     *  @param  pLhs address of first calo hit
+     *  @param  pRhs address of second calo hit
+     */
+    static bool SortCaloHits(const CaloHit *const pLhs, const CaloHit *const pRhs);
 
 private:
     /**
      *  @brief  Perform linear fit to cluster fit points
      * 
-     *  @param  clusterFitPointList list of cluster fit points
      *  @param  centralPosition central position of the cluster fit points
      *  @param  centralDirection central direction of normal to cluster fit calorimeter cells
+     *  @param  clusterFitPointList list of cluster fit points
      *  @param  clusterFitResult to receive the cluster fit result
      */
-    static StatusCode PerformLinearFit(const ClusterFitPointList &clusterFitPointList, const CartesianVector &centralPosition,
-        const CartesianVector &centralDirection, ClusterFitResult &clusterFitResult);
+    static StatusCode PerformLinearFit(const CartesianVector &centralPosition, const CartesianVector &centralDirection,
+        ClusterFitPointList &clusterFitPointList, ClusterFitResult &clusterFitResult);
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
