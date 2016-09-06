@@ -10,6 +10,7 @@
 
 #include "Objects/Cluster.h"
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 
@@ -172,10 +173,18 @@ StatusCode ClusterFitHelper::FitLayerCentroids(const Cluster *const pCluster, co
             if (endLayer < pseudoLayer)
                 break;
 
+            CaloHitVector caloHitVector(iter->second->begin(), iter->second->end());
+            std::sort(caloHitVector.begin(), caloHitVector.end(), ClusterFitHelper::SortCaloHits);
+
+            const unsigned int nCaloHits(caloHitVector.size());
+
+            if (0 == nCaloHits)
+                throw StatusCodeException(STATUS_CODE_FAILURE);
+
             float cellLengthScaleSum(0.f), cellEnergySum(0.f);
             CartesianVector cellNormalVectorSum(0.f, 0.f, 0.f);
 
-            for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
+            for (CaloHitVector::const_iterator hitIter = caloHitVector.begin(), hitIterEnd = caloHitVector.end(); hitIter != hitIterEnd; ++hitIter)
             {
                 cellLengthScaleSum += (*hitIter)->GetCellLengthScale();
                 cellNormalVectorSum += (*hitIter)->GetCellNormalVector();
@@ -183,8 +192,7 @@ StatusCode ClusterFitHelper::FitLayerCentroids(const Cluster *const pCluster, co
             }
 
             clusterFitPointList.push_back(ClusterFitPoint(pCluster->GetCentroid(pseudoLayer), cellNormalVectorSum.GetUnitVector(),
-                cellLengthScaleSum / static_cast<float>(iter->second->size()), cellEnergySum / static_cast<float>(iter->second->size()),
-                pseudoLayer));
+                cellLengthScaleSum / static_cast<float>(nCaloHits), cellEnergySum / static_cast<float>(nCaloHits), pseudoLayer));
         }
 
         return FitPoints(clusterFitPointList, clusterFitResult);
@@ -199,8 +207,10 @@ StatusCode ClusterFitHelper::FitLayerCentroids(const Cluster *const pCluster, co
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ClusterFitHelper::FitPoints(const ClusterFitPointList &clusterFitPointList, ClusterFitResult &clusterFitResult)
+StatusCode ClusterFitHelper::FitPoints(ClusterFitPointList &clusterFitPointList, ClusterFitResult &clusterFitResult)
 {
+    std::sort(clusterFitPointList.begin(), clusterFitPointList.end());
+
     try
     {
         const unsigned int nFitPoints(clusterFitPointList.size());
@@ -218,8 +228,7 @@ StatusCode ClusterFitHelper::FitPoints(const ClusterFitPointList &clusterFitPoin
             normalVectorSum += iter->GetCellNormalVector();
         }
 
-        return PerformLinearFit(clusterFitPointList, positionSum * (1.f / static_cast<float>(nFitPoints)), normalVectorSum.GetUnitVector(),
-            clusterFitResult);
+        return PerformLinearFit(positionSum * (1.f / static_cast<float>(nFitPoints)), normalVectorSum.GetUnitVector(), clusterFitPointList, clusterFitResult);
     }
     catch (StatusCodeException &statusCodeException)
     {
@@ -231,9 +240,11 @@ StatusCode ClusterFitHelper::FitPoints(const ClusterFitPointList &clusterFitPoin
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ClusterFitHelper::PerformLinearFit(const ClusterFitPointList &clusterFitPointList, const CartesianVector &centralPosition,
-    const CartesianVector &centralDirection, ClusterFitResult &clusterFitResult)
+StatusCode ClusterFitHelper::PerformLinearFit(const CartesianVector &centralPosition, const CartesianVector &centralDirection,
+    ClusterFitPointList &clusterFitPointList, ClusterFitResult &clusterFitResult)
 {
+    std::sort(clusterFitPointList.begin(), clusterFitPointList.end());
+
     // Extract the data
     double sumP(0.), sumQ(0.), sumR(0.), sumWeights(0.);
     double sumPR(0.), sumQR(0.), sumRR(0.);
@@ -361,6 +372,13 @@ StatusCode ClusterFitHelper::PerformLinearFit(const ClusterFitPointList &cluster
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
+
+bool ClusterFitHelper::SortCaloHits(const CaloHit *const pLhs, const CaloHit *const pRhs)
+{
+    return (ClusterFitPoint(pLhs) < ClusterFitPoint(pRhs));
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 ClusterFitPoint::ClusterFitPoint(const CaloHit *const pCaloHit) :
@@ -386,6 +404,24 @@ ClusterFitPoint::ClusterFitPoint(const CartesianVector &position, const Cartesia
 {
     if (m_cellSize < std::numeric_limits<float>::epsilon())
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool ClusterFitPoint::operator<(const ClusterFitPoint &rhs) const
+{
+    const CartesianVector deltaPosition(rhs.GetPosition() - this->GetPosition());
+
+    if (std::fabs(deltaPosition.GetZ()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetZ() > std::numeric_limits<float>::epsilon());
+
+    if (std::fabs(deltaPosition.GetX()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetX() > std::numeric_limits<float>::epsilon());
+
+    if (std::fabs(deltaPosition.GetY()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetY() > std::numeric_limits<float>::epsilon());
+
+    return (this->GetEnergy() > rhs.GetEnergy());
 }
 
 } // namespace pandora
