@@ -8,6 +8,8 @@
 
 #include "Objects/MCParticle.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -36,9 +38,10 @@ MCParticle::~MCParticle()
 
 StatusCode MCParticle::AddDaughter(const MCParticle *const pMCParticle)
 {
-    if (!m_daughterList.insert(pMCParticle).second)
+    if (m_daughterList.end() != std::find(m_daughterList.begin(), m_daughterList.end(), pMCParticle))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_daughterList.push_back(pMCParticle);
     return STATUS_CODE_SUCCESS;
 }
 
@@ -46,9 +49,10 @@ StatusCode MCParticle::AddDaughter(const MCParticle *const pMCParticle)
 
 StatusCode MCParticle::AddParent(const MCParticle *const pMCParticle)
 {
-    if (!m_parentList.insert(pMCParticle).second)
+    if (m_parentList.end() != std::find(m_parentList.begin(), m_parentList.end(), pMCParticle))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_parentList.push_back(pMCParticle);
     return STATUS_CODE_SUCCESS;
 }
 
@@ -56,13 +60,12 @@ StatusCode MCParticle::AddParent(const MCParticle *const pMCParticle)
 
 StatusCode MCParticle::RemoveDaughter(const MCParticle *const pMCParticle)
 {
-    MCParticleList::iterator iter = m_daughterList.find(pMCParticle);
+    MCParticleList::iterator iter = std::find(m_daughterList.begin(), m_daughterList.end(), pMCParticle);
 
     if (m_daughterList.end() == iter)
         return STATUS_CODE_NOT_FOUND;
 
     m_daughterList.erase(iter);
-
     return STATUS_CODE_SUCCESS;
 }
 
@@ -70,13 +73,12 @@ StatusCode MCParticle::RemoveDaughter(const MCParticle *const pMCParticle)
 
 StatusCode MCParticle::RemoveParent(const MCParticle *const pMCParticle)
 {
-    MCParticleList::iterator iter = m_parentList.find(pMCParticle);
+    MCParticleList::iterator iter = std::find(m_parentList.begin(), m_parentList.end(), pMCParticle);
 
     if (m_parentList.end() == iter)
         return STATUS_CODE_NOT_FOUND;
 
     m_parentList.erase(iter);
-
     return STATUS_CODE_SUCCESS;
 }
 
@@ -88,7 +90,6 @@ StatusCode MCParticle::SetPfoTarget(const MCParticle *const pMCParticle)
         return STATUS_CODE_FAILURE;
 
     m_pPfoTarget = pMCParticle;
-
     return STATUS_CODE_SUCCESS;
 }
 
@@ -97,7 +98,6 @@ StatusCode MCParticle::SetPfoTarget(const MCParticle *const pMCParticle)
 StatusCode MCParticle::RemovePfoTarget()
 {
     m_pPfoTarget = NULL;
-
     return STATUS_CODE_SUCCESS;
 }
 

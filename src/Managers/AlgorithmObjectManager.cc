@@ -12,6 +12,8 @@
 #include "Objects/ParticleFlowObject.h"
 #include "Objects/Vertex.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -115,8 +117,10 @@ StatusCode AlgorithmObjectManager<T>::MoveObjectsBetweenLists(const std::string 
         for (typename ObjectList::iterator iter = sourceListIter->second->begin(), iterEnd = sourceListIter->second->end();
             iter != iterEnd; ++iter)
         {
-            if (!targetListIter->second->insert(*iter).second)
+            if (targetListIter->second->end() != std::find(targetListIter->second->begin(), targetListIter->second->end(), *iter))
                 return STATUS_CODE_ALREADY_PRESENT;
+
+            targetListIter->second->push_back(*iter);
         }
 
         sourceListIter->second->clear();
@@ -128,14 +132,15 @@ StatusCode AlgorithmObjectManager<T>::MoveObjectsBetweenLists(const std::string 
 
         for (typename ObjectList::const_iterator iter = pObjectSubset->begin(), iterEnd = pObjectSubset->end(); iter != iterEnd; ++iter)
         {
-            typename ObjectList::iterator objectIter = sourceListIter->second->find(*iter);
+            typename ObjectList::iterator objectIter = std::find(sourceListIter->second->begin(), sourceListIter->second->end(), *iter);
 
             if (sourceListIter->second->end() == objectIter)
                 return STATUS_CODE_NOT_FOUND;
 
-            if (!targetListIter->second->insert(*objectIter).second)
+            if (targetListIter->second->end() != std::find(targetListIter->second->begin(), targetListIter->second->end(), *objectIter))
                 return STATUS_CODE_ALREADY_PRESENT;
 
+            targetListIter->second->push_back(*objectIter);
             sourceListIter->second->erase(objectIter);
         }
     }
@@ -167,7 +172,7 @@ StatusCode AlgorithmObjectManager<T>::DeleteObject(const T *const pT, const std:
     if (Manager<T>::m_nameToListMap.end() == listIter)
         return STATUS_CODE_NOT_FOUND;
 
-    typename ObjectList::iterator deletionIter = listIter->second->find(pT);
+    typename ObjectList::iterator deletionIter = std::find(listIter->second->begin(), listIter->second->end(), pT);
 
     if (listIter->second->end() == deletionIter)
         return STATUS_CODE_NOT_FOUND;
@@ -193,7 +198,7 @@ StatusCode AlgorithmObjectManager<T>::DeleteObjects(const ObjectList &objectList
 
     for (typename ObjectList::const_iterator objectIter = objectList.begin(), objectIterEnd = objectList.end(); objectIter != objectIterEnd; ++objectIter)
     {
-        typename ObjectList::iterator deletionIter = listIter->second->find(*objectIter);
+        typename ObjectList::iterator deletionIter = std::find(listIter->second->begin(), listIter->second->end(), *objectIter);
 
         if (listIter->second->end() == deletionIter)
             return STATUS_CODE_NOT_FOUND;
@@ -251,7 +256,7 @@ StatusCode AlgorithmObjectManager<T>::GetResetDeletionObjects(const Algorithm *c
         if (Manager<T>::m_nameToListMap.end() == listIter)
             return STATUS_CODE_FAILURE;
 
-        objectList.insert(listIter->second->begin(), listIter->second->end());
+        objectList.insert(objectList.end(), listIter->second->begin(), listIter->second->end());
     }
 
     return STATUS_CODE_SUCCESS;

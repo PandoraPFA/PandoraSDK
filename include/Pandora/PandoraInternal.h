@@ -8,19 +8,14 @@
 #ifndef PANDORA_INTERNAL_H
 #define PANDORA_INTERNAL_H 1
 
+#include <algorithm>
 #include <iostream>
+#include <list>
 #include <map>
 #include <set>
 #include <sstream>
 #include <string>
 #include <vector>
-
-#if __cplusplus > 199711L
-    #include <unordered_set>
-    #define MANAGED_CONTAINER unordered_set
-#else
-    #define MANAGED_CONTAINER set
-#endif
 
 #include <stdint.h>
 
@@ -157,14 +152,14 @@ inline bool PointerLessThan<T>::operator()(const T *lhs, const T *rhs) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-typedef std::MANAGED_CONTAINER<const CaloHit *> CaloHitList;
-typedef std::MANAGED_CONTAINER<const Cluster *> ClusterList;
-typedef std::MANAGED_CONTAINER<const DetectorGap *> DetectorGapList;
-typedef std::MANAGED_CONTAINER<const MCParticle *> MCParticleList;
-typedef std::MANAGED_CONTAINER<const ParticleFlowObject *> ParticleFlowObjectList;
-typedef std::MANAGED_CONTAINER<const ParticleFlowObject *> PfoList;
-typedef std::MANAGED_CONTAINER<const Track *> TrackList;
-typedef std::MANAGED_CONTAINER<const Vertex *> VertexList;
+typedef std::list<const CaloHit *> CaloHitList;
+typedef std::list<const Cluster *> ClusterList;
+typedef std::list<const DetectorGap *> DetectorGapList;
+typedef std::list<const MCParticle *> MCParticleList;
+typedef std::list<const ParticleFlowObject *> ParticleFlowObjectList;
+typedef std::list<const ParticleFlowObject *> PfoList;
+typedef std::list<const Track *> TrackList;
+typedef std::list<const Vertex *> VertexList;
 
 typedef std::vector<const CaloHit *> CaloHitVector;
 typedef std::vector<const Cluster *> ClusterVector;

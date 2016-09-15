@@ -13,6 +13,8 @@
 
 #include "Pandora/ObjectFactory.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -110,7 +112,10 @@ StatusCode GeometryManager::CreateGap(const PARAMETERS &parameters, const Object
         if (NULL == pDetectorGap)
             return STATUS_CODE_FAILURE;
 
-        m_detectorGapList.insert(pDetectorGap);
+        if (m_detectorGapList.end() != std::find(m_detectorGapList.begin(), m_detectorGapList.end(), pDetectorGap))
+            throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
+
+        m_detectorGapList.push_back(pDetectorGap);
         return STATUS_CODE_SUCCESS;
     }
     catch (StatusCodeException &statusCodeException)

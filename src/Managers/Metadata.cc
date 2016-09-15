@@ -8,6 +8,8 @@
 
 #include "Managers/Metadata.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -126,8 +128,10 @@ StatusCode CaloHitMetadata::Update(const CaloHitReplacement &caloHitReplacement)
     for (CaloHitList::const_iterator iter = caloHitReplacement.m_newCaloHits.begin(), iterEnd = caloHitReplacement.m_newCaloHits.end();
         iter != iterEnd; ++iter)
     {
-        if (!m_pCaloHitList->insert(*iter).second)
+        if (m_pCaloHitList->end() != std::find(m_pCaloHitList->begin(), m_pCaloHitList->end(), *iter))
             return STATUS_CODE_ALREADY_PRESENT;
+
+        m_pCaloHitList->push_back(*iter);
 
         if (!m_caloHitUsageMap.insert(CaloHitUsageMap::value_type(*iter, true)).second)
             return STATUS_CODE_ALREADY_PRESENT;
@@ -136,7 +140,7 @@ StatusCode CaloHitMetadata::Update(const CaloHitReplacement &caloHitReplacement)
     for (CaloHitList::const_iterator iter = caloHitReplacement.m_oldCaloHits.begin(), iterEnd = caloHitReplacement.m_oldCaloHits.end();
         iter != iterEnd; ++iter)
     {
-        CaloHitList::iterator listIter = m_pCaloHitList->find(*iter);
+        CaloHitList::iterator listIter = std::find(m_pCaloHitList->begin(), m_pCaloHitList->end(), *iter);
 
         if (m_pCaloHitList->end() == listIter)
             return STATUS_CODE_FAILURE;

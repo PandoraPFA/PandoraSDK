@@ -8,6 +8,7 @@
 
 #include "Objects/Track.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 
@@ -98,7 +99,6 @@ StatusCode Track::SetAssociatedCluster(const Cluster *const pCluster)
         return STATUS_CODE_ALREADY_INITIALIZED;
 
     m_pAssociatedCluster = pCluster;
-
     return STATUS_CODE_SUCCESS;
 }
 
@@ -110,7 +110,6 @@ StatusCode Track::RemoveAssociatedCluster(const Cluster *const pCluster)
         return STATUS_CODE_NOT_FOUND;
 
     m_pAssociatedCluster = NULL;
-
     return STATUS_CODE_SUCCESS;
 }
 
@@ -121,9 +120,10 @@ StatusCode Track::AddParent(const Track *const pTrack)
     if (NULL == pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    if (!m_parentTrackList.insert(pTrack).second)
+    if (m_parentTrackList.end() != std::find(m_parentTrackList.begin(), m_parentTrackList.end(), pTrack))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_parentTrackList.push_back(pTrack);
     return STATUS_CODE_SUCCESS;
 }
 
@@ -134,9 +134,10 @@ StatusCode Track::AddDaughter(const Track *const pTrack)
     if (NULL == pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    if (!m_daughterTrackList.insert(pTrack).second)
+    if (m_daughterTrackList.end() != std::find(m_daughterTrackList.begin(), m_daughterTrackList.end(), pTrack))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_daughterTrackList.push_back(pTrack);
     return STATUS_CODE_SUCCESS;
 }
 
@@ -147,9 +148,10 @@ StatusCode Track::AddSibling(const Track *const pTrack)
     if (NULL == pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    if (!m_siblingTrackList.insert(pTrack).second)
+    if (m_siblingTrackList.end() != std::find(m_siblingTrackList.begin(), m_siblingTrackList.end(), pTrack))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_siblingTrackList.push_back(pTrack);
     return STATUS_CODE_SUCCESS;
 }
 

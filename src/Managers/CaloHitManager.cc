@@ -17,6 +17,7 @@
 
 #include "Plugins/PseudoLayerPlugin.h"
 
+#include <algorithm>
 #include <cmath>
 
 namespace pandora
@@ -56,9 +57,13 @@ StatusCode CaloHitManager::Create(const PandoraApi::CaloHit::Parameters &paramet
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
 
-        if ((m_nameToListMap.end() == inputIter) || !inputIter->second->insert(pCaloHit).second)
+        if (m_nameToListMap.end() == inputIter)
             throw StatusCodeException(STATUS_CODE_FAILURE);
 
+        if (inputIter->second->end() != std::find(inputIter->second->begin(), inputIter->second->end(), pCaloHit))
+            throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
+
+        inputIter->second->push_back(pCaloHit);
         return STATUS_CODE_SUCCESS;
     }
     catch (StatusCodeException &statusCodeException)
@@ -146,7 +151,7 @@ StatusCode CaloHitManager::CreateTemporaryListAndSetCurrent(const Algorithm *con
     {
         const Cluster *const pCluster = *iter;
         pCluster->GetOrderedCaloHitList().GetCaloHitList(caloHitList);
-        caloHitList.insert(pCluster->GetIsolatedCaloHitList().begin(), pCluster->GetIsolatedCaloHitList().end());
+        caloHitList.insert(caloHitList.end(), pCluster->GetIsolatedCaloHitList().begin(), pCluster->GetIsolatedCaloHitList().end());
     }
 
     return InputObjectManager<CaloHit>::CreateTemporaryListAndSetCurrent(pAlgorithm, caloHitList, temporaryListName);
@@ -230,8 +235,8 @@ StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit
         return STATUS_CODE_FAILURE;
 
     CaloHitReplacement caloHitReplacement;
-    caloHitReplacement.m_oldCaloHits.insert(pOriginalCaloHit);
-    caloHitReplacement.m_newCaloHits.insert(pDaughterCaloHit1); caloHitReplacement.m_newCaloHits.insert(pDaughterCaloHit2);
+    caloHitReplacement.m_oldCaloHits.push_back(pOriginalCaloHit);
+    caloHitReplacement.m_newCaloHits.push_back(pDaughterCaloHit1); caloHitReplacement.m_newCaloHits.push_back(pDaughterCaloHit2);
 
     if (m_nReclusteringProcesses > 0)
     {
@@ -266,8 +271,8 @@ StatusCode CaloHitManager::MergeCaloHitFragments(const CaloHit *const pFragmentC
         return STATUS_CODE_FAILURE;
 
     CaloHitReplacement caloHitReplacement;
-    caloHitReplacement.m_newCaloHits.insert(pMergedCaloHit);
-    caloHitReplacement.m_oldCaloHits.insert(pFragmentCaloHit1); caloHitReplacement.m_oldCaloHits.insert(pFragmentCaloHit2);
+    caloHitReplacement.m_newCaloHits.push_back(pMergedCaloHit);
+    caloHitReplacement.m_oldCaloHits.push_back(pFragmentCaloHit1); caloHitReplacement.m_oldCaloHits.push_back(pFragmentCaloHit2);
 
     if (m_nReclusteringProcesses > 0)
     {
@@ -296,7 +301,7 @@ bool CaloHitManager::CanFragmentCaloHit(const CaloHit *const pOriginalCaloHit, c
     if (m_nameToListMap.end() == iter)
         throw StatusCodeException(STATUS_CODE_FAILURE);
 
-    if (iter->second->end() == iter->second->find(pOriginalCaloHit))
+    if (iter->second->end() == std::find(iter->second->begin(), iter->second->end(), pOriginalCaloHit))
         return false;
 
     return true;
@@ -320,8 +325,11 @@ bool CaloHitManager::CanMergeCaloHitFragments(const CaloHit *const pFragmentCalo
     if (m_nameToListMap.end() == iter)
         throw StatusCodeException(STATUS_CODE_FAILURE);
 
-    if ((iter->second->end() == iter->second->find(pFragmentCaloHit1)) || (iter->second->end() == iter->second->find(pFragmentCaloHit2)))
+    if ((iter->second->end() == std::find(iter->second->begin(), iter->second->end(), pFragmentCaloHit1)) ||
+        (iter->second->end() == std::find(iter->second->begin(), iter->second->end(), pFragmentCaloHit2)))
+    {
         return false;
+    }
 
     return true;
 }
@@ -450,7 +458,7 @@ StatusCode CaloHitManager::Update(CaloHitList *const pCaloHitList, const CaloHit
     for (CaloHitList::const_iterator hitIter = caloHitReplacement.m_oldCaloHits.begin(), hitIterEnd = caloHitReplacement.m_oldCaloHits.end();
         hitIter != hitIterEnd; ++hitIter)
     {
-        CaloHitList::iterator listIter = pCaloHitList->find(*hitIter);
+        CaloHitList::iterator listIter = std::find(pCaloHitList->begin(), pCaloHitList->end(), *hitIter);
 
         if (pCaloHitList->end() != listIter)
         {
@@ -471,8 +479,10 @@ StatusCode CaloHitManager::Update(CaloHitList *const pCaloHitList, const CaloHit
     for (CaloHitList::const_iterator hitIter = caloHitReplacement.m_newCaloHits.begin(), hitIterEnd = caloHitReplacement.m_newCaloHits.end();
         hitIter != hitIterEnd; ++hitIter)
     {
-        if (!pCaloHitList->insert(*hitIter).second)
+        if (pCaloHitList->end() != std::find(pCaloHitList->begin(), pCaloHitList->end(), *hitIter))
             return STATUS_CODE_ALREADY_PRESENT;
+
+        pCaloHitList->push_back(*hitIter);
     }
 
     return STATUS_CODE_SUCCESS;

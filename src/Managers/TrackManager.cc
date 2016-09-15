@@ -12,6 +12,8 @@
 
 #include "Pandora/ObjectFactory.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -41,15 +43,18 @@ StatusCode TrackManager::Create(const PandoraApi::Track::Parameters &parameters,
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
 
-        if ((NULL == pTrack) || (m_nameToListMap.end() == inputIter) || (inputIter->second->end() != inputIter->second->find(pTrack)))
+        if ((NULL == pTrack) || (m_nameToListMap.end() == inputIter))
             throw StatusCodeException(STATUS_CODE_FAILURE);
+
+        if (inputIter->second->end() != std::find(inputIter->second->begin(), inputIter->second->end(), pTrack))
+            throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
+
+        inputIter->second->push_back(pTrack);
 
         if (m_uidToTrackMap.end() != m_uidToTrackMap.find(pTrack->GetParentTrackAddress()))
             throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
 
-        (void) inputIter->second->insert(pTrack);
         (void) m_uidToTrackMap.insert(UidToTrackMap::value_type(pTrack->GetParentTrackAddress(), pTrack));
-
         return STATUS_CODE_SUCCESS;
     }
     catch (StatusCodeException &statusCodeException)

@@ -334,8 +334,7 @@ StatusCode PandoraContentApiImpl::AddToCluster(const Cluster *const pCluster, co
 template <>
 StatusCode PandoraContentApiImpl::AddToCluster(const Cluster *const pCluster, const CaloHit *const pCaloHit) const
 {
-    CaloHitList caloHitList;
-    caloHitList.insert(pCaloHit);
+    CaloHitList caloHitList(1, pCaloHit);
     return this->AddToCluster(pCluster, &caloHitList);
 }
 
@@ -375,8 +374,7 @@ StatusCode PandoraContentApiImpl::AddIsolatedToCluster(const Cluster *const pClu
 template <>
 StatusCode PandoraContentApiImpl::AddIsolatedToCluster(const Cluster *const pCluster, const CaloHit *const pCaloHit) const
 {
-    CaloHitList caloHitList;
-    caloHitList.insert(pCaloHit);
+    CaloHitList caloHitList(1, pCaloHit);
     return this->AddIsolatedToCluster(pCluster, &caloHitList);
 }
 
@@ -574,8 +572,7 @@ bool PandoraContentApiImpl::IsAddToClusterAllowed(const Cluster *const pCluster,
 template <typename T>
 StatusCode PandoraContentApiImpl::PrepareForDeletion(const T *const pT) const
 {
-    std::MANAGED_CONTAINER<const T *> objectList;
-    objectList.insert(pT);
+    std::list<const T *> objectList(1, pT);
     return this->PrepareForDeletion(&objectList);
 }
 
@@ -592,8 +589,8 @@ StatusCode PandoraContentApiImpl::PrepareForDeletion(const ClusterList *const pC
     {
         const Cluster *const pCluster = *iter;
         pCluster->GetOrderedCaloHitList().GetCaloHitList(caloHitList);
-        caloHitList.insert(pCluster->GetIsolatedCaloHitList().begin(), pCluster->GetIsolatedCaloHitList().end());
-        trackList.insert(pCluster->GetAssociatedTrackList().begin(), pCluster->GetAssociatedTrackList().end());
+        caloHitList.insert(caloHitList.end(), pCluster->GetIsolatedCaloHitList().begin(), pCluster->GetIsolatedCaloHitList().end());
+        trackList.insert(trackList.end(), pCluster->GetAssociatedTrackList().begin(), pCluster->GetAssociatedTrackList().end());
     }
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->SetAvailability(&caloHitList, true));
@@ -645,7 +642,7 @@ StatusCode PandoraContentApiImpl::PrepareForReclusteringDeletion(const ClusterLi
     TrackList trackList;
 
     for (ClusterList::const_iterator iter = pClusterList->begin(), iterEnd = pClusterList->end(); iter != iterEnd; ++iter)
-        trackList.insert((*iter)->GetAssociatedTrackList().begin(), (*iter)->GetAssociatedTrackList().end());
+        trackList.insert(trackList.end(), (*iter)->GetAssociatedTrackList().begin(), (*iter)->GetAssociatedTrackList().end());
 
     return m_pPandora->m_pTrackManager->RemoveClusterAssociations(trackList);
 }

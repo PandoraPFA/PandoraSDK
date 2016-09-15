@@ -12,6 +12,8 @@
 
 #include "Pandora/ObjectFactory.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -50,9 +52,10 @@ StatusCode ClusterManager::Create(const PandoraContentApi::Cluster::Parameters &
         if (NULL == pCluster)
              throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        if (!iter->second->insert(pCluster).second)
-             throw StatusCodeException(STATUS_CODE_FAILURE);
+        if (iter->second->end() != std::find(iter->second->begin(), iter->second->end(), pCluster))
+            throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
 
+        iter->second->push_back(pCluster);
         return STATUS_CODE_SUCCESS;
     }
     catch (StatusCodeException &statusCodeException)
@@ -147,8 +150,8 @@ StatusCode ClusterManager::MergeAndDeleteClusters(const Cluster *const pClusterT
     if ((m_nameToListMap.end() == enlargeListIter) || (m_nameToListMap.end() == deleteListIter))
         return STATUS_CODE_NOT_INITIALIZED;
 
-    ClusterList::iterator clusterToEnlargeIter = enlargeListIter->second->find(pClusterToEnlarge);
-    ClusterList::iterator clusterToDeleteIter = deleteListIter->second->find(pClusterToDelete);
+    ClusterList::iterator clusterToEnlargeIter = std::find(enlargeListIter->second->begin(), enlargeListIter->second->end(), pClusterToEnlarge);
+    ClusterList::iterator clusterToDeleteIter = std::find(deleteListIter->second->begin(), deleteListIter->second->end(), pClusterToDelete);
 
     if ((enlargeListIter->second->end() == clusterToEnlargeIter) || (deleteListIter->second->end() == clusterToDeleteIter))
         return STATUS_CODE_NOT_FOUND;
@@ -206,7 +209,7 @@ StatusCode ClusterManager::RemoveCurrentTrackAssociations(TrackList &danglingTra
     {
         const TrackList trackList((*cIter)->GetAssociatedTrackList());
 
-        danglingTracks.insert(trackList.begin(), trackList.end());
+        danglingTracks.insert(danglingTracks.end(), trackList.begin(), trackList.end());
 
         for (TrackList::const_iterator tIter = trackList.begin(), tIterEnd = trackList.end(); tIter != tIterEnd; ++tIter)
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveTrackAssociation(*cIter, *tIter));

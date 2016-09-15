@@ -11,6 +11,8 @@
 #include "Objects/ParticleFlowObject.h"
 #include "Objects/Track.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -96,27 +98,30 @@ ClusterAddressList ParticleFlowObject::GetClusterAddressList() const
 template <>
 StatusCode ParticleFlowObject::AddToPfo(const Cluster *const pCluster)
 {
-    if (!m_clusterList.insert(pCluster).second)
+    if (m_clusterList.end() != std::find(m_clusterList.begin(), m_clusterList.end(), pCluster))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_clusterList.push_back(pCluster);
     return STATUS_CODE_SUCCESS;
 }
 
 template <>
 StatusCode ParticleFlowObject::AddToPfo(const Track *const pTrack)
 {
-    if (!m_trackList.insert(pTrack).second)
+    if (m_trackList.end() != std::find(m_trackList.begin(), m_trackList.end(), pTrack))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_trackList.push_back(pTrack);
     return STATUS_CODE_SUCCESS;
 }
 
 template <>
 StatusCode ParticleFlowObject::AddToPfo(const Vertex *const pVertex)
 {
-    if (!m_vertexList.insert(pVertex).second)
+    if (m_vertexList.end() != std::find(m_vertexList.begin(), m_vertexList.end(), pVertex))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_vertexList.push_back(pVertex);
     return STATUS_CODE_SUCCESS;
 }
 
@@ -125,7 +130,7 @@ StatusCode ParticleFlowObject::AddToPfo(const Vertex *const pVertex)
 template <>
 StatusCode ParticleFlowObject::RemoveFromPfo(const Cluster *const pCluster)
 {
-    ClusterList::iterator iter = m_clusterList.find(pCluster);
+    ClusterList::iterator iter = std::find(m_clusterList.begin(), m_clusterList.end(), pCluster);
 
     if (m_clusterList.end() == iter)
         return STATUS_CODE_NOT_FOUND;
@@ -137,7 +142,7 @@ StatusCode ParticleFlowObject::RemoveFromPfo(const Cluster *const pCluster)
 template <>
 StatusCode ParticleFlowObject::RemoveFromPfo(const Track *const pTrack)
 {
-    TrackList::iterator iter = m_trackList.find(pTrack);
+    TrackList::iterator iter = std::find(m_trackList.begin(), m_trackList.end(), pTrack);
 
     if (m_trackList.end() == iter)
         return STATUS_CODE_NOT_FOUND;
@@ -149,7 +154,7 @@ StatusCode ParticleFlowObject::RemoveFromPfo(const Track *const pTrack)
 template <>
 StatusCode ParticleFlowObject::RemoveFromPfo(const Vertex *const pVertex)
 {
-    VertexList::iterator iter = m_vertexList.find(pVertex);
+    VertexList::iterator iter = std::find(m_vertexList.begin(), m_vertexList.end(), pVertex);
 
     if (m_vertexList.end() == iter)
         return STATUS_CODE_NOT_FOUND;
@@ -165,9 +170,10 @@ StatusCode ParticleFlowObject::AddParent(const ParticleFlowObject *const pPfo)
     if (NULL == pPfo)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    if (!m_parentPfoList.insert(pPfo).second)
+    if (m_parentPfoList.end() != std::find(m_parentPfoList.begin(), m_parentPfoList.end(), pPfo))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_parentPfoList.push_back(pPfo);
     return STATUS_CODE_SUCCESS;
 }
 
@@ -178,9 +184,10 @@ StatusCode ParticleFlowObject::AddDaughter(const ParticleFlowObject *const pPfo)
     if (NULL == pPfo)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    if (!m_daughterPfoList.insert(pPfo).second)
+    if (m_daughterPfoList.end() != std::find(m_daughterPfoList.begin(), m_daughterPfoList.end(), pPfo))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_daughterPfoList.push_back(pPfo);
     return STATUS_CODE_SUCCESS;
 }
 
@@ -188,7 +195,7 @@ StatusCode ParticleFlowObject::AddDaughter(const ParticleFlowObject *const pPfo)
 
 StatusCode ParticleFlowObject::RemoveParent(const ParticleFlowObject *const pPfo)
 {
-    PfoList::const_iterator iter = m_parentPfoList.find(pPfo);
+    PfoList::const_iterator iter = std::find(m_parentPfoList.begin(), m_parentPfoList.end(), pPfo);
 
     if (m_parentPfoList.end() == iter)
         return STATUS_CODE_NOT_FOUND;
@@ -201,7 +208,7 @@ StatusCode ParticleFlowObject::RemoveParent(const ParticleFlowObject *const pPfo
 
 StatusCode ParticleFlowObject::RemoveDaughter(const ParticleFlowObject *const pPfo)
 {
-    PfoList::const_iterator iter = m_daughterPfoList.find(pPfo);
+    PfoList::const_iterator iter = std::find(m_daughterPfoList.begin(), m_daughterPfoList.end(), pPfo);
 
     if (m_daughterPfoList.end() == iter)
         return STATUS_CODE_NOT_FOUND;

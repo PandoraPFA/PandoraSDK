@@ -12,6 +12,8 @@
 #include "Objects/MCParticle.h"
 #include "Objects/Track.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -96,8 +98,10 @@ StatusCode InputObjectManager<T>::AddObjectsToList(const std::string &listName, 
 
     for (typename ObjectList::const_iterator iter = objectList.begin(), iterEnd = objectList.end(); iter != iterEnd; ++iter)
     {
-        if (!pSavedList->insert(*iter).second)
+        if (pSavedList->end() != std::find(pSavedList->begin(), pSavedList->end(), *iter))
             return STATUS_CODE_ALREADY_PRESENT;
+
+        pSavedList->push_back(*iter);
     }
 
     return STATUS_CODE_SUCCESS;
@@ -120,7 +124,7 @@ StatusCode InputObjectManager<T>::RemoveObjectsFromList(const std::string &listN
 
     for (typename ObjectList::const_iterator iter = objectList.begin(), iterEnd = objectList.end(); iter != iterEnd; ++iter)
     {
-        typename ObjectList::iterator savedObjectIter = pSavedList->find(*iter);
+        typename ObjectList::iterator savedObjectIter = std::find(pSavedList->begin(), pSavedList->end(), *iter);
 
         if (pSavedList->end() != savedObjectIter)
             pSavedList->erase(savedObjectIter);

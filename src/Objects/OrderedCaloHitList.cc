@@ -9,6 +9,8 @@
 #include "Objects/CaloHit.h"
 #include "Objects/OrderedCaloHitList.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -134,7 +136,7 @@ void OrderedCaloHitList::GetCaloHitList(CaloHitList &caloHitList) const
 {
     for (OrderedCaloHitList::const_iterator iter = this->begin(), iterEnd = this->end(); iter != iterEnd; ++iter)
     {
-        caloHitList.insert(iter->second->begin(), iter->second->end());
+        caloHitList.insert(caloHitList.end(), iter->second->begin(), iter->second->end());
     }
 }
 
@@ -160,12 +162,7 @@ StatusCode OrderedCaloHitList::Add(const CaloHit *const pCaloHit, const unsigned
     if (m_theList.end() == iter)
     {
         CaloHitList *const pCaloHitList = new CaloHitList;
-
-        if (!pCaloHitList->insert(pCaloHit).second)
-        {
-            delete pCaloHitList;
-            return STATUS_CODE_FAILURE;
-        }
+        pCaloHitList->push_back(pCaloHit);
 
         if (!(m_theList.insert(TheList::value_type(pseudoLayer, pCaloHitList)).second))
         {
@@ -175,8 +172,10 @@ StatusCode OrderedCaloHitList::Add(const CaloHit *const pCaloHit, const unsigned
     }
     else
     {
-        if (!iter->second->insert(pCaloHit).second)
+        if (iter->second->end() != std::find(iter->second->begin(), iter->second->end(), pCaloHit))
             return STATUS_CODE_ALREADY_PRESENT;
+
+        iter->second->push_back(pCaloHit);
     }
 
     return STATUS_CODE_SUCCESS;
@@ -191,7 +190,7 @@ StatusCode OrderedCaloHitList::Remove(const CaloHit *const pCaloHit, const unsig
     if (m_theList.end() == listIter)
         return STATUS_CODE_NOT_FOUND;
 
-    CaloHitList::iterator caloHitIter = listIter->second->find(pCaloHit);
+    CaloHitList::iterator caloHitIter = std::find(listIter->second->begin(), listIter->second->end(), pCaloHit);
 
     if (listIter->second->end() == caloHitIter)
         return STATUS_CODE_NOT_FOUND;

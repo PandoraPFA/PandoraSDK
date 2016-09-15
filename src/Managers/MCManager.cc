@@ -15,6 +15,8 @@
 #include "Pandora/PandoraSettings.h"
 #include "Pandora/PdgTable.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -48,15 +50,18 @@ StatusCode MCManager::Create(const PandoraApi::MCParticle::Parameters &parameter
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
 
-        if ((NULL == pMCParticle) || (m_nameToListMap.end() == inputIter) || (inputIter->second->end() != inputIter->second->find(pMCParticle)))
+        if ((NULL == pMCParticle) || (m_nameToListMap.end() == inputIter))
             throw StatusCodeException(STATUS_CODE_FAILURE);
+
+        if (inputIter->second->end() != std::find(inputIter->second->begin(), inputIter->second->end(), pMCParticle))
+            throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
+
+        inputIter->second->push_back(pMCParticle);
 
         if (m_uidToMCParticleMap.end() != m_uidToMCParticleMap.find(pMCParticle->GetUid()))
             throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
 
-        (void) inputIter->second->insert(pMCParticle);
         (void) m_uidToMCParticleMap.insert(UidToMCParticleMap::value_type(pMCParticle->GetUid(), pMCParticle));
-
         return STATUS_CODE_SUCCESS;
     }
     catch (StatusCodeException &statusCodeException)
@@ -140,7 +145,7 @@ StatusCode MCManager::SelectPfoTargets()
 
         if (isPfoTarget || !shouldCollapseMCParticlesToPfoTarget)
         {
-            selectedMCPfoList.insert(*iter);
+            selectedMCPfoList.push_back(*iter);
         }
     }
 
@@ -163,14 +168,14 @@ StatusCode MCManager::ApplyPfoSelectionRules(const MCParticle *const pMCParticle
     const int particleId(pMCParticle->GetParticleId());
 
     // ATTN: Don't take particles from previously used decay chains; could happen because mc particles can have multiple parents.
-    if ((mcPfoList.find(pMCParticle) == mcPfoList.end()) &&
+    if ((mcPfoList.end() == std::find(mcPfoList.begin(), mcPfoList.end(), pMCParticle)) &&
         (pMCParticle->GetOuterRadius() > selectionRadius) &&
         (pMCParticle->GetInnerRadius() <= selectionRadius) &&
         (pMCParticle->GetMomentum().GetMagnitude() > selectionMomentum) &&
         !((particleId == PROTON || particleId == NEUTRON) && (pMCParticle->GetEnergy() < selectionEnergyCutOffProtonsNeutrons)))
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTargetInTree(pMCParticle, pMCParticle, true));
-        mcPfoList.insert(pMCParticle);
+        mcPfoList.push_back(pMCParticle);
     }
     else
     {

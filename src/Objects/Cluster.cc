@@ -19,6 +19,8 @@
 #include "Plugins/ParticleIdPlugin.h"
 #include "Plugins/ShowerProfilePlugin.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -176,9 +178,10 @@ StatusCode Cluster::RemoveCaloHit(const CaloHit *const pCaloHit)
 
 StatusCode Cluster::AddIsolatedCaloHit(const CaloHit *const pCaloHit)
 {
-    if (!m_isolatedCaloHitList.insert(pCaloHit).second)
+    if (m_isolatedCaloHitList.end() != std::find(m_isolatedCaloHitList.begin(), m_isolatedCaloHitList.end(), pCaloHit))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_isolatedCaloHitList.push_back(pCaloHit);
     const float electromagneticEnergy(pCaloHit->GetElectromagneticEnergy());
     const float hadronicEnergy(pCaloHit->GetHadronicEnergy());
 
@@ -194,7 +197,7 @@ StatusCode Cluster::AddIsolatedCaloHit(const CaloHit *const pCaloHit)
 
 StatusCode Cluster::RemoveIsolatedCaloHit(const CaloHit *const pCaloHit)
 {
-    CaloHitList::iterator iter = m_isolatedCaloHitList.find(pCaloHit);
+    CaloHitList::iterator iter = std::find(m_isolatedCaloHitList.begin(), m_isolatedCaloHitList.end(), pCaloHit);
 
     if (m_isolatedCaloHitList.end() == iter)
         return STATUS_CODE_NOT_FOUND;
@@ -384,7 +387,6 @@ StatusCode Cluster::ResetProperties()
     m_particleId = UNKNOWN_PARTICLE_TYPE;
 
     this->ResetOutdatedProperties();
-
     return STATUS_CODE_SUCCESS;
 }
 
@@ -420,8 +422,10 @@ StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
     const CaloHitList &isolatedCaloHitList(pCluster->GetIsolatedCaloHitList());
     for (CaloHitList::const_iterator iter = isolatedCaloHitList.begin(), iterEnd = isolatedCaloHitList.end(); iter != iterEnd; ++iter)
     {
-        if (!m_isolatedCaloHitList.insert(*iter).second)
+        if (m_isolatedCaloHitList.end() != std::find(m_isolatedCaloHitList.begin(), m_isolatedCaloHitList.end(), *iter))
             return STATUS_CODE_ALREADY_PRESENT;
+
+        m_isolatedCaloHitList.push_back(*iter);
     }
 
     this->ResetOutdatedProperties();
@@ -460,7 +464,6 @@ StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
 
     m_innerPseudoLayer = m_orderedCaloHitList.begin()->first;
     m_outerPseudoLayer = m_orderedCaloHitList.rbegin()->first;
-
     return STATUS_CODE_SUCCESS;
 }
 
@@ -471,9 +474,10 @@ StatusCode Cluster::AddTrackAssociation(const Track *const pTrack)
     if (NULL == pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    if (!m_associatedTrackList.insert(pTrack).second)
-        return STATUS_CODE_FAILURE;
+    if (m_associatedTrackList.end() != std::find(m_associatedTrackList.begin(), m_associatedTrackList.end(), pTrack))
+        return STATUS_CODE_ALREADY_PRESENT;
 
+    m_associatedTrackList.push_back(pTrack);
     return STATUS_CODE_SUCCESS;
 }
 
@@ -481,13 +485,12 @@ StatusCode Cluster::AddTrackAssociation(const Track *const pTrack)
 
 StatusCode Cluster::RemoveTrackAssociation(const Track *const pTrack)
 {
-    TrackList::iterator iter = m_associatedTrackList.find(pTrack);
+    TrackList::iterator iter = std::find(m_associatedTrackList.begin(), m_associatedTrackList.end(), pTrack);
 
     if (m_associatedTrackList.end() == iter)
         return STATUS_CODE_NOT_FOUND;
 
     m_associatedTrackList.erase(iter);
-
     return STATUS_CODE_SUCCESS;
 }
 
