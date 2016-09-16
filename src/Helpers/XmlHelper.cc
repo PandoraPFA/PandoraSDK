@@ -99,7 +99,7 @@ StatusCode XmlHelper::ProcessAlgorithmTool(const Algorithm &algorithm, const TiX
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode XmlHelper::ProcessAlgorithmToolList(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
-    AlgorithmToolList &algorithmToolList)
+    AlgorithmToolVector &algorithmToolVector)
 {
     if ("algorithm" != xmlHandle.ToNode()->ValueStr())
         return STATUS_CODE_NOT_ALLOWED;
@@ -111,7 +111,7 @@ StatusCode XmlHelper::ProcessAlgorithmToolList(const Algorithm &algorithm, const
     {
         AlgorithmTool *pAlgorithmTool = NULL;
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::CreateAlgorithmTool(algorithm, pXmlElement, pAlgorithmTool));
-        algorithmToolList.push_back(pAlgorithmTool);
+        algorithmToolVector.push_back(pAlgorithmTool);
     }
 
     return STATUS_CODE_SUCCESS;

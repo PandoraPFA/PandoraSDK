@@ -15,6 +15,8 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include <stdint.h>
@@ -170,24 +172,30 @@ typedef std::vector<const ParticleFlowObject *> PfoVector;
 typedef std::vector<const Track *> TrackVector;
 typedef std::vector<const Vertex *> VertexVector;
 
-typedef std::vector<AlgorithmTool *> AlgorithmToolList;
+typedef std::unordered_set<const CaloHit *> CaloHitSet;
+typedef std::unordered_set<const Cluster *> ClusterSet;
+typedef std::unordered_set<const DetectorGap *> DetectorGapSet;
+typedef std::unordered_set<const MCParticle *> MCParticleSet;
+typedef std::unordered_set<const ParticleFlowObject *> ParticleFlowObjectSet;
+typedef std::unordered_set<const ParticleFlowObject *> PfoSet;
+typedef std::unordered_set<const Track *> TrackSet;
+typedef std::unordered_set<const Vertex *> VertexSet;
 
-typedef std::set<std::string> StringSet;
+typedef std::vector<AlgorithmTool *> AlgorithmToolVector;
 typedef std::vector<std::string> StringVector;
 typedef std::vector<int> IntVector;
 typedef std::vector<float> FloatVector;
-typedef std::vector<CartesianVector> CartesianPointList;
-typedef std::vector<TrackState> TrackStateList;
+typedef std::vector<CartesianVector> CartesianPointVector;
+typedef std::vector<TrackState> TrackStateVector;
 
 typedef const void * Uid;
-typedef std::map<Uid, const MCParticle *> UidToMCParticleMap;
+typedef std::unordered_map<Uid, const MCParticle *> UidToMCParticleMap;
+typedef std::unordered_map<const MCParticle *, float> MCParticleWeightMap;
+typedef std::unordered_map<Uid, MCParticleWeightMap> UidToMCParticleWeightMap;
+typedef std::unordered_map<const Cluster *, const Track * > ClusterToTrackMap;
+typedef std::unordered_map<const Track *, const Cluster * > TrackToClusterMap;
 
-typedef std::map<const MCParticle *, float> MCParticleWeightMap;
-typedef std::map<Uid, MCParticleWeightMap> UidToMCParticleWeightMap;
-
-typedef std::map<const Cluster *, const Track * > ClusterToTrackMap;
-typedef std::map<const Track *, const Cluster * > TrackToClusterMap;
-
+typedef std::set<std::string> StringSet;
 typedef std::map<std::string, const SubDetector *> SubDetectorMap;
 
 } // namespace pandora

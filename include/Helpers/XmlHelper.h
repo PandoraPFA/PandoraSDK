@@ -115,10 +115,10 @@ public:
      *  @param  algorithm the parent algorithm calling this function
      *  @param  xmlHandle the relevant xml handle
      *  @param  listName the name of the algorithm tool list
-     *  @param  algorithmToolList to receive the list of addresses of the algorithm tool instances
+     *  @param  algorithmToolVector to receive the vector of addresses of the algorithm tool instances
      */
     static StatusCode ProcessAlgorithmToolList(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
-        AlgorithmToolList &algorithmToolList);
+        AlgorithmToolVector &algorithmToolVector);
 
     /**
      *  @brief  Tokenize a string

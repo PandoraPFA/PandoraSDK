@@ -210,9 +210,9 @@ public:
     /**
      *  @brief  Get the list of cartesian coordinates for the cell corners
      * 
-     *  @param  cartesianPointList to receive the cartesian coordinates of the cell corners
+     *  @param  cartesianPointVector to receive the cartesian coordinates of the cell corners
      */
-    void GetCellCorners(CartesianPointList &cartesianPointList) const;
+    void GetCellCorners(CartesianPointVector &cartesianPointVector) const;
 
 protected:
     /**
@@ -270,16 +270,16 @@ protected:
     /**
      *  @brief  Get the list of cartesian coordinates for rectangular cell corners
      * 
-     *  @param  cartesianPointList to receive the cartesian coordinates of the cell corners
+     *  @param  cartesianPointVector to receive the cartesian coordinates of the cell corners
      */
-    void GetRectangularCellCorners(CartesianPointList &cartesianPointList) const;
+    void GetRectangularCellCorners(CartesianPointVector &cartesianPointVector) const;
 
     /**
      *  @brief  Get the list of cartesian coordinates for pointing cell corners
      * 
-     *  @param  cartesianPointList to receive the cartesian coordinates of the cell corners
+     *  @param  cartesianPointVector to receive the cartesian coordinates of the cell corners
      */
-    void GetPointingCellCorners(CartesianPointList &cartesianPointList) const;
+    void GetPointingCellCorners(CartesianPointVector &cartesianPointVector) const;
 
     /**
      *  @brief  Whether the calo hit is available to be added to a cluster (access this function via PandoraContentAPI)

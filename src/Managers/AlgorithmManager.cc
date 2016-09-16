@@ -36,7 +36,7 @@ AlgorithmManager::~AlgorithmManager()
     for (AlgorithmFactoryMap::iterator iter = m_algorithmFactoryMap.begin(), iterEnd = m_algorithmFactoryMap.end(); iter != iterEnd; ++iter)
         delete iter->second;
 
-    for (AlgorithmToolList::iterator iter = m_algorithmToolList.begin(), iterEnd = m_algorithmToolList.end(); iter != iterEnd; ++iter)
+    for (AlgorithmToolVector::iterator iter = m_algorithmToolVector.begin(), iterEnd = m_algorithmToolVector.end(); iter != iterEnd; ++iter)
         delete *iter;
 
     for (AlgorithmToolFactoryMap::iterator iter = m_algorithmToolFactoryMap.begin(), iterEnd = m_algorithmToolFactoryMap.end(); iter != iterEnd; ++iter)
@@ -44,7 +44,7 @@ AlgorithmManager::~AlgorithmManager()
 
     m_algorithmMap.clear();
     m_algorithmFactoryMap.clear();
-    m_algorithmToolList.clear();
+    m_algorithmToolVector.clear();
     m_algorithmToolFactoryMap.clear();
 }
 
@@ -164,7 +164,7 @@ StatusCode AlgorithmManager::CreateAlgorithmTool(TiXmlElement *const pXmlElement
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->ReadSettings(TiXmlHandle(pXmlElement)));
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->Initialize());
 
-        m_algorithmToolList.push_back(pLocalAlgorithmTool);
+        m_algorithmToolVector.push_back(pLocalAlgorithmTool);
         pAlgorithmTool = pLocalAlgorithmTool;
     }
     catch (StatusCodeException &statusCodeException)

@@ -334,7 +334,7 @@ StatusCode PandoraContentApiImpl::AddToCluster(const Cluster *const pCluster, co
 template <>
 StatusCode PandoraContentApiImpl::AddToCluster(const Cluster *const pCluster, const CaloHit *const pCaloHit) const
 {
-    CaloHitList caloHitList(1, pCaloHit);
+    const CaloHitList caloHitList(1, pCaloHit);
     return this->AddToCluster(pCluster, &caloHitList);
 }
 
@@ -374,7 +374,7 @@ StatusCode PandoraContentApiImpl::AddIsolatedToCluster(const Cluster *const pClu
 template <>
 StatusCode PandoraContentApiImpl::AddIsolatedToCluster(const Cluster *const pCluster, const CaloHit *const pCaloHit) const
 {
-    CaloHitList caloHitList(1, pCaloHit);
+    const CaloHitList caloHitList(1, pCaloHit);
     return this->AddIsolatedToCluster(pCluster, &caloHitList);
 }
 
@@ -572,7 +572,7 @@ bool PandoraContentApiImpl::IsAddToClusterAllowed(const Cluster *const pCluster,
 template <typename T>
 StatusCode PandoraContentApiImpl::PrepareForDeletion(const T *const pT) const
 {
-    std::list<const T *> objectList(1, pT);
+    const std::list<const T *> objectList(1, pT);
     return this->PrepareForDeletion(&objectList);
 }
 

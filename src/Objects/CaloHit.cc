@@ -149,15 +149,15 @@ float CaloHit::CalculateCellLengthScale() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void CaloHit::GetCellCorners(CartesianPointList &cartesianPointList) const
+void CaloHit::GetCellCorners(CartesianPointVector &cartesianPointVector) const
 {
     if (RECTANGULAR == this->GetCellGeometry())
     {
-        this->GetRectangularCellCorners(cartesianPointList);
+        this->GetRectangularCellCorners(cartesianPointVector);
     }
     else if (POINTING == this->GetCellGeometry())
     {
-        this->GetPointingCellCorners(cartesianPointList);
+        this->GetPointingCellCorners(cartesianPointVector);
     }
     else
     {
@@ -167,7 +167,7 @@ void CaloHit::GetCellCorners(CartesianPointList &cartesianPointList) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void CaloHit::GetRectangularCellCorners(CartesianPointList &cartesianPointList) const
+void CaloHit::GetRectangularCellCorners(CartesianPointVector &cartesianPointVector) const
 {
     const CartesianVector &position(this->GetPositionVector());
 
@@ -179,20 +179,20 @@ void CaloHit::GetRectangularCellCorners(CartesianPointList &cartesianPointList) 
     dirV *= (this->GetCellSize1() / 2.f);
     normal *= (this->GetCellThickness() / 2.f);
 
-    cartesianPointList.push_back(CartesianVector(position - dirU - dirV - normal));
-    cartesianPointList.push_back(CartesianVector(position + dirU - dirV - normal));
-    cartesianPointList.push_back(CartesianVector(position + dirU + dirV - normal));
-    cartesianPointList.push_back(CartesianVector(position - dirU + dirV - normal));
+    cartesianPointVector.push_back(CartesianVector(position - dirU - dirV - normal));
+    cartesianPointVector.push_back(CartesianVector(position + dirU - dirV - normal));
+    cartesianPointVector.push_back(CartesianVector(position + dirU + dirV - normal));
+    cartesianPointVector.push_back(CartesianVector(position - dirU + dirV - normal));
 
-    cartesianPointList.push_back(CartesianVector(position - dirU - dirV + normal));
-    cartesianPointList.push_back(CartesianVector(position + dirU - dirV + normal));
-    cartesianPointList.push_back(CartesianVector(position + dirU + dirV + normal));
-    cartesianPointList.push_back(CartesianVector(position - dirU + dirV + normal));
+    cartesianPointVector.push_back(CartesianVector(position - dirU - dirV + normal));
+    cartesianPointVector.push_back(CartesianVector(position + dirU - dirV + normal));
+    cartesianPointVector.push_back(CartesianVector(position + dirU + dirV + normal));
+    cartesianPointVector.push_back(CartesianVector(position - dirU + dirV + normal));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void CaloHit::GetPointingCellCorners(CartesianPointList &cartesianPointList) const
+void CaloHit::GetPointingCellCorners(CartesianPointVector &cartesianPointVector) const
 {
     float radius(0.f), phi(0.f), theta(0.f);
     this->GetPositionVector().GetSphericalCoordinates(radius, phi, theta);
@@ -229,15 +229,15 @@ void CaloHit::GetPointingCellCorners(CartesianPointList &cartesianPointList) con
     const float rMinAtThetaMin(thetaMinRScale * rMin), rMinAtThetaMax(thetaMaxRScale * rMin);
     const float rMaxAtThetaMin(thetaMinRScale * rMax), rMaxAtThetaMax(thetaMaxRScale * rMax);
 
-    cartesianPointList.push_back(CartesianVector(rMinAtThetaMin * sinThetaMin * cosPhiMin, rMinAtThetaMin * sinThetaMin * sinPhiMin, rMinAtThetaMin * cosThetaMin));
-    cartesianPointList.push_back(CartesianVector(rMinAtThetaMax * sinThetaMax * cosPhiMin, rMinAtThetaMax * sinThetaMax * sinPhiMin, rMinAtThetaMax * cosThetaMax));
-    cartesianPointList.push_back(CartesianVector(rMinAtThetaMax * sinThetaMax * cosPhiMax, rMinAtThetaMax * sinThetaMax * sinPhiMax, rMinAtThetaMax * cosThetaMax));
-    cartesianPointList.push_back(CartesianVector(rMinAtThetaMin * sinThetaMin * cosPhiMax, rMinAtThetaMin * sinThetaMin * sinPhiMax, rMinAtThetaMin * cosThetaMin));
+    cartesianPointVector.push_back(CartesianVector(rMinAtThetaMin * sinThetaMin * cosPhiMin, rMinAtThetaMin * sinThetaMin * sinPhiMin, rMinAtThetaMin * cosThetaMin));
+    cartesianPointVector.push_back(CartesianVector(rMinAtThetaMax * sinThetaMax * cosPhiMin, rMinAtThetaMax * sinThetaMax * sinPhiMin, rMinAtThetaMax * cosThetaMax));
+    cartesianPointVector.push_back(CartesianVector(rMinAtThetaMax * sinThetaMax * cosPhiMax, rMinAtThetaMax * sinThetaMax * sinPhiMax, rMinAtThetaMax * cosThetaMax));
+    cartesianPointVector.push_back(CartesianVector(rMinAtThetaMin * sinThetaMin * cosPhiMax, rMinAtThetaMin * sinThetaMin * sinPhiMax, rMinAtThetaMin * cosThetaMin));
 
-    cartesianPointList.push_back(CartesianVector(rMaxAtThetaMin * sinThetaMin * cosPhiMin, rMaxAtThetaMin * sinThetaMin * sinPhiMin, rMaxAtThetaMin * cosThetaMin));
-    cartesianPointList.push_back(CartesianVector(rMaxAtThetaMax * sinThetaMax * cosPhiMin, rMaxAtThetaMax * sinThetaMax * sinPhiMin, rMaxAtThetaMax * cosThetaMax));
-    cartesianPointList.push_back(CartesianVector(rMaxAtThetaMax * sinThetaMax * cosPhiMax, rMaxAtThetaMax * sinThetaMax * sinPhiMax, rMaxAtThetaMax * cosThetaMax));
-    cartesianPointList.push_back(CartesianVector(rMaxAtThetaMin * sinThetaMin * cosPhiMax, rMaxAtThetaMin * sinThetaMin * sinPhiMax, rMaxAtThetaMin * cosThetaMin));
+    cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMin * sinThetaMin * cosPhiMin, rMaxAtThetaMin * sinThetaMin * sinPhiMin, rMaxAtThetaMin * cosThetaMin));
+    cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMax * sinThetaMax * cosPhiMin, rMaxAtThetaMax * sinThetaMax * sinPhiMin, rMaxAtThetaMax * cosThetaMax));
+    cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMax * sinThetaMax * cosPhiMax, rMaxAtThetaMax * sinThetaMax * sinPhiMax, rMaxAtThetaMax * cosThetaMax));
+    cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMin * sinThetaMin * cosPhiMax, rMaxAtThetaMin * sinThetaMin * sinPhiMax, rMaxAtThetaMin * cosThetaMin));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

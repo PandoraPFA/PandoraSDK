@@ -107,10 +107,9 @@ private:
     SpecificAlgorithmInstanceMap    m_specificAlgorithmInstanceMap;     ///< The specific algorithm instance map
     StringVector                    m_pandoraAlgorithms;                ///< The ordered list of names of top-level algorithms, to be run by pandora
 
-    typedef std::vector<AlgorithmTool*> AlgorithmToolList;
     typedef std::map<const std::string, AlgorithmToolFactory *const> AlgorithmToolFactoryMap;
 
-    AlgorithmToolList               m_algorithmToolList;                ///< The algorithm tool list
+    AlgorithmToolVector             m_algorithmToolVector;              ///< The algorithm tool vector
     AlgorithmToolFactoryMap         m_algorithmToolFactoryMap;          ///< The algorithm tool factory map
 
     const Pandora *const            m_pPandora;                         ///< The pandora instance that will run the algorithms
