@@ -8,8 +8,6 @@
 #ifndef PANDORA_INTERNAL_H
 #define PANDORA_INTERNAL_H 1
 
-    #include "Pandora/StatusCodes.h"
-
 #include <algorithm>
 #include <iostream>
 #include <list>
@@ -51,17 +49,6 @@ class TrackState;
 class TwoDHistogram;
 class Vertex;
 
-// Macro allowing use of pandora monitoring to be quickly included/excluded via pre-processor flag; only works within algorithms
-#ifdef MONITORING
-    #define PANDORA_MONITORING_API(command)                                                                 \
-    if (this->GetPandora().GetSettings()->IsMonitoringEnabled())                                            \
-    {                                                                                                       \
-        PandoraMonitoringApi::command;                                                                      \
-    }
-#else
-    #define PANDORA_MONITORING_API(command)
-#endif
-
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 // Macros for registering lists of algorithms, energy corrections functions, particle id functions or settings functions
@@ -93,6 +80,7 @@ class Vertex;
         return statusCode;                                                                                  \
 }
 
+//------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <class T>
@@ -175,24 +163,25 @@ public:
     MyList();
 
     /**
-     *  @brief  
+     *  @brief  Copy constructor
      * 
-     *  @param  
+     *  @param  rhs
      */
     MyList(const MyList &rhs);
 
     /**
-     *  @brief  
+     *  @brief  Constructor
      * 
-     *  @param  
+     *  @param  n
+     *  @param  val
      */
-    MyList(size_t n, const value_type& val = value_type());
+    MyList(size_t n, const value_type &val = value_type());
 
     /**
-     *  @brief  
+     *  @brief  Constructor
      * 
-     *  @param  
-     *  @param  
+     *  @param  first
+     *  @param  last
      */
     template <class InputIterator>
     MyList(InputIterator first, InputIterator last);
@@ -203,63 +192,67 @@ public:
     ~MyList();
 
     /**
-     *  @brief  Assignment operator
+     *  @brief  operator=
      * 
-     *  @param  
+     *  @param  rhs
      */
     void operator= (const MyList &rhs);
 
     /**
-     *  @brief  
+     *  @brief  begin
      */
     const_iterator begin() const;
 
     /**
-     *  @brief  
+     *  @brief  end
      */
     const_iterator end() const;
 
     /**
-     *  @brief  
+     *  @brief  push_back
      * 
-     *  @param  
+     *  @param  val
      */
     void push_back(const value_type &val);
 
     /**
-     *  @brief  
+     *  @brief  erase
      * 
-     *  @param  
+     *  @param  position
      */
     iterator erase(const_iterator position);
 
     /**
-     *  @brief  
+     *  @brief  insert
      * 
-     *  @param
-     *  @param
-     *  @param
+     *  @param  position
+     *  @param  first
+     *  @param  last
      */
     template <class InputIterator>
-    void insert (const_iterator position, InputIterator first, InputIterator last);
+    void insert(const_iterator position, InputIterator first, InputIterator last);
 
     /**
-     *  @brief  
+     *  @brief  size
+     * 
+     *  @return size
      */
     unsigned int size() const;
 
     /**
-     *  @brief  
+     *  @brief  empty
+     * 
+     *  @return boolean
      */
     bool empty() const;
 
     /**
-     *  @brief  
+     *  @brief  clear
      */
     void clear();
 
 private:
-    TheList     m_theList;      ///< The ordered calo hit list
+    TheList     m_theList;      ///< The list
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -332,8 +325,8 @@ inline void MyList<T>::push_back(const value_type &val)
 {
     if (m_theList.end() != std::find(m_theList.begin(), m_theList.end(), val))
     {
-        std::cout << "push_back duplicate " << std::endl;
-        throw pandora::StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+        std::cout << "push_back duplicate, in file:     " << __FILE__ << " line#: " << __LINE__ << std::endl;
+        throw;
     }
 
     m_theList.push_back(val);
@@ -357,8 +350,8 @@ inline void MyList<T>::insert(const_iterator position, InputIterator first, Inpu
     {
         if (m_theList.end() != std::find(m_theList.begin(), m_theList.end(), *iter))
         {
-            std::cout << "insert duplicate " << std::endl;
-            throw pandora::StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+            std::cout << "insert duplicate, in file:     " << __FILE__ << " line#: " << __LINE__ << std::endl;
+            throw;
         }
     }
 
@@ -392,14 +385,17 @@ inline void MyList<T>::clear()
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-typedef MyList<const CaloHit *> CaloHitList;
-typedef MyList<const Cluster *> ClusterList;
-typedef MyList<const DetectorGap *> DetectorGapList;
-typedef MyList<const MCParticle *> MCParticleList;
-typedef MyList<const ParticleFlowObject *> ParticleFlowObjectList;
-typedef MyList<const ParticleFlowObject *> PfoList;
-typedef MyList<const Track *> TrackList;
-typedef MyList<const Vertex *> VertexList;
+#define MANAGED_CONTAINER MyList
+
+typedef MANAGED_CONTAINER<const CaloHit *> CaloHitList;
+typedef MANAGED_CONTAINER<const Cluster *> ClusterList;
+typedef MANAGED_CONTAINER<const DetectorGap *> DetectorGapList;
+typedef MANAGED_CONTAINER<const MCParticle *> MCParticleList;
+typedef MANAGED_CONTAINER<const ParticleFlowObject *> ParticleFlowObjectList;
+typedef MANAGED_CONTAINER<const ParticleFlowObject *> PfoList;
+typedef MANAGED_CONTAINER<const SubDetector *> SubDetectorList;
+typedef MANAGED_CONTAINER<const Track *> TrackList;
+typedef MANAGED_CONTAINER<const Vertex *> VertexList;
 
 typedef std::vector<const CaloHit *> CaloHitVector;
 typedef std::vector<const Cluster *> ClusterVector;
@@ -407,6 +403,7 @@ typedef std::vector<const DetectorGap *> DetectorGapVector;
 typedef std::vector<const MCParticle *> MCParticleVector;
 typedef std::vector<const ParticleFlowObject *> ParticleFlowObjectVector;
 typedef std::vector<const ParticleFlowObject *> PfoVector;
+typedef std::vector<const SubDetector *> SubDetectorVector;
 typedef std::vector<const Track *> TrackVector;
 typedef std::vector<const Vertex *> VertexVector;
 
@@ -416,15 +413,16 @@ typedef std::unordered_set<const DetectorGap *> DetectorGapSet;
 typedef std::unordered_set<const MCParticle *> MCParticleSet;
 typedef std::unordered_set<const ParticleFlowObject *> ParticleFlowObjectSet;
 typedef std::unordered_set<const ParticleFlowObject *> PfoSet;
+typedef std::unordered_set<const SubDetector *> SubDetectorSet;
 typedef std::unordered_set<const Track *> TrackSet;
 typedef std::unordered_set<const Vertex *> VertexSet;
 
-typedef std::vector<AlgorithmTool *> AlgorithmToolVector;
-typedef std::vector<std::string> StringVector;
 typedef std::vector<int> IntVector;
 typedef std::vector<float> FloatVector;
+typedef std::vector<std::string> StringVector;
 typedef std::vector<CartesianVector> CartesianPointVector;
 typedef std::vector<TrackState> TrackStateVector;
+typedef std::vector<AlgorithmTool *> AlgorithmToolVector;
 
 typedef const void * Uid;
 typedef std::unordered_map<Uid, const MCParticle *> UidToMCParticleMap;

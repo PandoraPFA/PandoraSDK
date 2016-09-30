@@ -11,7 +11,7 @@
 #include <exception>
 #include <string>
 
-#if defined(__GNUC__)// && defined(BACKTRACE)
+#if defined(__GNUC__) && defined(BACKTRACE)
     #include <cstdlib>
     #include <execinfo.h>
 #endif
@@ -161,7 +161,7 @@ private:
 inline StatusCodeException::StatusCodeException(const StatusCode statusCode) :
     m_statusCode(statusCode)
 {
-#if defined(__GNUC__)// && defined(BACKTRACE)
+#if defined(__GNUC__) && defined(BACKTRACE)
     const size_t maxDepth = 100;
     void *stackAddresses[maxDepth];
 

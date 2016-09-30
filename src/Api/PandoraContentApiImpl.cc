@@ -572,7 +572,7 @@ bool PandoraContentApiImpl::IsAddToClusterAllowed(const Cluster *const pCluster,
 template <typename T>
 StatusCode PandoraContentApiImpl::PrepareForDeletion(const T *const pT) const
 {
-    const MyList<const T *> objectList(1, pT);
+    const MANAGED_CONTAINER<const T *> objectList(1, pT);
     return this->PrepareForDeletion(&objectList);
 }
 
