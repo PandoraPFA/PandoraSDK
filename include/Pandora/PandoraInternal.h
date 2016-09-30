@@ -8,6 +8,8 @@
 #ifndef PANDORA_INTERNAL_H
 #define PANDORA_INTERNAL_H 1
 
+    #include "Pandora/StatusCodes.h"
+
 #include <algorithm>
 #include <iostream>
 #include <list>
@@ -153,15 +155,236 @@ inline bool PointerLessThan<T>::operator()(const T *lhs, const T *rhs) const
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
 
-typedef std::list<const CaloHit *> CaloHitList;
-typedef std::list<const Cluster *> ClusterList;
-typedef std::list<const DetectorGap *> DetectorGapList;
-typedef std::list<const MCParticle *> MCParticleList;
-typedef std::list<const ParticleFlowObject *> ParticleFlowObjectList;
-typedef std::list<const ParticleFlowObject *> PfoList;
-typedef std::list<const Track *> TrackList;
-typedef std::list<const Vertex *> VertexList;
+/**
+ *  @brief  Wrapper around std::list
+ */
+template <typename T>
+class MyList
+{
+public:
+    typedef typename std::list<T> TheList;
+    typedef typename TheList::const_iterator const_iterator;
+    typedef typename TheList::const_iterator iterator;
+    typedef typename TheList::value_type value_type;
+
+    /**
+     *  @brief  Default constructor
+     */
+    MyList();
+
+    /**
+     *  @brief  
+     * 
+     *  @param  
+     */
+    MyList(const MyList &rhs);
+
+    /**
+     *  @brief  
+     * 
+     *  @param  
+     */
+    MyList(size_t n, const value_type& val = value_type());
+
+    /**
+     *  @brief  
+     * 
+     *  @param  
+     *  @param  
+     */
+    template <class InputIterator>
+    MyList(InputIterator first, InputIterator last);
+
+    /**
+     *  @brief  Destructor
+     */
+    ~MyList();
+
+    /**
+     *  @brief  Assignment operator
+     * 
+     *  @param  
+     */
+    void operator= (const MyList &rhs);
+
+    /**
+     *  @brief  
+     */
+    const_iterator begin() const;
+
+    /**
+     *  @brief  
+     */
+    const_iterator end() const;
+
+    /**
+     *  @brief  
+     * 
+     *  @param  
+     */
+    void push_back(const value_type &val);
+
+    /**
+     *  @brief  
+     * 
+     *  @param  
+     */
+    iterator erase (const_iterator position);
+
+    /**
+     *  @brief  
+     * 
+     *  @param
+     *  @param
+     *  @param
+     */
+    template <class InputIterator>
+    void insert (const_iterator position, InputIterator first, InputIterator last);
+
+    /**
+     *  @brief  
+     */
+    unsigned int size() const;
+
+    /**
+     *  @brief  
+     */
+    bool empty() const;
+
+    /**
+     *  @brief  
+     */
+    void clear();
+
+private:
+    TheList     m_theList;      ///< The ordered calo hit list
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+inline MyList<T>::MyList()
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+inline MyList<T>::MyList(const MyList &rhs) :
+    m_theList(rhs.m_theList)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+inline MyList<T>::MyList(size_t n, const value_type &val) :
+    m_theList(n, val)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+template <class InputIterator>
+inline MyList<T>::MyList(InputIterator first, InputIterator last) :
+    m_theList(first, last)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+inline MyList<T>::~MyList()
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+inline void MyList<T>::operator= (const MyList &rhs)
+{
+    m_theList = rhs.m_theList;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+inline typename MyList<T>::const_iterator MyList<T>::begin() const
+{
+    return m_theList.begin();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+inline typename MyList<T>::const_iterator MyList<T>::end() const
+{
+    return m_theList.end();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+inline void MyList<T>::push_back(const value_type &val)
+{
+    m_theList.push_back(val);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+inline typename MyList<T>::iterator MyList<T>::erase(const_iterator position)
+{
+    return m_theList.erase(position);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+template <class InputIterator>
+inline void MyList<T>::insert(const_iterator position, InputIterator first, InputIterator last)
+{
+    m_theList.insert(position, first, last);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+inline unsigned int MyList<T>::size() const
+{
+    return m_theList.size();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+inline bool MyList<T>::empty() const
+{
+    return m_theList.empty();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+inline void MyList<T>::clear()
+{
+    m_theList.clear();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+typedef MyList<const CaloHit *> CaloHitList;
+typedef MyList<const Cluster *> ClusterList;
+typedef MyList<const DetectorGap *> DetectorGapList;
+typedef MyList<const MCParticle *> MCParticleList;
+typedef MyList<const ParticleFlowObject *> ParticleFlowObjectList;
+typedef MyList<const ParticleFlowObject *> PfoList;
+typedef MyList<const Track *> TrackList;
+typedef MyList<const Vertex *> VertexList;
 
 typedef std::vector<const CaloHit *> CaloHitVector;
 typedef std::vector<const Cluster *> ClusterVector;

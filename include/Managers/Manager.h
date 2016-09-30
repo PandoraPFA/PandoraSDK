@@ -39,7 +39,7 @@ public:
     virtual ~Manager();
 
 protected:
-    typedef std::list<const T *> ObjectList;
+    typedef MyList<const T *> ObjectList;
 
     /**
      *  @brief  Get a list
