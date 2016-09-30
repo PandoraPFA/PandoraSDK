@@ -231,7 +231,7 @@ public:
      * 
      *  @param  
      */
-    iterator erase (const_iterator position);
+    iterator erase(const_iterator position);
 
     /**
      *  @brief  
@@ -330,6 +330,12 @@ inline typename MyList<T>::const_iterator MyList<T>::end() const
 template <typename T>
 inline void MyList<T>::push_back(const value_type &val)
 {
+    if (m_theList.end() != std::find(m_theList.begin(), m_theList.end(), val))
+    {
+        std::cout << "push_back duplicate " << std::endl;
+        throw pandora::StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+    }
+
     m_theList.push_back(val);
 }
 
@@ -347,6 +353,15 @@ template <typename T>
 template <class InputIterator>
 inline void MyList<T>::insert(const_iterator position, InputIterator first, InputIterator last)
 {
+    for (InputIterator iter = first; iter != last; ++iter)
+    {
+        if (m_theList.end() != std::find(m_theList.begin(), m_theList.end(), *iter))
+        {
+            std::cout << "insert duplicate " << std::endl;
+            throw pandora::StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+        }
+    }
+
     m_theList.insert(position, first, last);
 }
 
