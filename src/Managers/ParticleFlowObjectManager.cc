@@ -52,9 +52,6 @@ StatusCode ParticleFlowObjectManager::Create(const PandoraContentApi::ParticleFl
         if (NULL == pPfo)
              throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        //if (iter->second->end() != std::find(iter->second->begin(), iter->second->end(), pPfo))
-        //    throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
-
         iter->second->push_back(pPfo);
         return STATUS_CODE_SUCCESS;
     }

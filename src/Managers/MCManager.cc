@@ -53,14 +53,10 @@ StatusCode MCManager::Create(const PandoraApi::MCParticle::Parameters &parameter
         if ((NULL == pMCParticle) || (m_nameToListMap.end() == inputIter))
             throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        //if (inputIter->second->end() != std::find(inputIter->second->begin(), inputIter->second->end(), pMCParticle))
-        //    throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
-
-        if (m_uidToMCParticleMap.end() != m_uidToMCParticleMap.find(pMCParticle->GetUid()))
+        if (!m_uidToMCParticleMap.insert(UidToMCParticleMap::value_type(pMCParticle->GetUid(), pMCParticle)).second)
             throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
 
         inputIter->second->push_back(pMCParticle);
-        (void) m_uidToMCParticleMap.insert(UidToMCParticleMap::value_type(pMCParticle->GetUid(), pMCParticle));
         return STATUS_CODE_SUCCESS;
     }
     catch (StatusCodeException &statusCodeException)

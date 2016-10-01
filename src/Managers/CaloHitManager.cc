@@ -57,9 +57,6 @@ StatusCode CaloHitManager::Create(const PandoraApi::CaloHit::Parameters &paramet
         const unsigned int pseudoLayer(m_pPandora->GetPlugins()->GetPseudoLayerPlugin()->GetPseudoLayer(pCaloHit->GetPositionVector()));
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pCaloHit)->SetPseudoLayer(pseudoLayer));
 
-        //if (inputIter->second->end() != std::find(inputIter->second->begin(), inputIter->second->end(), pCaloHit))
-        //    throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
-
         inputIter->second->push_back(pCaloHit);
         return STATUS_CODE_SUCCESS;
     }

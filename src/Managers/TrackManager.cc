@@ -46,14 +46,10 @@ StatusCode TrackManager::Create(const PandoraApi::Track::Parameters &parameters,
         if ((NULL == pTrack) || (m_nameToListMap.end() == inputIter))
             throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        //if (inputIter->second->end() != std::find(inputIter->second->begin(), inputIter->second->end(), pTrack))
-        //    throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
-
-        if (m_uidToTrackMap.end() != m_uidToTrackMap.find(pTrack->GetParentTrackAddress()))
+        if (!m_uidToTrackMap.insert(UidToTrackMap::value_type(pTrack->GetParentTrackAddress(), pTrack)).second)
             throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
 
         inputIter->second->push_back(pTrack);
-        (void) m_uidToTrackMap.insert(UidToTrackMap::value_type(pTrack->GetParentTrackAddress(), pTrack));
         return STATUS_CODE_SUCCESS;
     }
     catch (StatusCodeException &statusCodeException)
