@@ -49,19 +49,16 @@ StatusCode CaloHitManager::Create(const PandoraApi::CaloHit::Parameters &paramet
     {
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pCaloHit));
 
-        if (NULL == pCaloHit)
+        NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
+
+        if ((NULL == pCaloHit) || (m_nameToListMap.end() == inputIter))
             throw StatusCodeException(STATUS_CODE_FAILURE);
 
         const unsigned int pseudoLayer(m_pPandora->GetPlugins()->GetPseudoLayerPlugin()->GetPseudoLayer(pCaloHit->GetPositionVector()));
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pCaloHit)->SetPseudoLayer(pseudoLayer));
 
-        NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
-
-        if (m_nameToListMap.end() == inputIter)
-            throw StatusCodeException(STATUS_CODE_FAILURE);
-
-        if (inputIter->second->end() != std::find(inputIter->second->begin(), inputIter->second->end(), pCaloHit))
-            throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
+        //if (inputIter->second->end() != std::find(inputIter->second->begin(), inputIter->second->end(), pCaloHit))
+        //    throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
 
         inputIter->second->push_back(pCaloHit);
         return STATUS_CODE_SUCCESS;

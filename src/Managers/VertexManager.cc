@@ -52,8 +52,8 @@ StatusCode VertexManager::Create(const PandoraContentApi::Vertex::Parameters &pa
         if (NULL == pVertex)
              throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        if (iter->second->end() != std::find(iter->second->begin(), iter->second->end(), pVertex))
-            throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
+        //if (iter->second->end() != std::find(iter->second->begin(), iter->second->end(), pVertex))
+        //    throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
 
         iter->second->push_back(pVertex);
         return STATUS_CODE_SUCCESS;

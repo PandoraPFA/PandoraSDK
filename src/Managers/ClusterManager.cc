@@ -52,8 +52,8 @@ StatusCode ClusterManager::Create(const PandoraContentApi::Cluster::Parameters &
         if (NULL == pCluster)
              throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        if (iter->second->end() != std::find(iter->second->begin(), iter->second->end(), pCluster))
-            throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
+        //if (iter->second->end() != std::find(iter->second->begin(), iter->second->end(), pCluster))
+        //    throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
 
         iter->second->push_back(pCluster);
         return STATUS_CODE_SUCCESS;
