@@ -228,7 +228,7 @@ StatusCode MCManager::AddMCParticleRelationships() const
         {
             UidToMCParticleMap::const_iterator daughterIter = m_uidToMCParticleMap.find(relIter->second);
 
-            if (m_uidToMCParticleMap.end() != daughterIter)
+            if ((m_uidToMCParticleMap.end() != daughterIter) && (daughterList.end() == std::find(daughterList.begin(), daughterList.end(), daughterIter->second)))
                 daughterList.push_back(daughterIter->second);
         }
         daughterList.sort(PointerLessThan<MCParticle>());

@@ -194,7 +194,7 @@ StatusCode TrackManager::AddParentDaughterAssociations() const
         {
             UidToTrackMap::const_iterator daughterIter = m_uidToTrackMap.find(relIter->second);
 
-            if (m_uidToTrackMap.end() != daughterIter)
+            if ((m_uidToTrackMap.end() != daughterIter) && (daughterList.end() == std::find(daughterList.begin(), daughterList.end(), daughterIter->second)))
                 daughterList.push_back(daughterIter->second);
         }
         daughterList.sort(PointerLessThan<Track>());
@@ -234,7 +234,7 @@ StatusCode TrackManager::AddSiblingAssociations() const
         {
             UidToTrackMap::const_iterator siblingIter = m_uidToTrackMap.find(relIter->second);
 
-            if (m_uidToTrackMap.end() != siblingIter)
+            if ((m_uidToTrackMap.end() != siblingIter) && (siblingList.end() == std::find(siblingList.begin(), siblingList.end(), siblingIter->second)))
                 siblingList.push_back(siblingIter->second);
         }
         siblingList.sort(PointerLessThan<Track>());
