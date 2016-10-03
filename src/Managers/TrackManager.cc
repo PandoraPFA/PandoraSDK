@@ -11,6 +11,7 @@
 #include "Objects/Track.h"
 
 #include "Pandora/ObjectFactory.h"
+#include "Pandora/PandoraInternal.h"
 
 #include <algorithm>
 
@@ -178,23 +179,37 @@ StatusCode TrackManager::AssociateTracks() const
 
 StatusCode TrackManager::AddParentDaughterAssociations() const
 {
-    for (TrackRelationMap::const_iterator uidIter = m_parentDaughterRelationMap.begin(), uidIterEnd = m_parentDaughterRelationMap.end();
-        uidIter != uidIterEnd; ++uidIter)
+    if (m_parentDaughterRelationMap.empty())
+        return STATUS_CODE_SUCCESS;
+
+    const TrackList *pInputList(nullptr);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetList(INPUT_LIST_NAME, pInputList));
+
+    for (const Track *const pParentTrack : *pInputList)
     {
-        UidToTrackMap::const_iterator parentIter = m_uidToTrackMap.find(uidIter->first);
-        UidToTrackMap::const_iterator daughterIter = m_uidToTrackMap.find(uidIter->second);
+        const auto range(m_parentDaughterRelationMap.equal_range(pParentTrack->GetParentTrackAddress()));
 
-        if ((m_uidToTrackMap.end() == parentIter) || (m_uidToTrackMap.end() == daughterIter))
-            continue;
+        TrackList daughterList;
+        for (TrackRelationMap::const_iterator relIter = range.first; relIter != range.second; ++relIter)
+        {
+            UidToTrackMap::const_iterator daughterIter = m_uidToTrackMap.find(relIter->second);
 
-        const StatusCode firstStatusCode(this->Modifiable(parentIter->second)->AddDaughter(daughterIter->second));
-        const StatusCode secondStatusCode(this->Modifiable(daughterIter->second)->AddParent(parentIter->second));
+            if (m_uidToTrackMap.end() != daughterIter)
+                daughterList.push_back(daughterIter->second);
+        }
+        daughterList.sort(PointerLessThan<Track>());
 
-        if (firstStatusCode != secondStatusCode)
-            return STATUS_CODE_FAILURE;
+        for (const Track *const pDaughterTrack : daughterList)
+        {
+            const StatusCode firstStatusCode(this->Modifiable(pParentTrack)->AddDaughter(pDaughterTrack));
+            const StatusCode secondStatusCode(this->Modifiable(pDaughterTrack)->AddParent(pParentTrack));
 
-        if ((firstStatusCode != STATUS_CODE_SUCCESS) && (firstStatusCode != STATUS_CODE_ALREADY_PRESENT))
-            return firstStatusCode;
+            if (firstStatusCode != secondStatusCode)
+                return STATUS_CODE_FAILURE;
+
+            if ((firstStatusCode != STATUS_CODE_SUCCESS) && (firstStatusCode != STATUS_CODE_ALREADY_PRESENT))
+                return firstStatusCode;
+        }
     }
 
     return STATUS_CODE_SUCCESS;
@@ -204,23 +219,37 @@ StatusCode TrackManager::AddParentDaughterAssociations() const
 
 StatusCode TrackManager::AddSiblingAssociations() const
 {
-    for (TrackRelationMap::const_iterator uidIter = m_siblingRelationMap.begin(), uidIterEnd = m_siblingRelationMap.end();
-        uidIter != uidIterEnd; ++uidIter)
+    if (m_siblingRelationMap.empty())
+        return STATUS_CODE_SUCCESS;
+
+    const TrackList *pInputList(nullptr);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetList(INPUT_LIST_NAME, pInputList));
+
+    for (const Track *const pTrack : *pInputList)
     {
-        UidToTrackMap::const_iterator firstSiblingIter = m_uidToTrackMap.find(uidIter->first);
-        UidToTrackMap::const_iterator secondSiblingIter = m_uidToTrackMap.find(uidIter->second);
+        const auto range(m_siblingRelationMap.equal_range(pTrack->GetParentTrackAddress()));
 
-        if ((m_uidToTrackMap.end() == firstSiblingIter) || (m_uidToTrackMap.end() == secondSiblingIter))
-            continue;
+        TrackList siblingList;
+        for (TrackRelationMap::const_iterator relIter = range.first; relIter != range.second; ++relIter)
+        {
+            UidToTrackMap::const_iterator siblingIter = m_uidToTrackMap.find(relIter->second);
 
-        const StatusCode firstStatusCode(this->Modifiable(firstSiblingIter->second)->AddSibling(secondSiblingIter->second));
-        const StatusCode secondStatusCode(this->Modifiable(secondSiblingIter->second)->AddSibling(firstSiblingIter->second));
+            if (m_uidToTrackMap.end() != siblingIter)
+                siblingList.push_back(siblingIter->second);
+        }
+        siblingList.sort(PointerLessThan<Track>());
 
-        if (firstStatusCode != secondStatusCode)
-            return STATUS_CODE_FAILURE;
+        for (const Track *const pSiblingTrack : siblingList)
+        {
+            const StatusCode firstStatusCode(this->Modifiable(pTrack)->AddSibling(pSiblingTrack));
+            const StatusCode secondStatusCode(this->Modifiable(pSiblingTrack)->AddSibling(pTrack));
 
-        if ((firstStatusCode != STATUS_CODE_SUCCESS) && (firstStatusCode != STATUS_CODE_ALREADY_PRESENT))
-            return firstStatusCode;
+            if (firstStatusCode != secondStatusCode)
+                return STATUS_CODE_FAILURE;
+
+            if ((firstStatusCode != STATUS_CODE_SUCCESS) && (firstStatusCode != STATUS_CODE_ALREADY_PRESENT))
+                return firstStatusCode;
+        }
     }
 
     return STATUS_CODE_SUCCESS;

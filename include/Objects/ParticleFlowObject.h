@@ -205,11 +205,9 @@ protected:
     float                   m_mass;                     ///< The particle flow object mass
     float                   m_energy;                   ///< The particle flow object energy
     CartesianVector         m_momentum;                 ///< The particle flow object momentum
-
     TrackList               m_trackList;                ///< The track list
     ClusterList             m_clusterList;              ///< The cluster list
     VertexList              m_vertexList;               ///< The vertex list
-
     PfoList                 m_parentPfoList;            ///< The list of parent pfos
     PfoList                 m_daughterPfoList;          ///< The list of daughter pfos
 

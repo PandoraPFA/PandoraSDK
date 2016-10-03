@@ -411,45 +411,34 @@ protected:
 
     OrderedCaloHitList          m_orderedCaloHitList;           ///< The ordered calo hit list
     CaloHitList                 m_isolatedCaloHitList;          ///< The list of isolated hits, which contribute only towards cluster energy
-
     unsigned int                m_nCaloHits;                    ///< The number of calo hits
     unsigned int                m_nPossibleMipHits;             ///< The number of calo hits that have been flagged as possible mip hits
     unsigned int                m_nCaloHitsInOuterLayer;        ///< Keep track of the number of calo hits in the outermost layers
-
     double                      m_electromagneticEnergy;        ///< The sum of electromagnetic energy measures of constituent calo hits, units GeV
     double                      m_hadronicEnergy;               ///< The sum of hadronic energy measures of constituent calo hits, units GeV
     double                      m_isolatedElectromagneticEnergy;///< Sum of electromagnetic energy measures of isolated calo hits, units GeV
     double                      m_isolatedHadronicEnergy;       ///< Sum of hadronic energy measures of isolated calo hits, units GeV
-
     int                         m_particleId;                   ///< The particle id flag
-
     const Track                *m_pTrackSeed;                   ///< Address of the track with which the cluster is seeded
-
     PointByPseudoLayerMap       m_sumXYZByPseudoLayer;          ///< Construct to allow rapid calculation of centroid in each pseudolayer
-
     InputUInt                   m_innerPseudoLayer;             ///< The innermost pseudo layer in the cluster
     InputUInt                   m_outerPseudoLayer;             ///< The outermost pseudo layer in the cluster
 
     mutable CartesianVector     m_initialDirection;             ///< The initial direction of the cluster
     mutable bool                m_isDirectionUpToDate;          ///< Whether the initial direction of the cluster is up to date
-
     mutable ClusterFitResult    m_fitToAllHitsResult;           ///< The result of a linear fit to all calo hits in the cluster
     mutable bool                m_isFitUpToDate;                ///< Whether the fit to all calo hits is up to date
-
     mutable InputFloat          m_correctedElectromagneticEnergy;///< The corrected electromagnetic estimate of the cluster energy, units GeV
     mutable InputFloat          m_correctedHadronicEnergy;      ///< The corrected hadronic estimate of the cluster energy, units GeV
     mutable InputFloat          m_trackComparisonEnergy;        ///< The appropriate corrected energy to use in comparisons with track momentum, units GeV
-
     mutable InputBool           m_isPhotonFast;                 ///< Whether the cluster is flagged as a photon by fast photon id function
     mutable InputUInt           m_showerStartLayer;             ///< The pseudo layer at which shower commences
     mutable InputFloat          m_showerProfileStart;           ///< The cluster shower profile start, units radiation lengths
     mutable InputFloat          m_showerProfileDiscrepancy;     ///< The cluster shower profile discrepancy
-
     mutable InputHitType        m_innerLayerHitType;            ///< The typical inner layer hit type
     mutable InputHitType        m_outerLayerHitType;            ///< The typical outer layer hit type
 
     TrackList                   m_associatedTrackList;          ///< The list of tracks associated with the cluster
-
     bool                        m_isAvailable;                  ///< Whether the cluster is available to be added to a particle flow object
 
     friend class ClusterManager;

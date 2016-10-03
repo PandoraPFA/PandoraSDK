@@ -15,24 +15,20 @@
 namespace pandora
 {
 
-const MCParticle *Track::GetMainMCParticle() const
+bool Track::operator< (const Track &rhs) const
 {
-    float bestWeight(0.f);
-    const MCParticle *pBestMCParticle = NULL;
+    const CartesianVector deltaPosition(rhs.GetTrackStateAtCalorimeter().GetPosition() - this->GetTrackStateAtCalorimeter().GetPosition());
 
-    for (MCParticleWeightMap::const_iterator iter = m_mcParticleWeightMap.begin(), iterEnd = m_mcParticleWeightMap.end(); iter != iterEnd; ++iter)
-    {
-        if (iter->second > bestWeight)
-        {
-            bestWeight = iter->second;
-            pBestMCParticle = iter->first;
-        }
-    }
+    if (std::fabs(deltaPosition.GetZ()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetZ() > std::numeric_limits<float>::epsilon());
 
-    if (NULL == pBestMCParticle)
-        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+    if (std::fabs(deltaPosition.GetX()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetX() > std::numeric_limits<float>::epsilon());
 
-    return pBestMCParticle;
+    if (std::fabs(deltaPosition.GetY()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetY() > std::numeric_limits<float>::epsilon());
+
+    return (this->GetEnergyAtDca() > rhs.GetEnergyAtDca());
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

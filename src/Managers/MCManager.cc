@@ -12,6 +12,7 @@
 
 #include "Pandora/ObjectFactory.h"
 #include "Pandora/Pandora.h"
+#include "Pandora/PandoraInternal.h"
 #include "Pandora/PandoraSettings.h"
 #include "Pandora/PdgTable.h"
 
@@ -144,7 +145,6 @@ StatusCode MCManager::SelectPfoTargets()
         }
     }
 
-
     // Save selected pfo target list
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SaveList(SELECTED_LIST_NAME, selectedMCPfoList));
     m_currentListName = SELECTED_LIST_NAME;
@@ -213,23 +213,37 @@ StatusCode MCManager::SetPfoTargetInTree(const MCParticle *const pMCParticle, co
 
 StatusCode MCManager::AddMCParticleRelationships() const
 {
-    for (MCParticleRelationMap::const_iterator uidIter = m_parentDaughterRelationMap.begin(), uidIterEnd = m_parentDaughterRelationMap.end();
-        uidIter != uidIterEnd; ++uidIter)
+    if (m_parentDaughterRelationMap.empty())
+        return STATUS_CODE_SUCCESS;
+
+    const MCParticleList *pInputList(nullptr);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetList(INPUT_LIST_NAME, pInputList));
+
+    for (const MCParticle *const pParentMCParticle : *pInputList)
     {
-        UidToMCParticleMap::const_iterator parentIter = m_uidToMCParticleMap.find(uidIter->first);
-        UidToMCParticleMap::const_iterator daughterIter = m_uidToMCParticleMap.find(uidIter->second);
+        const auto range(m_parentDaughterRelationMap.equal_range(pParentMCParticle->GetUid()));
 
-        if ((m_uidToMCParticleMap.end() == parentIter) || (m_uidToMCParticleMap.end() == daughterIter))
-            continue;
+        MCParticleList daughterList;
+        for (MCParticleRelationMap::const_iterator relIter = range.first; relIter != range.second; ++relIter)
+        {
+            UidToMCParticleMap::const_iterator daughterIter = m_uidToMCParticleMap.find(relIter->second);
 
-        const StatusCode firstStatusCode(this->Modifiable(parentIter->second)->AddDaughter(daughterIter->second));
-        const StatusCode secondStatusCode(this->Modifiable(daughterIter->second)->AddParent(parentIter->second));
+            if (m_uidToMCParticleMap.end() != daughterIter)
+                daughterList.push_back(daughterIter->second);
+        }
+        daughterList.sort(PointerLessThan<MCParticle>());
 
-        if (firstStatusCode != secondStatusCode)
-            return STATUS_CODE_FAILURE;
+        for (const MCParticle *const pDaughterMCParticle : daughterList)
+        {
+            const StatusCode firstStatusCode(this->Modifiable(pParentMCParticle)->AddDaughter(pDaughterMCParticle));
+            const StatusCode secondStatusCode(this->Modifiable(pDaughterMCParticle)->AddParent(pParentMCParticle));
 
-        if ((firstStatusCode != STATUS_CODE_SUCCESS) && (firstStatusCode != STATUS_CODE_ALREADY_PRESENT))
-            return firstStatusCode;
+            if (firstStatusCode != secondStatusCode)
+                return STATUS_CODE_FAILURE;
+
+            if ((firstStatusCode != STATUS_CODE_SUCCESS) && (firstStatusCode != STATUS_CODE_ALREADY_PRESENT))
+                return firstStatusCode;
+        }
     }
 
     return STATUS_CODE_SUCCESS;

@@ -18,8 +18,11 @@
 #include "Objects/Track.h"
 
 #include "Pandora/Pandora.h"
+#include "Pandora/PandoraInternal.h"
 
 #include "Persistency/FileWriter.h"
+
+#include <algorithm>
 
 namespace pandora
 {
@@ -200,10 +203,14 @@ StatusCode FileWriter::WriteCaloHitToMCParticleRelationship(const CaloHit *const
 
     const MCParticleWeightMap &mcParticleWeightMap(pCaloHit->GetMCParticleWeightMap());
 
-    for (MCParticleWeightMap::const_iterator iter = mcParticleWeightMap.begin(), iterEnd = mcParticleWeightMap.end(); iter != iterEnd; ++iter)
+    MCParticleVector mcParticleVector;
+    for (const MCParticleWeightMap::value_type &mapEntry : mcParticleWeightMap) mcParticleVector.push_back(mapEntry.first);
+    std::sort(mcParticleVector.begin(), mcParticleVector.end(), PointerLessThan<MCParticle>());
+
+    for (const MCParticle *const pMCParticle : mcParticleVector)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteRelationship(CALO_HIT_TO_MC, pCaloHit->GetParentCaloHitAddress(),
-            iter->first->GetUid(), iter->second));
+            pMCParticle->GetUid(), mcParticleWeightMap.at(pMCParticle)));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -218,10 +225,14 @@ StatusCode FileWriter::WriteTrackToMCParticleRelationship(const Track *const pTr
 
     const MCParticleWeightMap &mcParticleWeightMap(pTrack->GetMCParticleWeightMap());
 
-    for (MCParticleWeightMap::const_iterator iter = mcParticleWeightMap.begin(), iterEnd = mcParticleWeightMap.end(); iter != iterEnd; ++iter)
+    MCParticleVector mcParticleVector;
+    for (const MCParticleWeightMap::value_type &mapEntry : mcParticleWeightMap) mcParticleVector.push_back(mapEntry.first);
+    std::sort(mcParticleVector.begin(), mcParticleVector.end(), PointerLessThan<MCParticle>());
+
+    for (const MCParticle *const pMCParticle : mcParticleVector)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteRelationship(TRACK_TO_MC, pTrack->GetParentTrackAddress(),
-            iter->first->GetUid(), iter->second));
+            pMCParticle->GetUid(), mcParticleWeightMap.at(pMCParticle)));
     }
 
     return STATUS_CODE_SUCCESS;

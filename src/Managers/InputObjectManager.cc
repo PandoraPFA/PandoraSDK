@@ -12,6 +12,8 @@
 #include "Objects/MCParticle.h"
 #include "Objects/Track.h"
 
+#include "Pandora/PandoraInternal.h"
+
 #include <algorithm>
 
 namespace pandora
@@ -44,6 +46,9 @@ StatusCode InputObjectManager<T>::CreateInputList()
 
     if (Manager<T>::m_nameToListMap.end() == existingListIter)
         return STATUS_CODE_FAILURE;
+
+    // ATTN Defined ordering of input objects. After this, algorithms must control object sorting.
+    existingListIter->second->sort(PointerLessThan<T>());
 
     Manager<T>::m_currentListName = INPUT_LIST_NAME;
     return STATUS_CODE_SUCCESS;

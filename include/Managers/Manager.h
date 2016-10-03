@@ -162,7 +162,7 @@ protected:
     };
 
     typedef std::map<std::string, ObjectList *> NameToListMap;
-    typedef std::map<const Algorithm *, AlgorithmInfo> AlgorithmInfoMap;
+    typedef std::unordered_map<const Algorithm *, AlgorithmInfo> AlgorithmInfoMap;
 
     NameToListMap                   m_nameToListMap;                    ///< The name to list map
     AlgorithmInfoMap                m_algorithmInfoMap;                 ///< The algorithm info map

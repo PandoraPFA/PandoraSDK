@@ -135,9 +135,9 @@ private:
      */
     StatusCode RemoveMCParticleRelationships(const MCParticle *const pMCParticle) const;
 
-    typedef std::map<Uid, float> UidToWeightMap;
-    typedef std::map<Uid, UidToWeightMap> ObjectRelationMap;
-    typedef std::multimap<Uid, Uid> MCParticleRelationMap;
+    typedef std::unordered_map<Uid, float> UidToWeightMap;
+    typedef std::unordered_map<Uid, UidToWeightMap> ObjectRelationMap;
+    typedef std::unordered_multimap<Uid, Uid> MCParticleRelationMap;
 
     /**
      *  @brief  Set an object (e.g. calo hit or track) to mc particle relationship

@@ -25,6 +25,7 @@ class OrderedCaloHitList
 {
 public:
     typedef std::map<unsigned int, CaloHitList *> TheList;
+    typedef TheList::value_type value_type;
     typedef TheList::const_iterator const_iterator;
     typedef TheList::const_reverse_iterator const_reverse_iterator;
 

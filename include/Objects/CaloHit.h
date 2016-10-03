@@ -214,6 +214,15 @@ public:
      */
     void GetCellCorners(CartesianPointVector &cartesianPointVector) const;
 
+    /**
+     *  @brief  operator< sorting by position, then energy
+     * 
+     *  @param  rhs the object for comparison
+     * 
+     *  @return boolean
+     */
+    bool operator< (const CaloHit &rhs) const;
+
 protected:
     /**
      *  @brief  Constructor
@@ -298,34 +307,28 @@ protected:
     const CartesianVector   m_positionVector;           ///< Position vector of center of calorimeter cell, units mm
     const CartesianVector   m_expectedDirection;        ///< Unit vector in direction of expected hit propagation
     const CartesianVector   m_cellNormalVector;         ///< Unit normal to the sampling layer, pointing outwards from the origin
-
     const CellGeometry      m_cellGeometry;             ///< The cell geometry type, pointing or rectangular
     const float             m_cellSize0;                ///< Cell size 0 [pointing: pseudo rapidity, eta, rectangular: up in ENDCAP, along beam in BARREL, units mm]
     const float             m_cellSize1;                ///< Cell size 1 [pointing: azimuthal angle, phi, rectangular: perpendicular to size 0 and thickness, units mm]
     const float             m_cellThickness;            ///< Thickness of cell, units mm
-
     const float             m_nCellRadiationLengths;    ///< Absorber material in front of cell, units radiation lengths
     const float             m_nCellInteractionLengths;  ///< Absorber material in front of cell, units interaction lengths
-
     const float             m_time;                     ///< Time of (earliest) energy deposition in this cell, units ns
     const float             m_inputEnergy;              ///< Corrected energy of calorimeter cell in user framework, units GeV
     const float             m_mipEquivalentEnergy;      ///< The calibrated mip equivalent energy, units mip
     const float             m_electromagneticEnergy;    ///< The calibrated electromagnetic energy measure, units GeV
     const float             m_hadronicEnergy;           ///< The calibrated hadronic energy measure, units GeV
-
     const bool              m_isDigital;                ///< Whether cell should be treated as digital (implies constant cell energy)
     const HitType           m_hitType;                  ///< The type of calorimeter hit
     const HitRegion         m_hitRegion;                ///< Region of the detector in which the calo hit is located
     const unsigned int      m_layer;                    ///< The subdetector readout layer number
     InputUInt               m_pseudoLayer;              ///< The pseudo layer to which the calo hit has been assigned
     const bool              m_isInOuterSamplingLayer;   ///< Whether cell is in one of the outermost detector sampling layers
-
     float                   m_cellLengthScale;          ///< Typical length scale [pointing: measured at cell mid-point, rectangular: std::sqrt(cellSize0 * cellSize1), units mm ]
     bool                    m_isPossibleMip;            ///< Whether the calo hit is a possible mip hit
     bool                    m_isIsolated;               ///< Whether the calo hit is isolated
     bool                    m_isAvailable;              ///< Whether the calo hit is available to be added to a cluster
     float                   m_weight;                   ///< The calo hit weight, which may not be unity if the hit has been fragmented
-
     MCParticleWeightMap     m_mcParticleWeightMap;      ///< The mc particle weight map
     const void             *m_pParentAddress;           ///< The address of the parent calo hit in the user framework
 

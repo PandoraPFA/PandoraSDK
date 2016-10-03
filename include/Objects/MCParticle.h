@@ -131,6 +131,15 @@ public:
      */
     const MCParticleList &GetDaughterList() const;
 
+    /**
+     *  @brief  operator< sorting by vertex position, then energy
+     * 
+     *  @param  rhs the object for comparison
+     * 
+     *  @return boolean
+     */
+    bool operator< (const MCParticle &rhs) const;
+
 protected:
     /**
      *  @brief  Constructor
@@ -185,17 +194,14 @@ protected:
     StatusCode RemovePfoTarget();
 
     const Uid               m_uid;                      ///< Unique identifier for the mc particle
-
     const float             m_energy;                   ///< The energy of the mc particle, units GeV
     const CartesianVector   m_momentum;                 ///< The momentum of the mc particle, units GeV
     const CartesianVector   m_vertex;                   ///< The production vertex of the mc particle, units mm
     const CartesianVector   m_endpoint;                 ///< The endpoint of the mc particle, units mm
-
     const float             m_innerRadius;              ///< Inner radius of the particle's path, units mm
     const float             m_outerRadius;              ///< Outer radius of the particle's path, units mm
     const int               m_particleId;               ///< The PDG code of the mc particle
     const MCParticleType    m_mcParticleType;           ///< The type of the mc particle, e.g. vertex, 2D-projection, etc.
-
     const MCParticle       *m_pPfoTarget;               ///< The address of the pfo target
     MCParticleList          m_daughterList;             ///< The list of mc daughter particles
     MCParticleList          m_parentList;               ///< The list of mc parent particles

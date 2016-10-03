@@ -173,10 +173,7 @@ StatusCode ClusterFitHelper::FitLayerCentroids(const Cluster *const pCluster, co
             if (endLayer < pseudoLayer)
                 break;
 
-            CaloHitVector caloHitVector(iter->second->begin(), iter->second->end());
-            std::sort(caloHitVector.begin(), caloHitVector.end(), ClusterFitHelper::SortCaloHits);
-
-            const unsigned int nCaloHits(caloHitVector.size());
+            const unsigned int nCaloHits(iter->second->size());
 
             if (0 == nCaloHits)
                 throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -184,7 +181,7 @@ StatusCode ClusterFitHelper::FitLayerCentroids(const Cluster *const pCluster, co
             float cellLengthScaleSum(0.f), cellEnergySum(0.f);
             CartesianVector cellNormalVectorSum(0.f, 0.f, 0.f);
 
-            for (CaloHitVector::const_iterator hitIter = caloHitVector.begin(), hitIterEnd = caloHitVector.end(); hitIter != hitIterEnd; ++hitIter)
+            for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
             {
                 cellLengthScaleSum += (*hitIter)->GetCellLengthScale();
                 cellNormalVectorSum += (*hitIter)->GetCellNormalVector();
@@ -369,13 +366,6 @@ StatusCode ClusterFitHelper::PerformLinearFit(const CartesianVector &centralPosi
     clusterFitResult.SetSuccessFlag(true);
 
     return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-bool ClusterFitHelper::SortCaloHits(const CaloHit *const pLhs, const CaloHit *const pRhs)
-{
-    return (ClusterFitPoint(pLhs) < ClusterFitPoint(pRhs));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

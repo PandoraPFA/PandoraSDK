@@ -19,8 +19,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include <stdint.h>
-
 namespace pandora
 {
 
@@ -233,6 +231,14 @@ public:
     void insert(const_iterator position, InputIterator first, InputIterator last);
 
     /**
+     *  @brief  sort
+     * 
+     *  @param  comp
+     */
+    template <class Compare>
+    void sort (Compare comp);
+
+    /**
      *  @brief  size
      * 
      *  @return size
@@ -356,6 +362,15 @@ inline void MyList<T>::insert(const_iterator position, InputIterator first, Inpu
     }
 
     m_theList.insert(position, first, last);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
+template <class Compare>
+inline void MyList<T>::sort(Compare comp)
+{
+    m_theList.sort(comp);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

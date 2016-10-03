@@ -158,8 +158,8 @@ private:
     StatusCode InitializeReclustering(const Algorithm *const pAlgorithm, const TrackList &trackList,
         const std::string &originalReclusterListName);
 
-    typedef std::map<Uid, const Track *> UidToTrackMap;
-    typedef std::multimap<Uid, Uid> TrackRelationMap;
+    typedef std::unordered_map<Uid, const Track *> UidToTrackMap;
+    typedef std::unordered_multimap<Uid, Uid> TrackRelationMap;
 
     UidToTrackMap                   m_uidToTrackMap;                    ///< The uid to track map
     TrackRelationMap                m_parentDaughterRelationMap;        ///< The track parent-daughter relation map

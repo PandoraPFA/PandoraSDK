@@ -8,6 +8,8 @@
 
 #include "Managers/Metadata.h"
 
+#include "Pandora/PandoraInternal.h"
+
 #include <algorithm>
 
 namespace pandora
@@ -108,14 +110,18 @@ StatusCode CaloHitMetadata::Update(const CaloHitMetadata &caloHitMetadata)
 
     const CaloHitUsageMap &caloHitUsageMap(caloHitMetadata.GetCaloHitUsageMap());
 
-    for (CaloHitUsageMap::const_iterator iter = caloHitUsageMap.begin(), iterEnd = caloHitUsageMap.end(); iter != iterEnd; ++iter)
+    CaloHitVector caloHitVector;
+    for (const CaloHitUsageMap::value_type &mapEntry : caloHitUsageMap) caloHitVector.push_back(mapEntry.first);
+    std::sort(caloHitVector.begin(), caloHitVector.end(), PointerLessThan<CaloHit>());
+
+    for (const CaloHit *const pCaloHit : caloHitVector)
     {
-        CaloHitUsageMap::iterator usageMapIter = m_caloHitUsageMap.find(iter->first);
+        CaloHitUsageMap::iterator usageMapIter = m_caloHitUsageMap.find(pCaloHit);
 
         if (m_caloHitUsageMap.end() == usageMapIter)
             return STATUS_CODE_FAILURE;
 
-        usageMapIter->second = iter->second;
+        usageMapIter->second = caloHitUsageMap.at(pCaloHit);
     }
 
     return STATUS_CODE_SUCCESS;

@@ -14,6 +14,42 @@
 namespace pandora
 {
 
+void CaloHit::GetCellCorners(CartesianPointVector &cartesianPointVector) const
+{
+    if (RECTANGULAR == this->GetCellGeometry())
+    {
+        this->GetRectangularCellCorners(cartesianPointVector);
+    }
+    else if (POINTING == this->GetCellGeometry())
+    {
+        this->GetPointingCellCorners(cartesianPointVector);
+    }
+    else
+    {
+        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool CaloHit::operator< (const CaloHit &rhs) const
+{
+    const CartesianVector deltaPosition(rhs.GetPositionVector() - this->GetPositionVector());
+
+    if (std::fabs(deltaPosition.GetZ()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetZ() > std::numeric_limits<float>::epsilon());
+
+    if (std::fabs(deltaPosition.GetX()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetX() > std::numeric_limits<float>::epsilon());
+
+    if (std::fabs(deltaPosition.GetY()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetY() > std::numeric_limits<float>::epsilon());
+
+    return (this->GetInputEnergy() > rhs.GetInputEnergy());
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 CaloHit::CaloHit(const PandoraApi::CaloHit::Parameters &parameters) :
     m_positionVector(parameters.m_positionVector.Get()),
     m_expectedDirection(parameters.m_expectedDirection.Get().GetUnitVector()),
@@ -140,24 +176,6 @@ float CaloHit::CalculateCellLengthScale() const
         const float thetaMin(2.f * std::atan(std::exp(-1.f * etaMin))), thetaMax(2.f * std::atan(std::exp(-1.f * etaMax)));
 
         return std::sqrt(std::fabs(radius * this->GetCellSize1() * radius * (thetaMax - thetaMin)));
-    }
-    else
-    {
-        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
-    }
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void CaloHit::GetCellCorners(CartesianPointVector &cartesianPointVector) const
-{
-    if (RECTANGULAR == this->GetCellGeometry())
-    {
-        this->GetRectangularCellCorners(cartesianPointVector);
-    }
-    else if (POINTING == this->GetCellGeometry())
-    {
-        this->GetPointingCellCorners(cartesianPointVector);
     }
     else
     {

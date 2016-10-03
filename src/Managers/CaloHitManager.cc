@@ -12,8 +12,9 @@
 #include "Objects/Cluster.h"
 #include "Objects/CaloHit.h"
 
-#include "Pandora/Pandora.h"
 #include "Pandora/ObjectFactory.h"
+#include "Pandora/Pandora.h"
+#include "Pandora/PandoraInternal.h"
 
 #include "Plugins/PseudoLayerPlugin.h"
 
@@ -413,9 +414,13 @@ StatusCode CaloHitManager::Update(const CaloHitMetadata &caloHitMetadata)
 
     const CaloHitUsageMap &caloHitUsageMap(caloHitMetadata.GetCaloHitUsageMap());
 
-    for (CaloHitUsageMap::const_iterator iter = caloHitUsageMap.begin(), iterEnd = caloHitUsageMap.end(); iter != iterEnd; ++iter)
+    CaloHitVector caloHitVector;
+    for (const CaloHitUsageMap::value_type &mapEntry : caloHitUsageMap) caloHitVector.push_back(mapEntry.first);
+    std::sort(caloHitVector.begin(), caloHitVector.end(), PointerLessThan<CaloHit>());
+
+    for (const CaloHit *const pCaloHit : caloHitVector)
     {
-        this->Modifiable(iter->first)->SetAvailability(iter->second);
+        this->Modifiable(pCaloHit)->SetAvailability(caloHitUsageMap.at(pCaloHit));
     }
 
     return STATUS_CODE_SUCCESS;

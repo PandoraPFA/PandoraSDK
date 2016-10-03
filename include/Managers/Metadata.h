@@ -27,7 +27,7 @@ public:
 };
 
 typedef std::vector<CaloHitReplacement *> CaloHitReplacementList;
-typedef std::map<const CaloHit *, bool> CaloHitUsageMap;
+typedef std::unordered_map<const CaloHit *, bool> CaloHitUsageMap;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------

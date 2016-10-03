@@ -13,6 +13,24 @@
 namespace pandora
 {
 
+bool MCParticle::operator< (const MCParticle &rhs) const
+{
+    const CartesianVector deltaPosition(rhs.GetVertex() - this->GetVertex());
+
+    if (std::fabs(deltaPosition.GetZ()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetZ() > std::numeric_limits<float>::epsilon());
+
+    if (std::fabs(deltaPosition.GetX()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetX() > std::numeric_limits<float>::epsilon());
+
+    if (std::fabs(deltaPosition.GetY()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetY() > std::numeric_limits<float>::epsilon());
+
+    return (this->GetEnergy() > rhs.GetEnergy());
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 MCParticle::MCParticle(const PandoraApi::MCParticle::Parameters &parameters) :
     m_uid(parameters.m_pParentAddress.Get()),
     m_energy(parameters.m_energy.Get()),
@@ -26,7 +44,6 @@ MCParticle::MCParticle(const PandoraApi::MCParticle::Parameters &parameters) :
     m_pPfoTarget(NULL)
 {
 }
-
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
