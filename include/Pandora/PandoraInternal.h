@@ -400,7 +400,7 @@ inline void MyList<T>::clear()
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-#define MANAGED_CONTAINER MyList
+#define MANAGED_CONTAINER std::list
 
 typedef MANAGED_CONTAINER<const CaloHit *> CaloHitList;
 typedef MANAGED_CONTAINER<const Cluster *> ClusterList;
