@@ -8,10 +8,9 @@
 #ifndef PANDORA_PARTICLE_FLOW_OBJECT_MANAGER_H
 #define PANDORA_PARTICLE_FLOW_OBJECT_MANAGER_H 1
 
-#include "Api/PandoraContentApi.h"
-
 #include "Managers/AlgorithmObjectManager.h"
 
+#include "Pandora/ObjectCreation.h"
 #include "Pandora/PandoraInternal.h"
 
 namespace pandora
@@ -43,8 +42,8 @@ private:
      *  @param  pPfo to receive the address of the particle flow object created
      *  @param  factory the factory that performs the object allocation
      */
-    StatusCode Create(const PandoraContentApi::ParticleFlowObject::Parameters &parameters, const ParticleFlowObject *&pPfo,
-        const ObjectFactory<PandoraContentApi::ParticleFlowObject::Parameters, ParticleFlowObject> &factory);
+    StatusCode Create(const object_creation::ParticleFlowObject::Parameters &parameters, const ParticleFlowObject *&pPfo,
+        const ObjectFactory<object_creation::ParticleFlowObject::Parameters, ParticleFlowObject> &factory);
 
     /**
      *  @brief  Alter the metadata information stored in a particle flow object
@@ -52,7 +51,7 @@ private:
      *  @param  pPfo address of the particle flow object to modify
      *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
      */
-    StatusCode AlterMetadata(const ParticleFlowObject *const pPfo, const PandoraContentApi::ParticleFlowObject::Metadata &metadata) const;
+    StatusCode AlterMetadata(const ParticleFlowObject *const pPfo, const object_creation::ParticleFlowObject::Metadata &metadata) const;
 
     /**
      *  @brief  Add an object to a particle flow object

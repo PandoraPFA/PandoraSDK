@@ -8,9 +8,7 @@
 #ifndef PANDORA_MC_PARTICLE_H
 #define PANDORA_MC_PARTICLE_H 1
 
-#include "Api/PandoraApi.h"
-
-#include "Pandora/PandoraInternal.h"
+#include "Pandora/ObjectCreation.h"
 
 namespace pandora
 {
@@ -146,7 +144,7 @@ protected:
      * 
      *  @param  parameters the mc particle parameters
      */
-    MCParticle(const PandoraApi::MCParticle::Parameters &parameters);
+    MCParticle(const object_creation::MCParticle::Parameters &parameters);
 
     /**
      *  @brief  Destructor
@@ -208,7 +206,7 @@ protected:
 
     friend class MCManager;
     friend class InputObjectManager<MCParticle>;
-    friend class PandoraObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle>;
+    friend class PandoraObjectFactory<object_creation::MCParticle::Parameters, MCParticle>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

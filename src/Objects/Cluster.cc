@@ -24,7 +24,7 @@
 namespace pandora
 {
 
-Cluster::Cluster(const PandoraContentApi::Cluster::Parameters &parameters) :
+Cluster::Cluster(const object_creation::Cluster::Parameters &parameters) :
     m_nCaloHits(0),
     m_nPossibleMipHits(0),
     m_nCaloHitsInOuterLayer(0),
@@ -61,7 +61,13 @@ Cluster::Cluster(const PandoraContentApi::Cluster::Parameters &parameters) :
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Cluster::AlterMetadata(const PandoraContentApi::Cluster::Metadata &metadata)
+Cluster::~Cluster()
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode Cluster::AlterMetadata(const object_creation::Cluster::Metadata &metadata)
 {
     if (metadata.m_particleId.IsInitialized())
     {

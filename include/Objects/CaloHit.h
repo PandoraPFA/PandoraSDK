@@ -8,10 +8,7 @@
 #ifndef PANDORA_CALO_HIT_H
 #define PANDORA_CALO_HIT_H 1
 
-#include "Api/PandoraApi.h"
-#include "Api/PandoraContentApi.h"
-
-#include "Pandora/PandoraInternal.h"
+#include "Pandora/ObjectCreation.h"
 
 namespace pandora
 {
@@ -229,14 +226,14 @@ protected:
      * 
      *  @param  parameters the calo hit parameters
      */
-    CaloHit(const PandoraApi::CaloHit::Parameters &parameters);
+    CaloHit(const object_creation::CaloHit::Parameters &parameters);
 
     /**
      *  @brief  Weighted copy constructor
      * 
      *  @param  parameters the calo hit fragmentation parameters
      */
-    CaloHit(const PandoraContentApi::CaloHitFragment::Parameters &parameters);
+    CaloHit(const object_creation::CaloHitFragment::Parameters &parameters);
 
     /**
      *  @brief  Destructor
@@ -244,18 +241,18 @@ protected:
     virtual ~CaloHit();
 
     /**
+     *  @brief  Alter the metadata information stored in a calo hit
+     * 
+     *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
+     */
+    StatusCode AlterMetadata(const object_creation::CaloHit::Metadata &metadata);
+
+    /**
      *  @brief  Set the mc pseudo layer for the calo hit
      * 
      *  @param  pseudoLayer the pseudo layer
      */
     StatusCode SetPseudoLayer(const unsigned int pseudoLayer);
-
-    /**
-     *  @brief  Alter the metadata information stored in a calo hit
-     * 
-     *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
-     */
-    StatusCode AlterMetadata(const PandoraContentApi::CaloHit::Metadata &metadata);
 
     /**
      *  @brief  Set the mc particles associated with the calo hit
@@ -335,17 +332,9 @@ protected:
     friend class CaloHitMetadata;
     friend class CaloHitManager;
     friend class InputObjectManager<CaloHit>;
-    friend class PandoraObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit>;
-    friend class PandoraObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit>;
+    friend class PandoraObjectFactory<object_creation::CaloHit::Parameters, CaloHit>;
+    friend class PandoraObjectFactory<object_creation::CaloHitFragment::Parameters, CaloHit>;
 };
-
-/**
- *  @brief  Operator to dump calo hit properties to an ostream
- *
- *  @param  stream the target ostream
- *  @param  caloHit the calo hit
- */
-std::ostream &operator<<(std::ostream &stream, const CaloHit &caloHit);
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 

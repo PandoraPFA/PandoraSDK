@@ -8,10 +8,9 @@
 #ifndef PANDORA_TRACK_MANAGER_H
 #define PANDORA_TRACK_MANAGER_H 1
 
-#include "Api/PandoraApi.h"
-
 #include "Managers/InputObjectManager.h"
 
+#include "Pandora/ObjectCreation.h"
 #include "Pandora/PandoraInternal.h"
 
 namespace pandora
@@ -43,8 +42,8 @@ private:
      *  @param  pTrack to receive the address of the track
      *  @param  factory the factory that performs the object allocation
      */
-    StatusCode Create(const PandoraApi::Track::Parameters &parameters, const Track *&pTrack,
-        const ObjectFactory<PandoraApi::Track::Parameters, Track> &factory);
+    StatusCode Create(const object_creation::Track::Parameters &parameters, const Track *&pTrack,
+        const ObjectFactory<object_creation::Track::Parameters, Track> &factory);
 
     /**
      *  @brief  Is a track, or a list of tracks, available to add to a particle flow object

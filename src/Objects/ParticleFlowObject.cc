@@ -16,7 +16,7 @@
 namespace pandora
 {
 
-ParticleFlowObject::ParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &parameters) :
+ParticleFlowObject::ParticleFlowObject(const object_creation::ParticleFlowObject::Parameters &parameters) :
     m_particleId(parameters.m_particleId.Get()),
     m_charge(parameters.m_charge.Get()),
     m_mass(parameters.m_mass.Get()),
@@ -30,7 +30,13 @@ ParticleFlowObject::ParticleFlowObject(const PandoraContentApi::ParticleFlowObje
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObject::AlterMetadata(const PandoraContentApi::ParticleFlowObject::Metadata &metadata)
+ParticleFlowObject::~ParticleFlowObject()
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ParticleFlowObject::AlterMetadata(const object_creation::ParticleFlowObject::Metadata &metadata)
 {
     if (metadata.m_particleId.IsInitialized())
         m_particleId = metadata.m_particleId.Get();

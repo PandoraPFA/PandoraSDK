@@ -122,18 +122,18 @@ StatusCode BinaryFileWriter::WriteSubDetector(const SubDetector *const pSubDetec
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->IsMirroredInZ()));
 
     const unsigned int nLayers(pSubDetector->GetNLayers());
-    const SubDetector::SubDetectorLayerList &subDetectorLayerList(pSubDetector->GetSubDetectorLayerList());
+    const SubDetector::SubDetectorLayerVector &subDetectorLayerVector(pSubDetector->GetSubDetectorLayerVector());
 
-    if (subDetectorLayerList.size() != nLayers)
+    if (subDetectorLayerVector.size() != nLayers)
         return STATUS_CODE_FAILURE;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(nLayers));
 
     for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerList[iLayer].GetClosestDistanceToIp()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerList[iLayer].GetNRadiationLengths()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerList[iLayer].GetNInteractionLengths()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerVector.at(iLayer).GetClosestDistanceToIp()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerVector.at(iLayer).GetNRadiationLengths()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerVector.at(iLayer).GetNInteractionLengths()));
     }
 
     return STATUS_CODE_SUCCESS;

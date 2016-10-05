@@ -8,12 +8,10 @@
 
 #include "Objects/Vertex.h"
 
-#include <iostream>
-
 namespace pandora
 {
 
-Vertex::Vertex(const PandoraContentApi::Vertex::Parameters &parameters) :
+Vertex::Vertex(const object_creation::Vertex::Parameters &parameters) :
     m_position(parameters.m_position.Get()),
     m_vertexLabel(parameters.m_vertexLabel.Get()),
     m_vertexType(parameters.m_vertexType.Get()),
@@ -29,7 +27,7 @@ Vertex::~Vertex()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Vertex::AlterMetadata(const PandoraContentApi::Vertex::Metadata &metadata)
+StatusCode Vertex::AlterMetadata(const object_creation::Vertex::Metadata &metadata)
 {
     if (metadata.m_vertexLabel.IsInitialized())
         m_vertexLabel = metadata.m_vertexLabel.Get();
@@ -38,15 +36,6 @@ StatusCode Vertex::AlterMetadata(const PandoraContentApi::Vertex::Metadata &meta
         m_vertexType = metadata.m_vertexType.Get();
 
     return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-std::ostream &operator<<(std::ostream &stream, const Vertex &vertex)
-{
-    stream  << " Vertex: " << std::endl << " position " << vertex.GetPosition() << ", type " << vertex.GetVertexType() << std::endl;
-    return stream;
 }
 
 } // namespace pandora

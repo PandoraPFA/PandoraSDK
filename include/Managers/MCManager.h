@@ -8,10 +8,9 @@
 #ifndef PANDORA_MC_MANAGER_H
 #define PANDORA_MC_MANAGER_H 1
 
-#include "Api/PandoraApi.h"
-
 #include "Managers/InputObjectManager.h"
 
+#include "Pandora/ObjectCreation.h"
 #include "Pandora/PandoraInternal.h"
 
 namespace pandora
@@ -43,8 +42,8 @@ private:
      *  @param  pMCParticle address of the mc particle
      *  @param  factory the factory that performs the object allocation
      */
-    StatusCode Create(const PandoraApi::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle,
-        const ObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle> &factory);
+    StatusCode Create(const object_creation::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle,
+        const ObjectFactory<object_creation::MCParticle::Parameters, MCParticle> &factory);
 
     /**
      *  @brief  Erase all mc manager content

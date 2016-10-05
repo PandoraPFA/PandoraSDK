@@ -8,7 +8,7 @@
 #ifndef PANDORA_PARTICLE_FLOW_OBJECT_H
 #define PANDORA_PARTICLE_FLOW_OBJECT_H 1
 
-#include "Api/PandoraContentApi.h"
+#include "Pandora/ObjectCreation.h"
 
 namespace pandora
 {
@@ -142,7 +142,7 @@ protected:
      * 
      *  @param  parameters the particle flow object parameters
      */
-    ParticleFlowObject(const PandoraContentApi::ParticleFlowObject::Parameters &parameters);
+    ParticleFlowObject(const object_creation::ParticleFlowObject::Parameters &parameters);
 
     /**
      *  @brief  Destructor
@@ -154,7 +154,7 @@ protected:
      * 
      *  @param  metaData the new particle flow object metadata (all fields now optional)
      */
-    StatusCode AlterMetadata(const PandoraContentApi::ParticleFlowObject::Metadata &metadata);
+    StatusCode AlterMetadata(const object_creation::ParticleFlowObject::Metadata &metadata);
 
     /**
      *  @brief  Add an object to the particle flow object
@@ -213,7 +213,7 @@ protected:
 
     friend class ParticleFlowObjectManager;
     friend class AlgorithmObjectManager<ParticleFlowObject>;
-    friend class PandoraObjectFactory<PandoraContentApi::ParticleFlowObject::Parameters, ParticleFlowObject>;
+    friend class PandoraObjectFactory<object_creation::ParticleFlowObject::Parameters, ParticleFlowObject>;
 };
 
 typedef ParticleFlowObject Pfo;                         ///< The ParticleFlowObject to Pfo typedef
@@ -314,12 +314,6 @@ inline unsigned int ParticleFlowObject::GetNParentPfos() const
 inline unsigned int ParticleFlowObject::GetNDaughterPfos() const
 {
     return m_daughterPfoList.size();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline ParticleFlowObject::~ParticleFlowObject()
-{
 }
 
 } // namespace pandora

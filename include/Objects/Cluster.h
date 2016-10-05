@@ -8,13 +8,11 @@
 #ifndef PANDORA_CLUSTER_H
 #define PANDORA_CLUSTER_H 1
 
-#include "Api/PandoraContentApi.h"
-
 #include "Helpers/ClusterFitHelper.h"
 
 #include "Objects/OrderedCaloHitList.h"
 
-#include "Pandora/PandoraInternal.h"
+#include "Pandora/ObjectCreation.h"
 
 namespace pandora
 {
@@ -265,7 +263,7 @@ protected:
      * 
      *  @param  parameters the cluster parameters
      */
-    Cluster(const PandoraContentApi::Cluster::Parameters &parameters);
+    Cluster(const object_creation::Cluster::Parameters &parameters);
 
     /**
      *  @brief  Destructor
@@ -277,7 +275,7 @@ protected:
      * 
      *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
      */
-    StatusCode AlterMetadata(const PandoraContentApi::Cluster::Metadata &metadata);
+    StatusCode AlterMetadata(const object_creation::Cluster::Metadata &metadata);
 
     /**
      *  @brief  Add a calo hit to the cluster
@@ -443,7 +441,7 @@ protected:
 
     friend class ClusterManager;
     friend class AlgorithmObjectManager<Cluster>;
-    friend class PandoraObjectFactory<PandoraContentApi::Cluster::Parameters, Cluster>;
+    friend class PandoraObjectFactory<object_creation::Cluster::Parameters, Cluster>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -676,12 +674,6 @@ inline float Cluster::GetShowerProfileDiscrepancy(const Pandora &pandora) const
         this->CalculateShowerProfile(pandora);
 
     return m_showerProfileDiscrepancy.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline Cluster::~Cluster()
-{
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

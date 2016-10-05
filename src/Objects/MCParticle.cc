@@ -31,7 +31,7 @@ bool MCParticle::operator< (const MCParticle &rhs) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-MCParticle::MCParticle(const PandoraApi::MCParticle::Parameters &parameters) :
+MCParticle::MCParticle(const object_creation::MCParticle::Parameters &parameters) :
     m_uid(parameters.m_pParentAddress.Get()),
     m_energy(parameters.m_energy.Get()),
     m_momentum(parameters.m_momentum.Get()),

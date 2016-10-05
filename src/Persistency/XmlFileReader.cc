@@ -6,6 +6,8 @@
  *  $Log: $
  */
 
+#include "Api/PandoraApi.h"
+
 #include "Objects/CaloHit.h"
 #include "Objects/Track.h"
 
@@ -293,7 +295,7 @@ StatusCode XmlFileReader::ReadSubDetector()
                 layerParameters.m_closestDistanceToIp = closestDistanceToIp[iLayer];
                 layerParameters.m_nRadiationLengths = nRadiationLengths[iLayer];
                 layerParameters.m_nInteractionLengths = nInteractionLengths[iLayer];
-                pParameters->m_layerParametersList.push_back(layerParameters);
+                pParameters->m_layerParametersVector.push_back(layerParameters);
             }
         }
 

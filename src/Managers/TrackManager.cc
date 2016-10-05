@@ -33,8 +33,8 @@ TrackManager::~TrackManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode TrackManager::Create(const PandoraApi::Track::Parameters &parameters, const Track *&pTrack,
-    const ObjectFactory<PandoraApi::Track::Parameters, Track> &factory)
+StatusCode TrackManager::Create(const object_creation::Track::Parameters &parameters, const Track *&pTrack,
+    const ObjectFactory<object_creation::Track::Parameters, Track> &factory)
 {
     pTrack = NULL;
 

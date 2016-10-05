@@ -73,8 +73,8 @@ Granularity GeometryManager::GetHitTypeGranularity(const HitType hitType) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode GeometryManager::CreateSubDetector(const PandoraApi::Geometry::SubDetector::Parameters &inputParameters,
-    const ObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector> &factory)
+StatusCode GeometryManager::CreateSubDetector(const object_creation::Geometry::SubDetector::Parameters &inputParameters,
+    const ObjectFactory<object_creation::Geometry::SubDetector::Parameters, SubDetector> &factory)
 {
     const SubDetector *pSubDetector = NULL;
 
@@ -184,8 +184,8 @@ StatusCode GeometryManager::SetHitTypeGranularity(const HitType hitType, const G
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template StatusCode GeometryManager::CreateGap(const PandoraApi::Geometry::LineGap::Parameters &, const ObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap> &);
-template StatusCode GeometryManager::CreateGap(const PandoraApi::Geometry::BoxGap::Parameters &, const ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> &);
-template StatusCode GeometryManager::CreateGap(const PandoraApi::Geometry::ConcentricGap::Parameters &, const ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> &);
+template StatusCode GeometryManager::CreateGap(const object_creation::Geometry::LineGap::Parameters &, const ObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object> &);
+template StatusCode GeometryManager::CreateGap(const object_creation::Geometry::BoxGap::Parameters &, const ObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object> &);
+template StatusCode GeometryManager::CreateGap(const object_creation::Geometry::ConcentricGap::Parameters &, const ObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object> &);
 
 } // namespace pandora

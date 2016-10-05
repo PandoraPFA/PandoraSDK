@@ -32,8 +32,8 @@ ClusterManager::~ClusterManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ClusterManager::Create(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster,
-    const ObjectFactory<PandoraContentApi::Cluster::Parameters, Cluster> &factory)
+StatusCode ClusterManager::Create(const object_creation::Cluster::Parameters &parameters, const Cluster *&pCluster,
+    const ObjectFactory<object_creation::Cluster::Parameters, Cluster> &factory)
 {
     pCluster = NULL;
 
@@ -62,6 +62,13 @@ StatusCode ClusterManager::Create(const PandoraContentApi::Cluster::Parameters &
         pCluster = NULL;
         return statusCodeException.GetStatusCode();
     }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ClusterManager::AlterMetadata(const Cluster *const pCluster, const object_creation::Cluster::Metadata &metadata) const
+{
+    return this->Modifiable(pCluster)->AlterMetadata(metadata);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -96,13 +103,6 @@ void ClusterManager::SetAvailability(const ClusterList *const pClusterList, bool
 {
     for (ClusterList::const_iterator iter = pClusterList->begin(), iterEnd = pClusterList->end(); iter != iterEnd; ++iter)
         this->SetAvailability(*iter, isAvailable);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode ClusterManager::AlterMetadata(const Cluster *const pCluster, const PandoraContentApi::Cluster::Metadata &metadata) const
-{
-    return this->Modifiable(pCluster)->AlterMetadata(metadata);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

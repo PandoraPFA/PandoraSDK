@@ -32,8 +32,8 @@ ParticleFlowObjectManager::~ParticleFlowObjectManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObjectManager::Create(const PandoraContentApi::ParticleFlowObject::Parameters &parameters, const ParticleFlowObject *&pPfo,
-    const ObjectFactory<PandoraContentApi::ParticleFlowObject::Parameters, ParticleFlowObject> &factory)
+StatusCode ParticleFlowObjectManager::Create(const object_creation::ParticleFlowObject::Parameters &parameters, const ParticleFlowObject *&pPfo,
+    const ObjectFactory<object_creation::ParticleFlowObject::Parameters, ParticleFlowObject> &factory)
 {
     pPfo = NULL;
 
@@ -66,7 +66,7 @@ StatusCode ParticleFlowObjectManager::Create(const PandoraContentApi::ParticleFl
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObjectManager::AlterMetadata(const ParticleFlowObject *const pPfo, const PandoraContentApi::ParticleFlowObject::Metadata &metadata) const
+StatusCode ParticleFlowObjectManager::AlterMetadata(const ParticleFlowObject *const pPfo, const object_creation::ParticleFlowObject::Metadata &metadata) const
 {
     return this->Modifiable(pPfo)->AlterMetadata(metadata);
 }

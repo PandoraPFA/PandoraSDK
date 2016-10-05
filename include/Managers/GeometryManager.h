@@ -8,8 +8,7 @@
 #ifndef PANDORA_GEOMETRY_MANAGER_H
 #define PANDORA_GEOMETRY_MANAGER_H 1
 
-#include "Api/PandoraApi.h"
-
+#include "Pandora/ObjectCreation.h"
 #include "Pandora/PandoraEnumeratedTypes.h"
 
 namespace pandora
@@ -82,8 +81,8 @@ private:
      *  @param  subDetectorParameters the sub detector parameters
      *  @param  factory the factory that performs the object allocation
      */
-    StatusCode CreateSubDetector(const PandoraApi::Geometry::SubDetector::Parameters &subDetectorParameters,
-        const ObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector> &factory);
+    StatusCode CreateSubDetector(const object_creation::Geometry::SubDetector::Parameters &subDetectorParameters,
+        const ObjectFactory<object_creation::Geometry::SubDetector::Parameters, SubDetector> &factory);
 
     /**
      *  @brief  Create gap

@@ -104,9 +104,9 @@ StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsMirroredInZ", pSubDetector->IsMirroredInZ()));
 
     const unsigned int nLayers(pSubDetector->GetNLayers());
-    const SubDetector::SubDetectorLayerList &subDetectorLayerList(pSubDetector->GetSubDetectorLayerList());
+    const SubDetector::SubDetectorLayerVector &subDetectorLayerVector(pSubDetector->GetSubDetectorLayerVector());
 
-    if (subDetectorLayerList.size() != nLayers)
+    if (subDetectorLayerVector.size() != nLayers)
         return STATUS_CODE_FAILURE;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NLayers", nLayers));
@@ -117,9 +117,9 @@ StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector
 
         for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
         {
-            closestDistanceToIpString += TypeToString(subDetectorLayerList[iLayer].GetClosestDistanceToIp()) + " ";
-            nRadiationLengthsString += TypeToString(subDetectorLayerList[iLayer].GetNRadiationLengths()) + " ";
-            nInteractionLengthsString += TypeToString(subDetectorLayerList[iLayer].GetNInteractionLengths()) + " ";
+            closestDistanceToIpString += TypeToString(subDetectorLayerVector.at(iLayer).GetClosestDistanceToIp()) + " ";
+            nRadiationLengthsString += TypeToString(subDetectorLayerVector.at(iLayer).GetNRadiationLengths()) + " ";
+            nInteractionLengthsString += TypeToString(subDetectorLayerVector.at(iLayer).GetNInteractionLengths()) + " ";
         }
 
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ClosestDistanceToIp", closestDistanceToIpString));

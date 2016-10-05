@@ -7,7 +7,6 @@
  */
 
 #include "Objects/CaloHit.h"
-#include "Objects/MCParticle.h"
 
 #include <cmath>
 
@@ -50,7 +49,7 @@ bool CaloHit::operator< (const CaloHit &rhs) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-CaloHit::CaloHit(const PandoraApi::CaloHit::Parameters &parameters) :
+CaloHit::CaloHit(const object_creation::CaloHit::Parameters &parameters) :
     m_positionVector(parameters.m_positionVector.Get()),
     m_expectedDirection(parameters.m_expectedDirection.Get().GetUnitVector()),
     m_cellNormalVector(parameters.m_cellNormalVector.Get().GetUnitVector()),
@@ -82,7 +81,7 @@ CaloHit::CaloHit(const PandoraApi::CaloHit::Parameters &parameters) :
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-CaloHit::CaloHit(const PandoraContentApi::CaloHitFragment::Parameters &parameters) :
+CaloHit::CaloHit(const object_creation::CaloHitFragment::Parameters &parameters) :
     m_positionVector(parameters.m_pOriginalCaloHit->m_positionVector),
     m_expectedDirection(parameters.m_pOriginalCaloHit->m_expectedDirection),
     m_cellNormalVector(parameters.m_pOriginalCaloHit->m_cellNormalVector),
@@ -123,23 +122,23 @@ CaloHit::~CaloHit()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHit::SetPseudoLayer(const unsigned int pseudoLayer)
-{
-    if (!(m_pseudoLayer = pseudoLayer))
-        return STATUS_CODE_NOT_INITIALIZED;
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode CaloHit::AlterMetadata(const PandoraContentApi::CaloHit::Metadata &metadata)
+StatusCode CaloHit::AlterMetadata(const object_creation::CaloHit::Metadata &metadata)
 {
     if (metadata.m_isPossibleMip.IsInitialized())
         m_isPossibleMip = metadata.m_isPossibleMip.Get();
 
     if (metadata.m_isIsolated.IsInitialized())
         m_isIsolated = metadata.m_isIsolated.Get();
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode CaloHit::SetPseudoLayer(const unsigned int pseudoLayer)
+{
+    if (!(m_pseudoLayer = pseudoLayer))
+        return STATUS_CODE_NOT_INITIALIZED;
 
     return STATUS_CODE_SUCCESS;
 }
@@ -256,18 +255,6 @@ void CaloHit::GetPointingCellCorners(CartesianPointVector &cartesianPointVector)
     cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMax * sinThetaMax * cosPhiMin, rMaxAtThetaMax * sinThetaMax * sinPhiMin, rMaxAtThetaMax * cosThetaMax));
     cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMax * sinThetaMax * cosPhiMax, rMaxAtThetaMax * sinThetaMax * sinPhiMax, rMaxAtThetaMax * cosThetaMax));
     cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMin * sinThetaMin * cosPhiMax, rMaxAtThetaMin * sinThetaMin * sinPhiMax, rMaxAtThetaMin * cosThetaMin));
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-std::ostream &operator<<(std::ostream &stream, const CaloHit &caloHit)
-{
-    stream  << " CaloHit: " << std::endl
-            << " position " << caloHit.GetPositionVector()
-            << " energy   " << caloHit.GetInputEnergy() << std::endl;
-
-    return stream;
 }
 
 } // namespace pandora

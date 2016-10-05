@@ -11,7 +11,7 @@
 namespace pandora
 {
 
-SubDetector::SubDetector(const PandoraApi::Geometry::SubDetector::Parameters &inputParameters) :
+SubDetector::SubDetector(const object_creation::Geometry::SubDetector::Parameters &inputParameters) :
     m_subDetectorName(inputParameters.m_subDetectorName.Get()),
     m_subDetectorType(inputParameters.m_subDetectorType.Get()),
     m_innerRCoordinate(inputParameters.m_innerRCoordinate.Get()),
@@ -31,16 +31,16 @@ SubDetector::SubDetector(const PandoraApi::Geometry::SubDetector::Parameters &in
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
     }
 
-    if (m_nLayers != inputParameters.m_layerParametersList.size())
+    if (m_nLayers != inputParameters.m_layerParametersVector.size())
     {
         std::cout << "GeometryPlugin: Invalid number of entries in layer parameters list for " << m_subDetectorName << std::endl;
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
     }
 
-    for (PandoraApi::Geometry::LayerParametersList::const_iterator iter = inputParameters.m_layerParametersList.begin(); iter != inputParameters.m_layerParametersList.end(); ++iter)
+    for (object_creation::Geometry::LayerParametersVector::const_iterator iter = inputParameters.m_layerParametersVector.begin(); iter != inputParameters.m_layerParametersVector.end(); ++iter)
     {
         SubDetectorLayer subDetectorLayer(iter->m_closestDistanceToIp.Get(), iter->m_nRadiationLengths.Get(), iter->m_nInteractionLengths.Get());
-        m_subDetectorLayerList.push_back(subDetectorLayer);
+        m_subDetectorLayerVector.push_back(subDetectorLayer);
     }
 }
 

@@ -8,9 +8,8 @@
 #ifndef PANDORA_API_H
 #define PANDORA_API_H 1
 
-#include "Pandora/ObjectParameters.h"
+#include "Pandora/ObjectCreation.h"
 #include "Pandora/Pandora.h"
-#include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraObjectFactories.h"
 
 namespace pandora { class AlgorithmFactory; class AlgorithmToolFactory; }
@@ -23,95 +22,10 @@ namespace pandora { class AlgorithmFactory; class AlgorithmToolFactory; }
 class PandoraApi
 {
 public:
-    /**
-     *  @brief  Object creation helper class
-     * 
-     *  @param  PARAMETERS the type of object parameters
-     *  @param  OBJECT the type of object
-     */
-    template <typename PARAMETERS, typename OBJECT>
-    class ObjectCreationHelper
-    {
-    public:
-        typedef PARAMETERS Parameters;
-        typedef OBJECT Object;
-
-        /**
-         *  @brief  Create a new object from a user factory
-         *
-         *  @param  pandora the pandora instance to create the new object
-         *  @param  parameters the object parameters
-         *  @param  factory the factory that performs the object allocation
-         */
-        static pandora::StatusCode Create(const pandora::Pandora &pandora, const Parameters &parameters,
-            const pandora::ObjectFactory<Parameters, Object> &factory = pandora::PandoraObjectFactory<Parameters, Object>());
-    };
-
-    /**
-     *  @brief  MCParticleParameters class
-     */
-    class MCParticleParameters : public pandora::ObjectParameters
-    {
-    public:
-        pandora::InputFloat                 m_energy;                   ///< The energy of the MC particle, units GeV
-        pandora::InputCartesianVector       m_momentum;                 ///< The momentum of the MC particle, units GeV
-        pandora::InputCartesianVector       m_vertex;                   ///< The production vertex of the MC particle, units mm
-        pandora::InputCartesianVector       m_endpoint;                 ///< The endpoint of the MC particle, units mm
-        pandora::InputInt                   m_particleId;               ///< The MC particle's ID (PDG code)
-        pandora::InputMCParticleType        m_mcParticleType;           ///< The type of mc particle, e.g. vertex, 2D-projection, etc.
-        pandora::InputAddress               m_pParentAddress;           ///< Address of the parent MC particle in the user framework
-    };
-
-    /**
-     *  @brief  TrackParameters class
-     */
-    class TrackParameters : public pandora::ObjectParameters
-    {
-    public:
-        pandora::InputFloat                 m_d0;                       ///< The 2D impact parameter wrt (0,0), units mm
-        pandora::InputFloat                 m_z0;                       ///< The z coordinate at the 2D distance of closest approach, units mm
-        pandora::InputInt                   m_particleId;               ///< The PDG code of the tracked particle
-        pandora::InputInt                   m_charge;                   ///< The charge of the tracked particle
-        pandora::InputFloat                 m_mass;                     ///< The mass of the tracked particle, units GeV
-        pandora::InputCartesianVector       m_momentumAtDca;            ///< Track momentum at the 2D distance of closest approach, units GeV
-        pandora::InputTrackState            m_trackStateAtStart;        ///< Track state at the start of the track, units mm and GeV
-        pandora::InputTrackState            m_trackStateAtEnd;          ///< Track state at the end of the track, units mm and GeV
-        pandora::InputTrackState            m_trackStateAtCalorimeter;  ///< The (sometimes projected) track state at the calorimeter, units mm and GeV
-        pandora::InputFloat                 m_timeAtCalorimeter;        ///< The (sometimes projected) time at the calorimeter, units ns
-        pandora::InputBool                  m_reachesCalorimeter;       ///< Whether the track actually reaches the calorimeter
-        pandora::InputBool                  m_isProjectedToEndCap;      ///< Whether the calorimeter projection is to an endcap
-        pandora::InputBool                  m_canFormPfo;               ///< Whether track should form a pfo, if it has an associated cluster
-        pandora::InputBool                  m_canFormClusterlessPfo;    ///< Whether track should form a pfo, even if it has no associated cluster
-        pandora::InputAddress               m_pParentAddress;           ///< Address of the parent track in the user framework
-    };
-
-    /**
-     *  @brief  CaloHitParameters class
-     */
-    class CaloHitParameters : public pandora::ObjectParameters
-    {
-    public:
-        pandora::InputCartesianVector       m_positionVector;           ///< Position vector of center of calorimeter cell, units mm
-        pandora::InputCartesianVector       m_expectedDirection;        ///< Unit vector in direction of expected hit propagation
-        pandora::InputCartesianVector       m_cellNormalVector;         ///< Unit normal to sampling layer, pointing outwards from the origin
-        pandora::InputCellGeometry          m_cellGeometry;             ///< The cell geometry type, pointing or rectangular
-        pandora::InputFloat                 m_cellSize0;                ///< Cell size 0 [pointing: eta, rectangular: up in ENDCAP, along beam in BARREL, units mm]
-        pandora::InputFloat                 m_cellSize1;                ///< Cell size 1 [pointing: phi, rectangular: perpendicular to size 0 and thickness, units mm]
-        pandora::InputFloat                 m_cellThickness;            ///< Cell thickness, units mm
-        pandora::InputFloat                 m_nCellRadiationLengths;    ///< Absorber material in front of cell, units radiation lengths
-        pandora::InputFloat                 m_nCellInteractionLengths;  ///< Absorber material in front of cell, units interaction lengths
-        pandora::InputFloat                 m_time;                     ///< Time of (earliest) energy deposition in this cell, units ns
-        pandora::InputFloat                 m_inputEnergy;              ///< Corrected energy of calorimeter cell in user framework, units GeV
-        pandora::InputFloat                 m_mipEquivalentEnergy;      ///< The calibrated mip equivalent energy, units mip
-        pandora::InputFloat                 m_electromagneticEnergy;    ///< The calibrated electromagnetic energy measure, units GeV
-        pandora::InputFloat                 m_hadronicEnergy;           ///< The calibrated hadronic energy measure, units GeV
-        pandora::InputBool                  m_isDigital;                ///< Whether cell should be treated as digital
-        pandora::InputHitType               m_hitType;                  ///< The type of calorimeter hit
-        pandora::InputHitRegion             m_hitRegion;                ///< Region of the detector in which the calo hit is located
-        pandora::InputUInt                  m_layer;                    ///< The subdetector readout layer number
-        pandora::InputBool                  m_isInOuterSamplingLayer;   ///< Whether cell is in one of the outermost detector sampling layers
-        pandora::InputAddress               m_pParentAddress;           ///< Address of the parent calo hit in the user framework
-    };
+    /* Map object creation into PandoraApi */
+    typedef object_creation::CaloHit CaloHit;
+    typedef object_creation::MCParticle MCParticle;
+    typedef object_creation::Track Track;
 
     /**
      *  @brief  Geometry class
@@ -119,88 +33,12 @@ public:
     class Geometry
     {
     public:
-        /**
-         *  @brief  LayerParameters class
-         */
-        class LayerParameters : public pandora::ObjectParameters
-        {
-        public:
-            pandora::InputFloat             m_closestDistanceToIp;      ///< Closest distance of the layer from the interaction point, units mm
-            pandora::InputFloat             m_nRadiationLengths;        ///< Absorber material in front of layer, units radiation lengths
-            pandora::InputFloat             m_nInteractionLengths;      ///< Absorber material in front of layer, units interaction lengths
-        };
-
-        typedef std::vector<LayerParameters> LayerParametersList;
-
-        /**
-         *  @brief  SubDetectorParameters class
-         */
-        class SubDetectorParameters : public pandora::ObjectParameters
-        {
-        public:
-            pandora::InputString            m_subDetectorName;          ///< The sub detector name, must uniquely specify a single sub detector
-            pandora::InputSubDetectorType   m_subDetectorType;          ///< The sub detector type, e.g. ECAL_BARREL, HCAL_ENDCAP, TPC, etc.
-            pandora::InputFloat             m_innerRCoordinate;         ///< Inner cylindrical polar r coordinate, origin interaction point, units mm
-            pandora::InputFloat             m_innerZCoordinate;         ///< Inner cylindrical polar z coordinate, origin interaction point, units mm
-            pandora::InputFloat             m_innerPhiCoordinate;       ///< Inner cylindrical polar phi coordinate (angle wrt cartesian x axis)
-            pandora::InputUInt              m_innerSymmetryOrder;       ///< Order of symmetry of the innermost edge of subdetector
-            pandora::InputFloat             m_outerRCoordinate;         ///< Outer cylindrical polar r coordinate, origin interaction point, units mm
-            pandora::InputFloat             m_outerZCoordinate;         ///< Outer cylindrical polar z coordinate, origin interaction point, units mm
-            pandora::InputFloat             m_outerPhiCoordinate;       ///< Outer cylindrical polar phi coordinate (angle wrt cartesian x axis)
-            pandora::InputUInt              m_outerSymmetryOrder;       ///< Order of symmetry of the outermost edge of subdetector
-            pandora::InputBool              m_isMirroredInZ;            ///< Whether to construct a second subdetector, via reflection in z=0 plane
-            pandora::InputUInt              m_nLayers;                  ///< The number of layers in the detector section
-            LayerParametersList             m_layerParametersList;      ///< The list of layer parameters for the detector section
-        };
-
-        /**
-         *  @brief  LineGapParameters class
-         */
-        class LineGapParameters : public pandora::ObjectParameters
-        {
-        public:
-            pandora::InputHitType           m_hitType;                  ///< The hit type associated with the line gap
-            pandora::InputFloat             m_lineStartZ;               ///< The line start z coordinate, units mm
-            pandora::InputFloat             m_lineEndZ;                 ///< The line end z coordinate, units mm
-        };
-
-        /**
-         *  @brief  BoxGapParameters class
-         */
-        class BoxGapParameters : public pandora::ObjectParameters
-        {
-        public:
-            pandora::InputCartesianVector   m_vertex;                   ///< Cartesian coordinates of a gap vertex, units mm
-            pandora::InputCartesianVector   m_side1;                    ///< Cartesian vector describing first side meeting vertex, units mm
-            pandora::InputCartesianVector   m_side2;                    ///< Cartesian vector describing second side meeting vertex, units mm
-            pandora::InputCartesianVector   m_side3;                    ///< Cartesian vector describing third side meeting vertex, units mm
-        };
-
-        /**
-         *  @brief  ConcentricGapParameters class
-         */
-        class ConcentricGapParameters : public pandora::ObjectParameters
-        {
-        public:
-            pandora::InputFloat             m_minZCoordinate;           ///< Min cylindrical polar z coordinate, origin interaction point, units mm
-            pandora::InputFloat             m_maxZCoordinate;           ///< Max cylindrical polar z coordinate, origin interaction point, units mm
-            pandora::InputFloat             m_innerRCoordinate;         ///< Inner cylindrical polar r coordinate, origin interaction point, units mm
-            pandora::InputFloat             m_innerPhiCoordinate;       ///< Inner cylindrical polar phi coordinate (angle wrt cartesian x axis)
-            pandora::InputUInt              m_innerSymmetryOrder;       ///< Order of symmetry of the innermost edge of gap
-            pandora::InputFloat             m_outerRCoordinate;         ///< Outer cylindrical polar r coordinate, origin interaction point, units mm
-            pandora::InputFloat             m_outerPhiCoordinate;       ///< Outer cylindrical polar phi coordinate (angle wrt cartesian x axis)
-            pandora::InputUInt              m_outerSymmetryOrder;       ///< Order of symmetry of the outermost edge of gap
-        };
-
-        typedef ObjectCreationHelper<SubDetectorParameters, pandora::SubDetector> SubDetector;
-        typedef ObjectCreationHelper<LineGapParameters, pandora::LineGap> LineGap;
-        typedef ObjectCreationHelper<BoxGapParameters, pandora::BoxGap> BoxGap;
-        typedef ObjectCreationHelper<ConcentricGapParameters, pandora::ConcentricGap> ConcentricGap;
+        typedef object_creation::Geometry::LayerParameters LayerParameters;
+        typedef object_creation::Geometry::SubDetector SubDetector;
+        typedef object_creation::Geometry::LineGap LineGap;
+        typedef object_creation::Geometry::BoxGap BoxGap;
+        typedef object_creation::Geometry::ConcentricGap ConcentricGap;
     };
-
-    typedef ObjectCreationHelper<CaloHitParameters, pandora::CaloHit> CaloHit;
-    typedef ObjectCreationHelper<MCParticleParameters, pandora::MCParticle> MCParticle;
-    typedef ObjectCreationHelper<TrackParameters, pandora::Track> Track;
 
     /**
      *  @brief  Process an event

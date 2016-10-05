@@ -19,6 +19,8 @@
 #include "Managers/TrackManager.h"
 #include "Managers/VertexManager.h"
 
+#include "Pandora/ObjectCreation.h"
+#include "Pandora/Pandora.h"
 #include "Pandora/PandoraSettings.h"
 
 #include "Plugins/EnergyCorrectionsPlugin.h"
@@ -58,10 +60,31 @@ StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::SubDetector::Param
     return m_pPandora->m_pGeometryManager->CreateSubDetector(parameters, factory);
 }
 
-template <typename PARAMETERS, typename OBJECT>
-StatusCode PandoraApiImpl::Create(const PARAMETERS &parameters, const ObjectFactory<PARAMETERS, OBJECT> &factory) const
+template <>
+StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::LineGap::Parameters &parameters,
+    const ObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap> &factory) const
 {
     return m_pPandora->m_pGeometryManager->CreateGap(parameters, factory);
+}
+
+template <>
+StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::BoxGap::Parameters &parameters,
+    const ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> &factory) const
+{
+    return m_pPandora->m_pGeometryManager->CreateGap(parameters, factory);
+}
+
+template <>
+StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::ConcentricGap::Parameters &parameters,
+    const ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> &factory) const
+{
+    return m_pPandora->m_pGeometryManager->CreateGap(parameters, factory);
+}
+
+template <typename PARAMETERS, typename OBJECT>
+StatusCode PandoraApiImpl::Create(const PARAMETERS &/*parameters*/, const ObjectFactory<PARAMETERS, OBJECT> &/*factory*/) const
+{
+    return STATUS_CODE_NOT_ALLOWED;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -203,8 +226,8 @@ PandoraApiImpl::PandoraApiImpl(Pandora *const pPandora) :
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::LineGap::Parameters &, const ObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap> &) const;
-template StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::BoxGap::Parameters &, const ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> &) const;
-template StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::ConcentricGap::Parameters &, const ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> &) const;
+template StatusCode PandoraApiImpl::Create(const object_creation::Cluster::Parameters &, const ObjectFactory<object_creation::Cluster::Parameters, Cluster> &) const;
+template StatusCode PandoraApiImpl::Create(const object_creation::ParticleFlowObject::Parameters &, const ObjectFactory<object_creation::ParticleFlowObject::Parameters, ParticleFlowObject> &) const;
+template StatusCode PandoraApiImpl::Create(const object_creation::Vertex::Parameters &, const ObjectFactory<object_creation::Vertex::Parameters, Vertex> &) const;
 
 } // namespace pandora

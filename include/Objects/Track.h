@@ -8,9 +8,7 @@
 #ifndef PANDORA_TRACK_H
 #define PANDORA_TRACK_H 1
 
-#include "Api/PandoraApi.h"
-
-#include "Pandora/PandoraInternal.h"
+#include "Pandora/ObjectCreation.h"
 
 namespace pandora
 {
@@ -202,7 +200,7 @@ protected:
      * 
      *  @param  parameters the calo hit parameters
      */
-    Track(const PandoraApi::Track::Parameters &parameters);
+    Track(const object_creation::Track::Parameters &parameters);
 
     /**
      *  @brief  Destructor
@@ -288,16 +286,8 @@ protected:
 
     friend class TrackManager;
     friend class InputObjectManager<Track>;
-    friend class PandoraObjectFactory<PandoraApi::Track::Parameters, Track>;
+    friend class PandoraObjectFactory<object_creation::Track::Parameters, Track>;
 };
-
-/**
- *  @brief  Operator to dump track properties to an ostream
- *
- *  @param  stream the target ostream
- *  @param  track the track
- */
-std::ostream &operator<<(std::ostream &stream, const Track &track);
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 

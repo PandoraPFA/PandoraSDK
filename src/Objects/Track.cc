@@ -10,7 +10,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstdlib>
 
 namespace pandora
 {
@@ -33,7 +32,7 @@ bool Track::operator< (const Track &rhs) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-Track::Track(const PandoraApi::Track::Parameters &parameters) :
+Track::Track(const object_creation::Track::Parameters &parameters) :
     m_d0(parameters.m_d0.Get()),
     m_z0(parameters.m_z0.Get()),
     m_particleId(parameters.m_particleId.Get()),
@@ -65,9 +64,6 @@ Track::Track(const PandoraApi::Track::Parameters &parameters) :
 
 Track::~Track()
 {
-    m_parentTrackList.clear();
-    m_siblingTrackList.clear();
-    m_daughterTrackList.clear();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -149,19 +145,6 @@ StatusCode Track::AddSibling(const Track *const pTrack)
 
     m_siblingTrackList.push_back(pTrack);
     return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-std::ostream &operator<<(std::ostream &stream, const Track &track)
-{
-    stream  << " Track: " << std::endl
-            << " d0     " << track.GetD0() << std::endl
-            << " z0     " << track.GetZ0() << std::endl
-            << " p0     " << track.GetMomentumAtDca() << std::endl;
-
-    return stream;
 }
 
 } // namespace pandora

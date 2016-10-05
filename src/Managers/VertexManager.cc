@@ -32,8 +32,8 @@ VertexManager::~VertexManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode VertexManager::Create(const PandoraContentApi::Vertex::Parameters &parameters, const Vertex *&pVertex,
-    const ObjectFactory<PandoraContentApi::Vertex::Parameters, Vertex> &factory)
+StatusCode VertexManager::Create(const object_creation::Vertex::Parameters &parameters, const Vertex *&pVertex,
+    const ObjectFactory<object_creation::Vertex::Parameters, Vertex> &factory)
 {
     pVertex = NULL;
 
@@ -66,7 +66,7 @@ StatusCode VertexManager::Create(const PandoraContentApi::Vertex::Parameters &pa
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode VertexManager::AlterMetadata(const Vertex *const pVertex, const PandoraContentApi::Vertex::Metadata &metadata) const
+StatusCode VertexManager::AlterMetadata(const Vertex *const pVertex, const object_creation::Vertex::Metadata &metadata) const
 {
     return this->Modifiable(pVertex)->AlterMetadata(metadata);
 }

@@ -6,6 +6,8 @@
  *  $Log: $
  */
 
+#include "Api/PandoraApi.h"
+
 #include "Objects/CaloHit.h"
 #include "Objects/Track.h"
 
@@ -276,7 +278,7 @@ StatusCode BinaryFileReader::ReadSubDetector(bool checkComponentId)
             layerParameters.m_closestDistanceToIp = closestDistanceToIp;
             layerParameters.m_nRadiationLengths = nRadiationLengths;
             layerParameters.m_nInteractionLengths = nInteractionLengths;
-            pParameters->m_layerParametersList.push_back(layerParameters);
+            pParameters->m_layerParametersVector.push_back(layerParameters);
         }
 
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::SubDetector::Create(*m_pPandora, *pParameters, *m_pSubDetectorFactory));

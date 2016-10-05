@@ -39,6 +39,7 @@ class MCParticle;
 class OrderedCaloHitList;
 class ParticleFlowObject;
 class ParticleIdPlugin;
+class PandoraSettings;
 class PseudoLayerPlugin;
 class ShowerProfilePlugin;
 class SubDetector;

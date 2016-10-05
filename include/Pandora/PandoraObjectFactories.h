@@ -9,6 +9,7 @@
 #define PANDORA_OBJECT_FACTORIES_H 1
 
 #include "Pandora/ObjectFactory.h"
+#include "Pandora/StatusCodes.h"
 
 namespace pandora
 {

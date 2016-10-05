@@ -40,8 +40,8 @@ MCManager::~MCManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MCManager::Create(const PandoraApi::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle,
-    const ObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle> &factory)
+StatusCode MCManager::Create(const object_creation::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle,
+    const ObjectFactory<object_creation::MCParticle::Parameters, MCParticle> &factory)
 {
     pMCParticle = NULL;
 

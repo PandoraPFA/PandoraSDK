@@ -41,8 +41,8 @@ CaloHitManager::~CaloHitManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHitManager::Create(const PandoraApi::CaloHit::Parameters &parameters, const CaloHit *&pCaloHit,
-    const ObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit> &factory)
+StatusCode CaloHitManager::Create(const object_creation::CaloHit::Parameters &parameters, const CaloHit *&pCaloHit,
+    const ObjectFactory<object_creation::CaloHit::Parameters, CaloHit> &factory)
 {
     pCaloHit = NULL;
 
@@ -72,7 +72,7 @@ StatusCode CaloHitManager::Create(const PandoraApi::CaloHit::Parameters &paramet
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHitManager::AlterMetadata(const CaloHit *const pCaloHit, const PandoraContentApi::CaloHit::Metadata &metadata) const
+StatusCode CaloHitManager::AlterMetadata(const CaloHit *const pCaloHit, const object_creation::CaloHit::Metadata &metadata) const
 {
     return this->Modifiable(pCaloHit)->AlterMetadata(metadata);
 }
@@ -209,19 +209,19 @@ StatusCode CaloHitManager::RemoveAllMCParticleRelationships()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit, const float fraction1, const CaloHit *&pDaughterCaloHit1,
-    const CaloHit *&pDaughterCaloHit2, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory)
+    const CaloHit *&pDaughterCaloHit2, const ObjectFactory<object_creation::CaloHitFragment::Parameters, CaloHit> &factory)
 {
     pDaughterCaloHit1 = NULL; pDaughterCaloHit2 = NULL;
 
     if (!this->CanFragmentCaloHit(pOriginalCaloHit, fraction1))
         return STATUS_CODE_NOT_ALLOWED;
 
-    PandoraContentApi::CaloHitFragment::Parameters parameters1;
+    object_creation::CaloHitFragment::Parameters parameters1;
     parameters1.m_pOriginalCaloHit = pOriginalCaloHit;
     parameters1.m_weight = fraction1;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters1, pDaughterCaloHit1));
 
-    PandoraContentApi::CaloHitFragment::Parameters parameters2;
+    object_creation::CaloHitFragment::Parameters parameters2;
     parameters2.m_pOriginalCaloHit = pOriginalCaloHit;
     parameters2.m_weight = 1.f - fraction1;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters2, pDaughterCaloHit2));
@@ -248,7 +248,7 @@ StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode CaloHitManager::MergeCaloHitFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2,
-    const CaloHit *&pMergedCaloHit, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory)
+    const CaloHit *&pMergedCaloHit, const ObjectFactory<object_creation::CaloHitFragment::Parameters, CaloHit> &factory)
 {
     pMergedCaloHit = NULL;
 
@@ -257,7 +257,7 @@ StatusCode CaloHitManager::MergeCaloHitFragments(const CaloHit *const pFragmentC
 
     const float newWeight((pFragmentCaloHit1->GetWeight() + pFragmentCaloHit2->GetWeight()) / pFragmentCaloHit1->GetWeight());
 
-    PandoraContentApi::CaloHitFragment::Parameters parameters;
+    object_creation::CaloHitFragment::Parameters parameters;
     parameters.m_pOriginalCaloHit = pFragmentCaloHit1;
     parameters.m_weight = newWeight;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pMergedCaloHit));
