@@ -30,53 +30,53 @@ namespace pandora
 {
 
 template <>
-StatusCode PandoraApiImpl::Create(const PandoraApi::MCParticle::Parameters &parameters,
-    const ObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle> &factory) const
+StatusCode PandoraApiImpl::Create(const object_creation::MCParticle::Parameters &parameters,
+    const ObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object> &factory) const
 {
     const MCParticle *pMCParticle(NULL);
     return m_pPandora->m_pMCManager->Create(parameters, pMCParticle, factory);
 }
 
 template <>
-StatusCode PandoraApiImpl::Create(const PandoraApi::Track::Parameters &parameters,
-    const ObjectFactory<PandoraApi::Track::Parameters, Track> &factory) const
+StatusCode PandoraApiImpl::Create(const object_creation::Track::Parameters &parameters,
+    const ObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object> &factory) const
 {
     const Track *pTrack(NULL);
     return m_pPandora->m_pTrackManager->Create(parameters, pTrack, factory);
 }
 
 template <>
-StatusCode PandoraApiImpl::Create(const PandoraApi::CaloHit::Parameters &parameters,
-    const ObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit> &factory) const
+StatusCode PandoraApiImpl::Create(const object_creation::CaloHit::Parameters &parameters,
+    const ObjectFactory<object_creation::CaloHit::Parameters, object_creation::CaloHit::Object> &factory) const
 {
     const CaloHit *pCaloHit(NULL);
     return m_pPandora->m_pCaloHitManager->Create(parameters, pCaloHit, factory);
 }
 
 template <>
-StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::SubDetector::Parameters &parameters,
-    const ObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector> &factory) const
+StatusCode PandoraApiImpl::Create(const object_creation::Geometry::SubDetector::Parameters &parameters,
+    const ObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object> &factory) const
 {
     return m_pPandora->m_pGeometryManager->CreateSubDetector(parameters, factory);
 }
 
 template <>
-StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::LineGap::Parameters &parameters,
-    const ObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap> &factory) const
+StatusCode PandoraApiImpl::Create(const object_creation::Geometry::LineGap::Parameters &parameters,
+    const ObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object> &factory) const
 {
     return m_pPandora->m_pGeometryManager->CreateGap(parameters, factory);
 }
 
 template <>
-StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::BoxGap::Parameters &parameters,
-    const ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> &factory) const
+StatusCode PandoraApiImpl::Create(const object_creation::Geometry::BoxGap::Parameters &parameters,
+    const ObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object> &factory) const
 {
     return m_pPandora->m_pGeometryManager->CreateGap(parameters, factory);
 }
 
 template <>
-StatusCode PandoraApiImpl::Create(const PandoraApi::Geometry::ConcentricGap::Parameters &parameters,
-    const ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> &factory) const
+StatusCode PandoraApiImpl::Create(const object_creation::Geometry::ConcentricGap::Parameters &parameters,
+    const ObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object> &factory) const
 {
     return m_pPandora->m_pGeometryManager->CreateGap(parameters, factory);
 }
@@ -226,8 +226,8 @@ PandoraApiImpl::PandoraApiImpl(Pandora *const pPandora) :
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template StatusCode PandoraApiImpl::Create(const object_creation::Cluster::Parameters &, const ObjectFactory<object_creation::Cluster::Parameters, Cluster> &) const;
-template StatusCode PandoraApiImpl::Create(const object_creation::ParticleFlowObject::Parameters &, const ObjectFactory<object_creation::ParticleFlowObject::Parameters, ParticleFlowObject> &) const;
-template StatusCode PandoraApiImpl::Create(const object_creation::Vertex::Parameters &, const ObjectFactory<object_creation::Vertex::Parameters, Vertex> &) const;
+template StatusCode PandoraApiImpl::Create(const object_creation::Cluster::Parameters &, const ObjectFactory<object_creation::Cluster::Parameters, object_creation::Cluster::Object> &) const;
+template StatusCode PandoraApiImpl::Create(const object_creation::ParticleFlowObject::Parameters &, const ObjectFactory<object_creation::ParticleFlowObject::Parameters, object_creation::ParticleFlowObject::Object> &) const;
+template StatusCode PandoraApiImpl::Create(const object_creation::Vertex::Parameters &, const ObjectFactory<object_creation::Vertex::Parameters, object_creation::Vertex::Object> &) const;
 
 } // namespace pandora

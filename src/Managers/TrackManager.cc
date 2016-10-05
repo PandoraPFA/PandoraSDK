@@ -34,7 +34,7 @@ TrackManager::~TrackManager()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode TrackManager::Create(const object_creation::Track::Parameters &parameters, const Track *&pTrack,
-    const ObjectFactory<object_creation::Track::Parameters, Track> &factory)
+    const ObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object> &factory)
 {
     pTrack = NULL;
 

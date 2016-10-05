@@ -441,7 +441,7 @@ protected:
 
     friend class ClusterManager;
     friend class AlgorithmObjectManager<Cluster>;
-    friend class PandoraObjectFactory<object_creation::Cluster::Parameters, Cluster>;
+    friend class PandoraObjectFactory<object_creation::Cluster::Parameters, object_creation::Cluster::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

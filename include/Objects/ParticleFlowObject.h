@@ -213,7 +213,7 @@ protected:
 
     friend class ParticleFlowObjectManager;
     friend class AlgorithmObjectManager<ParticleFlowObject>;
-    friend class PandoraObjectFactory<object_creation::ParticleFlowObject::Parameters, ParticleFlowObject>;
+    friend class PandoraObjectFactory<object_creation::ParticleFlowObject::Parameters, object_creation::ParticleFlowObject::Object>;
 };
 
 typedef ParticleFlowObject Pfo;                         ///< The ParticleFlowObject to Pfo typedef

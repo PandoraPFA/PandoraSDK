@@ -43,7 +43,7 @@ private:
      *  @param  factory the factory that performs the object allocation
      */
     StatusCode Create(const object_creation::Track::Parameters &parameters, const Track *&pTrack,
-        const ObjectFactory<object_creation::Track::Parameters, Track> &factory);
+        const ObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object> &factory);
 
     /**
      *  @brief  Is a track, or a list of tracks, available to add to a particle flow object

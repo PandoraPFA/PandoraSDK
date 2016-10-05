@@ -33,7 +33,7 @@ ClusterManager::~ClusterManager()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode ClusterManager::Create(const object_creation::Cluster::Parameters &parameters, const Cluster *&pCluster,
-    const ObjectFactory<object_creation::Cluster::Parameters, Cluster> &factory)
+    const ObjectFactory<object_creation::Cluster::Parameters, object_creation::Cluster::Object> &factory)
 {
     pCluster = NULL;
 

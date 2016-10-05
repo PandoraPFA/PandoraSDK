@@ -82,7 +82,7 @@ private:
      *  @param  factory the factory that performs the object allocation
      */
     StatusCode CreateSubDetector(const object_creation::Geometry::SubDetector::Parameters &subDetectorParameters,
-        const ObjectFactory<object_creation::Geometry::SubDetector::Parameters, SubDetector> &factory);
+        const ObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object> &factory);
 
     /**
      *  @brief  Create gap

@@ -286,7 +286,7 @@ protected:
 
     friend class TrackManager;
     friend class InputObjectManager<Track>;
-    friend class PandoraObjectFactory<object_creation::Track::Parameters, Track>;
+    friend class PandoraObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

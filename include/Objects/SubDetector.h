@@ -188,7 +188,7 @@ protected:
     SubDetectorLayerVector  m_subDetectorLayerVector;   ///< The vector of layer parameters for the sub detector section
 
     friend class GeometryManager;
-    friend class PandoraObjectFactory<object_creation::Geometry::SubDetector::Parameters, SubDetector>;
+    friend class PandoraObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

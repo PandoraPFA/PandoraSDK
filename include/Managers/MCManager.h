@@ -43,7 +43,7 @@ private:
      *  @param  factory the factory that performs the object allocation
      */
     StatusCode Create(const object_creation::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle,
-        const ObjectFactory<object_creation::MCParticle::Parameters, MCParticle> &factory);
+        const ObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object> &factory);
 
     /**
      *  @brief  Erase all mc manager content

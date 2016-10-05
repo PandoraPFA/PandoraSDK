@@ -84,7 +84,7 @@ private:
     const float             m_lineStartZ;           ///< The line z start coordinate, units mm
     const float             m_lineEndZ;             ///< The line z end coordinate, units mm
 
-    friend class PandoraObjectFactory<object_creation::Geometry::LineGap::Parameters, LineGap>;
+    friend class PandoraObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -138,7 +138,7 @@ private:
     const CartesianVector   m_side2;                ///< Cartesian vector describing second side meeting vertex, units mm
     const CartesianVector   m_side3;                ///< Cartesian vector describing third side meeting vertex, units mm
 
-    friend class PandoraObjectFactory<object_creation::Geometry::BoxGap::Parameters, BoxGap>;
+    friend class PandoraObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -250,7 +250,7 @@ private:
     VertexPointList         m_innerVertexPointList; ///< The vertex points of the inner polygon
     VertexPointList         m_outerVertexPointList; ///< The vertex points of the outer polygon
 
-    friend class PandoraObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, ConcentricGap>;
+    friend class PandoraObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

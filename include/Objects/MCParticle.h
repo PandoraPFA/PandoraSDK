@@ -206,7 +206,7 @@ protected:
 
     friend class MCManager;
     friend class InputObjectManager<MCParticle>;
-    friend class PandoraObjectFactory<object_creation::MCParticle::Parameters, MCParticle>;
+    friend class PandoraObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

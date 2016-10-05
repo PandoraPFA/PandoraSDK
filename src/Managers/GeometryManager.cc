@@ -74,7 +74,7 @@ Granularity GeometryManager::GetHitTypeGranularity(const HitType hitType) const
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode GeometryManager::CreateSubDetector(const object_creation::Geometry::SubDetector::Parameters &inputParameters,
-    const ObjectFactory<object_creation::Geometry::SubDetector::Parameters, SubDetector> &factory)
+    const ObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object> &factory)
 {
     const SubDetector *pSubDetector = NULL;
 

@@ -42,7 +42,7 @@ CaloHitManager::~CaloHitManager()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode CaloHitManager::Create(const object_creation::CaloHit::Parameters &parameters, const CaloHit *&pCaloHit,
-    const ObjectFactory<object_creation::CaloHit::Parameters, CaloHit> &factory)
+    const ObjectFactory<object_creation::CaloHit::Parameters, object_creation::CaloHit::Object> &factory)
 {
     pCaloHit = NULL;
 
@@ -209,7 +209,7 @@ StatusCode CaloHitManager::RemoveAllMCParticleRelationships()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit, const float fraction1, const CaloHit *&pDaughterCaloHit1,
-    const CaloHit *&pDaughterCaloHit2, const ObjectFactory<object_creation::CaloHitFragment::Parameters, CaloHit> &factory)
+    const CaloHit *&pDaughterCaloHit2, const ObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object> &factory)
 {
     pDaughterCaloHit1 = NULL; pDaughterCaloHit2 = NULL;
 
@@ -248,7 +248,7 @@ StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode CaloHitManager::MergeCaloHitFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2,
-    const CaloHit *&pMergedCaloHit, const ObjectFactory<object_creation::CaloHitFragment::Parameters, CaloHit> &factory)
+    const CaloHit *&pMergedCaloHit, const ObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object> &factory)
 {
     pMergedCaloHit = NULL;
 

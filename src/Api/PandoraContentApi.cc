@@ -11,7 +11,6 @@
 
 #include "Pandora/Algorithm.h"
 #include "Pandora/Pandora.h"
-#include "Pandora/ObjectFactory.h"
 
 const pandora::PandoraSettings *PandoraContentApi::GetSettings(const pandora::Algorithm &algorithm)
 {
@@ -238,7 +237,7 @@ pandora::StatusCode PandoraContentApi::RemoveIsolatedFromCluster(const pandora::
 
 pandora::StatusCode PandoraContentApi::Fragment(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pOriginalCaloHit,
     const float fraction1, const pandora::CaloHit *&pDaughterCaloHit1, const pandora::CaloHit *&pDaughterCaloHit2,
-    const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory)
+    const pandora::ObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object> &factory)
 {
     return algorithm.GetPandora().GetPandoraContentApiImpl()->Fragment(pOriginalCaloHit, fraction1, pDaughterCaloHit1, pDaughterCaloHit2, factory);
 }
@@ -247,7 +246,7 @@ pandora::StatusCode PandoraContentApi::Fragment(const pandora::Algorithm &algori
 
 pandora::StatusCode PandoraContentApi::MergeFragments(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pFragmentCaloHit1,
     const pandora::CaloHit *const pFragmentCaloHit2, const pandora::CaloHit *&pMergedCaloHit,
-    const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory)
+    const pandora::ObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object> &factory)
 {
     return algorithm.GetPandora().GetPandoraContentApiImpl()->MergeFragments(pFragmentCaloHit1, pFragmentCaloHit2, pMergedCaloHit, factory);
 }

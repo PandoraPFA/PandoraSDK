@@ -43,7 +43,7 @@ private:
      *  @param  factory the factory that performs the object allocation
      */
     StatusCode Create(const object_creation::ParticleFlowObject::Parameters &parameters, const ParticleFlowObject *&pPfo,
-        const ObjectFactory<object_creation::ParticleFlowObject::Parameters, ParticleFlowObject> &factory);
+        const ObjectFactory<object_creation::ParticleFlowObject::Parameters, object_creation::ParticleFlowObject::Object> &factory);
 
     /**
      *  @brief  Alter the metadata information stored in a particle flow object

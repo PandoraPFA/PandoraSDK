@@ -8,10 +8,9 @@
 #ifndef PANDORA_VERTEX_MANAGER_H
 #define PANDORA_VERTEX_MANAGER_H 1
 
-#include "Api/PandoraContentApi.h"
-
 #include "Managers/AlgorithmObjectManager.h"
 
+#include "Pandora/ObjectCreation.h"
 #include "Pandora/PandoraInternal.h"
 
 namespace pandora
@@ -43,8 +42,8 @@ private:
      *  @param  pVertex to receive the address of the vertex created
      *  @param  factory the factory that performs the object allocation
      */
-    StatusCode Create(const PandoraContentApi::Vertex::Parameters &parameters, const Vertex *&pVertex,
-        const ObjectFactory<PandoraContentApi::Vertex::Parameters, Vertex> &factory);
+    StatusCode Create(const object_creation::Vertex::Parameters &parameters, const Vertex *&pVertex,
+        const ObjectFactory<object_creation::Vertex::Parameters, object_creation::Vertex::Object> &factory);
 
     /**
      *  @brief  Alter the metadata information stored in a vertex
@@ -52,7 +51,7 @@ private:
      *  @param  pVertex address of the vertex to modify
      *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
      */
-    StatusCode AlterMetadata(const Vertex *const pVertex, const PandoraContentApi::Vertex::Metadata &metadata) const;
+    StatusCode AlterMetadata(const Vertex *const pVertex, const object_creation::Vertex::Metadata &metadata) const;
 
     /**
      *  @brief  Is a vertex, or a list of vertices, available to add to a particle flow object

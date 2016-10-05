@@ -43,7 +43,7 @@ private:
      *  @param  factory the factory that performs the object allocation
      */
     StatusCode Create(const object_creation::Cluster::Parameters &parameters, const Cluster *&pCluster,
-        const ObjectFactory<object_creation::Cluster::Parameters, Cluster> &factory);
+        const ObjectFactory<object_creation::Cluster::Parameters, object_creation::Cluster::Object> &factory);
 
     /**
      *  @brief  Alter the metadata information stored in a cluster

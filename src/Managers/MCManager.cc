@@ -41,7 +41,7 @@ MCManager::~MCManager()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode MCManager::Create(const object_creation::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle,
-    const ObjectFactory<object_creation::MCParticle::Parameters, MCParticle> &factory)
+    const ObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object> &factory)
 {
     pMCParticle = NULL;
 

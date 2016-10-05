@@ -10,6 +10,7 @@
 
 #include "Api/PandoraContentApi.h"
 
+#include "Pandora/ObjectCreation.h"
 #include "Pandora/StatusCodes.h"
 
 namespace pandora
@@ -342,7 +343,7 @@ private:
      *  @param  factory to create the fragmented calo hits
      */
     StatusCode Fragment(const CaloHit *const pOriginalCaloHit, const float fraction1, const CaloHit *&pDaughterCaloHit1,
-        const CaloHit *&pDaughterCaloHit2, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory) const;
+        const CaloHit *&pDaughterCaloHit2, const ObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object> &factory) const;
 
     /**
      *  @brief  Merge two calo hit fragments, originally from the same parent hit, to form a new calo hit
@@ -353,7 +354,7 @@ private:
      *  @param  factory to create the merged calo hit fragment
      */
     StatusCode MergeFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2,
-        const CaloHit *&pMergedCaloHit, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory) const;
+        const CaloHit *&pMergedCaloHit, const ObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object> &factory) const;
 
 
     /* Track-related functions */

@@ -346,7 +346,7 @@ public:
      */
     static pandora::StatusCode Fragment(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pOriginalCaloHit,
         const float fraction1, const pandora::CaloHit *&pDaughterCaloHit1, const pandora::CaloHit *&pDaughterCaloHit2,
-        const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory = pandora::PandoraObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit>());
+        const pandora::ObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object> &factory = pandora::PandoraObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object>());
 
     /**
      *  @brief  Merge two calo hit fragments, originally from the same parent hit, to form a new calo hit
@@ -359,7 +359,7 @@ public:
      */
     static pandora::StatusCode MergeFragments(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pFragmentCaloHit1,
         const pandora::CaloHit *const pFragmentCaloHit2, const pandora::CaloHit *&pMergedCaloHit,
-        const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory = pandora::PandoraObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit>());
+        const pandora::ObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object> &factory = pandora::PandoraObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object>());
 
 
     /* Track-related functions */

@@ -332,8 +332,8 @@ protected:
     friend class CaloHitMetadata;
     friend class CaloHitManager;
     friend class InputObjectManager<CaloHit>;
-    friend class PandoraObjectFactory<object_creation::CaloHit::Parameters, CaloHit>;
-    friend class PandoraObjectFactory<object_creation::CaloHitFragment::Parameters, CaloHit>;
+    friend class PandoraObjectFactory<object_creation::CaloHit::Parameters, object_creation::CaloHit::Object>;
+    friend class PandoraObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

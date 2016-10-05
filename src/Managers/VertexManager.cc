@@ -33,7 +33,7 @@ VertexManager::~VertexManager()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode VertexManager::Create(const object_creation::Vertex::Parameters &parameters, const Vertex *&pVertex,
-    const ObjectFactory<object_creation::Vertex::Parameters, Vertex> &factory)
+    const ObjectFactory<object_creation::Vertex::Parameters, object_creation::Vertex::Object> &factory)
 {
     pVertex = NULL;
 

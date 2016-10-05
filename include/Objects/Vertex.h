@@ -86,7 +86,7 @@ protected:
 
     friend class VertexManager;
     friend class AlgorithmObjectManager<Vertex>;
-    friend class PandoraObjectFactory<object_creation::Vertex::Parameters, Vertex>;
+    friend class PandoraObjectFactory<object_creation::Vertex::Parameters, object_creation::Vertex::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
