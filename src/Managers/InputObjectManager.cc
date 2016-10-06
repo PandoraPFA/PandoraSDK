@@ -15,6 +15,7 @@
 #include "Pandora/PandoraInternal.h"
 
 #include <algorithm>
+#include <unordered_set>
 
 namespace pandora
 {
@@ -101,12 +102,16 @@ StatusCode InputObjectManager<T>::AddObjectsToList(const std::string &listName, 
     if (pSavedList == &objectList)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    for (typename ObjectList::const_iterator iter = objectList.begin(), iterEnd = objectList.end(); iter != iterEnd; ++iter)
+    // ATTN For look-up efficiency
+    std::unordered_set<const T*> savedSet(pSavedList->begin(), pSavedList->end());
+
+    for (const T *const pT : objectList)
     {
-        if (pSavedList->end() != std::find(pSavedList->begin(), pSavedList->end(), *iter))
+        if (savedSet.count(pT))
             return STATUS_CODE_ALREADY_PRESENT;
 
-        pSavedList->push_back(*iter);
+        pSavedList->push_back(pT);
+        (void) savedSet.insert(pT);
     }
 
     return STATUS_CODE_SUCCESS;
@@ -127,9 +132,9 @@ StatusCode InputObjectManager<T>::RemoveObjectsFromList(const std::string &listN
     if (pSavedList == &objectList)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    for (typename ObjectList::const_iterator iter = objectList.begin(), iterEnd = objectList.end(); iter != iterEnd; ++iter)
+    for (const T *const pT : objectList)
     {
-        typename ObjectList::iterator savedObjectIter = std::find(pSavedList->begin(), pSavedList->end(), *iter);
+        typename ObjectList::iterator savedObjectIter = std::find(pSavedList->begin(), pSavedList->end(), pT);
 
         if (pSavedList->end() != savedObjectIter)
             pSavedList->erase(savedObjectIter);
