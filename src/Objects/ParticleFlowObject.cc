@@ -201,7 +201,7 @@ StatusCode ParticleFlowObject::AddDaughter(const ParticleFlowObject *const pPfo)
 
 StatusCode ParticleFlowObject::RemoveParent(const ParticleFlowObject *const pPfo)
 {
-    PfoList::const_iterator iter = std::find(m_parentPfoList.begin(), m_parentPfoList.end(), pPfo);
+    PfoList::iterator iter = std::find(m_parentPfoList.begin(), m_parentPfoList.end(), pPfo);
 
     if (m_parentPfoList.end() == iter)
         return STATUS_CODE_NOT_FOUND;
@@ -214,7 +214,7 @@ StatusCode ParticleFlowObject::RemoveParent(const ParticleFlowObject *const pPfo
 
 StatusCode ParticleFlowObject::RemoveDaughter(const ParticleFlowObject *const pPfo)
 {
-    PfoList::const_iterator iter = std::find(m_daughterPfoList.begin(), m_daughterPfoList.end(), pPfo);
+    PfoList::iterator iter = std::find(m_daughterPfoList.begin(), m_daughterPfoList.end(), pPfo);
 
     if (m_daughterPfoList.end() == iter)
         return STATUS_CODE_NOT_FOUND;
