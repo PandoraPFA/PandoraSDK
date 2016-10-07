@@ -123,7 +123,10 @@ StatusCode MCManager::SelectPfoTargets()
     NameToListMap::iterator selectedIter = m_nameToListMap.find(SELECTED_LIST_NAME);
 
     if (m_nameToListMap.end() != selectedIter)
+    {
+        delete selectedIter->second;
         m_nameToListMap.erase(selectedIter);
+    }
 
     // Strip down mc particles and relationships to just those of pfo targets, if specified
     const bool shouldCollapseMCParticlesToPfoTarget(m_pPandora->GetSettings()->ShouldCollapseMCParticlesToPfoTarget());

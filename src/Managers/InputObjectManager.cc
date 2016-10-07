@@ -75,8 +75,13 @@ StatusCode InputObjectManager<T>::SaveList(const std::string &listName, const Ob
     if (Manager<T>::m_nameToListMap.end() != Manager<T>::m_nameToListMap.find(listName))
         return this->AddObjectsToList(listName, objectList);
 
-    if (!Manager<T>::m_nameToListMap.insert(typename Manager<T>::NameToListMap::value_type(listName, new ObjectList)).second)
+    ObjectList *const pObjectList(new ObjectList);
+
+    if (!Manager<T>::m_nameToListMap.insert(typename Manager<T>::NameToListMap::value_type(listName, pObjectList)).second)
+    {
+        delete pObjectList;
         return STATUS_CODE_ALREADY_PRESENT;
+    }
 
     *(Manager<T>::m_nameToListMap[listName]) = objectList;
     Manager<T>::m_savedLists.insert(listName);
