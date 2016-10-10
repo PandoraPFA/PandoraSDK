@@ -499,7 +499,7 @@ StatusCode BinaryFileReader::ReadCaloHit(bool checkComponentId)
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(layer));
         bool isInOuterSamplingLayer(false);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(isInOuterSamplingLayer));
-        const void *pParentAddress(NULL);
+        const void *pParentAddress(nullptr);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(pParentAddress));
         float cellSize0(0.f);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(cellSize0));
@@ -588,7 +588,7 @@ StatusCode BinaryFileReader::ReadTrack(bool checkComponentId)
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(canFormPfo));
         bool canFormClusterlessPfo(false);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(canFormClusterlessPfo));
-        const void *pParentAddress(NULL);
+        const void *pParentAddress(nullptr);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(pParentAddress));
 
         pParameters->m_d0 = d0;
@@ -652,7 +652,7 @@ StatusCode BinaryFileReader::ReadMCParticle(bool checkComponentId)
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(particleId));
         MCParticleType mcParticleType(MC_3D);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(mcParticleType));
-        const void *pParentAddress(NULL);
+        const void *pParentAddress(nullptr);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(pParentAddress));
 
         pParameters->m_energy = energy;
@@ -692,9 +692,9 @@ StatusCode BinaryFileReader::ReadRelationship(bool checkComponentId)
 
     RelationshipId relationshipId(UNKNOWN_RELATIONSHIP);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(relationshipId));
-    const void *address1(NULL);
+    const void *address1(nullptr);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(address1));
-    const void *address2(NULL);
+    const void *address2(nullptr);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(address2));
     float weight(1.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(weight));

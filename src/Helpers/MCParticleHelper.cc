@@ -54,9 +54,9 @@ const MCParticle *MCParticleHelper::GetMainMCParticle(const Cluster *const pClus
 {
     MCParticleWeightMap mcParticleWeightMap;
 
-    for (const OrderedCaloHitList::value_type &orderedIter : pCluster->GetOrderedCaloHitList())
+    for (const OrderedCaloHitList::value_type &layerIter : pCluster->GetOrderedCaloHitList())
     {
-        for (const CaloHit *const pCaloHit : *orderedIter.second)
+        for (const CaloHit *const pCaloHit : *layerIter.second)
         {
             const MCParticleWeightMap &hitMCParticleWeightMap(pCaloHit->GetMCParticleWeightMap());
 

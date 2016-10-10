@@ -35,7 +35,7 @@ VertexManager::~VertexManager()
 StatusCode VertexManager::Create(const object_creation::Vertex::Parameters &parameters, const Vertex *&pVertex,
     const ObjectFactory<object_creation::Vertex::Parameters, object_creation::Vertex::Object> &factory)
 {
-    pVertex = NULL;
+    pVertex = nullptr;
 
     try
     {
@@ -49,7 +49,7 @@ StatusCode VertexManager::Create(const object_creation::Vertex::Parameters &para
 
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pVertex));
 
-        if (NULL == pVertex)
+        if (!pVertex)
              throw StatusCodeException(STATUS_CODE_FAILURE);
 
         iter->second->push_back(pVertex);
@@ -59,7 +59,7 @@ StatusCode VertexManager::Create(const object_creation::Vertex::Parameters &para
     {
         std::cout << "Failed to create vertex: " << statusCodeException.ToString() << std::endl;
         delete pVertex;
-        pVertex = NULL;
+        pVertex = nullptr;
         return statusCodeException.GetStatusCode();
     }
 }
@@ -84,8 +84,8 @@ bool VertexManager::IsAvailable(const VertexList *const pVertexList) const
 {
     bool isAvailable(true);
 
-    for (VertexList::const_iterator iter = pVertexList->begin(), iterEnd = pVertexList->end(); iter != iterEnd; ++iter)
-        isAvailable &= this->IsAvailable(*iter);
+    for (const Vertex *const pVertex : *pVertexList)
+        isAvailable &= this->IsAvailable(pVertex);
 
     return isAvailable;
 }
@@ -101,8 +101,8 @@ void VertexManager::SetAvailability(const Vertex *const pVertex, bool isAvailabl
 template <>
 void VertexManager::SetAvailability(const VertexList *const pVertexList, bool isAvailable) const
 {
-    for (VertexList::const_iterator iter = pVertexList->begin(), iterEnd = pVertexList->end(); iter != iterEnd; ++iter)
-        this->SetAvailability(*iter, isAvailable);
+    for (const Vertex *const pVertex : *pVertexList)
+        this->SetAvailability(pVertex, isAvailable);
 }
 
 } // namespace pandora

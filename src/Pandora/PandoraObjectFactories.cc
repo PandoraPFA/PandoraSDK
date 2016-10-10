@@ -48,7 +48,7 @@ StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Write(const Object *const /
 template <typename PARAMETERS, typename OBJECT>
 StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Create(const PARAMETERS &parameters, const OBJECT *&pObject) const
 {
-    pObject = NULL;
+    pObject = nullptr;
 
     try
     {
@@ -57,7 +57,7 @@ StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Create(const PARAMETERS &pa
     catch (StatusCodeException &statusCodeException)
     {
         delete pObject;
-        pObject = NULL;
+        pObject = nullptr;
 
         std::cout << "StatusCodeException caught while instantiating pandora object :" << statusCodeException.ToString() << std::endl;
         return statusCodeException.GetStatusCode();

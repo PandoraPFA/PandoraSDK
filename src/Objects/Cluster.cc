@@ -33,7 +33,7 @@ Cluster::Cluster(const object_creation::Cluster::Parameters &parameters) :
     m_isolatedElectromagneticEnergy(0),
     m_isolatedHadronicEnergy(0),
     m_particleId(UNKNOWN_PARTICLE_TYPE),
-    m_pTrackSeed(parameters.m_pTrack.IsInitialized() ? parameters.m_pTrack.Get() : NULL),
+    m_pTrackSeed(parameters.m_pTrack.IsInitialized() ? parameters.m_pTrack.Get() : nullptr),
     m_initialDirection(0.f, 0.f, 0.f),
     m_isDirectionUpToDate(false),
     m_isFitUpToDate(false),
@@ -48,14 +48,14 @@ Cluster::Cluster(const object_creation::Cluster::Parameters &parameters) :
         m_isDirectionUpToDate = true;
     }
 
-    for (CaloHitList::const_iterator iter = parameters.m_caloHitList.begin(), iterEnd = parameters.m_caloHitList.end(); iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : parameters.m_caloHitList)
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddCaloHit(*iter));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddCaloHit(pCaloHit));
     }
 
-    for (CaloHitList::const_iterator iter = parameters.m_isolatedCaloHitList.begin(), iterEnd = parameters.m_isolatedCaloHitList.end(); iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : parameters.m_isolatedCaloHitList)
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddIsolatedCaloHit(*iter));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddIsolatedCaloHit(pCaloHit));
     }
 }
 
@@ -262,8 +262,8 @@ void Cluster::CalculateInitialDirection() const
     CartesianVector initialDirection(0.f, 0.f, 0.f);
     CaloHitList *const pCaloHitList(m_orderedCaloHitList.begin()->second);
 
-    for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
-        initialDirection += (*iter)->GetExpectedDirection();
+    for (const CaloHit *const pCaloHit : *pCaloHitList)
+        initialDirection += pCaloHit->GetExpectedDirection();
 
     m_initialDirection = initialDirection.GetUnitVector();
     m_isDirectionUpToDate = true;
@@ -280,28 +280,28 @@ void Cluster::CalculateLayerHitType(const unsigned int pseudoLayer, InputHitType
 
     HitTypeToEnergyMap hitTypeToEnergyMap;
 
-    for (CaloHitList::const_iterator iter = listIter->second->begin(), iterEnd = listIter->second->end(); iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : *listIter->second)
     {
-        HitTypeToEnergyMap::iterator mapIter = hitTypeToEnergyMap.find((*iter)->GetHitType());
+        HitTypeToEnergyMap::iterator mapIter = hitTypeToEnergyMap.find(pCaloHit->GetHitType());
 
         if (hitTypeToEnergyMap.end() != mapIter)
         {
-            mapIter->second += (*iter)->GetHadronicEnergy();
+            mapIter->second += pCaloHit->GetHadronicEnergy();
             continue;
         }
 
-        if (!hitTypeToEnergyMap.insert(HitTypeToEnergyMap::value_type((*iter)->GetHitType(), (*iter)->GetHadronicEnergy())).second)
+        if (!hitTypeToEnergyMap.insert(HitTypeToEnergyMap::value_type(pCaloHit->GetHitType(), pCaloHit->GetHadronicEnergy())).second)
             throw StatusCodeException(STATUS_CODE_FAILURE);
     }
 
     float highestEnergy(0.f);
 
-    for (HitTypeToEnergyMap::const_iterator iter = hitTypeToEnergyMap.begin(), iterEnd = hitTypeToEnergyMap.end(); iter != iterEnd; ++iter)
+    for (HitTypeToEnergyMap::value_type &mapEntry : hitTypeToEnergyMap)
     {
-        if (iter->second > highestEnergy)
+        if (mapEntry.second > highestEnergy)
         {
-            layerHitType = iter->first;
-            highestEnergy = iter->second;
+            layerHitType = mapEntry.first;
+            highestEnergy = mapEntry.second;
         }
     }
 }
@@ -426,12 +426,12 @@ StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_orderedCaloHitList.Add(orderedCaloHitList));
 
     const CaloHitList &isolatedCaloHitList(pCluster->GetIsolatedCaloHitList());
-    for (CaloHitList::const_iterator iter = isolatedCaloHitList.begin(), iterEnd = isolatedCaloHitList.end(); iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : isolatedCaloHitList)
     {
-        if (m_isolatedCaloHitList.end() != std::find(m_isolatedCaloHitList.begin(), m_isolatedCaloHitList.end(), *iter))
+        if (m_isolatedCaloHitList.end() != std::find(m_isolatedCaloHitList.begin(), m_isolatedCaloHitList.end(), pCaloHit))
             return STATUS_CODE_ALREADY_PRESENT;
 
-        m_isolatedCaloHitList.push_back(*iter);
+        m_isolatedCaloHitList.push_back(pCaloHit);
     }
 
     this->ResetOutdatedProperties();
@@ -444,9 +444,9 @@ StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
     m_hadronicEnergy += pCluster->GetHadronicEnergy();
 
     // Loop over pseudo layers in second cluster
-    for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
+    for (const OrderedCaloHitList::value_type &layerEntry : orderedCaloHitList)
     {
-        const unsigned int pseudoLayer(iter->first);
+        const unsigned int pseudoLayer(layerEntry.first);
         OrderedCaloHitList::const_iterator currentIter = m_orderedCaloHitList.find(pseudoLayer);
 
         SimplePoint &mypoint = m_sumXYZByPseudoLayer[pseudoLayer];
@@ -477,7 +477,7 @@ StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
 
 StatusCode Cluster::AddTrackAssociation(const Track *const pTrack)
 {
-    if (NULL == pTrack)
+    if (!pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
 
     if (m_associatedTrackList.end() != std::find(m_associatedTrackList.begin(), m_associatedTrackList.end(), pTrack))

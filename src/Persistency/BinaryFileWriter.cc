@@ -146,16 +146,16 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    const LineGap *pLineGap = NULL;
+    const LineGap *pLineGap(nullptr);
     pLineGap = dynamic_cast<const LineGap *>(pDetectorGap);
 
-    const BoxGap *pBoxGap = NULL;
+    const BoxGap *pBoxGap(nullptr);
     pBoxGap = dynamic_cast<const BoxGap *>(pDetectorGap);
 
-    const ConcentricGap *pConcentricGap = NULL;
+    const ConcentricGap *pConcentricGap(nullptr);
     pConcentricGap = dynamic_cast<const ConcentricGap *>(pDetectorGap);
 
-    if (NULL != pLineGap)
+    if (nullptr != pLineGap)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(LINE_GAP));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Write(pLineGap, *this));
@@ -164,7 +164,7 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineStartZ()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineEndZ()));
     }
-    else if (NULL != pBoxGap)
+    else if (nullptr != pBoxGap)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(BOX_GAP));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBoxGapFactory->Write(pBoxGap, *this));
@@ -174,7 +174,7 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide2()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide3()));
     }
-    else if (NULL != pConcentricGap)
+    else if (nullptr != pConcentricGap)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(CONCENTRIC_GAP));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pConcentricGapFactory->Write(pConcentricGap, *this));

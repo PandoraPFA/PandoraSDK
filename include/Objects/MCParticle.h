@@ -227,14 +227,14 @@ inline bool MCParticle::IsPfoTarget() const
 
 inline bool MCParticle::IsPfoTargetSet() const
 {
-    return (NULL != m_pPfoTarget);
+    return (nullptr != m_pPfoTarget);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 inline const MCParticle *MCParticle::GetPfoTarget() const
 {
-    if (NULL == m_pPfoTarget)
+    if (!m_pPfoTarget)
         throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
     return m_pPfoTarget;

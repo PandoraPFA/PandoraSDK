@@ -19,7 +19,7 @@ StatusCode XmlHelper::ProcessAlgorithm(const Algorithm &algorithm, const TiXmlHa
     if ("algorithm" != xmlHandle.ToNode()->ValueStr())
         return STATUS_CODE_NOT_ALLOWED;
 
-    for (TiXmlElement *pXmlElement = xmlHandle.FirstChild("algorithm").Element(); NULL != pXmlElement;
+    for (TiXmlElement *pXmlElement = xmlHandle.FirstChild("algorithm").Element(); nullptr != pXmlElement;
         pXmlElement = pXmlElement->NextSiblingElement("algorithm"))
     {
         if (description.empty())
@@ -29,7 +29,7 @@ StatusCode XmlHelper::ProcessAlgorithm(const Algorithm &algorithm, const TiXmlHa
         {
             const char *const pAttribute(pXmlElement->Attribute("description"));
 
-            if (NULL == pAttribute)
+            if (!pAttribute)
                 return STATUS_CODE_NOT_FOUND;
 
             if (description == std::string(pAttribute))
@@ -53,7 +53,7 @@ StatusCode XmlHelper::ProcessAlgorithmList(const Algorithm &algorithm, const TiX
 
     const TiXmlHandle algorithmListHandle = TiXmlHandle(xmlHandle.FirstChild(listName).Element());
 
-    for (TiXmlElement *pXmlElement = algorithmListHandle.FirstChild("algorithm").Element(); NULL != pXmlElement;
+    for (TiXmlElement *pXmlElement = algorithmListHandle.FirstChild("algorithm").Element(); nullptr != pXmlElement;
         pXmlElement = pXmlElement->NextSiblingElement("algorithm"))
     {
         std::string algorithmName;
@@ -72,7 +72,7 @@ StatusCode XmlHelper::ProcessAlgorithmTool(const Algorithm &algorithm, const TiX
     if ("algorithm" != xmlHandle.ToNode()->ValueStr())
         return STATUS_CODE_NOT_ALLOWED;
 
-    for (TiXmlElement *pXmlElement = xmlHandle.FirstChild("tool").Element(); NULL != pXmlElement;
+    for (TiXmlElement *pXmlElement = xmlHandle.FirstChild("tool").Element(); nullptr != pXmlElement;
         pXmlElement = pXmlElement->NextSiblingElement("tool"))
     {
         if (description.empty())
@@ -82,7 +82,7 @@ StatusCode XmlHelper::ProcessAlgorithmTool(const Algorithm &algorithm, const TiX
         {
             const char *const pAttribute(pXmlElement->Attribute("description"));
 
-            if (NULL == pAttribute)
+            if (!pAttribute)
                 return STATUS_CODE_NOT_FOUND;
 
             if (description == std::string(pAttribute))
@@ -106,10 +106,10 @@ StatusCode XmlHelper::ProcessAlgorithmToolList(const Algorithm &algorithm, const
 
     const TiXmlHandle algorithmListHandle = TiXmlHandle(xmlHandle.FirstChild(listName).Element());
 
-    for (TiXmlElement *pXmlElement = algorithmListHandle.FirstChild("tool").Element(); NULL != pXmlElement;
+    for (TiXmlElement *pXmlElement = algorithmListHandle.FirstChild("tool").Element(); nullptr != pXmlElement;
         pXmlElement = pXmlElement->NextSiblingElement("tool"))
     {
-        AlgorithmTool *pAlgorithmTool = NULL;
+        AlgorithmTool *pAlgorithmTool(nullptr);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::CreateAlgorithmTool(algorithm, pXmlElement, pAlgorithmTool));
         algorithmToolVector.push_back(pAlgorithmTool);
     }

@@ -94,9 +94,9 @@ private:
      * 
      *  @param  pXmlElement address of the xml element describing the algorithm type and settings
      *  @param  algorithmName to receive the name of the algorithm instance
-     *  @param  instanceLabel to receive the label referring to a specific algorithm instance
+     *  @param  xmlInstanceLabel to receive the xml label referring to a specific algorithm instance
      */
-    StatusCode FindSpecificAlgorithmInstance(TiXmlElement *const pXmlElement, std::string &algorithmName, std::string &instanceLabel) const;
+    StatusCode FindSpecificAlgorithmInstance(TiXmlElement *const pXmlElement, std::string &algorithmName, std::string &xmlInstanceLabel) const;
 
     typedef std::map<const std::string, Algorithm *const> AlgorithmMap;
     typedef std::map<const std::string, AlgorithmFactory *const> AlgorithmFactoryMap;

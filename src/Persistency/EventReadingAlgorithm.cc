@@ -20,7 +20,7 @@ EventReadingAlgorithm::EventReadingAlgorithm() :
     m_shouldReadGeometry(false),
     m_shouldReadEvents(true),
     m_skipToEvent(0),
-    m_pEventFileReader(NULL)
+    m_pEventFileReader(nullptr)
 {
 }
 
@@ -78,7 +78,7 @@ StatusCode EventReadingAlgorithm::Initialize()
 
 StatusCode EventReadingAlgorithm::Run()
 {
-    if ((NULL != m_pEventFileReader) && m_shouldReadEvents)
+    if (m_pEventFileReader && m_shouldReadEvents)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pEventFileReader->ReadEvent());
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::RepeatEventPreparation(*this));

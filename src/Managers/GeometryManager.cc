@@ -76,7 +76,7 @@ Granularity GeometryManager::GetHitTypeGranularity(const HitType hitType) const
 StatusCode GeometryManager::CreateSubDetector(const object_creation::Geometry::SubDetector::Parameters &inputParameters,
     const ObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object> &factory)
 {
-    const SubDetector *pSubDetector = NULL;
+    const SubDetector *pSubDetector = nullptr;
 
     try
     {
@@ -91,7 +91,7 @@ StatusCode GeometryManager::CreateSubDetector(const object_creation::Geometry::S
     {
         std::cout << "Failed to create sub detector: " << statusCodeException.ToString() << std::endl;
         delete pSubDetector;
-        pSubDetector = NULL;
+        pSubDetector = nullptr;
         return statusCodeException.GetStatusCode();
     }
 
@@ -103,13 +103,13 @@ StatusCode GeometryManager::CreateSubDetector(const object_creation::Geometry::S
 template <typename PARAMETERS, typename OBJECT>
 StatusCode GeometryManager::CreateGap(const PARAMETERS &parameters, const ObjectFactory<PARAMETERS, OBJECT> &factory)
 {
-    const OBJECT *pDetectorGap = NULL;
+    const OBJECT *pDetectorGap = nullptr;
 
     try
     {
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pDetectorGap));
 
-        if (NULL == pDetectorGap)
+        if (!pDetectorGap)
             return STATUS_CODE_FAILURE;
 
         m_detectorGapList.push_back(pDetectorGap);
@@ -119,7 +119,7 @@ StatusCode GeometryManager::CreateGap(const PARAMETERS &parameters, const Object
     {
         std::cout << "Failed to create gap: " << statusCodeException.ToString() << std::endl;
         delete pDetectorGap;
-        pDetectorGap = NULL;
+        pDetectorGap = nullptr;
         return statusCodeException.GetStatusCode();
     }
 }
@@ -128,11 +128,11 @@ StatusCode GeometryManager::CreateGap(const PARAMETERS &parameters, const Object
 
 StatusCode GeometryManager::EraseAllContent()
 {
-    for (SubDetectorMap::const_iterator iter = m_subDetectorMap.begin(), iterEnd = m_subDetectorMap.end(); iter != iterEnd; ++iter)
-        delete iter->second;
+    for (const SubDetectorMap::value_type &mapEntry : m_subDetectorMap)
+        delete mapEntry.second;
 
-    for (DetectorGapList::const_iterator iter = m_detectorGapList.begin(), iterEnd = m_detectorGapList.end(); iter != iterEnd; ++iter)
-        delete *iter;
+    for (const DetectorGap *const pDetectorGap : m_detectorGapList)
+        delete pDetectorGap;
 
     m_subDetectorMap.clear();
     m_subDetectorTypeMap.clear();

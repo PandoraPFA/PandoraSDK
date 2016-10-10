@@ -33,7 +33,7 @@ template <>
 StatusCode PandoraApiImpl::Create(const object_creation::MCParticle::Parameters &parameters,
     const ObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object> &factory) const
 {
-    const MCParticle *pMCParticle(NULL);
+    const MCParticle *pMCParticle(nullptr);
     return m_pPandora->m_pMCManager->Create(parameters, pMCParticle, factory);
 }
 
@@ -41,7 +41,7 @@ template <>
 StatusCode PandoraApiImpl::Create(const object_creation::Track::Parameters &parameters,
     const ObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object> &factory) const
 {
-    const Track *pTrack(NULL);
+    const Track *pTrack(nullptr);
     return m_pPandora->m_pTrackManager->Create(parameters, pTrack, factory);
 }
 
@@ -49,7 +49,7 @@ template <>
 StatusCode PandoraApiImpl::Create(const object_creation::CaloHit::Parameters &parameters,
     const ObjectFactory<object_creation::CaloHit::Parameters, object_creation::CaloHit::Object> &factory) const
 {
-    const CaloHit *pCaloHit(NULL);
+    const CaloHit *pCaloHit(nullptr);
     return m_pPandora->m_pCaloHitManager->Create(parameters, pCaloHit, factory);
 }
 

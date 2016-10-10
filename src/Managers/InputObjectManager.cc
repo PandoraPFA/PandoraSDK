@@ -161,8 +161,8 @@ StatusCode InputObjectManager<T>::EraseAllContent()
     }
     else
     {
-        for (typename ObjectList::iterator iter = inputIter->second->begin(), iterEnd = inputIter->second->end(); iter != iterEnd; ++iter)
-            delete *iter;
+        for (const T *const pT : *inputIter->second)
+            delete pT;
     }
 
     return Manager<T>::EraseAllContent();

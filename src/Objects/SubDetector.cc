@@ -37,9 +37,9 @@ SubDetector::SubDetector(const object_creation::Geometry::SubDetector::Parameter
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
     }
 
-    for (object_creation::Geometry::LayerParametersVector::const_iterator iter = inputParameters.m_layerParametersVector.begin(); iter != inputParameters.m_layerParametersVector.end(); ++iter)
+    for (const object_creation::Geometry::LayerParameters &layerParameters : inputParameters.m_layerParametersVector)
     {
-        SubDetectorLayer subDetectorLayer(iter->m_closestDistanceToIp.Get(), iter->m_nRadiationLengths.Get(), iter->m_nInteractionLengths.Get());
+        SubDetectorLayer subDetectorLayer(layerParameters.m_closestDistanceToIp.Get(), layerParameters.m_nRadiationLengths.Get(), layerParameters.m_nInteractionLengths.Get());
         m_subDetectorLayerVector.push_back(subDetectorLayer);
     }
 }

@@ -23,7 +23,7 @@ EventWritingAlgorithm::EventWritingAlgorithm() :
     m_shouldWriteTrackRelationships(true),
     m_shouldOverwriteEventFile(false),
     m_shouldOverwriteGeometryFile(false),
-    m_pEventFileWriter(NULL)
+    m_pEventFileWriter(nullptr)
 {
 }
 
@@ -83,15 +83,15 @@ StatusCode EventWritingAlgorithm::Initialize()
 
 StatusCode EventWritingAlgorithm::Run()
 {
-    if ((NULL != m_pEventFileWriter) && m_shouldWriteEvents)
+    if (m_pEventFileWriter && m_shouldWriteEvents)
     {
-        const CaloHitList *pCaloHitList = NULL;
+        const CaloHitList *pCaloHitList(nullptr);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pCaloHitList));
 
-        const TrackList *pTrackList = NULL;
+        const TrackList *pTrackList(nullptr);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pTrackList));
 
-        const MCParticleList *pMCParticleList = NULL;
+        const MCParticleList *pMCParticleList(nullptr);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pMCParticleList));
 
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pEventFileWriter->WriteEvent(*pCaloHitList, *pTrackList, *pMCParticleList,

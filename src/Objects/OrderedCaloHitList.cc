@@ -29,22 +29,19 @@ OrderedCaloHitList::OrderedCaloHitList(const OrderedCaloHitList &rhs)
 
 OrderedCaloHitList::~OrderedCaloHitList()
 {
-    for (TheList::iterator iter = m_theList.begin(), iterEnd = m_theList.end(); iter != iterEnd; ++iter)
-    {
-        delete iter->second;
-    }
+    for (const value_type &entry : m_theList)
+        delete entry.second;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode OrderedCaloHitList::Add(const OrderedCaloHitList &rhs)
 {
-    for (OrderedCaloHitList::const_iterator iter = rhs.begin(), iterEnd = rhs.end(); iter != iterEnd; ++iter)
+    for (const value_type &rhsEntry : rhs)
     {
-        for (CaloHitList::const_iterator caloHitIter = iter->second->begin(), caloHitIterEnd = iter->second->end();
-            caloHitIter != caloHitIterEnd; ++caloHitIter)
+        for (const CaloHit *const pCaloHit : *rhsEntry.second)
         {
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Add(*caloHitIter, iter->first));
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Add(pCaloHit, rhsEntry.first));
         }
     }
 
@@ -55,12 +52,11 @@ StatusCode OrderedCaloHitList::Add(const OrderedCaloHitList &rhs)
 
 StatusCode OrderedCaloHitList::Remove(const OrderedCaloHitList &rhs)
 {
-    for (OrderedCaloHitList::const_iterator iter = rhs.begin(), iterEnd = rhs.end(); iter != iterEnd; ++iter)
+    for (const value_type &rhsEntry : rhs)
     {
-        for (CaloHitList::const_iterator caloHitIter = iter->second->begin(), caloHitIterEnd = iter->second->end();
-            caloHitIter != caloHitIterEnd; ++caloHitIter)
+        for (const CaloHit *const pCaloHit : *rhsEntry.second)
         {
-            PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, this->Remove(*caloHitIter, iter->first));
+            PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, this->Remove(pCaloHit, rhsEntry.first));
         }
     }
 
@@ -71,9 +67,9 @@ StatusCode OrderedCaloHitList::Remove(const OrderedCaloHitList &rhs)
 
 StatusCode OrderedCaloHitList::Add(const CaloHitList &caloHitList)
 {
-    for (CaloHitList::const_iterator iter = caloHitList.begin(), iterEnd = caloHitList.end(); iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : caloHitList)
     {
-        PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, this->Add(*iter, (*iter)->GetPseudoLayer()));
+        PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, this->Add(pCaloHit, pCaloHit->GetPseudoLayer()));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -83,9 +79,9 @@ StatusCode OrderedCaloHitList::Add(const CaloHitList &caloHitList)
 
 StatusCode OrderedCaloHitList::Remove(const CaloHitList &caloHitList)
 {
-    for (CaloHitList::const_iterator iter = caloHitList.begin(), iterEnd = caloHitList.end(); iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : caloHitList)
     {
-        PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, this->Remove(*iter, (*iter)->GetPseudoLayer()));
+        PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, this->Remove(pCaloHit, pCaloHit->GetPseudoLayer()));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -121,8 +117,8 @@ unsigned int OrderedCaloHitList::GetNCaloHitsInPseudoLayer(const unsigned int ps
 
 void OrderedCaloHitList::Reset()
 {
-    for (TheList::iterator iter = m_theList.begin(), iterEnd = m_theList.end(); iter != iterEnd; ++iter)
-        delete iter->second;
+    for (const value_type &entry : m_theList)
+        delete entry.second;
 
     this->clear();
 
@@ -132,11 +128,11 @@ void OrderedCaloHitList::Reset()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void OrderedCaloHitList::GetCaloHitList(CaloHitList &caloHitList) const
+void OrderedCaloHitList::FillCaloHitList(CaloHitList &caloHitList) const
 {
-    for (OrderedCaloHitList::const_iterator iter = this->begin(), iterEnd = this->end(); iter != iterEnd; ++iter)
+    for (const value_type &entry : m_theList)
     {
-        caloHitList.insert(caloHitList.end(), iter->second->begin(), iter->second->end());
+        caloHitList.insert(caloHitList.end(), entry.second->begin(), entry.second->end());
     }
 }
 

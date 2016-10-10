@@ -62,9 +62,9 @@ TrackAddressList ParticleFlowObject::GetTrackAddressList() const
 {
     TrackAddressList trackAddressList;
 
-    for (TrackList::const_iterator iter = m_trackList.begin(), iterEnd = m_trackList.end(); iter != iterEnd; ++iter)
+    for (const Track *const pTrack : m_trackList)
     {
-        trackAddressList.push_back((*iter)->GetParentTrackAddress());
+        trackAddressList.push_back(pTrack->GetParentTrackAddress());
     }
 
     return trackAddressList;
@@ -76,21 +76,17 @@ ClusterAddressList ParticleFlowObject::GetClusterAddressList() const
 {
     ClusterAddressList clusterAddressList;
 
-    for (ClusterList::const_iterator iter = m_clusterList.begin(), iterEnd = m_clusterList.end(); iter != iterEnd; ++iter)
+    for (const Cluster *const pCluster : m_clusterList)
     {
         CaloHitAddressList caloHitAddressList;
 
-        OrderedCaloHitList orderedCaloHitList((*iter)->GetOrderedCaloHitList());
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, orderedCaloHitList.Add((*iter)->GetIsolatedCaloHitList()));
+        OrderedCaloHitList orderedCaloHitList(pCluster->GetOrderedCaloHitList());
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, orderedCaloHitList.Add(pCluster->GetIsolatedCaloHitList()));
 
-        for (OrderedCaloHitList::const_iterator layerIter = orderedCaloHitList.begin(), layerIterEnd = orderedCaloHitList.end();
-            layerIter != layerIterEnd; ++layerIter)
+        for (const OrderedCaloHitList::value_type &layerEntry : orderedCaloHitList)
         {
-            for (CaloHitList::const_iterator hitIter = layerIter->second->begin(), hitIterEnd = layerIter->second->end();
-                hitIter != hitIterEnd; ++hitIter)
-            {
-                caloHitAddressList.push_back((*hitIter)->GetParentCaloHitAddress());
-            }
+            for (const CaloHit *const pCaloHit : *layerEntry.second)
+                caloHitAddressList.push_back(pCaloHit->GetParentCaloHitAddress());
         }
 
         clusterAddressList.push_back(caloHitAddressList);
@@ -173,7 +169,7 @@ StatusCode ParticleFlowObject::RemoveFromPfo(const Vertex *const pVertex)
 
 StatusCode ParticleFlowObject::AddParent(const ParticleFlowObject *const pPfo)
 {
-    if (NULL == pPfo)
+    if (!pPfo)
         return STATUS_CODE_INVALID_PARAMETER;
 
     if (m_parentPfoList.end() != std::find(m_parentPfoList.begin(), m_parentPfoList.end(), pPfo))
@@ -187,7 +183,7 @@ StatusCode ParticleFlowObject::AddParent(const ParticleFlowObject *const pPfo)
 
 StatusCode ParticleFlowObject::AddDaughter(const ParticleFlowObject *const pPfo)
 {
-    if (NULL == pPfo)
+    if (!pPfo)
         return STATUS_CODE_INVALID_PARAMETER;
 
     if (m_daughterPfoList.end() != std::find(m_daughterPfoList.begin(), m_daughterPfoList.end(), pPfo))

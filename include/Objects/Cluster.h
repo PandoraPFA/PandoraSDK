@@ -532,14 +532,14 @@ inline int Cluster::GetParticleIdFlag() const
 
 inline bool Cluster::IsTrackSeeded() const
 {
-    return (NULL != m_pTrackSeed);
+    return (nullptr != m_pTrackSeed);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 inline const Track *Cluster::GetTrackSeed() const
 {
-    if (NULL == m_pTrackSeed)
+    if (!m_pTrackSeed)
         throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
     return m_pTrackSeed;
@@ -687,7 +687,7 @@ inline bool Cluster::IsAvailable() const
 
 inline void Cluster::RemoveTrackSeed()
 {
-    m_pTrackSeed = NULL;
+    m_pTrackSeed = nullptr;
     this->CalculateInitialDirection();
 }
 

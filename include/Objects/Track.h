@@ -398,14 +398,14 @@ inline bool Track::CanFormClusterlessPfo() const
 
 inline bool Track::HasAssociatedCluster() const
 {
-    return (NULL != m_pAssociatedCluster);
+    return (nullptr != m_pAssociatedCluster);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 inline const Cluster *Track::GetAssociatedCluster() const
 {
-    if (NULL == m_pAssociatedCluster)
+    if (!m_pAssociatedCluster)
         throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
     return m_pAssociatedCluster;

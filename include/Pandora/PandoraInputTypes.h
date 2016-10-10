@@ -134,7 +134,7 @@ typedef std::vector<CaloHitAddressList> ClusterAddressList;
 
 template <typename T>
 inline PandoraInputType<T>::PandoraInputType() :
-    m_pValue(NULL),
+    m_pValue(nullptr),
     m_isInitialized(false)
 {
 }
@@ -144,7 +144,7 @@ inline PandoraInputType<T>::PandoraInputType() :
 template <typename T>
 inline PandoraInputType<T>::~PandoraInputType()
 {
-    if (NULL != m_pValue)
+    if (nullptr != m_pValue)
         delete m_pValue;
 }
 
@@ -161,7 +161,7 @@ inline PandoraInputType<T>::PandoraInputType(const T &t) :
 
 template <typename T>
 inline PandoraInputType<T>::PandoraInputType(const PandoraInputType<T> &rhs) :
-    m_pValue(NULL),
+    m_pValue(nullptr),
     m_isInitialized(rhs.m_isInitialized)
 {
     if (rhs.m_isInitialized)
@@ -199,11 +199,11 @@ inline const T &PandoraInputType<T>::Get() const
 template <typename T>
 inline void PandoraInputType<T>::Reset()
 {
-    if (NULL != m_pValue)
+    if (nullptr != m_pValue)
         delete m_pValue;
 
     m_isInitialized = false;
-    m_pValue = NULL;
+    m_pValue = nullptr;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

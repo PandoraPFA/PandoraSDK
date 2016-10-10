@@ -48,7 +48,7 @@ Track::Track(const object_creation::Track::Parameters &parameters) :
     m_isProjectedToEndCap(parameters.m_isProjectedToEndCap.Get()),
     m_canFormPfo(parameters.m_canFormPfo.Get()),
     m_canFormClusterlessPfo(parameters.m_canFormClusterlessPfo.Get()),
-    m_pAssociatedCluster(NULL),
+    m_pAssociatedCluster(nullptr),
     m_pParentAddress(parameters.m_pParentAddress.Get()),
     m_isAvailable(true)
 {
@@ -84,10 +84,10 @@ void Track::RemoveMCParticles()
 
 StatusCode Track::SetAssociatedCluster(const Cluster *const pCluster)
 {
-    if (NULL == pCluster)
+    if (!pCluster)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    if (NULL != m_pAssociatedCluster)
+    if (nullptr != m_pAssociatedCluster)
         return STATUS_CODE_ALREADY_INITIALIZED;
 
     m_pAssociatedCluster = pCluster;
@@ -101,7 +101,7 @@ StatusCode Track::RemoveAssociatedCluster(const Cluster *const pCluster)
     if (pCluster != m_pAssociatedCluster)
         return STATUS_CODE_NOT_FOUND;
 
-    m_pAssociatedCluster = NULL;
+    m_pAssociatedCluster = nullptr;
     return STATUS_CODE_SUCCESS;
 }
 
@@ -109,7 +109,7 @@ StatusCode Track::RemoveAssociatedCluster(const Cluster *const pCluster)
 
 StatusCode Track::AddParent(const Track *const pTrack)
 {
-    if (NULL == pTrack)
+    if (!pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
 
     if (m_parentTrackList.end() != std::find(m_parentTrackList.begin(), m_parentTrackList.end(), pTrack))
@@ -123,7 +123,7 @@ StatusCode Track::AddParent(const Track *const pTrack)
 
 StatusCode Track::AddDaughter(const Track *const pTrack)
 {
-    if (NULL == pTrack)
+    if (!pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
 
     if (m_daughterTrackList.end() != std::find(m_daughterTrackList.begin(), m_daughterTrackList.end(), pTrack))
@@ -137,7 +137,7 @@ StatusCode Track::AddDaughter(const Track *const pTrack)
 
 StatusCode Track::AddSibling(const Track *const pTrack)
 {
-    if (NULL == pTrack)
+    if (!pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
 
     if (m_siblingTrackList.end() != std::find(m_siblingTrackList.begin(), m_siblingTrackList.end(), pTrack))

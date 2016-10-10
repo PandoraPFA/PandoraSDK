@@ -112,15 +112,14 @@ StatusCode AlgorithmObjectManager<T>::MoveObjectsBetweenLists(const std::string 
     if (Manager<T>::m_nameToListMap.end() == targetListIter)
         return STATUS_CODE_FAILURE;
 
-    if (NULL == pObjectSubset)
+    if (!pObjectSubset)
     {
-        for (typename ObjectList::iterator iter = sourceListIter->second->begin(), iterEnd = sourceListIter->second->end();
-            iter != iterEnd; ++iter)
+        for (const T *const pT : *sourceListIter->second)
         {
-            if (targetListIter->second->end() != std::find(targetListIter->second->begin(), targetListIter->second->end(), *iter))
+            if (targetListIter->second->end() != std::find(targetListIter->second->begin(), targetListIter->second->end(), pT))
                 return STATUS_CODE_ALREADY_PRESENT;
 
-            targetListIter->second->push_back(*iter);
+            targetListIter->second->push_back(pT);
         }
 
         sourceListIter->second->clear();
@@ -130,17 +129,17 @@ StatusCode AlgorithmObjectManager<T>::MoveObjectsBetweenLists(const std::string 
         if ((sourceListIter->second == pObjectSubset) || (targetListIter->second == pObjectSubset))
             return STATUS_CODE_INVALID_PARAMETER;
 
-        for (typename ObjectList::const_iterator iter = pObjectSubset->begin(), iterEnd = pObjectSubset->end(); iter != iterEnd; ++iter)
+        for (const T *const pT : *pObjectSubset)
         {
-            typename ObjectList::iterator objectIter = std::find(sourceListIter->second->begin(), sourceListIter->second->end(), *iter);
+            typename ObjectList::iterator objectIter = std::find(sourceListIter->second->begin(), sourceListIter->second->end(), pT);
 
             if (sourceListIter->second->end() == objectIter)
                 return STATUS_CODE_NOT_FOUND;
 
-            if (targetListIter->second->end() != std::find(targetListIter->second->begin(), targetListIter->second->end(), *objectIter))
+            if (targetListIter->second->end() != std::find(targetListIter->second->begin(), targetListIter->second->end(), pT))
                 return STATUS_CODE_ALREADY_PRESENT;
 
-            targetListIter->second->push_back(*objectIter);
+            targetListIter->second->push_back(pT);
             sourceListIter->second->erase(objectIter);
         }
     }
@@ -196,14 +195,14 @@ StatusCode AlgorithmObjectManager<T>::DeleteObjects(const ObjectList &objectList
     if (listIter->second == &objectList)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    for (typename ObjectList::const_iterator objectIter = objectList.begin(), objectIterEnd = objectList.end(); objectIter != objectIterEnd; ++objectIter)
+    for (const T *const pT : objectList)
     {
-        typename ObjectList::iterator deletionIter = std::find(listIter->second->begin(), listIter->second->end(), *objectIter);
+        typename ObjectList::iterator deletionIter = std::find(listIter->second->begin(), listIter->second->end(), pT);
 
         if (listIter->second->end() == deletionIter)
             return STATUS_CODE_NOT_FOUND;
 
-        delete *objectIter;
+        delete pT;
         listIter->second->erase(deletionIter);
     }
 
@@ -231,8 +230,8 @@ StatusCode AlgorithmObjectManager<T>::DeleteTemporaryObjects(const Algorithm *co
     if (Manager<T>::m_nameToListMap.end() == listIter)
         return STATUS_CODE_FAILURE;
 
-    for (typename ObjectList::iterator iter = listIter->second->begin(), iterEnd = listIter->second->end(); iter != iterEnd; ++iter)
-        delete *iter;
+    for (const T *const pT : *listIter->second)
+        delete pT;
 
     listIter->second->clear();
     return STATUS_CODE_SUCCESS;
@@ -248,10 +247,9 @@ StatusCode AlgorithmObjectManager<T>::GetResetDeletionObjects(const Algorithm *c
     if (Manager<T>::m_algorithmInfoMap.end() == algorithmIter)
         return STATUS_CODE_NOT_FOUND;
 
-    for (StringSet::const_iterator listNameIter = algorithmIter->second.m_temporaryListNames.begin(),
-        listNameIterEnd = algorithmIter->second.m_temporaryListNames.end(); listNameIter != listNameIterEnd; ++listNameIter)
+    for (const std::string &temporaryListName : algorithmIter->second.m_temporaryListNames)
     {
-        typename Manager<T>::NameToListMap::const_iterator listIter = Manager<T>::m_nameToListMap.find(*listNameIter);
+        typename Manager<T>::NameToListMap::const_iterator listIter = Manager<T>::m_nameToListMap.find(temporaryListName);
 
         if (Manager<T>::m_nameToListMap.end() == listIter)
             return STATUS_CODE_FAILURE;
@@ -297,8 +295,8 @@ StatusCode AlgorithmObjectManager<T>::ResetAlgorithmInfo(const Algorithm *const 
     ObjectList objectList;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetResetDeletionObjects(pAlgorithm, objectList));
 
-    for (typename ObjectList::const_iterator iter = objectList.begin(), iterEnd = objectList.end(); iter != iterEnd; ++iter)
-        delete *iter;
+    for (const T *const pT : objectList)
+        delete pT;
 
     m_canMakeNewObjects = false;
     return Manager<T>::ResetAlgorithmInfo(pAlgorithm, isAlgorithmFinished);
@@ -309,11 +307,10 @@ StatusCode AlgorithmObjectManager<T>::ResetAlgorithmInfo(const Algorithm *const 
 template<typename T>
 StatusCode AlgorithmObjectManager<T>::EraseAllContent()
 {
-    for (typename Manager<T>::NameToListMap::iterator listIter = Manager<T>::m_nameToListMap.begin(), listIterEnd = Manager<T>::m_nameToListMap.end();
-        listIter != listIterEnd; ++listIter)
+    for (const typename Manager<T>::NameToListMap::value_type &mapEntry : Manager<T>::m_nameToListMap)
     {
-        for (typename ObjectList::iterator iter = listIter->second->begin(), iterEnd = listIter->second->end(); iter != iterEnd; ++iter)
-            delete (*iter);
+        for (const T *const pT : *mapEntry.second)
+            delete pT;
     }
 
     m_canMakeNewObjects = false;

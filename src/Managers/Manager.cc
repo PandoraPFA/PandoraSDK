@@ -8,6 +8,8 @@
 
 #include "Managers/Manager.h"
 
+#include "Pandora/Algorithm.h"
+
 namespace pandora
 {
 
@@ -122,9 +124,9 @@ StatusCode Manager<T>::ReplaceCurrentAndAlgorithmInputLists(const Algorithm *con
 
     m_currentListName = listName;
 
-    for (typename AlgorithmInfoMap::iterator iter = m_algorithmInfoMap.begin(), iterEnd = m_algorithmInfoMap.end(); iter != iterEnd; ++iter)
+    for (typename AlgorithmInfoMap::value_type &mapEntry : m_algorithmInfoMap)
     {
-        iter->second.m_parentListName = listName;
+        mapEntry.second.m_parentListName = listName;
     }
 
     return STATUS_CODE_SUCCESS;
@@ -148,7 +150,7 @@ StatusCode Manager<T>::CreateTemporaryListAndSetCurrent(const Algorithm *const p
     if (m_algorithmInfoMap.end() == iter)
         return STATUS_CODE_NOT_FOUND;
 
-    temporaryListName = TypeToString(pAlgorithm) + "_" + TypeToString(iter->second.m_numberOfListsCreated++);
+    temporaryListName = pAlgorithm->GetInstanceName() + "_" + TypeToString(iter->second.m_numberOfListsCreated++);
 
     if (!iter->second.m_temporaryListNames.insert(temporaryListName).second)
         return STATUS_CODE_ALREADY_PRESENT;
@@ -182,15 +184,14 @@ StatusCode Manager<T>::RegisterAlgorithm(const Algorithm *const pAlgorithm)
 template<typename T>
 StatusCode Manager<T>::ResetAlgorithmInfo(const Algorithm *const pAlgorithm, bool isAlgorithmFinished)
 {
-    typename AlgorithmInfoMap::iterator algorithmListIter = m_algorithmInfoMap.find(pAlgorithm);
+    typename AlgorithmInfoMap::iterator algorithmIter = m_algorithmInfoMap.find(pAlgorithm);
 
-    if (m_algorithmInfoMap.end() == algorithmListIter)
+    if (m_algorithmInfoMap.end() == algorithmIter)
         return STATUS_CODE_NOT_FOUND;
 
-    for (StringSet::const_iterator listNameIter = algorithmListIter->second.m_temporaryListNames.begin(),
-        listNameIterEnd = algorithmListIter->second.m_temporaryListNames.end(); listNameIter != listNameIterEnd; ++listNameIter)
+    for (const std::string &temporaryListName : algorithmIter->second.m_temporaryListNames)
     {
-        typename NameToListMap::iterator iter = m_nameToListMap.find(*listNameIter);
+        typename NameToListMap::iterator iter = m_nameToListMap.find(temporaryListName);
 
         if (m_nameToListMap.end() == iter)
             return STATUS_CODE_FAILURE;
@@ -199,11 +200,11 @@ StatusCode Manager<T>::ResetAlgorithmInfo(const Algorithm *const pAlgorithm, boo
         m_nameToListMap.erase(iter);
     }
 
-    algorithmListIter->second.m_temporaryListNames.clear();
-    m_currentListName = algorithmListIter->second.m_parentListName;
+    algorithmIter->second.m_temporaryListNames.clear();
+    m_currentListName = algorithmIter->second.m_parentListName;
 
     if (isAlgorithmFinished)
-        m_algorithmInfoMap.erase(algorithmListIter);
+        m_algorithmInfoMap.erase(algorithmIter);
 
     return STATUS_CODE_SUCCESS;
 }
@@ -224,11 +225,8 @@ StatusCode Manager<T>::ResetForNextEvent()
 template<typename T>
 StatusCode Manager<T>::EraseAllContent()
 {
-    for (typename NameToListMap::iterator iter = m_nameToListMap.begin(); iter != m_nameToListMap.end();)
-    {
-        delete iter->second;
-        m_nameToListMap.erase(iter++);
-    }
+    for (const typename NameToListMap::value_type &mapEntry : m_nameToListMap)
+        delete mapEntry.second;
 
     m_currentListName = NULL_LIST_NAME;
     m_nameToListMap.clear();

@@ -111,11 +111,11 @@ public:
     void Reset();
 
     /**
-     *  @brief  Get a simple list of all the calo hits in the ordered calo hit list (no ordering by pseudolayer)
+     *  @brief  Fill a provided calo hit list with all the calo hits in the ordered calo hit list
      * 
-     *  @param  caloHitList to receive the simple list of calo hits
+     *  @param  caloHitList to receive the list of calo hits
      */
-    void GetCaloHitList(CaloHitList &caloHitList) const;
+    void FillCaloHitList(CaloHitList &caloHitList) const;
 
     /**
      *  @brief  Returns a const iterator referring to the first element in the ordered calo hit list

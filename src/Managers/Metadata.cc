@@ -19,9 +19,9 @@ CaloHitMetadata::CaloHitMetadata(CaloHitList *const pCaloHitList, const std::str
     m_pCaloHitList(pCaloHitList),
     m_caloHitListName(caloHitListName)
 {
-    for (CaloHitList::const_iterator hitIter = pCaloHitList->begin(), hitIterEnd = pCaloHitList->end(); hitIter != hitIterEnd; ++hitIter)
+    for (const CaloHit *const pCaloHit : *pCaloHitList)
     {
-        if (!m_caloHitUsageMap.insert(CaloHitUsageMap::value_type(*hitIter, initialHitAvailability)).second)
+        if (!m_caloHitUsageMap.insert(CaloHitUsageMap::value_type(pCaloHit, initialHitAvailability)).second)
             throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
     }
 }
@@ -30,12 +30,12 @@ CaloHitMetadata::CaloHitMetadata(CaloHitList *const pCaloHitList, const std::str
 
 CaloHitMetadata::~CaloHitMetadata()
 {
-    for (CaloHitReplacementList::iterator iter = m_caloHitReplacementList.begin(), iterEnd = m_caloHitReplacementList.end(); iter != iterEnd; ++iter)
+    for (const CaloHitReplacement *const pCaloHitReplacement : m_caloHitReplacementList)
     {
-        for (CaloHitList::iterator hitIter = (*iter)->m_newCaloHits.begin(), hitIterEnd = (*iter)->m_newCaloHits.end(); hitIter != hitIterEnd; ++hitIter)
-            delete *hitIter;
+        for (const CaloHit *const pCaloHit : pCaloHitReplacement->m_newCaloHits)
+            delete pCaloHit;
 
-        delete *iter;
+        delete pCaloHitReplacement;
     }
 }
 
@@ -55,9 +55,9 @@ bool CaloHitMetadata::IsAvailable(const CaloHit *const pCaloHit) const
 template <>
 bool CaloHitMetadata::IsAvailable(const CaloHitList *const pCaloHitList) const
 {
-    for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : *pCaloHitList)
     {
-        CaloHitUsageMap::const_iterator usageMapIter = m_caloHitUsageMap.find(*iter);
+        CaloHitUsageMap::const_iterator usageMapIter = m_caloHitUsageMap.find(pCaloHit);
 
         if ((m_caloHitUsageMap.end()) == usageMapIter || !usageMapIter->second)
             return false;
@@ -84,9 +84,9 @@ StatusCode CaloHitMetadata::SetAvailability(const CaloHit *const pCaloHit, bool 
 template <>
 StatusCode CaloHitMetadata::SetAvailability(const CaloHitList *const pCaloHitList, bool isAvailable)
 {
-    for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : *pCaloHitList)
     {
-        CaloHitUsageMap::iterator usageMapIter = m_caloHitUsageMap.find(*iter);
+        CaloHitUsageMap::iterator usageMapIter = m_caloHitUsageMap.find(pCaloHit);
 
         if (m_caloHitUsageMap.end() == usageMapIter)
             return STATUS_CODE_NOT_FOUND;
@@ -103,9 +103,9 @@ StatusCode CaloHitMetadata::Update(const CaloHitMetadata &caloHitMetadata)
 {
     const CaloHitReplacementList &caloHitReplacementList(caloHitMetadata.GetCaloHitReplacementList());
 
-    for (CaloHitReplacementList::const_iterator iter = caloHitReplacementList.begin(), iterEnd = caloHitReplacementList.end(); iter != iterEnd; ++iter)
+    for (const CaloHitReplacement *const pCaloHitReplacement : caloHitReplacementList)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Update(*(*iter)));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Update(*pCaloHitReplacement));
     }
 
     const CaloHitUsageMap &caloHitUsageMap(caloHitMetadata.GetCaloHitUsageMap());
@@ -131,29 +131,27 @@ StatusCode CaloHitMetadata::Update(const CaloHitMetadata &caloHitMetadata)
 
 StatusCode CaloHitMetadata::Update(const CaloHitReplacement &caloHitReplacement)
 {
-    for (CaloHitList::const_iterator iter = caloHitReplacement.m_newCaloHits.begin(), iterEnd = caloHitReplacement.m_newCaloHits.end();
-        iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : caloHitReplacement.m_newCaloHits)
     {
-        if (m_pCaloHitList->end() != std::find(m_pCaloHitList->begin(), m_pCaloHitList->end(), *iter))
+        if (m_pCaloHitList->end() != std::find(m_pCaloHitList->begin(), m_pCaloHitList->end(), pCaloHit))
             return STATUS_CODE_ALREADY_PRESENT;
 
-        m_pCaloHitList->push_back(*iter);
+        m_pCaloHitList->push_back(pCaloHit);
 
-        if (!m_caloHitUsageMap.insert(CaloHitUsageMap::value_type(*iter, true)).second)
+        if (!m_caloHitUsageMap.insert(CaloHitUsageMap::value_type(pCaloHit, true)).second)
             return STATUS_CODE_ALREADY_PRESENT;
     }
 
-    for (CaloHitList::const_iterator iter = caloHitReplacement.m_oldCaloHits.begin(), iterEnd = caloHitReplacement.m_oldCaloHits.end();
-        iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : caloHitReplacement.m_oldCaloHits)
     {
-        CaloHitList::iterator listIter = std::find(m_pCaloHitList->begin(), m_pCaloHitList->end(), *iter);
+        CaloHitList::iterator listIter = std::find(m_pCaloHitList->begin(), m_pCaloHitList->end(), pCaloHit);
 
         if (m_pCaloHitList->end() == listIter)
             return STATUS_CODE_FAILURE;
 
         m_pCaloHitList->erase(listIter);
 
-        CaloHitUsageMap::iterator mapIter = m_caloHitUsageMap.find(*iter);
+        CaloHitUsageMap::iterator mapIter = m_caloHitUsageMap.find(pCaloHit);
 
         if (m_caloHitUsageMap.end() == mapIter)
             return STATUS_CODE_FAILURE;
@@ -170,10 +168,10 @@ StatusCode CaloHitMetadata::Update(const CaloHitReplacement &caloHitReplacement)
 
 void CaloHitMetadata::Clear()
 {
-    for (CaloHitReplacementList::iterator iter = m_caloHitReplacementList.begin(), iterEnd = m_caloHitReplacementList.end(); iter != iterEnd; ++iter)
-        delete *iter;
+    for (const CaloHitReplacement *const pCaloHitReplacement : m_caloHitReplacementList)
+        delete pCaloHitReplacement;
 
-    m_pCaloHitList = NULL;
+    m_pCaloHitList = nullptr;
     m_caloHitListName.clear();
     m_caloHitUsageMap.clear();
     m_caloHitReplacementList.clear();
@@ -183,7 +181,7 @@ void CaloHitMetadata::Clear()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 ReclusterMetadata::ReclusterMetadata(CaloHitList *const pCaloHitList) :
-    m_pCurrentCaloHitMetadata(NULL),
+    m_pCurrentCaloHitMetadata(nullptr),
     m_caloHitList(*pCaloHitList)
 {
     if (m_caloHitList.empty())
@@ -194,8 +192,8 @@ ReclusterMetadata::ReclusterMetadata(CaloHitList *const pCaloHitList) :
 
 ReclusterMetadata::~ReclusterMetadata()
 {
-    for (NameToMetadataMap::iterator iter = m_nameToMetadataMap.begin(), iterEnd = m_nameToMetadataMap.end(); iter != iterEnd; ++iter)
-        delete iter->second;
+    for (const NameToMetadataMap::value_type &mapEntry : m_nameToMetadataMap)
+        delete mapEntry.second;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

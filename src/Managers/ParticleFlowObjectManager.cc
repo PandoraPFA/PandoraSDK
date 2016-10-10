@@ -35,7 +35,7 @@ ParticleFlowObjectManager::~ParticleFlowObjectManager()
 StatusCode ParticleFlowObjectManager::Create(const object_creation::ParticleFlowObject::Parameters &parameters, const ParticleFlowObject *&pPfo,
     const ObjectFactory<object_creation::ParticleFlowObject::Parameters, object_creation::ParticleFlowObject::Object> &factory)
 {
-    pPfo = NULL;
+    pPfo = nullptr;
 
     try
     {
@@ -49,7 +49,7 @@ StatusCode ParticleFlowObjectManager::Create(const object_creation::ParticleFlow
 
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pPfo));
 
-        if (NULL == pPfo)
+        if (!pPfo)
              throw StatusCodeException(STATUS_CODE_FAILURE);
 
         iter->second->push_back(pPfo);
@@ -59,7 +59,7 @@ StatusCode ParticleFlowObjectManager::Create(const object_creation::ParticleFlow
     {
         std::cout << "Failed to create particle flow object: " << statusCodeException.ToString() << std::endl;
         delete pPfo;
-        pPfo = NULL;
+        pPfo = nullptr;
         return statusCodeException.GetStatusCode();
     }
 }

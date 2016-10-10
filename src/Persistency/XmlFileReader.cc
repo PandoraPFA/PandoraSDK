@@ -18,8 +18,8 @@ namespace pandora
 
 XmlFileReader::XmlFileReader(const pandora::Pandora &pandora, const std::string &fileName) :
     FileReader(pandora, fileName),
-    m_pContainerXmlNode(NULL),
-    m_pCurrentXmlElement(NULL),
+    m_pContainerXmlNode(nullptr),
+    m_pCurrentXmlElement(nullptr),
     m_isAtFileStart(true)
 {
     m_fileType = XML;
@@ -44,7 +44,7 @@ XmlFileReader::~XmlFileReader()
 
 StatusCode XmlFileReader::ReadHeader()
 {
-    m_pCurrentXmlElement = NULL;
+    m_pCurrentXmlElement = nullptr;
     m_containerId = this->GetNextContainerId();
 
     if ((EVENT != m_containerId) && (GEOMETRY != m_containerId))
@@ -57,18 +57,18 @@ StatusCode XmlFileReader::ReadHeader()
 
 StatusCode XmlFileReader::GoToNextContainer()
 {
-    m_pCurrentXmlElement = NULL;
+    m_pCurrentXmlElement = nullptr;
 
     if (m_isAtFileStart)
     {
-        if (NULL == m_pContainerXmlNode)
+        if (!m_pContainerXmlNode)
             m_pContainerXmlNode = TiXmlHandle(m_pXmlDocument).FirstChildElement().Element();
 
         m_isAtFileStart = false;
     }
     else
     {
-        if (NULL == m_pContainerXmlNode)
+        if (!m_pContainerXmlNode)
             throw StatusCodeException(STATUS_CODE_NOT_FOUND);
 
         m_pContainerXmlNode = m_pContainerXmlNode->NextSibling();
@@ -81,7 +81,7 @@ StatusCode XmlFileReader::GoToNextContainer()
 
 ContainerId XmlFileReader::GetNextContainerId()
 {
-    const std::string containerId((NULL != m_pContainerXmlNode) ? m_pContainerXmlNode->ValueStr() : "");
+    const std::string containerId((nullptr != m_pContainerXmlNode) ? m_pContainerXmlNode->ValueStr() : "");
 
     if (std::string("Event") == containerId)
     {
@@ -103,8 +103,8 @@ StatusCode XmlFileReader::GoToGeometry(const unsigned int geometryNumber)
 {
     int nGeometriesRead(0);
     m_isAtFileStart = true;
-    m_pContainerXmlNode = NULL;
-    m_pCurrentXmlElement = NULL;
+    m_pContainerXmlNode = nullptr;
+    m_pCurrentXmlElement = nullptr;
 
     if (GEOMETRY != this->GetNextContainerId())
         --nGeometriesRead;
@@ -124,8 +124,8 @@ StatusCode XmlFileReader::GoToEvent(const unsigned int eventNumber)
 {
     int nEventsRead(0);
     m_isAtFileStart = true;
-    m_pContainerXmlNode = NULL;
-    m_pCurrentXmlElement = NULL;
+    m_pContainerXmlNode = nullptr;
+    m_pCurrentXmlElement = nullptr;
 
     if (EVENT != this->GetNextContainerId())
         --nEventsRead;
@@ -143,7 +143,7 @@ StatusCode XmlFileReader::GoToEvent(const unsigned int eventNumber)
 
 StatusCode XmlFileReader::ReadNextGeometryComponent()
 {
-    if (NULL == m_pCurrentXmlElement)
+    if (!m_pCurrentXmlElement)
     {
         TiXmlHandle localHandle(m_pContainerXmlNode);
         m_pCurrentXmlElement = localHandle.FirstChild().Element();
@@ -153,7 +153,7 @@ StatusCode XmlFileReader::ReadNextGeometryComponent()
         m_pCurrentXmlElement = m_pCurrentXmlElement->NextSiblingElement();
     }
 
-    if (NULL == m_pCurrentXmlElement)
+    if (!m_pCurrentXmlElement)
     {
         this->GoToNextContainer();
         return STATUS_CODE_NOT_FOUND;
@@ -187,7 +187,7 @@ StatusCode XmlFileReader::ReadNextGeometryComponent()
 
 StatusCode XmlFileReader::ReadNextEventComponent()
 {
-    if (NULL == m_pCurrentXmlElement)
+    if (!m_pCurrentXmlElement)
     {
         TiXmlHandle localHandle(m_pContainerXmlNode);
         m_pCurrentXmlElement = localHandle.FirstChild().Element();
@@ -197,7 +197,7 @@ StatusCode XmlFileReader::ReadNextEventComponent()
         m_pCurrentXmlElement = m_pCurrentXmlElement->NextSiblingElement();
     }
 
-    if (NULL == m_pCurrentXmlElement)
+    if (!m_pCurrentXmlElement)
     {
         this->GoToNextContainer();
         return STATUS_CODE_NOT_FOUND;
@@ -485,7 +485,7 @@ StatusCode XmlFileReader::ReadCaloHit()
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Layer", layer));
         bool isInOuterSamplingLayer(false);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("IsInOuterSamplingLayer", isInOuterSamplingLayer));
-        const void *pParentAddress(NULL);
+        const void *pParentAddress(nullptr);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("ParentCaloHitAddress", pParentAddress));
         float cellSize0(0.f);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("CellSize0", cellSize0));
@@ -565,7 +565,7 @@ StatusCode XmlFileReader::ReadTrack()
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("CanFormPfo", canFormPfo));
         bool canFormClusterlessPfo(false);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("CanFormClusterlessPfo", canFormClusterlessPfo));
-        const void *pParentAddress(NULL);
+        const void *pParentAddress(nullptr);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("ParentTrackAddress", pParentAddress));
 
         pParameters->m_d0 = d0;
@@ -621,7 +621,7 @@ StatusCode XmlFileReader::ReadMCParticle()
         unsigned int mcParticleTypeInput(0);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("MCParticleType", mcParticleTypeInput));
         const MCParticleType mcParticleType(static_cast<MCParticleType>(mcParticleTypeInput));
-        const void *pParentAddress(NULL);
+        const void *pParentAddress(nullptr);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Uid", pParentAddress));
 
         pParameters->m_energy = energy;
@@ -653,9 +653,9 @@ StatusCode XmlFileReader::ReadRelationship()
     unsigned int relationshipIdInput(0);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("RelationshipId", relationshipIdInput));
     const RelationshipId relationshipId(static_cast<RelationshipId>(relationshipIdInput));
-    const void *address1(NULL);
+    const void *address1(nullptr);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Address1", address1));
-    const void *address2(NULL);
+    const void *address2(nullptr);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Address2", address2));
     float weight(1.f);
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Weight", weight));

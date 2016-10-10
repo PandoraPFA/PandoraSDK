@@ -41,7 +41,7 @@ MCParticle::MCParticle(const object_creation::MCParticle::Parameters &parameters
     m_outerRadius(parameters.m_endpoint.Get().GetMagnitude()),
     m_particleId(parameters.m_particleId.Get()),
     m_mcParticleType(parameters.m_mcParticleType.Get()),
-    m_pPfoTarget(NULL)
+    m_pPfoTarget(nullptr)
 {
 }
 
@@ -103,7 +103,7 @@ StatusCode MCParticle::RemoveParent(const MCParticle *const pMCParticle)
 
 StatusCode MCParticle::SetPfoTarget(const MCParticle *const pMCParticle)
 {
-    if (NULL == pMCParticle)
+    if (!pMCParticle)
         return STATUS_CODE_FAILURE;
 
     m_pPfoTarget = pMCParticle;
@@ -114,7 +114,7 @@ StatusCode MCParticle::SetPfoTarget(const MCParticle *const pMCParticle)
 
 StatusCode MCParticle::RemovePfoTarget()
 {
-    m_pPfoTarget = NULL;
+    m_pPfoTarget = nullptr;
     return STATUS_CODE_SUCCESS;
 }
 

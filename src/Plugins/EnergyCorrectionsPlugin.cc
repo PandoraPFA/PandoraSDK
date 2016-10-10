@@ -20,18 +20,16 @@ StatusCode EnergyCorrections::MakeEnergyCorrections(const Cluster *const pCluste
 {
     correctedHadronicEnergy = pCluster->GetHadronicEnergy();
 
-    for (EnergyCorrectionPluginVector::const_iterator iter = m_hadEnergyCorrectionPlugins.begin(),
-        iterEnd = m_hadEnergyCorrectionPlugins.end(); iter != iterEnd; ++iter)
+    for (const EnergyCorrectionPlugin *const pPlugin : m_hadEnergyCorrectionPlugins)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, (*iter)->MakeEnergyCorrections(pCluster, correctedHadronicEnergy));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pPlugin->MakeEnergyCorrections(pCluster, correctedHadronicEnergy));
     }
 
     correctedElectromagneticEnergy = pCluster->GetElectromagneticEnergy();
 
-    for (EnergyCorrectionPluginVector::const_iterator iter = m_emEnergyCorrectionPlugins.begin(),
-        iterEnd = m_emEnergyCorrectionPlugins.end(); iter != iterEnd; ++iter)
+    for (const EnergyCorrectionPlugin *const pPlugin : m_emEnergyCorrectionPlugins)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, (*iter)->MakeEnergyCorrections(pCluster, correctedElectromagneticEnergy));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pPlugin->MakeEnergyCorrections(pCluster, correctedElectromagneticEnergy));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -48,17 +46,11 @@ EnergyCorrections::EnergyCorrections(const Pandora *const pPandora) :
 
 EnergyCorrections::~EnergyCorrections()
 {
-    for (EnergyCorrectionPluginMap::const_iterator iter = m_hadEnergyCorrectionPluginMap.begin(),
-        iterEnd = m_hadEnergyCorrectionPluginMap.end(); iter != iterEnd; ++iter)
-    {
-        delete iter->second;
-    }
+    for (const EnergyCorrectionPluginMap::value_type &mapEntry : m_hadEnergyCorrectionPluginMap)
+        delete mapEntry.second;
 
-    for (EnergyCorrectionPluginMap::const_iterator iter = m_emEnergyCorrectionPluginMap.begin(),
-        iterEnd = m_emEnergyCorrectionPluginMap.end(); iter != iterEnd; ++iter)
-    {
-        delete iter->second;
-    }
+    for (const EnergyCorrectionPluginMap::value_type &mapEntry : m_emEnergyCorrectionPluginMap)
+        delete mapEntry.second;
 
     m_hadEnergyCorrectionPluginMap.clear();
     m_emEnergyCorrectionPluginMap.clear();
@@ -71,7 +63,7 @@ EnergyCorrections::~EnergyCorrections()
 StatusCode EnergyCorrections::RegisterPlugin(const std::string &name, const EnergyCorrectionType energyCorrectionType,
     EnergyCorrectionPlugin *const pEnergyCorrectionPlugin)
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pEnergyCorrectionPlugin->RegisterDetails(m_pPandora, name));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pEnergyCorrectionPlugin->RegisterDetails(m_pPandora, name, name));
 
     EnergyCorrectionPluginMap &energyCorrectionPluginMap(this->GetEnergyCorrectionPluginMap(energyCorrectionType));
 
@@ -85,26 +77,23 @@ StatusCode EnergyCorrections::RegisterPlugin(const std::string &name, const Ener
 
 StatusCode EnergyCorrections::InitializePlugins(const TiXmlHandle *const pXmlHandle)
 {
-    for (EnergyCorrectionPluginMap::const_iterator iter = m_hadEnergyCorrectionPluginMap.begin(),
-        iterEnd = m_hadEnergyCorrectionPluginMap.end(); iter != iterEnd; ++iter)
+    for (EnergyCorrectionPluginMap::value_type &mapEntry : m_hadEnergyCorrectionPluginMap)
     {
-        TiXmlElement *const pXmlElement(pXmlHandle->FirstChild(iter->first).Element());
+        TiXmlElement *const pXmlElement(pXmlHandle->FirstChild(mapEntry.first).Element());
+        if (nullptr != pXmlElement)
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, mapEntry.second->ReadSettings(TiXmlHandle(pXmlElement)));
 
-        if (NULL != pXmlElement)
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, iter->second->ReadSettings(TiXmlHandle(pXmlElement)));
-
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, iter->second->Initialize());
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, mapEntry.second->Initialize());
     }
 
-    for (EnergyCorrectionPluginMap::const_iterator iter = m_emEnergyCorrectionPluginMap.begin(),
-        iterEnd = m_emEnergyCorrectionPluginMap.end(); iter != iterEnd; ++iter)
+    for (EnergyCorrectionPluginMap::value_type &mapEntry : m_emEnergyCorrectionPluginMap)
     {
-        TiXmlElement *const pXmlElement(pXmlHandle->FirstChild(iter->first).Element());
+        TiXmlElement *const pXmlElement(pXmlHandle->FirstChild(mapEntry.first).Element());
 
-        if (NULL != pXmlElement)
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, iter->second->ReadSettings(TiXmlHandle(pXmlElement)));
+        if (nullptr != pXmlElement)
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, mapEntry.second->ReadSettings(TiXmlHandle(pXmlElement)));
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, iter->second->Initialize());
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, mapEntry.second->Initialize());
     }
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->InitializePlugin(pXmlHandle,
@@ -130,9 +119,9 @@ StatusCode EnergyCorrections::InitializePlugin(const TiXmlHandle *const pXmlHand
 
     EnergyCorrectionPluginMap &energyCorrectionPluginMap(this->GetEnergyCorrectionPluginMap(energyCorrectionType));
 
-    for (StringVector::const_iterator iter = requestedPluginNames.begin(), iterEnd = requestedPluginNames.end(); iter != iterEnd; ++iter)
+    for (const std::string &requestedPluginName : requestedPluginNames)
     {
-        EnergyCorrectionPluginMap::const_iterator mapIter = energyCorrectionPluginMap.find(*iter);
+        EnergyCorrectionPluginMap::const_iterator mapIter = energyCorrectionPluginMap.find(requestedPluginName);
 
         if (energyCorrectionPluginMap.end() == mapIter)
             return STATUS_CODE_NOT_FOUND;

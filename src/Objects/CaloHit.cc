@@ -110,8 +110,8 @@ CaloHit::CaloHit(const object_creation::CaloHitFragment::Parameters &parameters)
     m_mcParticleWeightMap(parameters.m_pOriginalCaloHit->m_mcParticleWeightMap),
     m_pParentAddress(parameters.m_pOriginalCaloHit->m_pParentAddress)
 {
-    for (MCParticleWeightMap::iterator iter = m_mcParticleWeightMap.begin(), iterEnd = m_mcParticleWeightMap.end(); iter != iterEnd; ++iter)
-        iter->second = iter->second * parameters.m_weight.Get();
+    for (MCParticleWeightMap::value_type &mapEntry : m_mcParticleWeightMap)
+        mapEntry.second = mapEntry.second * parameters.m_weight.Get();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -31,19 +31,19 @@ namespace pandora
 {
 
 Pandora::Pandora() :
-    m_pAlgorithmManager(NULL),
-    m_pCaloHitManager(NULL),
-    m_pClusterManager(NULL),
-    m_pGeometryManager(NULL),
-    m_pMCManager(NULL),
-    m_pPfoManager(NULL),
-    m_pPluginManager(NULL),
-    m_pTrackManager(NULL),
-    m_pVertexManager(NULL),
-    m_pPandoraSettings(NULL),
-    m_pPandoraApiImpl(NULL),
-    m_pPandoraContentApiImpl(NULL),
-    m_pPandoraImpl(NULL)
+    m_pAlgorithmManager(nullptr),
+    m_pCaloHitManager(nullptr),
+    m_pClusterManager(nullptr),
+    m_pGeometryManager(nullptr),
+    m_pMCManager(nullptr),
+    m_pPfoManager(nullptr),
+    m_pPluginManager(nullptr),
+    m_pTrackManager(nullptr),
+    m_pVertexManager(nullptr),
+    m_pPandoraSettings(nullptr),
+    m_pPandoraApiImpl(nullptr),
+    m_pPandoraContentApiImpl(nullptr),
+    m_pPandoraImpl(nullptr)
 {
     try
     {
@@ -114,8 +114,8 @@ StatusCode Pandora::ProcessEvent()
     // Loop over algorithms
     const StringVector &pandoraAlgorithms(m_pPandoraImpl->GetPandoraAlgorithms());
 
-    for (StringVector::const_iterator iter = pandoraAlgorithms.begin(), iterEnd = pandoraAlgorithms.end(); iter != iterEnd; ++iter)
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandoraImpl->RunAlgorithm(*iter));
+    for (const std::string &algorithmName : pandoraAlgorithms)
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandoraImpl->RunAlgorithm(algorithmName));
 
     return STATUS_CODE_SUCCESS;
 }
