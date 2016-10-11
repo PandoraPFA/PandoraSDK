@@ -335,37 +335,36 @@ StatusCode MCManager::CreateUidToPfoTargetsMap(UidToMCParticleWeightMap &uidToMC
     if (m_uidToMCParticleMap.empty())
         return STATUS_CODE_SUCCESS;
 
-    const bool shouldCollapseMCParticlesToPfoTarget(m_pPandora->GetSettings()->ShouldCollapseMCParticlesToPfoTarget());
+    const bool collapseToPfoTarget(m_pPandora->GetSettings()->ShouldCollapseMCParticlesToPfoTarget());
 
     for (const ObjectRelationMap::value_type &relationEntry : objectRelationMap)
     {
-        const Uid objectUid(relationEntry.first);
+        MCParticleSet mcParticleSet;
 
         for (const UidToWeightMap::value_type &weightEntry : relationEntry.second)
         {
-            const Uid mcParticleUid(weightEntry.first);
-            const float mcParticleWeight(weightEntry.second);
+            UidToMCParticleMap::const_iterator mcParticleIter = m_uidToMCParticleMap.find(weightEntry.first);
 
-            UidToMCParticleMap::const_iterator mcParticleIter = m_uidToMCParticleMap.find(mcParticleUid);
+            if (m_uidToMCParticleMap.end() != mcParticleIter)
+                mcParticleSet.insert(mcParticleIter->second);
+        }
 
-            if (m_uidToMCParticleMap.end() == mcParticleIter)
+        if (mcParticleSet.empty())
+            continue;
+
+        MCParticleList mcParticleList(mcParticleSet.begin(), mcParticleSet.end());
+        mcParticleList.sort(PointerLessThan<MCParticle>());
+        MCParticleWeightMap &mcParticleWeightMap(uidToMCParticleWeightMap[relationEntry.first]);
+
+        for (const MCParticle *const pMCParticle : mcParticleList)
+        {
+            const float mcParticleWeight(relationEntry.second.at(pMCParticle->GetUid()));
+            const MCParticle *const pTargetMCParticle(!collapseToPfoTarget ? pMCParticle : pMCParticle->m_pPfoTarget);
+
+            if (!pTargetMCParticle)
                 continue;
 
-            const MCParticle *pMCParticle(nullptr);
-
-            if (!shouldCollapseMCParticlesToPfoTarget)
-            {
-                pMCParticle = mcParticleIter->second;
-            }
-            else
-            {
-                pMCParticle = mcParticleIter->second->m_pPfoTarget;
-            }
-
-            if (!pMCParticle)
-                continue;
-
-            uidToMCParticleWeightMap[objectUid][pMCParticle] += mcParticleWeight;
+            mcParticleWeightMap[pTargetMCParticle] += mcParticleWeight;
         }
     }
 
