@@ -64,7 +64,7 @@ TrackAddressList ParticleFlowObject::GetTrackAddressList() const
 
     for (const Track *const pTrack : m_trackList)
     {
-        trackAddressList.push_back(pTrack->GetParentTrackAddress());
+        trackAddressList.push_back(pTrack->GetParentAddress());
     }
 
     return trackAddressList;
@@ -86,7 +86,7 @@ ClusterAddressList ParticleFlowObject::GetClusterAddressList() const
         for (const OrderedCaloHitList::value_type &layerEntry : orderedCaloHitList)
         {
             for (const CaloHit *const pCaloHit : *layerEntry.second)
-                caloHitAddressList.push_back(pCaloHit->GetParentCaloHitAddress());
+                caloHitAddressList.push_back(pCaloHit->GetParentAddress());
         }
 
         clusterAddressList.push_back(caloHitAddressList);

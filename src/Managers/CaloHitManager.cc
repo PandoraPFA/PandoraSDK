@@ -179,7 +179,7 @@ StatusCode CaloHitManager::MatchCaloHitsToMCPfoTargets(const UidToMCParticleWeig
 
     for (const CaloHit *const pCaloHit : *inputIter->second)
     {
-        UidToMCParticleWeightMap::const_iterator pfoTargetIter = caloHitToPfoTargetsMap.find(pCaloHit->GetParentCaloHitAddress());
+        UidToMCParticleWeightMap::const_iterator pfoTargetIter = caloHitToPfoTargetsMap.find(pCaloHit->GetParentAddress());
 
         if (caloHitToPfoTargetsMap.end() == pfoTargetIter)
             continue;
@@ -308,7 +308,7 @@ bool CaloHitManager::CanMergeCaloHitFragments(const CaloHit *const pFragmentCalo
     if (pFragmentCaloHit1->GetWeight() < std::numeric_limits<float>::epsilon())
         return false;
 
-    if (pFragmentCaloHit1->GetParentCaloHitAddress() != pFragmentCaloHit2->GetParentCaloHitAddress())
+    if (pFragmentCaloHit1->GetParentAddress() != pFragmentCaloHit2->GetParentAddress())
         return false;
 
     if (!this->IsAvailable(pFragmentCaloHit1) || !this->IsAvailable(pFragmentCaloHit2))

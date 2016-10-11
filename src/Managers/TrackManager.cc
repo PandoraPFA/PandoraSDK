@@ -47,7 +47,7 @@ StatusCode TrackManager::Create(const object_creation::Track::Parameters &parame
         if (!pTrack || (m_nameToListMap.end() == inputIter))
             throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        if (!m_uidToTrackMap.insert(UidToTrackMap::value_type(pTrack->GetParentTrackAddress(), pTrack)).second)
+        if (!m_uidToTrackMap.insert(UidToTrackMap::value_type(pTrack->GetParentAddress(), pTrack)).second)
             throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
 
         inputIter->second->push_back(pTrack);
@@ -121,7 +121,7 @@ StatusCode TrackManager::MatchTracksToMCPfoTargets(const UidToMCParticleWeightMa
 
     for (const Track *const pTrack : *inputIter->second)
     {
-        UidToMCParticleWeightMap::const_iterator pfoTargetIter = trackToPfoTargetsMap.find(pTrack->GetParentTrackAddress());
+        UidToMCParticleWeightMap::const_iterator pfoTargetIter = trackToPfoTargetsMap.find(pTrack->GetParentAddress());
 
         if (trackToPfoTargetsMap.end() == pfoTargetIter)
             continue;
@@ -187,7 +187,7 @@ StatusCode TrackManager::AddParentDaughterAssociations() const
 
     for (const Track *const pParentTrack : *pInputList)
     {
-        const auto range(m_parentDaughterRelationMap.equal_range(pParentTrack->GetParentTrackAddress()));
+        const auto range(m_parentDaughterRelationMap.equal_range(pParentTrack->GetParentAddress()));
 
         TrackList daughterList;
         for (TrackRelationMap::const_iterator relIter = range.first; relIter != range.second; ++relIter)
@@ -227,7 +227,7 @@ StatusCode TrackManager::AddSiblingAssociations() const
 
     for (const Track *const pTrack : *pInputList)
     {
-        const auto range(m_siblingRelationMap.equal_range(pTrack->GetParentTrackAddress()));
+        const auto range(m_siblingRelationMap.equal_range(pTrack->GetParentAddress()));
 
         TrackList siblingList;
         for (TrackRelationMap::const_iterator relIter = range.first; relIter != range.second; ++relIter)

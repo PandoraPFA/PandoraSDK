@@ -155,28 +155,28 @@ public:
      *
      *  @param  the address of the parent track in the user framework
      */
-    const void *GetParentTrackAddress() const;
+    const void *GetParentAddress() const;
 
     /**
      *  @brief  Get the parent track list
      * 
      *  @return the parent track list
      */
-    const TrackList &GetParentTrackList() const;
+    const TrackList &GetParentList() const;
 
     /**
      *  @brief  Get the sibling track list
      * 
      *  @return the sibling track list
      */
-    const TrackList &GetSiblingTrackList() const;
+    const TrackList &GetSiblingList() const;
 
     /**
      *  @brief  Get the daughter track list
      * 
      *  @return the daughter track list
      */
-    const TrackList &GetDaughterTrackList() const;
+    const TrackList &GetDaughterList() const;
 
     /**
      *  @brief  Whether the track is available to be added to a particle flow object
@@ -420,28 +420,28 @@ inline const MCParticleWeightMap &Track::GetMCParticleWeightMap() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const void *Track::GetParentTrackAddress() const
+inline const void *Track::GetParentAddress() const
 {
     return m_pParentAddress;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const TrackList &Track::GetParentTrackList() const
+inline const TrackList &Track::GetParentList() const
 {
     return m_parentTrackList;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const TrackList &Track::GetSiblingTrackList() const
+inline const TrackList &Track::GetSiblingList() const
 {
     return m_siblingTrackList;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const TrackList &Track::GetDaughterTrackList() const
+inline const TrackList &Track::GetDaughterList() const
 {
     return m_daughterTrackList;
 }

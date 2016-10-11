@@ -202,7 +202,7 @@ public:
     /**
      *  @brief  Get the address of the parent calo hit in the user framework
      */
-    const void *GetParentCaloHitAddress() const;
+    const void *GetParentAddress() const;
 
     /**
      *  @brief  Get the list of cartesian coordinates for the cell corners
@@ -513,7 +513,7 @@ inline const MCParticleWeightMap &CaloHit::GetMCParticleWeightMap() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const void *CaloHit::GetParentCaloHitAddress() const
+inline const void *CaloHit::GetParentAddress() const
 {
     return m_pParentAddress;
 }

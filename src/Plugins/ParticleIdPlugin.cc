@@ -9,6 +9,7 @@
 #include "Helpers/XmlHelper.h"
 
 #include "Objects/Cluster.h"
+#include "Objects/ParticleFlowObject.h"
 
 #include "Pandora/PdgTable.h"
 
@@ -19,51 +20,55 @@
 namespace pandora
 {
 
-bool ParticleId::IsEmShower(const Cluster *const pCluster) const
+template <typename T>
+bool ParticleId::IsEmShower(const T *const pT) const
 {
     if (!m_pEmShowerPlugin)
         return false;
 
-    return m_pEmShowerPlugin->IsMatch(pCluster);
+    return m_pEmShowerPlugin->IsMatch(pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool ParticleId::IsPhoton(const Cluster *const pCluster) const
+template <typename T>
+bool ParticleId::IsPhoton(const T *const pT) const
 {
-    if (PHOTON == pCluster->GetParticleIdFlag())
+    if (PHOTON == pT->GetParticleId())
         return true;
 
     if (!m_pPhotonPlugin)
         return false;
 
-    return m_pPhotonPlugin->IsMatch(pCluster);
+    return m_pPhotonPlugin->IsMatch(pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool ParticleId::IsElectron(const Cluster *const pCluster) const
+template <typename T>
+bool ParticleId::IsElectron(const T *const pT) const
 {
-    if (E_MINUS == std::abs(pCluster->GetParticleIdFlag()))
+    if (E_MINUS == std::abs(pT->GetParticleId()))
         return true;
 
     if (!m_pElectronPlugin)
         return false;
 
-    return m_pElectronPlugin->IsMatch(pCluster);
+    return m_pElectronPlugin->IsMatch(pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-bool ParticleId::IsMuon(const Cluster *const pCluster) const
+template <typename T>
+bool ParticleId::IsMuon(const T *const pT) const
 {
-    if (MU_MINUS == std::abs(pCluster->GetParticleIdFlag()))
+    if (MU_MINUS == std::abs(pT->GetParticleId()))
         return true;
 
     if (!m_pMuonPlugin)
         return false;
 
-    return m_pMuonPlugin->IsMatch(pCluster);
+    return m_pMuonPlugin->IsMatch(pT);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -147,5 +152,18 @@ StatusCode ParticleId::InitializePlugin(const TiXmlHandle *const pXmlHandle, con
     pParticleIdPlugin = mapIter->second;
     return STATUS_CODE_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template bool ParticleId::IsEmShower(const Cluster *const ) const;
+template bool ParticleId::IsPhoton(const Cluster *const ) const;
+template bool ParticleId::IsElectron(const Cluster *const ) const;
+template bool ParticleId::IsMuon(const Cluster *const ) const;
+
+template bool ParticleId::IsEmShower(const ParticleFlowObject *const ) const;
+template bool ParticleId::IsPhoton(const ParticleFlowObject *const ) const;
+template bool ParticleId::IsElectron(const ParticleFlowObject *const ) const;
+template bool ParticleId::IsMuon(const ParticleFlowObject *const ) const;
 
 } // namespace pandora

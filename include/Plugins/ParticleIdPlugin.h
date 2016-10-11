@@ -29,6 +29,15 @@ public:
      */
     virtual bool IsMatch(const Cluster *const pCluster) const = 0;
 
+    /**
+     *  @brief  Whether the pfo matches the specific particle hypothesis
+     * 
+     *  @param  pPfo address of the cluster
+     * 
+     *  @return boolean
+     */
+    virtual bool IsMatch(const ParticleFlowObject *const pPfo) const = 0;
+
 protected:
     friend class ParticleId;
 };
@@ -42,40 +51,44 @@ class ParticleId
 {
 public:
     /**
-     *  @brief  Provide identification of whether a cluster is an electromagnetic shower
+     *  @brief  Provide identification of whether a cluster or pfo is an electromagnetic shower
      * 
-     *  @param  pCluster address of the cluster
+     *  @param  pT address of the cluster or pfo
      * 
      *  @return boolean
      */
-    bool IsEmShower(const Cluster *const pCluster) const;
+    template <typename T>
+    bool IsEmShower(const T *const pT) const;
 
     /**
-     *  @brief  Provide identification of whether a cluster is a photon
+     *  @brief  Provide identification of whether a cluster or pfo is a photon
      * 
-     *  @param  pCluster address of the cluster
+     *  @param  pT address of the cluster or pfo
      * 
      *  @return boolean
      */
-    bool IsPhoton(const Cluster *const pCluster) const;
+    template <typename T>
+    bool IsPhoton(const T *const pT) const;
 
     /**
-     *  @brief  Provide identification of whether a cluster is an electron
+     *  @brief  Provide identification of whether a cluster or pfo is an electron
      * 
-     *  @param  pCluster address of the cluster
+     *  @param  pT address of the cluster or pfo
      * 
      *  @return boolean
      */
-    bool IsElectron(const Cluster *const pCluster) const;
+    template <typename T>
+    bool IsElectron(const T *const pT) const;
 
     /**
-     *  @brief  Provide identification of whether a cluster is a muon
+     *  @brief  Provide identification of whether a cluster or pfo is a muon
      * 
-     *  @param  pCluster address of the cluster
+     *  @param  pT address of the cluster or pfo
      * 
      *  @return boolean
      */
-    bool IsMuon(const Cluster *const pCluster) const;
+    template <typename T>
+    bool IsMuon(const T *const pT) const;
 
 private:
     /**

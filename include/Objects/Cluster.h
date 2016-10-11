@@ -111,7 +111,7 @@ public:
      * 
      *  @return The particle id flag
      */
-    int GetParticleIdFlag() const;
+    int GetParticleId() const;
 
     /**
      *  @brief  Whether the cluster is track seeded
@@ -523,7 +523,7 @@ inline float Cluster::GetIsolatedHadronicEnergy() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline int Cluster::GetParticleIdFlag() const
+inline int Cluster::GetParticleId() const
 {
     return m_particleId;
 }
