@@ -245,92 +245,16 @@ inline bool PandoraInputType<T>::operator= (const PandoraInputType<T> &rhs)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-#ifdef _MSC_VER
-    #include <float.h>
-    #define IS_NAN _isnan
-    #define IS_INF !_finite
-#else
-    #define IS_NAN std::isnan
-    #define IS_INF std::isinf
-#endif
-
 template <typename T>
 inline bool PandoraInputType<T>::IsValid(const T &t) const
 {
-    return !(IS_NAN(t) || IS_INF(t));
+    return !(std::isnan(t) || std::isinf(t));
 }
 
 template <>
 inline bool PandoraInputType<const void *>::IsValid(const void *const &) const
 {
     return true;
-}
-
-template <>
-inline bool PandoraInputType<std::string>::IsValid(const std::string &t) const
-{
-    return !t.empty();
-}
-
-template <>
-inline bool PandoraInputType<CellGeometry>::IsValid(const CellGeometry &t) const
-{
-    return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
-}
-
-template <>
-inline bool PandoraInputType<HitType>::IsValid(const HitType &t) const
-{
-    return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
-}
-
-template <>
-inline bool PandoraInputType<HitRegion>::IsValid(const HitRegion &t) const
-{
-    return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
-}
-
-template <>
-inline bool PandoraInputType<MCParticleType>::IsValid(const MCParticleType &t) const
-{
-    return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
-}
-
-template <>
-inline bool PandoraInputType<SubDetectorType>::IsValid(const SubDetectorType &t) const
-{
-    return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
-}
-
-template <>
-inline bool PandoraInputType<VertexType>::IsValid(const VertexType &t) const
-{
-    return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
-}
-
-template <>
-inline bool PandoraInputType<VertexLabel>::IsValid(const VertexLabel &t) const
-{
-    return !(IS_NAN(static_cast<unsigned int>(t)) || IS_INF(static_cast<unsigned int>(t)));
-}
-
-template <>
-inline bool PandoraInputType<CartesianVector>::IsValid(const CartesianVector &t) const
-{
-    return !(IS_NAN(t.GetX()) || IS_NAN(t.GetY()) || IS_NAN(t.GetZ()) ||
-        IS_INF(t.GetX()) || IS_INF(t.GetY()) || IS_INF(t.GetZ()));
-}
-
-template <>
-inline bool PandoraInputType<TrackState>::IsValid(const TrackState &t) const
-{
-    const CartesianVector &p(t.GetPosition());
-    const CartesianVector &m(t.GetMomentum());
-
-    return !(IS_NAN(p.GetX()) || IS_NAN(p.GetY()) || IS_NAN(p.GetZ()) ||
-        IS_INF(p.GetX()) || IS_INF(p.GetY()) || IS_INF(p.GetZ()) ||
-        IS_NAN(m.GetX()) || IS_NAN(m.GetY()) || IS_NAN(m.GetZ()) ||
-        IS_INF(m.GetX()) || IS_INF(m.GetY()) || IS_INF(m.GetZ()));
 }
 
 template <>
@@ -343,6 +267,73 @@ template <>
 inline bool PandoraInputType<const Track *>::IsValid(const Track *const &) const
 {
     return true;
+}
+
+template <>
+inline bool PandoraInputType<CellGeometry>::IsValid(const CellGeometry &t) const
+{
+    return !(std::isnan(static_cast<unsigned int>(t)) || std::isinf(static_cast<unsigned int>(t)));
+}
+
+template <>
+inline bool PandoraInputType<HitType>::IsValid(const HitType &t) const
+{
+    return !(std::isnan(static_cast<unsigned int>(t)) || std::isinf(static_cast<unsigned int>(t)));
+}
+
+template <>
+inline bool PandoraInputType<HitRegion>::IsValid(const HitRegion &t) const
+{
+    return !(std::isnan(static_cast<unsigned int>(t)) || std::isinf(static_cast<unsigned int>(t)));
+}
+
+template <>
+inline bool PandoraInputType<MCParticleType>::IsValid(const MCParticleType &t) const
+{
+    return !(std::isnan(static_cast<unsigned int>(t)) || std::isinf(static_cast<unsigned int>(t)));
+}
+
+template <>
+inline bool PandoraInputType<SubDetectorType>::IsValid(const SubDetectorType &t) const
+{
+    return !(std::isnan(static_cast<unsigned int>(t)) || std::isinf(static_cast<unsigned int>(t)));
+}
+
+template <>
+inline bool PandoraInputType<VertexType>::IsValid(const VertexType &t) const
+{
+    return !(std::isnan(static_cast<unsigned int>(t)) || std::isinf(static_cast<unsigned int>(t)));
+}
+
+template <>
+inline bool PandoraInputType<VertexLabel>::IsValid(const VertexLabel &t) const
+{
+    return !(std::isnan(static_cast<unsigned int>(t)) || std::isinf(static_cast<unsigned int>(t)));
+}
+
+template <>
+inline bool PandoraInputType<std::string>::IsValid(const std::string &t) const
+{
+    return !t.empty();
+}
+
+template <>
+inline bool PandoraInputType<CartesianVector>::IsValid(const CartesianVector &t) const
+{
+    return !(std::isnan(t.GetX()) || std::isnan(t.GetY()) || std::isnan(t.GetZ()) ||
+        std::isinf(t.GetX()) || std::isinf(t.GetY()) || std::isinf(t.GetZ()));
+}
+
+template <>
+inline bool PandoraInputType<TrackState>::IsValid(const TrackState &t) const
+{
+    const CartesianVector &p(t.GetPosition());
+    const CartesianVector &m(t.GetMomentum());
+
+    return !(std::isnan(p.GetX()) || std::isnan(p.GetY()) || std::isnan(p.GetZ()) ||
+        std::isinf(p.GetX()) || std::isinf(p.GetY()) || std::isinf(p.GetZ()) ||
+        std::isnan(m.GetX()) || std::isnan(m.GetY()) || std::isnan(m.GetZ()) ||
+        std::isinf(m.GetX()) || std::isinf(m.GetY()) || std::isinf(m.GetZ()));
 }
 
 } // namespace pandora

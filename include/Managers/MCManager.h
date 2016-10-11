@@ -90,9 +90,9 @@ private:
      *  @brief  Apply mc pfo selection rules 
      *
      *  @param  mcRootParticle address of the mc root particle
-     *  @param  mcPfoList reference to list with all MCPFOs which have been selected so far
+     *  @param  mcPfoSet set of all MCPFOs selected so far
      */
-    StatusCode ApplyPfoSelectionRules(const MCParticle *const mcRootParticle, MCParticleList &mcPfoList) const;
+    StatusCode ApplyPfoSelectionRules(const MCParticle *const mcRootParticle, MCParticleSet &mcPfoSet) const;
 
     /**
      *  @brief  Set pfo target for a mc tree

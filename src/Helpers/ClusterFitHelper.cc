@@ -352,7 +352,7 @@ StatusCode ClusterFitHelper::PerformLinearFit(const CartesianVector &centralPosi
     const double nPoints(static_cast<double>(clusterFitPointList.size()));
     const double denominatorL(sumL * sumL - nPoints * sumLL);
 
-    if (0. != denominatorL)
+    if (std::fabs(denominatorL) > std::numeric_limits<double>::epsilon())
     {
         if (0. > ((sumL * sumA - nPoints * sumAL) / denominatorL))
             direction = direction * -1.f;

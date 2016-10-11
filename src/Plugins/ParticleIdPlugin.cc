@@ -82,9 +82,7 @@ ParticleId::ParticleId(const Pandora *const pPandora) :
 ParticleId::~ParticleId()
 {
     for (const ParticleIdPluginMap::value_type &mapEntry : m_particleIdPluginMap)
-    {
         delete mapEntry.second;
-    }
 
     m_particleIdPluginMap.clear();
     m_pEmShowerPlugin = nullptr;

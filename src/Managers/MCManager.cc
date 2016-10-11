@@ -101,10 +101,10 @@ StatusCode MCManager::IdentifyPfoTargets()
 
     for (const MCParticle *const pMCParticle : *inputIter->second)
     {
-        MCParticleList mcPfoCandidates;
+        MCParticleSet mcPfoSet;
 
         if (pMCParticle->IsRootParticle())
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ApplyPfoSelectionRules(pMCParticle, mcPfoCandidates));
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ApplyPfoSelectionRules(pMCParticle, mcPfoSet));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -157,7 +157,7 @@ StatusCode MCManager::SelectPfoTargets()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MCManager::ApplyPfoSelectionRules(const MCParticle *const pMCParticle, MCParticleList &mcPfoList) const
+StatusCode MCManager::ApplyPfoSelectionRules(const MCParticle *const pMCParticle, MCParticleSet &mcPfoSet) const
 {
     const float selectionRadius(m_pPandora->GetSettings()->GetMCPfoSelectionRadius());
     const float selectionMomentum(m_pPandora->GetSettings()->GetMCPfoSelectionMomentum());
@@ -166,20 +166,20 @@ StatusCode MCManager::ApplyPfoSelectionRules(const MCParticle *const pMCParticle
     const int particleId(pMCParticle->GetParticleId());
 
     // ATTN: Don't take particles from previously used decay chains; could happen because mc particles can have multiple parents.
-    if ((mcPfoList.end() == std::find(mcPfoList.begin(), mcPfoList.end(), pMCParticle)) &&
+    if (!mcPfoSet.count(pMCParticle) &&
         (pMCParticle->GetOuterRadius() > selectionRadius) &&
         (pMCParticle->GetInnerRadius() <= selectionRadius) &&
         (pMCParticle->GetMomentum().GetMagnitude() > selectionMomentum) &&
         !((particleId == PROTON || particleId == NEUTRON) && (pMCParticle->GetEnergy() < selectionEnergyCutOffProtonsNeutrons)))
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTargetInTree(pMCParticle, pMCParticle, true));
-        mcPfoList.push_back(pMCParticle);
+        mcPfoSet.insert(pMCParticle);
     }
     else
     {
-        for (const MCParticle *const pDaughterMCParticle : pMCParticle->m_daughterList)
+        for (const MCParticle *const pDaughterMCParticle : pMCParticle->GetDaughterList())
         {
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ApplyPfoSelectionRules(pDaughterMCParticle, mcPfoList));
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ApplyPfoSelectionRules(pDaughterMCParticle, mcPfoSet));
         }
     }
 
