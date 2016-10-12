@@ -34,9 +34,6 @@ bool ParticleId::IsEmShower(const T *const pT) const
 template <typename T>
 bool ParticleId::IsPhoton(const T *const pT) const
 {
-    if (PHOTON == pT->GetParticleId())
-        return true;
-
     if (!m_pPhotonPlugin)
         return false;
 
@@ -48,9 +45,6 @@ bool ParticleId::IsPhoton(const T *const pT) const
 template <typename T>
 bool ParticleId::IsElectron(const T *const pT) const
 {
-    if (E_MINUS == std::abs(pT->GetParticleId()))
-        return true;
-
     if (!m_pElectronPlugin)
         return false;
 
@@ -62,9 +56,6 @@ bool ParticleId::IsElectron(const T *const pT) const
 template <typename T>
 bool ParticleId::IsMuon(const T *const pT) const
 {
-    if (MU_MINUS == std::abs(pT->GetParticleId()))
-        return true;
-
     if (!m_pMuonPlugin)
         return false;
 

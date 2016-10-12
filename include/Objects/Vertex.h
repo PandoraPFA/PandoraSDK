@@ -9,6 +9,7 @@
 #define PANDORA_VERTEX_H 1
 
 #include "Pandora/ObjectCreation.h"
+#include "Pandora/StatusCodes.h"
 
 namespace pandora
 {

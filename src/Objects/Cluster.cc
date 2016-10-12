@@ -24,6 +24,148 @@
 namespace pandora
 {
 
+const Track *Cluster::GetTrackSeed() const
+{
+    if (!m_pTrackSeed)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
+    return m_pTrackSeed;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const CartesianVector Cluster::GetCentroid(const unsigned int pseudoLayer) const
+{
+    PointByPseudoLayerMap::const_iterator pointValueIter = m_sumXYZByPseudoLayer.find(pseudoLayer);
+
+    if (m_sumXYZByPseudoLayer.end() == pointValueIter)
+        throw StatusCodeException(STATUS_CODE_FAILURE);
+
+    const SimplePoint &mypoint = pointValueIter->second;
+
+    if (0 == mypoint.m_nHits)
+        throw StatusCodeException(STATUS_CODE_FAILURE);
+
+    return CartesianVector(static_cast<float>(mypoint.m_xyzPositionSums[0] / static_cast<float>(mypoint.m_nHits)),
+        static_cast<float>(mypoint.m_xyzPositionSums[1] / static_cast<float>(mypoint.m_nHits)),
+        static_cast<float>(mypoint.m_xyzPositionSums[2] / static_cast<float>(mypoint.m_nHits)));
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const CartesianVector &Cluster::GetInitialDirection() const
+{
+    if (!m_isDirectionUpToDate)
+        this->UpdateInitialDirectionCache();
+
+    return m_initialDirection;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const ClusterFitResult &Cluster::GetFitToAllHitsResult() const
+{
+    if (!m_isFitUpToDate)
+        this->UpdateFitToAllHitsCache();
+
+    return m_fitToAllHitsResult;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+HitType Cluster::GetInnerLayerHitType() const
+{
+    if (!m_innerLayerHitType.IsInitialized())
+        this->UpdateLayerHitTypeCache(m_innerPseudoLayer.Get(), m_innerLayerHitType);
+
+    return m_innerLayerHitType.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+HitType Cluster::GetOuterLayerHitType() const
+{
+    if (!m_outerLayerHitType.IsInitialized())
+        this->UpdateLayerHitTypeCache(m_outerPseudoLayer.Get(), m_outerLayerHitType);
+
+    return m_outerLayerHitType.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+float Cluster::GetCorrectedElectromagneticEnergy(const Pandora &pandora) const
+{
+    if (!m_correctedElectromagneticEnergy.IsInitialized())
+        this->UpdateEnergyCorrectionsCache(pandora);
+
+    return m_correctedElectromagneticEnergy.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+float Cluster::GetCorrectedHadronicEnergy(const Pandora &pandora) const
+{
+    if (!m_correctedHadronicEnergy.IsInitialized())
+        this->UpdateEnergyCorrectionsCache(pandora);
+
+    return m_correctedHadronicEnergy.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+float Cluster::GetTrackComparisonEnergy(const Pandora &pandora) const
+{
+    if (!m_trackComparisonEnergy.IsInitialized())
+        this->UpdateEnergyCorrectionsCache(pandora);
+
+    return m_trackComparisonEnergy.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Cluster::PassPhotonId(const Pandora &pandora) const
+{
+    if (PHOTON == m_particleId)
+        return true;
+
+    if (!m_passPhotonId.IsInitialized())
+        this->UpdatePhotonIdCache(pandora);
+
+    return m_passPhotonId.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+unsigned int Cluster::GetShowerStartLayer(const Pandora &pandora) const
+{
+    if (!m_showerStartLayer.IsInitialized())
+        this->UpdateShowerLayerCache(pandora);
+
+    return m_showerStartLayer.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+float Cluster::GetShowerProfileStart(const Pandora &pandora) const
+{
+    if (!m_showerProfileStart.IsInitialized())
+        this->UpdateShowerProfileCache(pandora);
+
+    return m_showerProfileStart.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+float Cluster::GetShowerProfileDiscrepancy(const Pandora &pandora) const
+{
+    if (!m_showerProfileDiscrepancy.IsInitialized())
+        this->UpdateShowerProfileCache(pandora);
+
+    return m_showerProfileDiscrepancy.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 Cluster::Cluster(const object_creation::Cluster::Parameters &parameters) :
     m_nCaloHits(0),
     m_nPossibleMipHits(0),
@@ -71,7 +213,7 @@ StatusCode Cluster::AlterMetadata(const object_creation::Cluster::Metadata &meta
 {
     if (metadata.m_particleId.IsInitialized())
     {
-        m_isPhotonFast.Reset();
+        m_passPhotonId.Reset();
         m_particleId = metadata.m_particleId.Get();
     }
 
@@ -223,26 +365,7 @@ StatusCode Cluster::RemoveIsolatedCaloHit(const CaloHit *const pCaloHit)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-const CartesianVector Cluster::GetCentroid(const unsigned int pseudoLayer) const
-{
-    PointByPseudoLayerMap::const_iterator pointValueIter = m_sumXYZByPseudoLayer.find(pseudoLayer);
-
-    if (m_sumXYZByPseudoLayer.end() == pointValueIter)
-        throw StatusCodeException(STATUS_CODE_FAILURE);
-
-    const SimplePoint &mypoint = pointValueIter->second;
-
-    if (0 == mypoint.m_nHits)
-        throw StatusCodeException(STATUS_CODE_FAILURE);
-
-    return CartesianVector(static_cast<float>(mypoint.m_xyzPositionSums[0] / static_cast<float>(mypoint.m_nHits)),
-        static_cast<float>(mypoint.m_xyzPositionSums[1] / static_cast<float>(mypoint.m_nHits)),
-        static_cast<float>(mypoint.m_xyzPositionSums[2] / static_cast<float>(mypoint.m_nHits)));
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void Cluster::CalculateFitToAllHitsResult() const
+void Cluster::UpdateFitToAllHitsCache() const
 {
     (void) ClusterFitHelper::FitFullCluster(this, m_fitToAllHitsResult);
     m_isFitUpToDate = true;
@@ -250,7 +373,7 @@ void Cluster::CalculateFitToAllHitsResult() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::CalculateInitialDirection() const
+void Cluster::UpdateInitialDirectionCache() const
 {
     if (m_orderedCaloHitList.empty())
     {
@@ -271,7 +394,7 @@ void Cluster::CalculateInitialDirection() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::CalculateLayerHitType(const unsigned int pseudoLayer, InputHitType &layerHitType) const
+void Cluster::UpdateLayerHitTypeCache(const unsigned int pseudoLayer, InputHitType &layerHitType) const
 {
     OrderedCaloHitList::const_iterator listIter = m_orderedCaloHitList.find(pseudoLayer);
 
@@ -308,7 +431,7 @@ void Cluster::CalculateLayerHitType(const unsigned int pseudoLayer, InputHitType
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::PerformEnergyCorrections(const Pandora &pandora) const
+void Cluster::UpdateEnergyCorrectionsCache(const Pandora &pandora) const
 {
     const EnergyCorrections *const pEnergyCorrections(pandora.GetPlugins()->GetEnergyCorrections());
     const ParticleId *const pParticleId(pandora.GetPlugins()->GetParticleId());
@@ -335,17 +458,17 @@ void Cluster::PerformEnergyCorrections(const Pandora &pandora) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::CalculateFastPhotonFlag(const Pandora &pandora) const
+void Cluster::UpdatePhotonIdCache(const Pandora &pandora) const
 {
-    const bool fastPhotonFlag(pandora.GetPlugins()->GetParticleId()->IsPhoton(this));
+    const bool passPhotonId(pandora.GetPlugins()->GetParticleId()->IsPhoton(this));
 
-    if (!(m_isPhotonFast = fastPhotonFlag))
+    if (!(m_passPhotonId = passPhotonId))
         throw StatusCodeException(STATUS_CODE_FAILURE);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::CalculateShowerStartLayer(const Pandora &pandora) const
+void Cluster::UpdateShowerLayerCache(const Pandora &pandora) const
 {
     const ShowerProfilePlugin *const pShowerProfilePlugin(pandora.GetPlugins()->GetShowerProfilePlugin());
 
@@ -358,7 +481,7 @@ void Cluster::CalculateShowerStartLayer(const Pandora &pandora) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::CalculateShowerProfile(const Pandora &pandora) const
+void Cluster::UpdateShowerProfileCache(const Pandora &pandora) const
 {
     const ShowerProfilePlugin *const pShowerProfilePlugin(pandora.GetPlugins()->GetShowerProfilePlugin());
 
@@ -405,7 +528,7 @@ void Cluster::ResetOutdatedProperties()
     m_initialDirection.SetValues(0.f, 0.f, 0.f);
     m_fitToAllHitsResult.Reset();
     m_showerStartLayer.Reset();
-    m_isPhotonFast.Reset();
+    m_passPhotonId.Reset();
     m_showerProfileStart.Reset();
     m_showerProfileDiscrepancy.Reset();
     m_correctedElectromagneticEnergy.Reset();
@@ -498,6 +621,14 @@ StatusCode Cluster::RemoveTrackAssociation(const Track *const pTrack)
 
     m_associatedTrackList.erase(iter);
     return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void Cluster::RemoveTrackSeed()
+{
+    m_pTrackSeed = nullptr;
+    this->UpdateInitialDirectionCache();
 }
 
 } // namespace pandora

@@ -13,6 +13,16 @@
 namespace pandora
 {
 
+const MCParticle *MCParticle::GetPfoTarget() const
+{
+    if (!m_pPfoTarget)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
+    return m_pPfoTarget;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 bool MCParticle::operator< (const MCParticle &rhs) const
 {
     const CartesianVector deltaPosition(rhs.GetVertex() - this->GetVertex());

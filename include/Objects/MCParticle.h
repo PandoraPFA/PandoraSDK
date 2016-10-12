@@ -9,6 +9,7 @@
 #define PANDORA_MC_PARTICLE_H 1
 
 #include "Pandora/ObjectCreation.h"
+#include "Pandora/StatusCodes.h"
 
 namespace pandora
 {
@@ -228,16 +229,6 @@ inline bool MCParticle::IsPfoTarget() const
 inline bool MCParticle::IsPfoTargetSet() const
 {
     return (nullptr != m_pPfoTarget);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline const MCParticle *MCParticle::GetPfoTarget() const
-{
-    if (!m_pPfoTarget)
-        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
-
-    return m_pPfoTarget;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

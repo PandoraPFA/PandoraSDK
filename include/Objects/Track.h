@@ -9,6 +9,7 @@
 #define PANDORA_TRACK_H 1
 
 #include "Pandora/ObjectCreation.h"
+#include "Pandora/StatusCodes.h"
 
 namespace pandora
 {
@@ -399,16 +400,6 @@ inline bool Track::CanFormClusterlessPfo() const
 inline bool Track::HasAssociatedCluster() const
 {
     return (nullptr != m_pAssociatedCluster);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline const Cluster *Track::GetAssociatedCluster() const
-{
-    if (!m_pAssociatedCluster)
-        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
-
-    return m_pAssociatedCluster;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -9,6 +9,7 @@
 #define PANDORA_CALO_HIT_H 1
 
 #include "Pandora/ObjectCreation.h"
+#include "Pandora/StatusCodes.h"
 
 namespace pandora
 {

@@ -14,6 +14,16 @@
 namespace pandora
 {
 
+const Cluster *Track::GetAssociatedCluster() const
+{
+    if (!m_pAssociatedCluster)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
+    return m_pAssociatedCluster;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 bool Track::operator< (const Track &rhs) const
 {
     const CartesianVector deltaPosition(rhs.GetTrackStateAtCalorimeter().GetPosition() - this->GetTrackStateAtCalorimeter().GetPosition());
