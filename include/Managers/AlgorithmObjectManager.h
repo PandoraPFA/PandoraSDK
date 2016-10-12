@@ -83,7 +83,7 @@ protected:
      *  @param  pObjectSubset if specified, only objects in both this and the source list will be moved
      */
     virtual StatusCode MoveObjectsBetweenLists(const std::string &targetListName, const std::string &sourceListName,
-        const ObjectList *pObjectSubset = NULL);
+        const ObjectList *pObjectSubset = nullptr);
 
     /**
      *  @brief  Temporarily replace the current list with another list, which may only be a temporary list.

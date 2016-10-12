@@ -12,6 +12,8 @@
 
 #include "Pandora/ObjectFactory.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -30,10 +32,10 @@ ClusterManager::~ClusterManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ClusterManager::Create(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster,
-    const ObjectFactory<PandoraContentApi::Cluster::Parameters, Cluster> &factory)
+StatusCode ClusterManager::Create(const object_creation::Cluster::Parameters &parameters, const Cluster *&pCluster,
+    const ObjectFactory<object_creation::Cluster::Parameters, object_creation::Cluster::Object> &factory)
 {
-    pCluster = NULL;
+    pCluster = nullptr;
 
     try
     {
@@ -47,21 +49,26 @@ StatusCode ClusterManager::Create(const PandoraContentApi::Cluster::Parameters &
 
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pCluster));
 
-        if (NULL == pCluster)
+        if (!pCluster)
              throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        if (!iter->second->insert(pCluster).second)
-             throw StatusCodeException(STATUS_CODE_FAILURE);
-
+        iter->second->push_back(pCluster);
         return STATUS_CODE_SUCCESS;
     }
     catch (StatusCodeException &statusCodeException)
     {
         std::cout << "Failed to create cluster: " << statusCodeException.ToString() << std::endl;
         delete pCluster;
-        pCluster = NULL;
+        pCluster = nullptr;
         return statusCodeException.GetStatusCode();
     }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ClusterManager::AlterMetadata(const Cluster *const pCluster, const object_creation::Cluster::Metadata &metadata) const
+{
+    return this->Modifiable(pCluster)->AlterMetadata(metadata);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -77,8 +84,8 @@ bool ClusterManager::IsAvailable(const ClusterList *const pClusterList) const
 {
     bool isAvailable(true);
 
-    for (ClusterList::const_iterator iter = pClusterList->begin(), iterEnd = pClusterList->end(); iter != iterEnd; ++iter)
-        isAvailable &= this->IsAvailable(*iter);
+    for (const Cluster *const pCluster : *pClusterList)
+        isAvailable &= this->IsAvailable(pCluster);
 
     return isAvailable;
 }
@@ -94,15 +101,8 @@ void ClusterManager::SetAvailability(const Cluster *const pCluster, bool isAvail
 template <>
 void ClusterManager::SetAvailability(const ClusterList *const pClusterList, bool isAvailable) const
 {
-    for (ClusterList::const_iterator iter = pClusterList->begin(), iterEnd = pClusterList->end(); iter != iterEnd; ++iter)
-        this->SetAvailability(*iter, isAvailable);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode ClusterManager::AlterMetadata(const Cluster *const pCluster, const PandoraContentApi::Cluster::Metadata &metadata) const
-{
-    return this->Modifiable(pCluster)->AlterMetadata(metadata);
+    for (const Cluster *const pCluster : *pClusterList)
+        this->SetAvailability(pCluster, isAvailable);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -147,8 +147,8 @@ StatusCode ClusterManager::MergeAndDeleteClusters(const Cluster *const pClusterT
     if ((m_nameToListMap.end() == enlargeListIter) || (m_nameToListMap.end() == deleteListIter))
         return STATUS_CODE_NOT_INITIALIZED;
 
-    ClusterList::iterator clusterToEnlargeIter = enlargeListIter->second->find(pClusterToEnlarge);
-    ClusterList::iterator clusterToDeleteIter = deleteListIter->second->find(pClusterToDelete);
+    ClusterList::iterator clusterToEnlargeIter = std::find(enlargeListIter->second->begin(), enlargeListIter->second->end(), pClusterToEnlarge);
+    ClusterList::iterator clusterToDeleteIter = std::find(deleteListIter->second->begin(), deleteListIter->second->end(), pClusterToDelete);
 
     if ((enlargeListIter->second->end() == clusterToEnlargeIter) || (deleteListIter->second->end() == clusterToDeleteIter))
         return STATUS_CODE_NOT_FOUND;
@@ -179,14 +179,14 @@ StatusCode ClusterManager::RemoveTrackAssociation(const Cluster *const pCluster,
 
 StatusCode ClusterManager::RemoveAllTrackAssociations() const
 {
-    for (NameToListMap::const_iterator iter = m_nameToListMap.begin(); iter != m_nameToListMap.end(); ++iter)
+    for (const NameToListMap::value_type &mapEntry : m_nameToListMap)
     {
-        for (ClusterList::const_iterator cIter = iter->second->begin(), cIterEnd = iter->second->end(); cIter != cIterEnd; ++cIter)
+        for (const Cluster *const pCluster : *mapEntry.second)
         {
-            const TrackList trackList((*cIter)->GetAssociatedTrackList());
+            const TrackList trackList(pCluster->GetAssociatedTrackList());
 
-            for (TrackList::const_iterator tIter = trackList.begin(), tIterEnd = trackList.end(); tIter != tIterEnd; ++tIter)
-                PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveTrackAssociation(*cIter, *tIter));
+            for (const Track *const pTrack : trackList)
+                PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveTrackAssociation(pCluster, pTrack));
         }
     }
 
@@ -202,14 +202,14 @@ StatusCode ClusterManager::RemoveCurrentTrackAssociations(TrackList &danglingTra
     if (m_nameToListMap.end() == iter)
         return STATUS_CODE_NOT_INITIALIZED;
 
-    for (ClusterList::iterator cIter = iter->second->begin(), cIterEnd = iter->second->end(); cIter != cIterEnd; ++cIter)
+    for (const Cluster *const pCluster : *iter->second)
     {
-        const TrackList trackList((*cIter)->GetAssociatedTrackList());
+        const TrackList trackList(pCluster->GetAssociatedTrackList());
 
-        danglingTracks.insert(trackList.begin(), trackList.end());
+        danglingTracks.insert(danglingTracks.end(), trackList.begin(), trackList.end());
 
-        for (TrackList::const_iterator tIter = trackList.begin(), tIterEnd = trackList.end(); tIter != tIterEnd; ++tIter)
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveTrackAssociation(*cIter, *tIter));
+        for (const Track *const pTrack : trackList)
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveTrackAssociation(pCluster, pTrack));
     }
 
     return STATUS_CODE_SUCCESS;

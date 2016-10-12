@@ -8,7 +8,6 @@
 
 #include "Objects/CartesianVector.h"
 
-#include <iostream>
 #include <limits>
 
 namespace pandora

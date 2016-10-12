@@ -184,6 +184,7 @@ private:
     friend class Pandora;
     friend class PandoraImpl;
     friend class ::PandoraApi;
+    template<typename PARAMETERS, typename METADATA, typename OBJECT> friend class ::object_creation::ObjectCreationHelper;
 };
 
 } // namespace pandora

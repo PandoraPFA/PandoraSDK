@@ -8,35 +8,41 @@
 
 #include "Objects/Track.h"
 
+#include <algorithm>
 #include <cmath>
-#include <cstdlib>
 
 namespace pandora
 {
 
-const MCParticle *Track::GetMainMCParticle() const
+const Cluster *Track::GetAssociatedCluster() const
 {
-    float bestWeight(0.f);
-    const MCParticle *pBestMCParticle = NULL;
-
-    for (MCParticleWeightMap::const_iterator iter = m_mcParticleWeightMap.begin(), iterEnd = m_mcParticleWeightMap.end(); iter != iterEnd; ++iter)
-    {
-        if (iter->second > bestWeight)
-        {
-            bestWeight = iter->second;
-            pBestMCParticle = iter->first;
-        }
-    }
-
-    if (NULL == pBestMCParticle)
+    if (!m_pAssociatedCluster)
         throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
-    return pBestMCParticle;
+    return m_pAssociatedCluster;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-Track::Track(const PandoraApi::Track::Parameters &parameters) :
+bool Track::operator< (const Track &rhs) const
+{
+    const CartesianVector deltaPosition(rhs.GetTrackStateAtCalorimeter().GetPosition() - this->GetTrackStateAtCalorimeter().GetPosition());
+
+    if (std::fabs(deltaPosition.GetZ()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetZ() > std::numeric_limits<float>::epsilon());
+
+    if (std::fabs(deltaPosition.GetX()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetX() > std::numeric_limits<float>::epsilon());
+
+    if (std::fabs(deltaPosition.GetY()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetY() > std::numeric_limits<float>::epsilon());
+
+    return (this->GetEnergyAtDca() > rhs.GetEnergyAtDca());
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+Track::Track(const object_creation::Track::Parameters &parameters) :
     m_d0(parameters.m_d0.Get()),
     m_z0(parameters.m_z0.Get()),
     m_particleId(parameters.m_particleId.Get()),
@@ -52,7 +58,7 @@ Track::Track(const PandoraApi::Track::Parameters &parameters) :
     m_isProjectedToEndCap(parameters.m_isProjectedToEndCap.Get()),
     m_canFormPfo(parameters.m_canFormPfo.Get()),
     m_canFormClusterlessPfo(parameters.m_canFormClusterlessPfo.Get()),
-    m_pAssociatedCluster(NULL),
+    m_pAssociatedCluster(nullptr),
     m_pParentAddress(parameters.m_pParentAddress.Get()),
     m_isAvailable(true)
 {
@@ -68,9 +74,6 @@ Track::Track(const PandoraApi::Track::Parameters &parameters) :
 
 Track::~Track()
 {
-    m_parentTrackList.clear();
-    m_siblingTrackList.clear();
-    m_daughterTrackList.clear();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -91,14 +94,13 @@ void Track::RemoveMCParticles()
 
 StatusCode Track::SetAssociatedCluster(const Cluster *const pCluster)
 {
-    if (NULL == pCluster)
+    if (!pCluster)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    if (NULL != m_pAssociatedCluster)
+    if (nullptr != m_pAssociatedCluster)
         return STATUS_CODE_ALREADY_INITIALIZED;
 
     m_pAssociatedCluster = pCluster;
-
     return STATUS_CODE_SUCCESS;
 }
 
@@ -109,8 +111,7 @@ StatusCode Track::RemoveAssociatedCluster(const Cluster *const pCluster)
     if (pCluster != m_pAssociatedCluster)
         return STATUS_CODE_NOT_FOUND;
 
-    m_pAssociatedCluster = NULL;
-
+    m_pAssociatedCluster = nullptr;
     return STATUS_CODE_SUCCESS;
 }
 
@@ -118,12 +119,13 @@ StatusCode Track::RemoveAssociatedCluster(const Cluster *const pCluster)
 
 StatusCode Track::AddParent(const Track *const pTrack)
 {
-    if (NULL == pTrack)
+    if (!pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    if (!m_parentTrackList.insert(pTrack).second)
+    if (m_parentTrackList.end() != std::find(m_parentTrackList.begin(), m_parentTrackList.end(), pTrack))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_parentTrackList.push_back(pTrack);
     return STATUS_CODE_SUCCESS;
 }
 
@@ -131,12 +133,13 @@ StatusCode Track::AddParent(const Track *const pTrack)
 
 StatusCode Track::AddDaughter(const Track *const pTrack)
 {
-    if (NULL == pTrack)
+    if (!pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    if (!m_daughterTrackList.insert(pTrack).second)
+    if (m_daughterTrackList.end() != std::find(m_daughterTrackList.begin(), m_daughterTrackList.end(), pTrack))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_daughterTrackList.push_back(pTrack);
     return STATUS_CODE_SUCCESS;
 }
 
@@ -144,26 +147,14 @@ StatusCode Track::AddDaughter(const Track *const pTrack)
 
 StatusCode Track::AddSibling(const Track *const pTrack)
 {
-    if (NULL == pTrack)
+    if (!pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    if (!m_siblingTrackList.insert(pTrack).second)
+    if (m_siblingTrackList.end() != std::find(m_siblingTrackList.begin(), m_siblingTrackList.end(), pTrack))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_siblingTrackList.push_back(pTrack);
     return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-std::ostream &operator<<(std::ostream &stream, const Track &track)
-{
-    stream  << " Track: " << std::endl
-            << " d0     " << track.GetD0() << std::endl
-            << " z0     " << track.GetZ0() << std::endl
-            << " p0     " << track.GetMomentumAtDca() << std::endl;
-
-    return stream;
 }
 
 } // namespace pandora

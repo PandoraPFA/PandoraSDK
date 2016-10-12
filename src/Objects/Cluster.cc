@@ -19,10 +19,154 @@
 #include "Plugins/ParticleIdPlugin.h"
 #include "Plugins/ShowerProfilePlugin.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
-Cluster::Cluster(const PandoraContentApi::Cluster::Parameters &parameters) :
+const Track *Cluster::GetTrackSeed() const
+{
+    if (!m_pTrackSeed)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
+    return m_pTrackSeed;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const CartesianVector Cluster::GetCentroid(const unsigned int pseudoLayer) const
+{
+    PointByPseudoLayerMap::const_iterator pointValueIter = m_sumXYZByPseudoLayer.find(pseudoLayer);
+
+    if (m_sumXYZByPseudoLayer.end() == pointValueIter)
+        throw StatusCodeException(STATUS_CODE_FAILURE);
+
+    const SimplePoint &mypoint = pointValueIter->second;
+
+    if (0 == mypoint.m_nHits)
+        throw StatusCodeException(STATUS_CODE_FAILURE);
+
+    return CartesianVector(static_cast<float>(mypoint.m_xyzPositionSums[0] / static_cast<float>(mypoint.m_nHits)),
+        static_cast<float>(mypoint.m_xyzPositionSums[1] / static_cast<float>(mypoint.m_nHits)),
+        static_cast<float>(mypoint.m_xyzPositionSums[2] / static_cast<float>(mypoint.m_nHits)));
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const CartesianVector &Cluster::GetInitialDirection() const
+{
+    if (!m_isDirectionUpToDate)
+        this->UpdateInitialDirectionCache();
+
+    return m_initialDirection;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const ClusterFitResult &Cluster::GetFitToAllHitsResult() const
+{
+    if (!m_isFitUpToDate)
+        this->UpdateFitToAllHitsCache();
+
+    return m_fitToAllHitsResult;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+HitType Cluster::GetInnerLayerHitType() const
+{
+    if (!m_innerLayerHitType.IsInitialized())
+        this->UpdateLayerHitTypeCache(m_innerPseudoLayer.Get(), m_innerLayerHitType);
+
+    return m_innerLayerHitType.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+HitType Cluster::GetOuterLayerHitType() const
+{
+    if (!m_outerLayerHitType.IsInitialized())
+        this->UpdateLayerHitTypeCache(m_outerPseudoLayer.Get(), m_outerLayerHitType);
+
+    return m_outerLayerHitType.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+float Cluster::GetCorrectedElectromagneticEnergy(const Pandora &pandora) const
+{
+    if (!m_correctedElectromagneticEnergy.IsInitialized())
+        this->UpdateEnergyCorrectionsCache(pandora);
+
+    return m_correctedElectromagneticEnergy.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+float Cluster::GetCorrectedHadronicEnergy(const Pandora &pandora) const
+{
+    if (!m_correctedHadronicEnergy.IsInitialized())
+        this->UpdateEnergyCorrectionsCache(pandora);
+
+    return m_correctedHadronicEnergy.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+float Cluster::GetTrackComparisonEnergy(const Pandora &pandora) const
+{
+    if (!m_trackComparisonEnergy.IsInitialized())
+        this->UpdateEnergyCorrectionsCache(pandora);
+
+    return m_trackComparisonEnergy.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool Cluster::PassPhotonId(const Pandora &pandora) const
+{
+    if (PHOTON == m_particleId)
+        return true;
+
+    if (!m_passPhotonId.IsInitialized())
+        this->UpdatePhotonIdCache(pandora);
+
+    return m_passPhotonId.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+unsigned int Cluster::GetShowerStartLayer(const Pandora &pandora) const
+{
+    if (!m_showerStartLayer.IsInitialized())
+        this->UpdateShowerLayerCache(pandora);
+
+    return m_showerStartLayer.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+float Cluster::GetShowerProfileStart(const Pandora &pandora) const
+{
+    if (!m_showerProfileStart.IsInitialized())
+        this->UpdateShowerProfileCache(pandora);
+
+    return m_showerProfileStart.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+float Cluster::GetShowerProfileDiscrepancy(const Pandora &pandora) const
+{
+    if (!m_showerProfileDiscrepancy.IsInitialized())
+        this->UpdateShowerProfileCache(pandora);
+
+    return m_showerProfileDiscrepancy.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+Cluster::Cluster(const object_creation::Cluster::Parameters &parameters) :
     m_nCaloHits(0),
     m_nPossibleMipHits(0),
     m_nCaloHitsInOuterLayer(0),
@@ -31,7 +175,7 @@ Cluster::Cluster(const PandoraContentApi::Cluster::Parameters &parameters) :
     m_isolatedElectromagneticEnergy(0),
     m_isolatedHadronicEnergy(0),
     m_particleId(UNKNOWN_PARTICLE_TYPE),
-    m_pTrackSeed(parameters.m_pTrack.IsInitialized() ? parameters.m_pTrack.Get() : NULL),
+    m_pTrackSeed(parameters.m_pTrack.IsInitialized() ? parameters.m_pTrack.Get() : nullptr),
     m_initialDirection(0.f, 0.f, 0.f),
     m_isDirectionUpToDate(false),
     m_isFitUpToDate(false),
@@ -46,24 +190,30 @@ Cluster::Cluster(const PandoraContentApi::Cluster::Parameters &parameters) :
         m_isDirectionUpToDate = true;
     }
 
-    for (CaloHitList::const_iterator iter = parameters.m_caloHitList.begin(), iterEnd = parameters.m_caloHitList.end(); iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : parameters.m_caloHitList)
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddCaloHit(*iter));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddCaloHit(pCaloHit));
     }
 
-    for (CaloHitList::const_iterator iter = parameters.m_isolatedCaloHitList.begin(), iterEnd = parameters.m_isolatedCaloHitList.end(); iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : parameters.m_isolatedCaloHitList)
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddIsolatedCaloHit(*iter));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddIsolatedCaloHit(pCaloHit));
     }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode Cluster::AlterMetadata(const PandoraContentApi::Cluster::Metadata &metadata)
+Cluster::~Cluster()
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode Cluster::AlterMetadata(const object_creation::Cluster::Metadata &metadata)
 {
     if (metadata.m_particleId.IsInitialized())
     {
-        m_isPhotonFast.Reset();
+        m_passPhotonId.Reset();
         m_particleId = metadata.m_particleId.Get();
     }
 
@@ -176,9 +326,10 @@ StatusCode Cluster::RemoveCaloHit(const CaloHit *const pCaloHit)
 
 StatusCode Cluster::AddIsolatedCaloHit(const CaloHit *const pCaloHit)
 {
-    if (!m_isolatedCaloHitList.insert(pCaloHit).second)
+    if (m_isolatedCaloHitList.end() != std::find(m_isolatedCaloHitList.begin(), m_isolatedCaloHitList.end(), pCaloHit))
         return STATUS_CODE_ALREADY_PRESENT;
 
+    m_isolatedCaloHitList.push_back(pCaloHit);
     const float electromagneticEnergy(pCaloHit->GetElectromagneticEnergy());
     const float hadronicEnergy(pCaloHit->GetHadronicEnergy());
 
@@ -194,7 +345,7 @@ StatusCode Cluster::AddIsolatedCaloHit(const CaloHit *const pCaloHit)
 
 StatusCode Cluster::RemoveIsolatedCaloHit(const CaloHit *const pCaloHit)
 {
-    CaloHitList::iterator iter = m_isolatedCaloHitList.find(pCaloHit);
+    CaloHitList::iterator iter = std::find(m_isolatedCaloHitList.begin(), m_isolatedCaloHitList.end(), pCaloHit);
 
     if (m_isolatedCaloHitList.end() == iter)
         return STATUS_CODE_NOT_FOUND;
@@ -214,26 +365,7 @@ StatusCode Cluster::RemoveIsolatedCaloHit(const CaloHit *const pCaloHit)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-const CartesianVector Cluster::GetCentroid(const unsigned int pseudoLayer) const
-{
-    PointByPseudoLayerMap::const_iterator pointValueIter = m_sumXYZByPseudoLayer.find(pseudoLayer);
-
-    if (m_sumXYZByPseudoLayer.end() == pointValueIter)
-        throw StatusCodeException(STATUS_CODE_FAILURE);
-
-    const SimplePoint &mypoint = pointValueIter->second;
-
-    if (0 == mypoint.m_nHits)
-        throw StatusCodeException(STATUS_CODE_FAILURE);
-
-    return CartesianVector(static_cast<float>(mypoint.m_xyzPositionSums[0] / static_cast<float>(mypoint.m_nHits)),
-        static_cast<float>(mypoint.m_xyzPositionSums[1] / static_cast<float>(mypoint.m_nHits)),
-        static_cast<float>(mypoint.m_xyzPositionSums[2] / static_cast<float>(mypoint.m_nHits)));
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void Cluster::CalculateFitToAllHitsResult() const
+void Cluster::UpdateFitToAllHitsCache() const
 {
     (void) ClusterFitHelper::FitFullCluster(this, m_fitToAllHitsResult);
     m_isFitUpToDate = true;
@@ -241,7 +373,7 @@ void Cluster::CalculateFitToAllHitsResult() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::CalculateInitialDirection() const
+void Cluster::UpdateInitialDirectionCache() const
 {
     if (m_orderedCaloHitList.empty())
     {
@@ -253,8 +385,8 @@ void Cluster::CalculateInitialDirection() const
     CartesianVector initialDirection(0.f, 0.f, 0.f);
     CaloHitList *const pCaloHitList(m_orderedCaloHitList.begin()->second);
 
-    for (CaloHitList::const_iterator iter = pCaloHitList->begin(), iterEnd = pCaloHitList->end(); iter != iterEnd; ++iter)
-        initialDirection += (*iter)->GetExpectedDirection();
+    for (const CaloHit *const pCaloHit : *pCaloHitList)
+        initialDirection += pCaloHit->GetExpectedDirection();
 
     m_initialDirection = initialDirection.GetUnitVector();
     m_isDirectionUpToDate = true;
@@ -262,7 +394,7 @@ void Cluster::CalculateInitialDirection() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::CalculateLayerHitType(const unsigned int pseudoLayer, InputHitType &layerHitType) const
+void Cluster::UpdateLayerHitTypeCache(const unsigned int pseudoLayer, InputHitType &layerHitType) const
 {
     OrderedCaloHitList::const_iterator listIter = m_orderedCaloHitList.find(pseudoLayer);
 
@@ -271,35 +403,35 @@ void Cluster::CalculateLayerHitType(const unsigned int pseudoLayer, InputHitType
 
     HitTypeToEnergyMap hitTypeToEnergyMap;
 
-    for (CaloHitList::const_iterator iter = listIter->second->begin(), iterEnd = listIter->second->end(); iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : *listIter->second)
     {
-        HitTypeToEnergyMap::iterator mapIter = hitTypeToEnergyMap.find((*iter)->GetHitType());
+        HitTypeToEnergyMap::iterator mapIter = hitTypeToEnergyMap.find(pCaloHit->GetHitType());
 
         if (hitTypeToEnergyMap.end() != mapIter)
         {
-            mapIter->second += (*iter)->GetHadronicEnergy();
+            mapIter->second += pCaloHit->GetHadronicEnergy();
             continue;
         }
 
-        if (!hitTypeToEnergyMap.insert(HitTypeToEnergyMap::value_type((*iter)->GetHitType(), (*iter)->GetHadronicEnergy())).second)
+        if (!hitTypeToEnergyMap.insert(HitTypeToEnergyMap::value_type(pCaloHit->GetHitType(), pCaloHit->GetHadronicEnergy())).second)
             throw StatusCodeException(STATUS_CODE_FAILURE);
     }
 
     float highestEnergy(0.f);
 
-    for (HitTypeToEnergyMap::const_iterator iter = hitTypeToEnergyMap.begin(), iterEnd = hitTypeToEnergyMap.end(); iter != iterEnd; ++iter)
+    for (HitTypeToEnergyMap::value_type &mapEntry : hitTypeToEnergyMap)
     {
-        if (iter->second > highestEnergy)
+        if (mapEntry.second > highestEnergy)
         {
-            layerHitType = iter->first;
-            highestEnergy = iter->second;
+            layerHitType = mapEntry.first;
+            highestEnergy = mapEntry.second;
         }
     }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::PerformEnergyCorrections(const Pandora &pandora) const
+void Cluster::UpdateEnergyCorrectionsCache(const Pandora &pandora) const
 {
     const EnergyCorrections *const pEnergyCorrections(pandora.GetPlugins()->GetEnergyCorrections());
     const ParticleId *const pParticleId(pandora.GetPlugins()->GetParticleId());
@@ -326,17 +458,17 @@ void Cluster::PerformEnergyCorrections(const Pandora &pandora) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::CalculateFastPhotonFlag(const Pandora &pandora) const
+void Cluster::UpdatePhotonIdCache(const Pandora &pandora) const
 {
-    const bool fastPhotonFlag(pandora.GetPlugins()->GetParticleId()->IsPhoton(this));
+    const bool passPhotonId(pandora.GetPlugins()->GetParticleId()->IsPhoton(this));
 
-    if (!(m_isPhotonFast = fastPhotonFlag))
+    if (!(m_passPhotonId = passPhotonId))
         throw StatusCodeException(STATUS_CODE_FAILURE);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::CalculateShowerStartLayer(const Pandora &pandora) const
+void Cluster::UpdateShowerLayerCache(const Pandora &pandora) const
 {
     const ShowerProfilePlugin *const pShowerProfilePlugin(pandora.GetPlugins()->GetShowerProfilePlugin());
 
@@ -349,7 +481,7 @@ void Cluster::CalculateShowerStartLayer(const Pandora &pandora) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Cluster::CalculateShowerProfile(const Pandora &pandora) const
+void Cluster::UpdateShowerProfileCache(const Pandora &pandora) const
 {
     const ShowerProfilePlugin *const pShowerProfilePlugin(pandora.GetPlugins()->GetShowerProfilePlugin());
 
@@ -384,7 +516,6 @@ StatusCode Cluster::ResetProperties()
     m_particleId = UNKNOWN_PARTICLE_TYPE;
 
     this->ResetOutdatedProperties();
-
     return STATUS_CODE_SUCCESS;
 }
 
@@ -397,7 +528,7 @@ void Cluster::ResetOutdatedProperties()
     m_initialDirection.SetValues(0.f, 0.f, 0.f);
     m_fitToAllHitsResult.Reset();
     m_showerStartLayer.Reset();
-    m_isPhotonFast.Reset();
+    m_passPhotonId.Reset();
     m_showerProfileStart.Reset();
     m_showerProfileDiscrepancy.Reset();
     m_correctedElectromagneticEnergy.Reset();
@@ -418,10 +549,12 @@ StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_orderedCaloHitList.Add(orderedCaloHitList));
 
     const CaloHitList &isolatedCaloHitList(pCluster->GetIsolatedCaloHitList());
-    for (CaloHitList::const_iterator iter = isolatedCaloHitList.begin(), iterEnd = isolatedCaloHitList.end(); iter != iterEnd; ++iter)
+    for (const CaloHit *const pCaloHit : isolatedCaloHitList)
     {
-        if (!m_isolatedCaloHitList.insert(*iter).second)
+        if (m_isolatedCaloHitList.end() != std::find(m_isolatedCaloHitList.begin(), m_isolatedCaloHitList.end(), pCaloHit))
             return STATUS_CODE_ALREADY_PRESENT;
+
+        m_isolatedCaloHitList.push_back(pCaloHit);
     }
 
     this->ResetOutdatedProperties();
@@ -434,9 +567,9 @@ StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
     m_hadronicEnergy += pCluster->GetHadronicEnergy();
 
     // Loop over pseudo layers in second cluster
-    for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
+    for (const OrderedCaloHitList::value_type &layerEntry : orderedCaloHitList)
     {
-        const unsigned int pseudoLayer(iter->first);
+        const unsigned int pseudoLayer(layerEntry.first);
         OrderedCaloHitList::const_iterator currentIter = m_orderedCaloHitList.find(pseudoLayer);
 
         SimplePoint &mypoint = m_sumXYZByPseudoLayer[pseudoLayer];
@@ -460,7 +593,6 @@ StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
 
     m_innerPseudoLayer = m_orderedCaloHitList.begin()->first;
     m_outerPseudoLayer = m_orderedCaloHitList.rbegin()->first;
-
     return STATUS_CODE_SUCCESS;
 }
 
@@ -468,12 +600,13 @@ StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
 
 StatusCode Cluster::AddTrackAssociation(const Track *const pTrack)
 {
-    if (NULL == pTrack)
+    if (!pTrack)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    if (!m_associatedTrackList.insert(pTrack).second)
-        return STATUS_CODE_FAILURE;
+    if (m_associatedTrackList.end() != std::find(m_associatedTrackList.begin(), m_associatedTrackList.end(), pTrack))
+        return STATUS_CODE_ALREADY_PRESENT;
 
+    m_associatedTrackList.push_back(pTrack);
     return STATUS_CODE_SUCCESS;
 }
 
@@ -481,14 +614,21 @@ StatusCode Cluster::AddTrackAssociation(const Track *const pTrack)
 
 StatusCode Cluster::RemoveTrackAssociation(const Track *const pTrack)
 {
-    TrackList::iterator iter = m_associatedTrackList.find(pTrack);
+    TrackList::iterator iter = std::find(m_associatedTrackList.begin(), m_associatedTrackList.end(), pTrack);
 
     if (m_associatedTrackList.end() == iter)
         return STATUS_CODE_NOT_FOUND;
 
     m_associatedTrackList.erase(iter);
-
     return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void Cluster::RemoveTrackSeed()
+{
+    m_pTrackSeed = nullptr;
+    this->UpdateInitialDirectionCache();
 }
 
 } // namespace pandora

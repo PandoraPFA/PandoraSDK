@@ -8,8 +8,7 @@
 #ifndef PANDORA_PERSISTENCY_H
 #define PANDORA_PERSISTENCY_H 1
 
-#include "Api/PandoraApi.h"
-
+#include "Pandora/ObjectCreation.h"
 #include "Pandora/ObjectFactory.h"
 #include "Pandora/PandoraObjectFactories.h"
 
@@ -76,13 +75,13 @@ protected:
     FileType                    m_fileType;             ///< The file type
     ContainerId                 m_containerId;          ///< The type of container currently being written to file
 
-    ObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit>                        *m_pCaloHitFactory;       ///< Address of the calo hit factory
-    ObjectFactory<PandoraApi::Track::Parameters, Track>                            *m_pTrackFactory;         ///< Address of the track factory
-    ObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle>                  *m_pMCParticleFactory;    ///< Address of the mc particle factory
-    ObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector>      *m_pSubDetectorFactory;   ///< Address of the sub detector factory
-    ObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap>              *m_pLineGapFactory;       ///< Address of the line gap factory
-    ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap>                *m_pBoxGapFactory;        ///< Address of the box gap factory
-    ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap>  *m_pConcentricGapFactory; ///< Address of the concentric gap factory
+    ObjectFactory<object_creation::CaloHit::Parameters, object_creation::CaloHit::Object>                                  *m_pCaloHitFactory;       ///< Address of the calo hit factory
+    ObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object>                                      *m_pTrackFactory;         ///< Address of the track factory
+    ObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object>                            *m_pMCParticleFactory;    ///< Address of the mc particle factory
+    ObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object>      *m_pSubDetectorFactory;   ///< Address of the sub detector factory
+    ObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object>              *m_pLineGapFactory;       ///< Address of the line gap factory
+    ObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object>                *m_pBoxGapFactory;        ///< Address of the box gap factory
+    ObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object>  *m_pConcentricGapFactory; ///< Address of the concentric gap factory
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

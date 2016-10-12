@@ -39,7 +39,7 @@ public:
     virtual ~Manager();
 
 protected:
-    typedef std::MANAGED_CONTAINER<const T *> ObjectList;
+    typedef MANAGED_CONTAINER<const T *> ObjectList;
 
     /**
      *  @brief  Get a list
@@ -162,7 +162,7 @@ protected:
     };
 
     typedef std::map<std::string, ObjectList *> NameToListMap;
-    typedef std::map<const Algorithm *, AlgorithmInfo> AlgorithmInfoMap;
+    typedef std::unordered_map<const Algorithm *, AlgorithmInfo> AlgorithmInfoMap;
 
     NameToListMap                   m_nameToListMap;                    ///< The name to list map
     AlgorithmInfoMap                m_algorithmInfoMap;                 ///< The algorithm info map

@@ -115,10 +115,10 @@ public:
      *  @param  algorithm the parent algorithm calling this function
      *  @param  xmlHandle the relevant xml handle
      *  @param  listName the name of the algorithm tool list
-     *  @param  algorithmToolList to receive the list of addresses of the algorithm tool instances
+     *  @param  algorithmToolVector to receive the vector of addresses of the algorithm tool instances
      */
     static StatusCode ProcessAlgorithmToolList(const Algorithm &algorithm, const TiXmlHandle &xmlHandle, const std::string &listName,
-        AlgorithmToolList &algorithmToolList);
+        AlgorithmToolVector &algorithmToolVector);
 
     /**
      *  @brief  Tokenize a string
@@ -137,7 +137,7 @@ inline StatusCode XmlHelper::ReadValue(const TiXmlHandle &xmlHandle, const std::
 {
     const TiXmlElement *const pXmlElement = xmlHandle.FirstChild(xmlElementName).Element();
 
-    if (NULL == pXmlElement)
+    if (!pXmlElement)
         return STATUS_CODE_NOT_FOUND;
 
     if (!StringToType(pXmlElement->GetText(), t))
@@ -151,7 +151,7 @@ inline StatusCode XmlHelper::ReadValue<CartesianVector>(const TiXmlHandle &xmlHa
 {
     const TiXmlElement *const pXmlElement = xmlHandle.FirstChild(xmlElementName).Element();
 
-    if (NULL == pXmlElement)
+    if (!pXmlElement)
         return STATUS_CODE_NOT_FOUND;
 
     StringVector tokens;
@@ -175,7 +175,7 @@ inline StatusCode XmlHelper::ReadValue<TrackState>(const TiXmlHandle &xmlHandle,
 {
     const TiXmlElement *const pXmlElement = xmlHandle.FirstChild(xmlElementName).Element();
 
-    if (NULL == pXmlElement)
+    if (!pXmlElement)
         return STATUS_CODE_NOT_FOUND;
 
     StringVector tokens;
@@ -202,7 +202,7 @@ inline StatusCode XmlHelper::ReadValue<bool>(const TiXmlHandle &xmlHandle, const
 {
     const TiXmlElement *const pXmlElement = xmlHandle.FirstChild(xmlElementName).Element();
 
-    if (NULL == pXmlElement)
+    if (!pXmlElement)
         return STATUS_CODE_NOT_FOUND;
 
     const std::string xmlElementString = pXmlElement->GetText();
@@ -230,17 +230,17 @@ inline StatusCode XmlHelper::ReadVectorOfValues(const TiXmlHandle &xmlHandle, co
 {
     const TiXmlElement *const pXmlElement = xmlHandle.FirstChild(xmlElementName).Element();
 
-    if (NULL == pXmlElement)
+    if (!pXmlElement)
         return STATUS_CODE_NOT_FOUND;
 
     StringVector tokens;
     TokenizeString(pXmlElement->GetText(), tokens);
 
-    for (StringVector::const_iterator iter = tokens.begin(), iterEnd = tokens.end(); iter != iterEnd; ++iter)
+    for (const std::string &token : tokens)
     {
         T t;
 
-        if (!StringToType(*iter, t))
+        if (!StringToType(token, t))
             return STATUS_CODE_FAILURE;
 
         vector.push_back(t);
@@ -257,26 +257,26 @@ inline StatusCode XmlHelper::Read2DVectorOfValues(const TiXmlHandle &xmlHandle, 
 {
     TiXmlElement *const pXmlElement = xmlHandle.FirstChild(xmlElementName).Element();
 
-    if (NULL == pXmlElement)
+    if (!pXmlElement)
         return STATUS_CODE_NOT_FOUND;
 
     TiXmlElement *pXmlRowElement = TiXmlHandle(pXmlElement).FirstChild(rowName).Element();
 
-    if (NULL == pXmlRowElement)
+    if (!pXmlRowElement)
         return STATUS_CODE_NOT_FOUND;
 
-    for ( ; NULL != pXmlRowElement; pXmlRowElement = pXmlRowElement->NextSiblingElement(rowName))
+    for ( ; nullptr != pXmlRowElement; pXmlRowElement = pXmlRowElement->NextSiblingElement(rowName))
     {
         std::vector<T> rowVector;
 
         StringVector tokens;
         TokenizeString(pXmlRowElement->GetText(), tokens);
 
-        for (StringVector::const_iterator iter = tokens.begin(), iterEnd = tokens.end(); iter != iterEnd; ++iter)
+        for (const std::string &token : tokens)
         {
             T t;
 
-            if (!StringToType(*iter, t))
+            if (!StringToType(token, t))
                 return STATUS_CODE_FAILURE;
 
             rowVector.push_back(t);

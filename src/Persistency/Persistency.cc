@@ -7,7 +7,6 @@
  */
 
 #include "Pandora/Pandora.h"
-#include "Pandora/PandoraObjectFactories.h"
 
 #include "Persistency/Persistency.h"
 
@@ -19,13 +18,13 @@ Persistency::Persistency(const pandora::Pandora &pandora, const std::string &fil
     m_fileName(fileName),
     m_fileType(UNKNOWN_FILE_TYPE),
     m_containerId(UNKNOWN_CONTAINER),
-    m_pCaloHitFactory(new PandoraObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit>()),
-    m_pTrackFactory(new PandoraObjectFactory<PandoraApi::Track::Parameters, Track>()),
-    m_pMCParticleFactory(new PandoraObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle>()),
-    m_pSubDetectorFactory(new PandoraObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector>()),
-    m_pLineGapFactory(new PandoraObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap>()),
-    m_pBoxGapFactory(new PandoraObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap>()),
-    m_pConcentricGapFactory(new PandoraObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap>())
+    m_pCaloHitFactory(new PandoraObjectFactory<object_creation::CaloHit::Parameters, object_creation::CaloHit::Object>()),
+    m_pTrackFactory(new PandoraObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object>()),
+    m_pMCParticleFactory(new PandoraObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object>()),
+    m_pSubDetectorFactory(new PandoraObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object>()),
+    m_pLineGapFactory(new PandoraObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object>()),
+    m_pBoxGapFactory(new PandoraObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object>()),
+    m_pConcentricGapFactory(new PandoraObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object>())
 {
 }
 
@@ -57,49 +56,49 @@ StatusCode Persistency::SetFactory(ObjectFactory<PARAMETERS, OBJECT> *const pFac
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<>
-void Persistency::ReplaceCurrentFactory(ObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit> *const pFactory)
+void Persistency::ReplaceCurrentFactory(ObjectFactory<object_creation::CaloHit::Parameters, object_creation::CaloHit::Object> *const pFactory)
 {
     delete m_pCaloHitFactory;
     m_pCaloHitFactory = pFactory;
 }
 
 template<>
-void Persistency::ReplaceCurrentFactory(ObjectFactory<PandoraApi::Track::Parameters, Track> *const pFactory)
+void Persistency::ReplaceCurrentFactory(ObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object> *const pFactory)
 {
     delete m_pTrackFactory;
     m_pTrackFactory = pFactory;
 }
 
 template<>
-void Persistency::ReplaceCurrentFactory(ObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle> *const pFactory)
+void Persistency::ReplaceCurrentFactory(ObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object> *const pFactory)
 {
     delete m_pMCParticleFactory;
     m_pMCParticleFactory = pFactory;
 }
 
 template<>
-void Persistency::ReplaceCurrentFactory(ObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector> *const pFactory)
+void Persistency::ReplaceCurrentFactory(ObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object> *const pFactory)
 {
     delete m_pSubDetectorFactory;
     m_pSubDetectorFactory = pFactory;
 }
 
 template<>
-void Persistency::ReplaceCurrentFactory(ObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap> *const pFactory)
+void Persistency::ReplaceCurrentFactory(ObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object> *const pFactory)
 {
     delete m_pLineGapFactory;
     m_pLineGapFactory = pFactory;
 }
 
 template<>
-void Persistency::ReplaceCurrentFactory(ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> *const pFactory)
+void Persistency::ReplaceCurrentFactory(ObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object> *const pFactory)
 {
     delete m_pBoxGapFactory;
     m_pBoxGapFactory = pFactory;
 }
 
 template<>
-void Persistency::ReplaceCurrentFactory(ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> *const pFactory)
+void Persistency::ReplaceCurrentFactory(ObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object> *const pFactory)
 {
     delete m_pConcentricGapFactory;
     m_pConcentricGapFactory = pFactory;
@@ -108,12 +107,12 @@ void Persistency::ReplaceCurrentFactory(ObjectFactory<PandoraApi::Geometry::Conc
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template StatusCode Persistency::SetFactory(ObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit> *const);
-template StatusCode Persistency::SetFactory(ObjectFactory<PandoraApi::Track::Parameters, Track> *const);
-template StatusCode Persistency::SetFactory(ObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle> *const);
-template StatusCode Persistency::SetFactory(ObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector> *const);
-template StatusCode Persistency::SetFactory(ObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap> *const);
-template StatusCode Persistency::SetFactory(ObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap> *const);
-template StatusCode Persistency::SetFactory(ObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap> *const);
+template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::CaloHit::Parameters, object_creation::CaloHit::Object> *const);
+template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object> *const);
+template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object> *const);
+template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object> *const);
+template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object> *const);
+template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object> *const);
+template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object> *const);
 
 } // namespace pandora

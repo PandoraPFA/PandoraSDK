@@ -10,28 +10,38 @@
 
 #include "Objects/Cluster.h"
 #include "Objects/MCParticle.h"
-#include "Objects/OrderedCaloHitList.h"
+#include "Objects/Track.h"
+
+#include "Pandora/PandoraInternal.h"
+
+#include <algorithm>
 
 namespace pandora
 {
 
-template <>
-const MCParticle *MCParticleHelper::GetMainMCParticle(const CaloHit *const pCaloHit)
+template <typename T>
+const MCParticle *MCParticleHelper::GetMainMCParticle(const T *const pT)
 {
     float bestWeight(0.f);
-    const MCParticle *pBestMCParticle = NULL;
-    const MCParticleWeightMap &hitMCParticleWeightMap(pCaloHit->GetMCParticleWeightMap());
+    const MCParticle *pBestMCParticle(nullptr);
+    const MCParticleWeightMap &hitMCParticleWeightMap(pT->GetMCParticleWeightMap());
 
-    for (MCParticleWeightMap::const_iterator iter = hitMCParticleWeightMap.begin(), iterEnd = hitMCParticleWeightMap.end(); iter != iterEnd; ++iter)
+    MCParticleVector mcParticleVector;
+    for (const MCParticleWeightMap::value_type &mapEntry : hitMCParticleWeightMap) mcParticleVector.push_back(mapEntry.first);
+    std::sort(mcParticleVector.begin(), mcParticleVector.end(), PointerLessThan<MCParticle>());
+
+    for (const MCParticle *const pMCParticle : mcParticleVector)
     {
-        if (iter->second > bestWeight)
+        const float weight(hitMCParticleWeightMap.at(pMCParticle));
+
+        if (weight > bestWeight)
         {
-            bestWeight = iter->second;
-            pBestMCParticle = iter->first;
+            bestWeight = weight;
+            pBestMCParticle = pMCParticle;
         }
     }
 
-    if (NULL == pBestMCParticle)
+    if (!pBestMCParticle)
         throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
     return pBestMCParticle;
@@ -43,31 +53,35 @@ template <>
 const MCParticle *MCParticleHelper::GetMainMCParticle(const Cluster *const pCluster)
 {
     MCParticleWeightMap mcParticleWeightMap;
-    const OrderedCaloHitList &orderedCaloHitList(pCluster->GetOrderedCaloHitList());
 
-    for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
+    for (const OrderedCaloHitList::value_type &layerIter : pCluster->GetOrderedCaloHitList())
     {
-        for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
+        for (const CaloHit *const pCaloHit : *layerIter.second)
         {
-            const CaloHit *const pCaloHit = *hitIter;
             const MCParticleWeightMap &hitMCParticleWeightMap(pCaloHit->GetMCParticleWeightMap());
 
-            for (MCParticleWeightMap::const_iterator weightIter = hitMCParticleWeightMap.begin(), weightIterEnd = hitMCParticleWeightMap.end();
-                weightIter != weightIterEnd; ++weightIter)
+            MCParticleVector mcParticleVector;
+            for (const MCParticleWeightMap::value_type &mapEntry : hitMCParticleWeightMap) mcParticleVector.push_back(mapEntry.first);
+            std::sort(mcParticleVector.begin(), mcParticleVector.end(), PointerLessThan<MCParticle>());
+
+            for (const MCParticle *const pMCParticle : mcParticleVector)
             {
-                const float weight(weightIter->second);
-                mcParticleWeightMap[weightIter->first] += weight;
+                const float weight(hitMCParticleWeightMap.at(pMCParticle));
+                mcParticleWeightMap[pMCParticle] += weight;
             }
         }
     }
 
     float bestWeight(0.f);
-    const MCParticle *pBestMCParticle(NULL);
+    const MCParticle *pBestMCParticle(nullptr);
 
-    for (MCParticleWeightMap::const_iterator iter = mcParticleWeightMap.begin(), iterEnd = mcParticleWeightMap.end(); iter != iterEnd; ++iter)
+    MCParticleVector mcParticleVector;
+    for (const MCParticleWeightMap::value_type &mapEntry : mcParticleWeightMap) mcParticleVector.push_back(mapEntry.first);
+    std::sort(mcParticleVector.begin(), mcParticleVector.end(), PointerLessThan<MCParticle>());
+
+    for (const MCParticle *const pCurrentMCParticle : mcParticleVector)
     {
-        const MCParticle *const pCurrentMCParticle = iter->first;
-        const float currentWeight = iter->second;
+        const float currentWeight(mcParticleWeightMap.at(pCurrentMCParticle));
 
         if (currentWeight > bestWeight)
         {
@@ -76,10 +90,16 @@ const MCParticle *MCParticleHelper::GetMainMCParticle(const Cluster *const pClus
         }
     }
 
-    if (NULL == pBestMCParticle)
+    if (!pBestMCParticle)
         throw StatusCodeException(STATUS_CODE_NOT_FOUND);
 
     return pBestMCParticle;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template const MCParticle *MCParticleHelper::GetMainMCParticle(const CaloHit *const);
+template const MCParticle *MCParticleHelper::GetMainMCParticle(const Track *const);
 
 } // namespace pandora

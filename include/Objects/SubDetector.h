@@ -8,9 +8,7 @@
 #ifndef PANDORA_SUB_DETECTOR_H
 #define PANDORA_SUB_DETECTOR_H 1
 
-#include "Api/PandoraApi.h"
-
-#include "Pandora/PandoraInternal.h"
+#include "Pandora/ObjectCreation.h"
 
 #include <string>
 
@@ -69,7 +67,7 @@ public:
         float       m_nInteractionLengths;              ///< Absorber material in front of layer, units interaction lengths
     };
 
-    typedef std::vector<SubDetectorLayer> SubDetectorLayerList;
+    typedef std::vector<SubDetectorLayer> SubDetectorLayerVector;
 
     /**
      *  @brief  Get the sub detector name, uniquely specifying the sub detector
@@ -156,11 +154,11 @@ public:
     unsigned int GetNLayers() const;
 
     /**
-     *  @brief  Get the list of layer parameters for the sub detector
+     *  @brief  Get the vector of layer parameters for the sub detector
      * 
-     *  @return The list of layer parameters for the sub detector
+     *  @return The vector of layer parameters for the sub detector
      */
-    const SubDetectorLayerList &GetSubDetectorLayerList() const;
+    const SubDetectorLayerVector &GetSubDetectorLayerVector() const;
 
 protected:
     /**
@@ -168,29 +166,29 @@ protected:
      * 
      *  @param  inputParameters the input sub detector parameters
      */
-    SubDetector(const PandoraApi::Geometry::SubDetector::Parameters &inputParameters);
+    SubDetector(const object_creation::Geometry::SubDetector::Parameters &inputParameters);
 
     /**
      *  @brief  Destructor
      */
     virtual ~SubDetector();
 
-    std::string             m_subDetectorName;      ///< The sub detector name, must uniquely specify a single sub detector
-    SubDetectorType         m_subDetectorType;      ///< The sub detector type, e.g. ECAL_BARREL, HCAL_ENDCAP, TPC, etc.
-    float                   m_innerRCoordinate;     ///< Inner cylindrical polar r coordinate, origin interaction point, units mm
-    float                   m_innerZCoordinate;     ///< Inner cylindrical polar z coordinate, origin interaction point, units mm
-    float                   m_innerPhiCoordinate;   ///< Inner cylindrical polar phi coordinate (angle wrt cartesian x axis)
-    unsigned int            m_innerSymmetryOrder;   ///< Order of symmetry of the innermost edge of sub detector
-    float                   m_outerRCoordinate;     ///< Outer cylindrical polar r coordinate, origin interaction point, units mm
-    float                   m_outerZCoordinate;     ///< Outer cylindrical polar z coordinate, origin interaction point, units mm
-    float                   m_outerPhiCoordinate;   ///< Outer cylindrical polar phi coordinate (angle wrt cartesian x axis)
-    unsigned int            m_outerSymmetryOrder;   ///< Order of symmetry of the outermost edge of sub detector
-    bool                    m_isMirroredInZ;        ///< Whether a second sub detector exists, equivalent to a reflection in z=0 plane
-    unsigned int            m_nLayers;              ///< The number of layers in the sub detector section
-    SubDetectorLayerList    m_subDetectorLayerList; ///< The list of layer parameters for the sub detector section
+    std::string             m_subDetectorName;          ///< The sub detector name, must uniquely specify a single sub detector
+    SubDetectorType         m_subDetectorType;          ///< The sub detector type, e.g. ECAL_BARREL, HCAL_ENDCAP, TPC, etc.
+    float                   m_innerRCoordinate;         ///< Inner cylindrical polar r coordinate, origin interaction point, units mm
+    float                   m_innerZCoordinate;         ///< Inner cylindrical polar z coordinate, origin interaction point, units mm
+    float                   m_innerPhiCoordinate;       ///< Inner cylindrical polar phi coordinate (angle wrt cartesian x axis)
+    unsigned int            m_innerSymmetryOrder;       ///< Order of symmetry of the innermost edge of sub detector
+    float                   m_outerRCoordinate;         ///< Outer cylindrical polar r coordinate, origin interaction point, units mm
+    float                   m_outerZCoordinate;         ///< Outer cylindrical polar z coordinate, origin interaction point, units mm
+    float                   m_outerPhiCoordinate;       ///< Outer cylindrical polar phi coordinate (angle wrt cartesian x axis)
+    unsigned int            m_outerSymmetryOrder;       ///< Order of symmetry of the outermost edge of sub detector
+    bool                    m_isMirroredInZ;            ///< Whether a second sub detector exists, equivalent to a reflection in z=0 plane
+    unsigned int            m_nLayers;                  ///< The number of layers in the sub detector section
+    SubDetectorLayerVector  m_subDetectorLayerVector;   ///< The vector of layer parameters for the sub detector section
 
     friend class GeometryManager;
-    friend class PandoraObjectFactory<PandoraApi::Geometry::SubDetector::Parameters, SubDetector>;
+    friend class PandoraObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -310,9 +308,9 @@ inline unsigned int SubDetector::GetNLayers() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const SubDetector::SubDetectorLayerList &SubDetector::GetSubDetectorLayerList() const
+inline const SubDetector::SubDetectorLayerVector &SubDetector::GetSubDetectorLayerVector() const
 {
-    return m_subDetectorLayerList;
+    return m_subDetectorLayerVector;
 }
 
 } // namespace pandora

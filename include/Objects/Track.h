@@ -8,9 +8,8 @@
 #ifndef PANDORA_TRACK_H
 #define PANDORA_TRACK_H 1
 
-#include "Api/PandoraApi.h"
-
-#include "Pandora/PandoraInternal.h"
+#include "Pandora/ObjectCreation.h"
+#include "Pandora/StatusCodes.h"
 
 namespace pandora
 {
@@ -146,13 +145,6 @@ public:
     const Cluster *GetAssociatedCluster() const;
 
     /**
-     *  @brief  Get address of the mc particle associated with the track
-     * 
-     *  @param  pMCParticle to receive the address of the mc particle
-     */
-    const MCParticle *GetMainMCParticle() const;
-
-    /**
      *  @brief  Get mc particle weight map for the track
      * 
      *  @return the mc particle weight map
@@ -164,28 +156,28 @@ public:
      *
      *  @param  the address of the parent track in the user framework
      */
-    const void *GetParentTrackAddress() const;
+    const void *GetParentAddress() const;
 
     /**
      *  @brief  Get the parent track list
      * 
      *  @return the parent track list
      */
-    const TrackList &GetParentTrackList() const;
+    const TrackList &GetParentList() const;
 
     /**
      *  @brief  Get the sibling track list
      * 
      *  @return the sibling track list
      */
-    const TrackList &GetSiblingTrackList() const;
+    const TrackList &GetSiblingList() const;
 
     /**
      *  @brief  Get the daughter track list
      * 
      *  @return the daughter track list
      */
-    const TrackList &GetDaughterTrackList() const;
+    const TrackList &GetDaughterList() const;
 
     /**
      *  @brief  Whether the track is available to be added to a particle flow object
@@ -194,13 +186,22 @@ public:
      */
     bool IsAvailable() const;
 
+    /**
+     *  @brief  operator< sorting by position at calorimeter, then energy at the 2D distance of closest approach
+     * 
+     *  @param  rhs the object for comparison
+     * 
+     *  @return boolean
+     */
+    bool operator< (const Track &rhs) const;
+
 protected:
     /**
      *  @brief  Constructor
      * 
      *  @param  parameters the calo hit parameters
      */
-    Track(const PandoraApi::Track::Parameters &parameters);
+    Track(const object_creation::Track::Parameters &parameters);
 
     /**
      *  @brief  Destructor
@@ -263,47 +264,31 @@ protected:
 
     const float             m_d0;                       ///< The 2D impact parameter wrt (0,0), units mm
     const float             m_z0;                       ///< The z coordinate at the 2D distance of closest approach, units mm
-
     const int               m_particleId;               ///< The PDG code of the tracked particle
     const int               m_charge;                   ///< The charge of the tracked particle
     const float             m_mass;                     ///< The mass of the tracked particle, units GeV
-
     const CartesianVector   m_momentumAtDca;            ///< The momentum vector at the 2D distance of closest approach, units GeV
     const float             m_energyAtDca;              ///< The track energy at the 2D distance of closest approach, units GeV
-
     const TrackState        m_trackStateAtStart;        ///< The track state at the start of the track, units mm and GeV
     const TrackState        m_trackStateAtEnd;          ///< The track state at the end of the track, units mm and GeV
-
     const TrackState        m_trackStateAtCalorimeter;  ///< The (sometimes projected) track state at the calorimeter, units mm and GeV
     const float             m_timeAtCalorimeter;        ///< The (sometimes projected) time at the calorimeter, units ns
     const bool              m_reachesCalorimeter;       ///< Whether the track actually reaches the calorimeter
     const bool              m_isProjectedToEndCap;      ///< Whether the calorimeter projection is to an endcap
-
     const bool              m_canFormPfo;               ///< Whether track should form a pfo, if it has an associated cluster
     const bool              m_canFormClusterlessPfo;    ///< Whether track should form a pfo, even if it has no associated cluster
-
     const Cluster          *m_pAssociatedCluster;       ///< The address of an associated cluster
     MCParticleWeightMap     m_mcParticleWeightMap;      ///< The mc particle weight map
     const void             *m_pParentAddress;           ///< The address of the parent track in the user framework
-
     TrackList               m_parentTrackList;          ///< The list of parent track addresses
     TrackList               m_siblingTrackList;         ///< The list of sibling track addresses
     TrackList               m_daughterTrackList;        ///< The list of daughter track addresses
-
     bool                    m_isAvailable;              ///< Whether the track is available to be added to a particle flow object
 
     friend class TrackManager;
     friend class InputObjectManager<Track>;
-    friend class PandoraObjectFactory<PandoraApi::Track::Parameters, Track>;
+    friend class PandoraObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object>;
 };
-
-/**
- *  @brief  Operator to dump track properties to an ostream
- *
- *  @param  stream the target ostream
- *  @param  track the track
- */
-std::ostream &operator<<(std::ostream &stream, const Track &track);
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -414,17 +399,7 @@ inline bool Track::CanFormClusterlessPfo() const
 
 inline bool Track::HasAssociatedCluster() const
 {
-    return (NULL != m_pAssociatedCluster);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline const Cluster *Track::GetAssociatedCluster() const
-{
-    if (NULL == m_pAssociatedCluster)
-        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
-
-    return m_pAssociatedCluster;
+    return (nullptr != m_pAssociatedCluster);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -436,28 +411,28 @@ inline const MCParticleWeightMap &Track::GetMCParticleWeightMap() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const void *Track::GetParentTrackAddress() const
+inline const void *Track::GetParentAddress() const
 {
     return m_pParentAddress;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const TrackList &Track::GetParentTrackList() const
+inline const TrackList &Track::GetParentList() const
 {
     return m_parentTrackList;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const TrackList &Track::GetSiblingTrackList() const
+inline const TrackList &Track::GetSiblingList() const
 {
     return m_siblingTrackList;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const TrackList &Track::GetDaughterTrackList() const
+inline const TrackList &Track::GetDaughterList() const
 {
     return m_daughterTrackList;
 }

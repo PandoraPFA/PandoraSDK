@@ -8,9 +8,8 @@
 #ifndef PANDORA_VERTEX_H
 #define PANDORA_VERTEX_H 1
 
-#include "Api/PandoraContentApi.h"
-
-#include "Pandora/PandoraInternal.h"
+#include "Pandora/ObjectCreation.h"
+#include "Pandora/StatusCodes.h"
 
 namespace pandora
 {
@@ -60,7 +59,7 @@ protected:
      * 
      *  @param  parameters the vertex parameters
      */
-    Vertex(const PandoraContentApi::Vertex::Parameters &parameters);
+    Vertex(const object_creation::Vertex::Parameters &parameters);
 
     /**
      *  @brief  Destructor
@@ -72,7 +71,7 @@ protected:
      * 
      *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
      */
-    StatusCode AlterMetadata(const PandoraContentApi::Vertex::Metadata &metadata);
+    StatusCode AlterMetadata(const object_creation::Vertex::Metadata &metadata);
 
     /**
      *  @brief  Set availability of vertex to be added to a particle flow object
@@ -88,16 +87,8 @@ protected:
 
     friend class VertexManager;
     friend class AlgorithmObjectManager<Vertex>;
-    friend class PandoraObjectFactory<PandoraContentApi::Vertex::Parameters, Vertex>;
+    friend class PandoraObjectFactory<object_creation::Vertex::Parameters, object_creation::Vertex::Object>;
 };
-
-/**
- *  @brief  Operator to dump vertex properties to an ostream
- *
- *  @param  stream the target ostream
- *  @param  vertex the vertex
- */
-std::ostream &operator<<(std::ostream &stream, const Vertex &vertex);
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 

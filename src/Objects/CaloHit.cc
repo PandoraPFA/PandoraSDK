@@ -7,14 +7,49 @@
  */
 
 #include "Objects/CaloHit.h"
-#include "Objects/MCParticle.h"
 
 #include <cmath>
 
 namespace pandora
 {
 
-CaloHit::CaloHit(const PandoraApi::CaloHit::Parameters &parameters) :
+void CaloHit::GetCellCorners(CartesianPointVector &cartesianPointVector) const
+{
+    if (RECTANGULAR == this->GetCellGeometry())
+    {
+        this->GetRectangularCellCorners(cartesianPointVector);
+    }
+    else if (POINTING == this->GetCellGeometry())
+    {
+        this->GetPointingCellCorners(cartesianPointVector);
+    }
+    else
+    {
+        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool CaloHit::operator< (const CaloHit &rhs) const
+{
+    const CartesianVector deltaPosition(rhs.GetPositionVector() - this->GetPositionVector());
+
+    if (std::fabs(deltaPosition.GetZ()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetZ() > std::numeric_limits<float>::epsilon());
+
+    if (std::fabs(deltaPosition.GetX()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetX() > std::numeric_limits<float>::epsilon());
+
+    if (std::fabs(deltaPosition.GetY()) > std::numeric_limits<float>::epsilon())
+        return (deltaPosition.GetY() > std::numeric_limits<float>::epsilon());
+
+    return (this->GetInputEnergy() > rhs.GetInputEnergy());
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+CaloHit::CaloHit(const object_creation::CaloHit::Parameters &parameters) :
     m_positionVector(parameters.m_positionVector.Get()),
     m_expectedDirection(parameters.m_expectedDirection.Get().GetUnitVector()),
     m_cellNormalVector(parameters.m_cellNormalVector.Get().GetUnitVector()),
@@ -46,7 +81,7 @@ CaloHit::CaloHit(const PandoraApi::CaloHit::Parameters &parameters) :
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-CaloHit::CaloHit(const PandoraContentApi::CaloHitFragment::Parameters &parameters) :
+CaloHit::CaloHit(const object_creation::CaloHitFragment::Parameters &parameters) :
     m_positionVector(parameters.m_pOriginalCaloHit->m_positionVector),
     m_expectedDirection(parameters.m_pOriginalCaloHit->m_expectedDirection),
     m_cellNormalVector(parameters.m_pOriginalCaloHit->m_cellNormalVector),
@@ -75,8 +110,8 @@ CaloHit::CaloHit(const PandoraContentApi::CaloHitFragment::Parameters &parameter
     m_mcParticleWeightMap(parameters.m_pOriginalCaloHit->m_mcParticleWeightMap),
     m_pParentAddress(parameters.m_pOriginalCaloHit->m_pParentAddress)
 {
-    for (MCParticleWeightMap::iterator iter = m_mcParticleWeightMap.begin(), iterEnd = m_mcParticleWeightMap.end(); iter != iterEnd; ++iter)
-        iter->second = iter->second * parameters.m_weight.Get();
+    for (MCParticleWeightMap::value_type &mapEntry : m_mcParticleWeightMap)
+        mapEntry.second = mapEntry.second * parameters.m_weight.Get();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -87,23 +122,23 @@ CaloHit::~CaloHit()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode CaloHit::SetPseudoLayer(const unsigned int pseudoLayer)
-{
-    if (!(m_pseudoLayer = pseudoLayer))
-        return STATUS_CODE_NOT_INITIALIZED;
-
-    return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode CaloHit::AlterMetadata(const PandoraContentApi::CaloHit::Metadata &metadata)
+StatusCode CaloHit::AlterMetadata(const object_creation::CaloHit::Metadata &metadata)
 {
     if (metadata.m_isPossibleMip.IsInitialized())
         m_isPossibleMip = metadata.m_isPossibleMip.Get();
 
     if (metadata.m_isIsolated.IsInitialized())
         m_isIsolated = metadata.m_isIsolated.Get();
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode CaloHit::SetPseudoLayer(const unsigned int pseudoLayer)
+{
+    if (!(m_pseudoLayer = pseudoLayer))
+        return STATUS_CODE_NOT_INITIALIZED;
 
     return STATUS_CODE_SUCCESS;
 }
@@ -149,25 +184,7 @@ float CaloHit::CalculateCellLengthScale() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void CaloHit::GetCellCorners(CartesianPointList &cartesianPointList) const
-{
-    if (RECTANGULAR == this->GetCellGeometry())
-    {
-        this->GetRectangularCellCorners(cartesianPointList);
-    }
-    else if (POINTING == this->GetCellGeometry())
-    {
-        this->GetPointingCellCorners(cartesianPointList);
-    }
-    else
-    {
-        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
-    }
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void CaloHit::GetRectangularCellCorners(CartesianPointList &cartesianPointList) const
+void CaloHit::GetRectangularCellCorners(CartesianPointVector &cartesianPointVector) const
 {
     const CartesianVector &position(this->GetPositionVector());
 
@@ -179,20 +196,20 @@ void CaloHit::GetRectangularCellCorners(CartesianPointList &cartesianPointList) 
     dirV *= (this->GetCellSize1() / 2.f);
     normal *= (this->GetCellThickness() / 2.f);
 
-    cartesianPointList.push_back(CartesianVector(position - dirU - dirV - normal));
-    cartesianPointList.push_back(CartesianVector(position + dirU - dirV - normal));
-    cartesianPointList.push_back(CartesianVector(position + dirU + dirV - normal));
-    cartesianPointList.push_back(CartesianVector(position - dirU + dirV - normal));
+    cartesianPointVector.push_back(CartesianVector(position - dirU - dirV - normal));
+    cartesianPointVector.push_back(CartesianVector(position + dirU - dirV - normal));
+    cartesianPointVector.push_back(CartesianVector(position + dirU + dirV - normal));
+    cartesianPointVector.push_back(CartesianVector(position - dirU + dirV - normal));
 
-    cartesianPointList.push_back(CartesianVector(position - dirU - dirV + normal));
-    cartesianPointList.push_back(CartesianVector(position + dirU - dirV + normal));
-    cartesianPointList.push_back(CartesianVector(position + dirU + dirV + normal));
-    cartesianPointList.push_back(CartesianVector(position - dirU + dirV + normal));
+    cartesianPointVector.push_back(CartesianVector(position - dirU - dirV + normal));
+    cartesianPointVector.push_back(CartesianVector(position + dirU - dirV + normal));
+    cartesianPointVector.push_back(CartesianVector(position + dirU + dirV + normal));
+    cartesianPointVector.push_back(CartesianVector(position - dirU + dirV + normal));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void CaloHit::GetPointingCellCorners(CartesianPointList &cartesianPointList) const
+void CaloHit::GetPointingCellCorners(CartesianPointVector &cartesianPointVector) const
 {
     float radius(0.f), phi(0.f), theta(0.f);
     this->GetPositionVector().GetSphericalCoordinates(radius, phi, theta);
@@ -229,27 +246,15 @@ void CaloHit::GetPointingCellCorners(CartesianPointList &cartesianPointList) con
     const float rMinAtThetaMin(thetaMinRScale * rMin), rMinAtThetaMax(thetaMaxRScale * rMin);
     const float rMaxAtThetaMin(thetaMinRScale * rMax), rMaxAtThetaMax(thetaMaxRScale * rMax);
 
-    cartesianPointList.push_back(CartesianVector(rMinAtThetaMin * sinThetaMin * cosPhiMin, rMinAtThetaMin * sinThetaMin * sinPhiMin, rMinAtThetaMin * cosThetaMin));
-    cartesianPointList.push_back(CartesianVector(rMinAtThetaMax * sinThetaMax * cosPhiMin, rMinAtThetaMax * sinThetaMax * sinPhiMin, rMinAtThetaMax * cosThetaMax));
-    cartesianPointList.push_back(CartesianVector(rMinAtThetaMax * sinThetaMax * cosPhiMax, rMinAtThetaMax * sinThetaMax * sinPhiMax, rMinAtThetaMax * cosThetaMax));
-    cartesianPointList.push_back(CartesianVector(rMinAtThetaMin * sinThetaMin * cosPhiMax, rMinAtThetaMin * sinThetaMin * sinPhiMax, rMinAtThetaMin * cosThetaMin));
+    cartesianPointVector.push_back(CartesianVector(rMinAtThetaMin * sinThetaMin * cosPhiMin, rMinAtThetaMin * sinThetaMin * sinPhiMin, rMinAtThetaMin * cosThetaMin));
+    cartesianPointVector.push_back(CartesianVector(rMinAtThetaMax * sinThetaMax * cosPhiMin, rMinAtThetaMax * sinThetaMax * sinPhiMin, rMinAtThetaMax * cosThetaMax));
+    cartesianPointVector.push_back(CartesianVector(rMinAtThetaMax * sinThetaMax * cosPhiMax, rMinAtThetaMax * sinThetaMax * sinPhiMax, rMinAtThetaMax * cosThetaMax));
+    cartesianPointVector.push_back(CartesianVector(rMinAtThetaMin * sinThetaMin * cosPhiMax, rMinAtThetaMin * sinThetaMin * sinPhiMax, rMinAtThetaMin * cosThetaMin));
 
-    cartesianPointList.push_back(CartesianVector(rMaxAtThetaMin * sinThetaMin * cosPhiMin, rMaxAtThetaMin * sinThetaMin * sinPhiMin, rMaxAtThetaMin * cosThetaMin));
-    cartesianPointList.push_back(CartesianVector(rMaxAtThetaMax * sinThetaMax * cosPhiMin, rMaxAtThetaMax * sinThetaMax * sinPhiMin, rMaxAtThetaMax * cosThetaMax));
-    cartesianPointList.push_back(CartesianVector(rMaxAtThetaMax * sinThetaMax * cosPhiMax, rMaxAtThetaMax * sinThetaMax * sinPhiMax, rMaxAtThetaMax * cosThetaMax));
-    cartesianPointList.push_back(CartesianVector(rMaxAtThetaMin * sinThetaMin * cosPhiMax, rMaxAtThetaMin * sinThetaMin * sinPhiMax, rMaxAtThetaMin * cosThetaMin));
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-std::ostream &operator<<(std::ostream &stream, const CaloHit &caloHit)
-{
-    stream  << " CaloHit: " << std::endl
-            << " position " << caloHit.GetPositionVector()
-            << " energy   " << caloHit.GetInputEnergy() << std::endl;
-
-    return stream;
+    cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMin * sinThetaMin * cosPhiMin, rMaxAtThetaMin * sinThetaMin * sinPhiMin, rMaxAtThetaMin * cosThetaMin));
+    cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMax * sinThetaMax * cosPhiMin, rMaxAtThetaMax * sinThetaMax * sinPhiMin, rMaxAtThetaMax * cosThetaMax));
+    cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMax * sinThetaMax * cosPhiMax, rMaxAtThetaMax * sinThetaMax * sinPhiMax, rMaxAtThetaMax * cosThetaMax));
+    cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMin * sinThetaMin * cosPhiMax, rMaxAtThetaMin * sinThetaMin * sinPhiMax, rMaxAtThetaMin * cosThetaMin));
 }
 
 } // namespace pandora

@@ -12,6 +12,11 @@
 #include "Objects/MCParticle.h"
 #include "Objects/Track.h"
 
+#include "Pandora/PandoraInternal.h"
+
+#include <algorithm>
+#include <unordered_set>
+
 namespace pandora
 {
 
@@ -43,6 +48,9 @@ StatusCode InputObjectManager<T>::CreateInputList()
     if (Manager<T>::m_nameToListMap.end() == existingListIter)
         return STATUS_CODE_FAILURE;
 
+    // ATTN Defined ordering of input objects. After this, algorithms must control object sorting.
+    existingListIter->second->sort(PointerLessThan<T>());
+
     Manager<T>::m_currentListName = INPUT_LIST_NAME;
     return STATUS_CODE_SUCCESS;
 }
@@ -67,8 +75,13 @@ StatusCode InputObjectManager<T>::SaveList(const std::string &listName, const Ob
     if (Manager<T>::m_nameToListMap.end() != Manager<T>::m_nameToListMap.find(listName))
         return this->AddObjectsToList(listName, objectList);
 
-    if (!Manager<T>::m_nameToListMap.insert(typename Manager<T>::NameToListMap::value_type(listName, new ObjectList)).second)
+    ObjectList *const pObjectList(new ObjectList);
+
+    if (!Manager<T>::m_nameToListMap.insert(typename Manager<T>::NameToListMap::value_type(listName, pObjectList)).second)
+    {
+        delete pObjectList;
         return STATUS_CODE_ALREADY_PRESENT;
+    }
 
     *(Manager<T>::m_nameToListMap[listName]) = objectList;
     Manager<T>::m_savedLists.insert(listName);
@@ -94,10 +107,16 @@ StatusCode InputObjectManager<T>::AddObjectsToList(const std::string &listName, 
     if (pSavedList == &objectList)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    for (typename ObjectList::const_iterator iter = objectList.begin(), iterEnd = objectList.end(); iter != iterEnd; ++iter)
+    // ATTN For look-up efficiency
+    std::unordered_set<const T*> savedSet(pSavedList->begin(), pSavedList->end());
+
+    for (const T *const pT : objectList)
     {
-        if (!pSavedList->insert(*iter).second)
+        if (savedSet.count(pT))
             return STATUS_CODE_ALREADY_PRESENT;
+
+        pSavedList->push_back(pT);
+        (void) savedSet.insert(pT);
     }
 
     return STATUS_CODE_SUCCESS;
@@ -118,9 +137,9 @@ StatusCode InputObjectManager<T>::RemoveObjectsFromList(const std::string &listN
     if (pSavedList == &objectList)
         return STATUS_CODE_INVALID_PARAMETER;
 
-    for (typename ObjectList::const_iterator iter = objectList.begin(), iterEnd = objectList.end(); iter != iterEnd; ++iter)
+    for (const T *const pT : objectList)
     {
-        typename ObjectList::iterator savedObjectIter = pSavedList->find(*iter);
+        typename ObjectList::iterator savedObjectIter = std::find(pSavedList->begin(), pSavedList->end(), pT);
 
         if (pSavedList->end() != savedObjectIter)
             pSavedList->erase(savedObjectIter);
@@ -142,8 +161,8 @@ StatusCode InputObjectManager<T>::EraseAllContent()
     }
     else
     {
-        for (typename ObjectList::iterator iter = inputIter->second->begin(), iterEnd = inputIter->second->end(); iter != iterEnd; ++iter)
-            delete *iter;
+        for (const T *const pT : *inputIter->second)
+            delete pT;
     }
 
     return Manager<T>::EraseAllContent();

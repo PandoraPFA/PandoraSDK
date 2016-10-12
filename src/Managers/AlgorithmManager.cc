@@ -16,6 +16,10 @@
 
 #include "Xml/tinyxml.h"
 
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+
 namespace pandora
 {
 
@@ -30,21 +34,21 @@ AlgorithmManager::AlgorithmManager(const Pandora *const pPandora) :
 
 AlgorithmManager::~AlgorithmManager()
 {
-    for (AlgorithmMap::iterator iter = m_algorithmMap.begin(), iterEnd = m_algorithmMap.end(); iter != iterEnd; ++iter)
-        delete iter->second;
+    for (AlgorithmMap::value_type &mapEntry : m_algorithmMap)
+        delete mapEntry.second;
 
-    for (AlgorithmFactoryMap::iterator iter = m_algorithmFactoryMap.begin(), iterEnd = m_algorithmFactoryMap.end(); iter != iterEnd; ++iter)
-        delete iter->second;
+    for (AlgorithmFactoryMap::value_type &mapEntry : m_algorithmFactoryMap)
+        delete mapEntry.second;
 
-    for (AlgorithmToolList::iterator iter = m_algorithmToolList.begin(), iterEnd = m_algorithmToolList.end(); iter != iterEnd; ++iter)
-        delete *iter;
+    for (AlgorithmTool *const pAlgorithmTool : m_algorithmToolVector)
+        delete pAlgorithmTool;
 
-    for (AlgorithmToolFactoryMap::iterator iter = m_algorithmToolFactoryMap.begin(), iterEnd = m_algorithmToolFactoryMap.end(); iter != iterEnd; ++iter)
-        delete iter->second;
+    for (AlgorithmToolFactoryMap::value_type &mapEntry : m_algorithmToolFactoryMap)
+        delete mapEntry.second;
 
     m_algorithmMap.clear();
     m_algorithmFactoryMap.clear();
-    m_algorithmToolList.clear();
+    m_algorithmToolVector.clear();
     m_algorithmToolFactoryMap.clear();
 }
 
@@ -72,7 +76,7 @@ StatusCode AlgorithmManager::RegisterAlgorithmToolFactory(const std::string &alg
 
 StatusCode AlgorithmManager::InitializeAlgorithms(const TiXmlHandle *const pXmlHandle)
 {
-    for (TiXmlElement *pXmlElement = pXmlHandle->FirstChild("algorithm").Element(); NULL != pXmlElement;
+    for (TiXmlElement *pXmlElement = pXmlHandle->FirstChild("algorithm").Element(); nullptr != pXmlElement;
         pXmlElement = pXmlElement->NextSiblingElement("algorithm"))
     {
         std::string algorithmName;
@@ -89,14 +93,14 @@ StatusCode AlgorithmManager::CreateAlgorithm(TiXmlElement *const pXmlElement, st
 {
     const char *const pAttribute(pXmlElement->Attribute("type"));
 
-    if (NULL == pAttribute)
+    if (!pAttribute)
     {
         std::cout << "Algorithm encountered in xml without defined type." << std::endl;
         return STATUS_CODE_NOT_FOUND;
     }
 
-    std::string instanceLabel;
-    const StatusCode instanceStatusCode = FindSpecificAlgorithmInstance(pXmlElement, algorithmName, instanceLabel);
+    std::string xmlInstanceLabel;
+    const StatusCode instanceStatusCode(FindSpecificAlgorithmInstance(pXmlElement, algorithmName, xmlInstanceLabel));
 
     if (STATUS_CODE_NOT_FOUND != instanceStatusCode)
         return instanceStatusCode;
@@ -113,22 +117,27 @@ StatusCode AlgorithmManager::CreateAlgorithm(TiXmlElement *const pXmlElement, st
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithm->RegisterDetails(m_pPandora, iter->first));
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithm->ReadSettings(TiXmlHandle(pXmlElement)));
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithm->Initialize());
-        algorithmName = TypeToString(pLocalAlgorithm);
+        std::stringstream ss;
+        ss << std::setw(4) << std::setfill('0') << (1 + m_algorithmMap.size());
+        algorithmName = "Alg" + ss.str();
+
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithm->RegisterDetails(m_pPandora, iter->first, algorithmName));
 
         if (!m_algorithmMap.insert(AlgorithmMap::value_type(algorithmName, pLocalAlgorithm)).second)
             throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        if (!instanceLabel.empty() && !m_specificAlgorithmInstanceMap.insert(SpecificAlgorithmInstanceMap::value_type(instanceLabel, algorithmName)).second)
+        if (!xmlInstanceLabel.empty() && !m_specificAlgorithmInstanceMap.insert(SpecificAlgorithmInstanceMap::value_type(xmlInstanceLabel, algorithmName)).second)
         {
-            m_algorithmMap.erase(algorithmName);
+            std::cout << "Failure attempting to reuse algorithm with xml instance label " << xmlInstanceLabel << std::endl;
             throw StatusCodeException(STATUS_CODE_FAILURE);
         }
+
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithm->ReadSettings(TiXmlHandle(pXmlElement)));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithm->Initialize());
     }
     catch (StatusCodeException &statusCodeException)
     {
+        m_algorithmMap.erase(algorithmName);
         delete pLocalAlgorithm;
         throw statusCodeException;
     }
@@ -142,7 +151,7 @@ StatusCode AlgorithmManager::CreateAlgorithmTool(TiXmlElement *const pXmlElement
 {
     const char *const pAttribute(pXmlElement->Attribute("type"));
 
-    if (NULL == pAttribute)
+    if (!pAttribute)
     {
         std::cout << "Algorithm tool encountered in xml without defined type." << std::endl;
         return STATUS_CODE_NOT_FOUND;
@@ -160,11 +169,15 @@ StatusCode AlgorithmManager::CreateAlgorithmTool(TiXmlElement *const pXmlElement
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->RegisterDetails(m_pPandora, iter->first));
+        std::stringstream ss;
+        ss << std::setw(4) << std::setfill('0') << (1 + m_algorithmToolVector.size());
+        const std::string toolInstanceName("Tool" + ss.str());
+
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->RegisterDetails(m_pPandora, iter->first, toolInstanceName));
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->ReadSettings(TiXmlHandle(pXmlElement)));
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, pLocalAlgorithmTool->Initialize());
 
-        m_algorithmToolList.push_back(pLocalAlgorithmTool);
+        m_algorithmToolVector.push_back(pLocalAlgorithmTool);
         pAlgorithmTool = pLocalAlgorithmTool;
     }
     catch (StatusCodeException &statusCodeException)
@@ -178,23 +191,22 @@ StatusCode AlgorithmManager::CreateAlgorithmTool(TiXmlElement *const pXmlElement
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode AlgorithmManager::FindSpecificAlgorithmInstance(TiXmlElement *const pXmlElement, std::string &algorithmName, std::string &instanceLabel) const
+StatusCode AlgorithmManager::FindSpecificAlgorithmInstance(TiXmlElement *const pXmlElement, std::string &algorithmName, std::string &xmlInstanceLabel) const
 {
     try
     {
         const char *const pAttribute(pXmlElement->Attribute("instance"));
 
-        if (NULL == pAttribute)
+        if (!pAttribute)
             return STATUS_CODE_NOT_FOUND;
 
-        instanceLabel = std::string(pAttribute);
-        SpecificAlgorithmInstanceMap::const_iterator iter = m_specificAlgorithmInstanceMap.find(instanceLabel);
+        xmlInstanceLabel = std::string(pAttribute);
+        SpecificAlgorithmInstanceMap::const_iterator iter = m_specificAlgorithmInstanceMap.find(xmlInstanceLabel);
 
         if (m_specificAlgorithmInstanceMap.end() == iter)
             return STATUS_CODE_NOT_FOUND;
 
         algorithmName = iter->second;
-
         AlgorithmMap::const_iterator targetIter = m_algorithmMap.find(algorithmName);
 
         if ((m_algorithmMap.end() == targetIter) || (targetIter->second->GetType() != std::string(pXmlElement->Attribute("type"))))

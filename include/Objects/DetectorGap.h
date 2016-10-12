@@ -8,7 +8,7 @@
 #ifndef PANDORA_DETECTOR_GAP_H
 #define PANDORA_DETECTOR_GAP_H 1
 
-#include "Api/PandoraApi.h"
+#include "Pandora/ObjectCreation.h"
 
 namespace pandora
 {
@@ -78,13 +78,13 @@ private:
      * 
      *  @param  parameters the gap parameters
      */
-    LineGap(const PandoraApi::Geometry::LineGap::Parameters &parameters);
+    LineGap(const object_creation::Geometry::LineGap::Parameters &parameters);
 
     const HitType           m_hitType;              ///< The hit type associated with the line gap
     const float             m_lineStartZ;           ///< The line z start coordinate, units mm
     const float             m_lineEndZ;             ///< The line z end coordinate, units mm
 
-    friend class PandoraObjectFactory<PandoraApi::Geometry::LineGap::Parameters, LineGap>;
+    friend class PandoraObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -131,14 +131,14 @@ private:
      * 
      *  @param  parameters the gap parameters
      */
-    BoxGap(const PandoraApi::Geometry::BoxGap::Parameters &parameters);
+    BoxGap(const object_creation::Geometry::BoxGap::Parameters &parameters);
 
     const CartesianVector   m_vertex;               ///< Cartesian coordinates of a gap vertex, units mm
     const CartesianVector   m_side1;                ///< Cartesian vector describing first side meeting vertex, units mm
     const CartesianVector   m_side2;                ///< Cartesian vector describing second side meeting vertex, units mm
     const CartesianVector   m_side3;                ///< Cartesian vector describing third side meeting vertex, units mm
 
-    friend class PandoraObjectFactory<PandoraApi::Geometry::BoxGap::Parameters, BoxGap>;
+    friend class PandoraObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -213,7 +213,7 @@ private:
      * 
      *  @param  parameters the gap parameters
      */
-    ConcentricGap(const PandoraApi::Geometry::ConcentricGap::Parameters &parameters);
+    ConcentricGap(const object_creation::Geometry::ConcentricGap::Parameters &parameters);
 
     /**
      *  @brief  Populate list of polygon vertices, assuming regular polygon in XY plane at constant z coordinate
@@ -250,15 +250,8 @@ private:
     VertexPointList         m_innerVertexPointList; ///< The vertex points of the inner polygon
     VertexPointList         m_outerVertexPointList; ///< The vertex points of the outer polygon
 
-    friend class PandoraObjectFactory<PandoraApi::Geometry::ConcentricGap::Parameters, ConcentricGap>;
+    friend class PandoraObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object>;
 };
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline DetectorGap::~DetectorGap()
-{
-}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------

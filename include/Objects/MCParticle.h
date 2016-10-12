@@ -8,9 +8,8 @@
 #ifndef PANDORA_MC_PARTICLE_H
 #define PANDORA_MC_PARTICLE_H 1
 
-#include "Api/PandoraApi.h"
-
-#include "Pandora/PandoraInternal.h"
+#include "Pandora/ObjectCreation.h"
+#include "Pandora/StatusCodes.h"
 
 namespace pandora
 {
@@ -131,13 +130,22 @@ public:
      */
     const MCParticleList &GetDaughterList() const;
 
+    /**
+     *  @brief  operator< sorting by vertex position, then energy
+     * 
+     *  @param  rhs the object for comparison
+     * 
+     *  @return boolean
+     */
+    bool operator< (const MCParticle &rhs) const;
+
 protected:
     /**
      *  @brief  Constructor
      * 
      *  @param  parameters the mc particle parameters
      */
-    MCParticle(const PandoraApi::MCParticle::Parameters &parameters);
+    MCParticle(const object_creation::MCParticle::Parameters &parameters);
 
     /**
      *  @brief  Destructor
@@ -185,24 +193,21 @@ protected:
     StatusCode RemovePfoTarget();
 
     const Uid               m_uid;                      ///< Unique identifier for the mc particle
-
     const float             m_energy;                   ///< The energy of the mc particle, units GeV
     const CartesianVector   m_momentum;                 ///< The momentum of the mc particle, units GeV
     const CartesianVector   m_vertex;                   ///< The production vertex of the mc particle, units mm
     const CartesianVector   m_endpoint;                 ///< The endpoint of the mc particle, units mm
-
     const float             m_innerRadius;              ///< Inner radius of the particle's path, units mm
     const float             m_outerRadius;              ///< Outer radius of the particle's path, units mm
     const int               m_particleId;               ///< The PDG code of the mc particle
     const MCParticleType    m_mcParticleType;           ///< The type of the mc particle, e.g. vertex, 2D-projection, etc.
-
     const MCParticle       *m_pPfoTarget;               ///< The address of the pfo target
     MCParticleList          m_daughterList;             ///< The list of mc daughter particles
     MCParticleList          m_parentList;               ///< The list of mc parent particles
 
     friend class MCManager;
     friend class InputObjectManager<MCParticle>;
-    friend class PandoraObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle>;
+    friend class PandoraObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -223,17 +228,7 @@ inline bool MCParticle::IsPfoTarget() const
 
 inline bool MCParticle::IsPfoTargetSet() const
 {
-    return (NULL != m_pPfoTarget);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline const MCParticle *MCParticle::GetPfoTarget() const
-{
-    if (NULL == m_pPfoTarget)
-        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
-
-    return m_pPfoTarget;
+    return (nullptr != m_pPfoTarget);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -8,10 +8,9 @@
 #ifndef PANDORA_CLUSTER_MANAGER_H
 #define PANDORA_CLUSTER_MANAGER_H 1
 
-#include "Api/PandoraContentApi.h"
-
 #include "Managers/AlgorithmObjectManager.h"
 
+#include "Pandora/ObjectCreation.h"
 #include "Pandora/PandoraInternal.h"
 
 namespace pandora
@@ -43,8 +42,8 @@ private:
      *  @param  pCluster to receive the address of the cluster created
      *  @param  factory the factory that performs the object allocation
      */
-    StatusCode Create(const PandoraContentApi::Cluster::Parameters &parameters, const Cluster *&pCluster,
-        const ObjectFactory<PandoraContentApi::Cluster::Parameters, Cluster> &factory);
+    StatusCode Create(const object_creation::Cluster::Parameters &parameters, const Cluster *&pCluster,
+        const ObjectFactory<object_creation::Cluster::Parameters, object_creation::Cluster::Object> &factory);
 
     /**
      *  @brief  Alter the metadata information stored in a cluster
@@ -52,7 +51,7 @@ private:
      *  @param  pCluster address of the cluster to modify
      *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
      */
-    StatusCode AlterMetadata(const Cluster *const pCluster, const PandoraContentApi::Cluster::Metadata &metadata) const;
+    StatusCode AlterMetadata(const Cluster *const pCluster, const object_creation::Cluster::Metadata &metadata) const;
 
     /**
      *  @brief  Is a cluster, or a list of clusters, available to add to a particle flow object

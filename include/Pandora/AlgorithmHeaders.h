@@ -52,4 +52,15 @@
 #include <cmath>
 #include <limits>
 
+// Macro allowing use of pandora monitoring to be quickly included/excluded via pre-processor flag; only works within algorithms
+#ifdef MONITORING
+    #define PANDORA_MONITORING_API(command)                                                                 \
+    if (this->GetPandora().GetSettings()->IsMonitoringEnabled())                                            \
+    {                                                                                                       \
+        PandoraMonitoringApi::command;                                                                      \
+    }
+#else
+    #define PANDORA_MONITORING_API(command)
+#endif
+
 #endif // #ifndef PANDORA_ALGORITHM_HEADERS_H

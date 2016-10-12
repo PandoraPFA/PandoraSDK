@@ -8,13 +8,12 @@
 #ifndef PANDORA_CLUSTER_H
 #define PANDORA_CLUSTER_H 1
 
-#include "Api/PandoraContentApi.h"
-
 #include "Helpers/ClusterFitHelper.h"
 
 #include "Objects/OrderedCaloHitList.h"
 
-#include "Pandora/PandoraInternal.h"
+#include "Pandora/ObjectCreation.h"
+#include "Pandora/StatusCodes.h"
 
 namespace pandora
 {
@@ -113,7 +112,7 @@ public:
      * 
      *  @return The particle id flag
      */
-    int GetParticleIdFlag() const;
+    int GetParticleId() const;
 
     /**
      *  @brief  Whether the cluster is track seeded
@@ -224,13 +223,13 @@ public:
     float GetTrackComparisonEnergy(const Pandora &pandora) const;
 
     /**
-     *  @brief  Whether the cluster has been flagged as a photon by photon id function
+     *  @brief  Whether the cluster passes the photon id
      * 
      *  @param  pandora the associated pandora instance
      * 
      *  @return boolean
      */
-    bool IsPhotonFast(const Pandora &pandora) const;
+    bool PassPhotonId(const Pandora &pandora) const;
 
     /**
      *  @brief  Get the pseudo layer at which shower commences
@@ -265,7 +264,7 @@ protected:
      * 
      *  @param  parameters the cluster parameters
      */
-    Cluster(const PandoraContentApi::Cluster::Parameters &parameters);
+    Cluster(const object_creation::Cluster::Parameters &parameters);
 
     /**
      *  @brief  Destructor
@@ -277,7 +276,7 @@ protected:
      * 
      *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
      */
-    StatusCode AlterMetadata(const PandoraContentApi::Cluster::Metadata &metadata);
+    StatusCode AlterMetadata(const object_creation::Cluster::Metadata &metadata);
 
     /**
      *  @brief  Add a calo hit to the cluster
@@ -308,50 +307,50 @@ protected:
     StatusCode RemoveIsolatedCaloHit(const CaloHit *const pCaloHit);
 
     /**
-     *  @brief  Calculate result of a linear fit to all calo hits in the cluster
+     *  @brief  Update result of linear fit to all calo hits in cluster
      */
-    void CalculateFitToAllHitsResult() const;
+    void UpdateFitToAllHitsCache() const;
 
     /**
-     *  @brief  Calculate cluster initial direction
+     *  @brief  Update cluster initial direction
      */
-    void CalculateInitialDirection() const;
+    void UpdateInitialDirectionCache() const;
 
     /**
-     *  @brief  Calculate the typical hit type for a specified layer
+     *  @brief  Update typical hit type for specified layer
      * 
      *  @param  pseudoLayer the pseudo layer
      *  @param  layerHitType to receive the typical layer hit type
      */
-    void CalculateLayerHitType(const unsigned int pseudoLayer, InputHitType &layerHitType) const;
+    void UpdateLayerHitTypeCache(const unsigned int pseudoLayer, InputHitType &layerHitType) const;
 
     /**
-     *  @brief  PerformClusterEnergyCorrections
+     *  @brief  Update cluster corrected energy values
      * 
      *  @param  pandora the associated pandora instance
      */
-    void PerformEnergyCorrections(const Pandora &pandora) const;
+    void UpdateEnergyCorrectionsCache(const Pandora &pandora) const;
 
     /**
-     *  @brief  Calculate the fast photon flag
+     *  @brief  Update photon if flag
      * 
      *  @param  pandora the associated pandora instance
      */
-    void CalculateFastPhotonFlag(const Pandora &pandora) const;
+    void UpdatePhotonIdCache(const Pandora &pandora) const;
 
     /**
-     *  @brief  Calculate the pseudo layer at which shower commences
+     *  @brief  Update the pseudo layer at which shower commences
      * 
      *  @param  pandora the associated pandora instance
      */
-    void CalculateShowerStartLayer(const Pandora &pandora) const;
+    void UpdateShowerLayerCache(const Pandora &pandora) const;
 
     /**
-     *  @brief  Calculate shower profile and compare it with the expected profile for a photon
+     *  @brief  Update shower profile and comparison with expectation for a photon
      * 
      *  @param  pandora the associated pandora instance
      */
-    void CalculateShowerProfile(const Pandora &pandora) const;
+    void UpdateShowerProfileCache(const Pandora &pandora) const;
 
     /**
      *  @brief  Reset all cluster properties
@@ -411,50 +410,39 @@ protected:
 
     OrderedCaloHitList          m_orderedCaloHitList;           ///< The ordered calo hit list
     CaloHitList                 m_isolatedCaloHitList;          ///< The list of isolated hits, which contribute only towards cluster energy
-
     unsigned int                m_nCaloHits;                    ///< The number of calo hits
     unsigned int                m_nPossibleMipHits;             ///< The number of calo hits that have been flagged as possible mip hits
     unsigned int                m_nCaloHitsInOuterLayer;        ///< Keep track of the number of calo hits in the outermost layers
-
     double                      m_electromagneticEnergy;        ///< The sum of electromagnetic energy measures of constituent calo hits, units GeV
     double                      m_hadronicEnergy;               ///< The sum of hadronic energy measures of constituent calo hits, units GeV
     double                      m_isolatedElectromagneticEnergy;///< Sum of electromagnetic energy measures of isolated calo hits, units GeV
     double                      m_isolatedHadronicEnergy;       ///< Sum of hadronic energy measures of isolated calo hits, units GeV
-
     int                         m_particleId;                   ///< The particle id flag
-
     const Track                *m_pTrackSeed;                   ///< Address of the track with which the cluster is seeded
-
     PointByPseudoLayerMap       m_sumXYZByPseudoLayer;          ///< Construct to allow rapid calculation of centroid in each pseudolayer
-
     InputUInt                   m_innerPseudoLayer;             ///< The innermost pseudo layer in the cluster
     InputUInt                   m_outerPseudoLayer;             ///< The outermost pseudo layer in the cluster
 
     mutable CartesianVector     m_initialDirection;             ///< The initial direction of the cluster
     mutable bool                m_isDirectionUpToDate;          ///< Whether the initial direction of the cluster is up to date
-
     mutable ClusterFitResult    m_fitToAllHitsResult;           ///< The result of a linear fit to all calo hits in the cluster
     mutable bool                m_isFitUpToDate;                ///< Whether the fit to all calo hits is up to date
-
     mutable InputFloat          m_correctedElectromagneticEnergy;///< The corrected electromagnetic estimate of the cluster energy, units GeV
     mutable InputFloat          m_correctedHadronicEnergy;      ///< The corrected hadronic estimate of the cluster energy, units GeV
     mutable InputFloat          m_trackComparisonEnergy;        ///< The appropriate corrected energy to use in comparisons with track momentum, units GeV
-
-    mutable InputBool           m_isPhotonFast;                 ///< Whether the cluster is flagged as a photon by fast photon id function
+    mutable InputBool           m_passPhotonId;                 ///< Whether the cluster passes the photon id
     mutable InputUInt           m_showerStartLayer;             ///< The pseudo layer at which shower commences
     mutable InputFloat          m_showerProfileStart;           ///< The cluster shower profile start, units radiation lengths
     mutable InputFloat          m_showerProfileDiscrepancy;     ///< The cluster shower profile discrepancy
-
     mutable InputHitType        m_innerLayerHitType;            ///< The typical inner layer hit type
     mutable InputHitType        m_outerLayerHitType;            ///< The typical outer layer hit type
 
     TrackList                   m_associatedTrackList;          ///< The list of tracks associated with the cluster
-
     bool                        m_isAvailable;                  ///< Whether the cluster is available to be added to a particle flow object
 
     friend class ClusterManager;
     friend class AlgorithmObjectManager<Cluster>;
-    friend class PandoraObjectFactory<PandoraContentApi::Cluster::Parameters, Cluster>;
+    friend class PandoraObjectFactory<object_creation::Cluster::Parameters, object_creation::Cluster::Object>;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -536,7 +524,7 @@ inline float Cluster::GetIsolatedHadronicEnergy() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline int Cluster::GetParticleIdFlag() const
+inline int Cluster::GetParticleId() const
 {
     return m_particleId;
 }
@@ -545,17 +533,7 @@ inline int Cluster::GetParticleIdFlag() const
 
 inline bool Cluster::IsTrackSeeded() const
 {
-    return (NULL != m_pTrackSeed);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline const Track *Cluster::GetTrackSeed() const
-{
-    if (NULL == m_pTrackSeed)
-        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
-
-    return m_pTrackSeed;
+    return (nullptr != m_pTrackSeed);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -574,46 +552,6 @@ inline unsigned int Cluster::GetOuterPseudoLayer() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const CartesianVector &Cluster::GetInitialDirection() const
-{
-    if (!m_isDirectionUpToDate)
-        this->CalculateInitialDirection();
-
-    return m_initialDirection;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline const ClusterFitResult &Cluster::GetFitToAllHitsResult() const
-{
-    if (!m_isFitUpToDate)
-        this->CalculateFitToAllHitsResult();
-
-    return m_fitToAllHitsResult;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline HitType Cluster::GetInnerLayerHitType() const
-{
-    if (!m_innerLayerHitType.IsInitialized())
-        this->CalculateLayerHitType(m_innerPseudoLayer.Get(), m_innerLayerHitType);
-
-    return m_innerLayerHitType.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline HitType Cluster::GetOuterLayerHitType() const
-{
-    if (!m_outerLayerHitType.IsInitialized())
-        this->CalculateLayerHitType(m_outerPseudoLayer.Get(), m_outerLayerHitType);
-
-    return m_outerLayerHitType.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 inline const TrackList &Cluster::GetAssociatedTrackList() const
 {
     return m_associatedTrackList;
@@ -621,93 +559,9 @@ inline const TrackList &Cluster::GetAssociatedTrackList() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float Cluster::GetCorrectedElectromagneticEnergy(const Pandora &pandora) const
-{
-    if (!m_correctedElectromagneticEnergy.IsInitialized())
-        this->PerformEnergyCorrections(pandora);
-
-    return m_correctedElectromagneticEnergy.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float Cluster::GetCorrectedHadronicEnergy(const Pandora &pandora) const
-{
-    if (!m_correctedHadronicEnergy.IsInitialized())
-        this->PerformEnergyCorrections(pandora);
-
-    return m_correctedHadronicEnergy.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float Cluster::GetTrackComparisonEnergy(const Pandora &pandora) const
-{
-    if (!m_trackComparisonEnergy.IsInitialized())
-        this->PerformEnergyCorrections(pandora);
-
-    return m_trackComparisonEnergy.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool Cluster::IsPhotonFast(const Pandora &pandora) const
-{
-    if (!m_isPhotonFast.IsInitialized())
-        this->CalculateFastPhotonFlag(pandora);
-
-    return m_isPhotonFast.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline unsigned int Cluster::GetShowerStartLayer(const Pandora &pandora) const
-{
-    if (!m_showerStartLayer.IsInitialized())
-        this->CalculateShowerStartLayer(pandora);
-
-    return m_showerStartLayer.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float Cluster::GetShowerProfileStart(const Pandora &pandora) const
-{
-    if (!m_showerProfileStart.IsInitialized())
-        this->CalculateShowerProfile(pandora);
-
-    return m_showerProfileStart.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline float Cluster::GetShowerProfileDiscrepancy(const Pandora &pandora) const
-{
-    if (!m_showerProfileDiscrepancy.IsInitialized())
-        this->CalculateShowerProfile(pandora);
-
-    return m_showerProfileDiscrepancy.Get();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline Cluster::~Cluster()
-{
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 inline bool Cluster::IsAvailable() const
 {
     return m_isAvailable;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline void Cluster::RemoveTrackSeed()
-{
-    m_pTrackSeed = NULL;
-    this->CalculateInitialDirection();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

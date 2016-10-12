@@ -8,15 +8,11 @@
 #ifndef PANDORA_CONTENT_API_H
 #define PANDORA_CONTENT_API_H 1
 
-#include "Api/PandoraApi.h"
-
-#include "Pandora/ObjectParameters.h"
-#include "Pandora/PandoraInputTypes.h"
-#include "Pandora/PandoraInternal.h"
+#include "Pandora/ObjectCreation.h"
+#include "Pandora/Pandora.h"
 #include "Pandora/PandoraObjectFactories.h"
 
-namespace pandora { class Algorithm; class AlgorithmTool; class TiXmlElement; }
-namespace pandora { class CaloHit; class Cluster; class MCParticle; class ParticleFlowObject; class Track; class Vertex; }
+namespace pandora { class TiXmlElement; }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -26,154 +22,14 @@ namespace pandora { class CaloHit; class Cluster; class MCParticle; class Partic
 class PandoraContentApi
 {
 public:
-    /* Object-metadata manipulation */
-
-    /**
-     *  @brief  CaloHitMetadata class
-     */
-    class CaloHitMetadata
-    {
-    public:
-        pandora::InputBool              m_isIsolated;           ///< The calo hit isolation flag
-        pandora::InputBool              m_isPossibleMip;        ///< The calo hit minimum ionising particle flag
-    };
-
-    /**
-     *  @brief  ClusterMetadata class
-     */
-    class ClusterMetadata
-    {
-    public:
-        pandora::InputInt               m_particleId;           ///< The cluster id (PDG code)
-    };
-
-    /**
-     *  @brief  ParticleFlowObjectMetadata class
-     */
-    class ParticleFlowObjectMetadata
-    {
-    public:
-        pandora::InputInt               m_particleId;           ///< The particle flow object id (PDG code)
-        pandora::InputInt               m_charge;               ///< The particle flow object charge
-        pandora::InputFloat             m_mass;                 ///< The particle flow object mass
-        pandora::InputFloat             m_energy;               ///< The particle flow object energy
-        pandora::InputCartesianVector   m_momentum;             ///< The particle flow object momentum
-    };
-
-    /**
-     *  @brief  VertexMetadata class
-     */
-    class VertexMetadata
-    {
-    public:
-        pandora::InputVertexLabel       m_vertexLabel;          ///< The vertex label (interaction, start, end, etc.)
-        pandora::InputVertexType        m_vertexType;           ///< The vertex type (3d, view u, v, w, etc.)
-    };
-
-    /**
-     *  @brief  Alter the metadata information stored in an object
-     * 
-     *  @param  algorithm the algorithm calling this function
-     *  @param  pObject address of the object to modify
-     *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
-     */
-    template <typename OBJECT, typename METADATA>
-    static pandora::StatusCode AlterMetadata(const pandora::Algorithm &algorithm, const OBJECT *const pObject, const METADATA &metadata);
-
-
-    /* Object-creation functions */
-
-    /**
-     *  @brief  Object creation helper class
-     * 
-     *  @param  PARAMETERS the type of object parameters
-     *  @param  METADATA the type of object metadata
-     *  @param  OBJECT the type of object
-     */
-    template <typename PARAMETERS, typename METADATA, typename OBJECT>
-    class ObjectCreationHelper
-    {
-    public:
-        typedef PARAMETERS Parameters;
-        typedef METADATA Metadata;
-        typedef OBJECT Object;
-
-        /**
-         *  @brief  Create a new object from a user factory
-         *
-         *  @param  algorithm the algorithm calling this function
-         *  @param  parameters the object parameters
-         *  @param  pObject to receive the address of the object created
-         *  @param  factory the factory that performs the object allocation
-         */
-        static pandora::StatusCode Create(const pandora::Algorithm &algorithm, const Parameters &parameters,
-            const Object *&pObject, const pandora::ObjectFactory<Parameters, Object> &factory = pandora::PandoraObjectFactory<Parameters, Object>());
-    };
-
-    /**
-     *  @brief  ClusterParameters class. To build a cluster must provide at least one hit (which may be isolated) or a track address.
-     */
-    class ClusterParameters : public pandora::ObjectParameters
-    {
-    public:
-        pandora::CaloHitList            m_caloHitList;          ///< The calo hit(s) to include
-        pandora::CaloHitList            m_isolatedCaloHitList;  ///< The isolated calo hit(s) to include
-        pandora::InputTrackAddress      m_pTrack;               ///< The address of the track seeding the cluster
-    };
-
-    /**
-     *  @brief  ParticleFlowObjectParameters class
-     */
-    class ParticleFlowObjectParameters : public ParticleFlowObjectMetadata, public pandora::ObjectParameters
-    {
-    public:
-        pandora::ClusterList            m_clusterList;          ///< The clusters in the particle flow object
-        pandora::TrackList              m_trackList;            ///< The tracks in the particle flow object
-        pandora::VertexList             m_vertexList;           ///< The vertices in the particle flow object
-    };
-
-    /**
-     *  @brief  Vertex creation class
-     */
-    class VertexParameters : public VertexMetadata, public pandora::ObjectParameters
-    {
-    public:
-        pandora::InputCartesianVector   m_position;             ///< The vertex position
-    };
-
-    typedef ObjectCreationHelper<PandoraApi::CaloHit::Parameters, CaloHitMetadata, pandora::CaloHit> CaloHit;
-    typedef ObjectCreationHelper<ClusterParameters, ClusterMetadata, pandora::Cluster> Cluster;
-    typedef ObjectCreationHelper<ParticleFlowObjectParameters, ParticleFlowObjectMetadata, pandora::ParticleFlowObject> ParticleFlowObject;
-    typedef ObjectCreationHelper<VertexParameters, VertexMetadata, pandora::Vertex> Vertex;
-    typedef ObjectCreationHelper<PandoraApi::MCParticle::Parameters, void, pandora::MCParticle> MCParticle;
-    typedef ObjectCreationHelper<PandoraApi::Track::Parameters, void, pandora::Track> Track;
-
-    /**
-     *  @brief  Type definition helper class
-     * 
-     *  @param  PARAMETERS the type of object parameters
-     *  @param  OBJECT the type of object
-     */
-    template <typename PARAMETERS, typename OBJECT>
-    class TypedefHelper
-    {
-    public:
-        typedef PARAMETERS Parameters;
-        typedef OBJECT Object;
-    };
-
-    /**
-     *  @brief  CaloHit fragment creation class
-     */
-    class CaloHitFragmentParameters : public pandora::ObjectParameters
-    {
-    public:
-        const pandora::CaloHit         *m_pOriginalCaloHit;     ///< The address of the original calo hit
-        pandora::InputFloat             m_weight;               ///< The weight to be assigned to the fragment
-    };
-
-    typedef TypedefHelper<CaloHitFragmentParameters, pandora::CaloHit> CaloHitFragment;
-
+    /* Map object creation and metadata functionality into PandoraContentApi */
+    typedef object_creation::CaloHit CaloHit;
+    typedef object_creation::Cluster Cluster;
+    typedef object_creation::ParticleFlowObject ParticleFlowObject;
+    typedef object_creation::Vertex Vertex;
+    typedef object_creation::MCParticle MCParticle;
+    typedef object_creation::Track Track;
+    typedef object_creation::CaloHitFragment CaloHitFragment;
 
     /* Accessors for plugins and global settings */
 
@@ -490,7 +346,7 @@ public:
      */
     static pandora::StatusCode Fragment(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pOriginalCaloHit,
         const float fraction1, const pandora::CaloHit *&pDaughterCaloHit1, const pandora::CaloHit *&pDaughterCaloHit2,
-        const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory = pandora::PandoraObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit>());
+        const pandora::ObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object> &factory = pandora::PandoraObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object>());
 
     /**
      *  @brief  Merge two calo hit fragments, originally from the same parent hit, to form a new calo hit
@@ -503,7 +359,7 @@ public:
      */
     static pandora::StatusCode MergeFragments(const pandora::Algorithm &algorithm, const pandora::CaloHit *const pFragmentCaloHit1,
         const pandora::CaloHit *const pFragmentCaloHit2, const pandora::CaloHit *&pMergedCaloHit,
-        const pandora::ObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit> &factory = pandora::PandoraObjectFactory<CaloHitFragment::Parameters, pandora::CaloHit>());
+        const pandora::ObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object> &factory = pandora::PandoraObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object>());
 
 
     /* Track-related functions */

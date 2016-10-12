@@ -11,6 +11,9 @@
 #include "Objects/Track.h"
 
 #include "Pandora/ObjectFactory.h"
+#include "Pandora/PandoraInternal.h"
+
+#include <algorithm>
 
 namespace pandora
 {
@@ -30,10 +33,10 @@ TrackManager::~TrackManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode TrackManager::Create(const PandoraApi::Track::Parameters &parameters, const Track *&pTrack,
-    const ObjectFactory<PandoraApi::Track::Parameters, Track> &factory)
+StatusCode TrackManager::Create(const object_creation::Track::Parameters &parameters, const Track *&pTrack,
+    const ObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object> &factory)
 {
-    pTrack = NULL;
+    pTrack = nullptr;
 
     try
     {
@@ -41,22 +44,20 @@ StatusCode TrackManager::Create(const PandoraApi::Track::Parameters &parameters,
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
 
-        if ((NULL == pTrack) || (m_nameToListMap.end() == inputIter) || (inputIter->second->end() != inputIter->second->find(pTrack)))
+        if (!pTrack || (m_nameToListMap.end() == inputIter))
             throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        if (m_uidToTrackMap.end() != m_uidToTrackMap.find(pTrack->GetParentTrackAddress()))
+        if (!m_uidToTrackMap.insert(UidToTrackMap::value_type(pTrack->GetParentAddress(), pTrack)).second)
             throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
 
-        (void) inputIter->second->insert(pTrack);
-        (void) m_uidToTrackMap.insert(UidToTrackMap::value_type(pTrack->GetParentTrackAddress(), pTrack));
-
+        inputIter->second->push_back(pTrack);
         return STATUS_CODE_SUCCESS;
     }
     catch (StatusCodeException &statusCodeException)
     {
         std::cout << "Failed to create track: " << statusCodeException.ToString() << std::endl;
         delete pTrack;
-        pTrack = NULL;
+        pTrack = nullptr;
         return statusCodeException.GetStatusCode();
     }
 }
@@ -74,8 +75,8 @@ bool TrackManager::IsAvailable(const TrackList *const pTrackList) const
 {
     bool isAvailable(true);
 
-    for (TrackList::const_iterator iter = pTrackList->begin(), iterEnd = pTrackList->end(); iter != iterEnd; ++iter)
-        isAvailable &= this->IsAvailable(*iter);
+    for (const Track *const pTrack : *pTrackList)
+        isAvailable &= this->IsAvailable(pTrack);
 
     return isAvailable;
 }
@@ -91,8 +92,8 @@ void TrackManager::SetAvailability(const Track *const pTrack, bool isAvailable) 
 template <>
 void TrackManager::SetAvailability(const TrackList *const pTrackList, bool isAvailable) const
 {
-    for (TrackList::const_iterator iter = pTrackList->begin(), iterEnd = pTrackList->end(); iter != iterEnd; ++iter)
-        this->SetAvailability(*iter, isAvailable);
+    for (const Track *const pTrack : *pTrackList)
+        this->SetAvailability(pTrack, isAvailable);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -118,14 +119,14 @@ StatusCode TrackManager::MatchTracksToMCPfoTargets(const UidToMCParticleWeightMa
     if (m_nameToListMap.end() == inputIter)
         return STATUS_CODE_FAILURE;
 
-    for (TrackList::const_iterator iter = inputIter->second->begin(), iterEnd = inputIter->second->end(); iter != iterEnd; ++iter)
+    for (const Track *const pTrack : *inputIter->second)
     {
-        UidToMCParticleWeightMap::const_iterator pfoTargetIter = trackToPfoTargetsMap.find((*iter)->GetParentTrackAddress());
+        UidToMCParticleWeightMap::const_iterator pfoTargetIter = trackToPfoTargetsMap.find(pTrack->GetParentAddress());
 
         if (trackToPfoTargetsMap.end() == pfoTargetIter)
             continue;
 
-        this->Modifiable(*iter)->SetMCParticleWeightMap(pfoTargetIter->second);
+        this->Modifiable(pTrack)->SetMCParticleWeightMap(pfoTargetIter->second);
     }
 
     return STATUS_CODE_SUCCESS;
@@ -140,8 +141,8 @@ StatusCode TrackManager::RemoveAllMCParticleRelationships()
     if (m_nameToListMap.end() == inputIter)
         return STATUS_CODE_FAILURE;
 
-    for (TrackList::const_iterator iter = inputIter->second->begin(), iterEnd = inputIter->second->end(); iter != iterEnd; ++iter)
-        this->Modifiable(*iter)->RemoveMCParticles();
+    for (const Track *const pTrack : *inputIter->second)
+        this->Modifiable(pTrack)->RemoveMCParticles();
 
     return STATUS_CODE_SUCCESS;
 }
@@ -178,23 +179,37 @@ StatusCode TrackManager::AssociateTracks() const
 
 StatusCode TrackManager::AddParentDaughterAssociations() const
 {
-    for (TrackRelationMap::const_iterator uidIter = m_parentDaughterRelationMap.begin(), uidIterEnd = m_parentDaughterRelationMap.end();
-        uidIter != uidIterEnd; ++uidIter)
+    if (m_parentDaughterRelationMap.empty())
+        return STATUS_CODE_SUCCESS;
+
+    const TrackList *pInputList(nullptr);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetList(INPUT_LIST_NAME, pInputList));
+
+    for (const Track *const pParentTrack : *pInputList)
     {
-        UidToTrackMap::const_iterator parentIter = m_uidToTrackMap.find(uidIter->first);
-        UidToTrackMap::const_iterator daughterIter = m_uidToTrackMap.find(uidIter->second);
+        const auto range(m_parentDaughterRelationMap.equal_range(pParentTrack->GetParentAddress()));
 
-        if ((m_uidToTrackMap.end() == parentIter) || (m_uidToTrackMap.end() == daughterIter))
-            continue;
+        TrackList daughterList;
+        for (TrackRelationMap::const_iterator relIter = range.first; relIter != range.second; ++relIter)
+        {
+            UidToTrackMap::const_iterator daughterIter = m_uidToTrackMap.find(relIter->second);
 
-        const StatusCode firstStatusCode(this->Modifiable(parentIter->second)->AddDaughter(daughterIter->second));
-        const StatusCode secondStatusCode(this->Modifiable(daughterIter->second)->AddParent(parentIter->second));
+            if ((m_uidToTrackMap.end() != daughterIter) && (daughterList.end() == std::find(daughterList.begin(), daughterList.end(), daughterIter->second)))
+                daughterList.push_back(daughterIter->second);
+        }
+        daughterList.sort(PointerLessThan<Track>());
 
-        if (firstStatusCode != secondStatusCode)
-            return STATUS_CODE_FAILURE;
+        for (const Track *const pDaughterTrack : daughterList)
+        {
+            const StatusCode firstStatusCode(this->Modifiable(pParentTrack)->AddDaughter(pDaughterTrack));
+            const StatusCode secondStatusCode(this->Modifiable(pDaughterTrack)->AddParent(pParentTrack));
 
-        if ((firstStatusCode != STATUS_CODE_SUCCESS) && (firstStatusCode != STATUS_CODE_ALREADY_PRESENT))
-            return firstStatusCode;
+            if (firstStatusCode != secondStatusCode)
+                return STATUS_CODE_FAILURE;
+
+            if ((firstStatusCode != STATUS_CODE_SUCCESS) && (firstStatusCode != STATUS_CODE_ALREADY_PRESENT))
+                return firstStatusCode;
+        }
     }
 
     return STATUS_CODE_SUCCESS;
@@ -204,23 +219,37 @@ StatusCode TrackManager::AddParentDaughterAssociations() const
 
 StatusCode TrackManager::AddSiblingAssociations() const
 {
-    for (TrackRelationMap::const_iterator uidIter = m_siblingRelationMap.begin(), uidIterEnd = m_siblingRelationMap.end();
-        uidIter != uidIterEnd; ++uidIter)
+    if (m_siblingRelationMap.empty())
+        return STATUS_CODE_SUCCESS;
+
+    const TrackList *pInputList(nullptr);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetList(INPUT_LIST_NAME, pInputList));
+
+    for (const Track *const pTrack : *pInputList)
     {
-        UidToTrackMap::const_iterator firstSiblingIter = m_uidToTrackMap.find(uidIter->first);
-        UidToTrackMap::const_iterator secondSiblingIter = m_uidToTrackMap.find(uidIter->second);
+        const auto range(m_siblingRelationMap.equal_range(pTrack->GetParentAddress()));
 
-        if ((m_uidToTrackMap.end() == firstSiblingIter) || (m_uidToTrackMap.end() == secondSiblingIter))
-            continue;
+        TrackList siblingList;
+        for (TrackRelationMap::const_iterator relIter = range.first; relIter != range.second; ++relIter)
+        {
+            UidToTrackMap::const_iterator siblingIter = m_uidToTrackMap.find(relIter->second);
 
-        const StatusCode firstStatusCode(this->Modifiable(firstSiblingIter->second)->AddSibling(secondSiblingIter->second));
-        const StatusCode secondStatusCode(this->Modifiable(secondSiblingIter->second)->AddSibling(firstSiblingIter->second));
+            if ((m_uidToTrackMap.end() != siblingIter) && (siblingList.end() == std::find(siblingList.begin(), siblingList.end(), siblingIter->second)))
+                siblingList.push_back(siblingIter->second);
+        }
+        siblingList.sort(PointerLessThan<Track>());
 
-        if (firstStatusCode != secondStatusCode)
-            return STATUS_CODE_FAILURE;
+        for (const Track *const pSiblingTrack : siblingList)
+        {
+            const StatusCode firstStatusCode(this->Modifiable(pTrack)->AddSibling(pSiblingTrack));
+            const StatusCode secondStatusCode(this->Modifiable(pSiblingTrack)->AddSibling(pTrack));
 
-        if ((firstStatusCode != STATUS_CODE_SUCCESS) && (firstStatusCode != STATUS_CODE_ALREADY_PRESENT))
-            return firstStatusCode;
+            if (firstStatusCode != secondStatusCode)
+                return STATUS_CODE_FAILURE;
+
+            if ((firstStatusCode != STATUS_CODE_SUCCESS) && (firstStatusCode != STATUS_CODE_ALREADY_PRESENT))
+                return firstStatusCode;
+        }
     }
 
     return STATUS_CODE_SUCCESS;
@@ -261,15 +290,15 @@ StatusCode TrackManager::RemoveCurrentClusterAssociations(TrackToClusterMap &dan
     if (m_nameToListMap.end() == listIter)
         return STATUS_CODE_FAILURE;
 
-    for (TrackList::iterator iter = listIter->second->begin(), iterEnd = listIter->second->end(); iter != iterEnd; ++iter)
+    for (const Track *const pTrack : *listIter->second)
     {
-        if (!(*iter)->HasAssociatedCluster())
+        if (!pTrack->HasAssociatedCluster())
             continue;
 
-        if (!danglingClusters.insert(TrackToClusterMap::value_type(*iter, (*iter)->GetAssociatedCluster())).second)
+        if (!danglingClusters.insert(TrackToClusterMap::value_type(pTrack, pTrack->GetAssociatedCluster())).second)
             return STATUS_CODE_FAILURE;
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveAssociatedCluster(*iter, (*iter)->GetAssociatedCluster()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveAssociatedCluster(pTrack, pTrack->GetAssociatedCluster()));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -279,10 +308,10 @@ StatusCode TrackManager::RemoveCurrentClusterAssociations(TrackToClusterMap &dan
 
 StatusCode TrackManager::RemoveClusterAssociations(const TrackList &trackList) const
 {
-    for (TrackList::const_iterator iter = trackList.begin(), iterEnd = trackList.end(); iter != iterEnd; ++iter)
+    for (const Track *const pTrack : trackList)
     {
-        if ((*iter)->HasAssociatedCluster())
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveAssociatedCluster(*iter, (*iter)->GetAssociatedCluster()));
+        if (pTrack->HasAssociatedCluster())
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveAssociatedCluster(pTrack, pTrack->GetAssociatedCluster()));
     }
 
     return STATUS_CODE_SUCCESS;

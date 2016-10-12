@@ -34,14 +34,14 @@ StatusCode ClusterFitHelper::FitStart(const Cluster *const pCluster, const unsig
     unsigned int occupiedLayerCount(0);
 
     ClusterFitPointList clusterFitPointList;
-    for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
+    for (const OrderedCaloHitList::value_type &layerIter : orderedCaloHitList)
     {
         if (++occupiedLayerCount > maxOccupiedLayers)
             break;
 
-        for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
+        for (const CaloHit *const pCaloHit : *layerIter.second)
         {
-            clusterFitPointList.push_back(ClusterFitPoint(*hitIter));
+            clusterFitPointList.push_back(ClusterFitPoint(pCaloHit));
         }
     }
 
@@ -72,9 +72,9 @@ StatusCode ClusterFitHelper::FitEnd(const Cluster *const pCluster, const unsigne
         if (++occupiedLayerCount > maxOccupiedLayers)
             break;
 
-        for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
+        for (const CaloHit *const pCaloHit : *iter->second)
         {
-            clusterFitPointList.push_back(ClusterFitPoint(*hitIter));
+            clusterFitPointList.push_back(ClusterFitPoint(pCaloHit));
         }
     }
 
@@ -95,11 +95,11 @@ StatusCode ClusterFitHelper::FitFullCluster(const Cluster *const pCluster, Clust
         return STATUS_CODE_OUT_OF_RANGE;
 
     ClusterFitPointList clusterFitPointList;
-    for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
+    for (const OrderedCaloHitList::value_type &layerIter : orderedCaloHitList)
     {
-        for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
+        for (const CaloHit *const pCaloHit : *layerIter.second)
         {
-            clusterFitPointList.push_back(ClusterFitPoint(*hitIter));
+            clusterFitPointList.push_back(ClusterFitPoint(pCaloHit));
         }
     }
 
@@ -124,9 +124,9 @@ StatusCode ClusterFitHelper::FitLayers(const Cluster *const pCluster, const unsi
         return STATUS_CODE_OUT_OF_RANGE;
 
     ClusterFitPointList clusterFitPointList;
-    for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
+    for (const OrderedCaloHitList::value_type &layerIter : orderedCaloHitList)
     {
-        const unsigned int pseudoLayer(iter->first);
+        const unsigned int pseudoLayer(layerIter.first);
 
         if (startLayer > pseudoLayer)
             continue;
@@ -134,9 +134,9 @@ StatusCode ClusterFitHelper::FitLayers(const Cluster *const pCluster, const unsi
         if (endLayer < pseudoLayer)
             break;
 
-        for (CaloHitList::const_iterator hitIter = iter->second->begin(), hitIterEnd = iter->second->end(); hitIter != hitIterEnd; ++hitIter)
+        for (const CaloHit *const pCaloHit : *layerIter.second)
         {
-            clusterFitPointList.push_back(ClusterFitPoint(*hitIter));
+            clusterFitPointList.push_back(ClusterFitPoint(pCaloHit));
         }
     }
 
@@ -163,9 +163,9 @@ StatusCode ClusterFitHelper::FitLayerCentroids(const Cluster *const pCluster, co
             return STATUS_CODE_OUT_OF_RANGE;
 
         ClusterFitPointList clusterFitPointList;
-        for (OrderedCaloHitList::const_iterator iter = orderedCaloHitList.begin(), iterEnd = orderedCaloHitList.end(); iter != iterEnd; ++iter)
+        for (const OrderedCaloHitList::value_type &layerIter : orderedCaloHitList)
         {
-            const unsigned int pseudoLayer(iter->first);
+            const unsigned int pseudoLayer(layerIter.first);
 
             if (startLayer > pseudoLayer)
                 continue;
@@ -173,10 +173,7 @@ StatusCode ClusterFitHelper::FitLayerCentroids(const Cluster *const pCluster, co
             if (endLayer < pseudoLayer)
                 break;
 
-            CaloHitVector caloHitVector(iter->second->begin(), iter->second->end());
-            std::sort(caloHitVector.begin(), caloHitVector.end(), ClusterFitHelper::SortCaloHits);
-
-            const unsigned int nCaloHits(caloHitVector.size());
+            const unsigned int nCaloHits(layerIter.second->size());
 
             if (0 == nCaloHits)
                 throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -184,11 +181,11 @@ StatusCode ClusterFitHelper::FitLayerCentroids(const Cluster *const pCluster, co
             float cellLengthScaleSum(0.f), cellEnergySum(0.f);
             CartesianVector cellNormalVectorSum(0.f, 0.f, 0.f);
 
-            for (CaloHitVector::const_iterator hitIter = caloHitVector.begin(), hitIterEnd = caloHitVector.end(); hitIter != hitIterEnd; ++hitIter)
+            for (const CaloHit *const pCaloHit : *layerIter.second)
             {
-                cellLengthScaleSum += (*hitIter)->GetCellLengthScale();
-                cellNormalVectorSum += (*hitIter)->GetCellNormalVector();
-                cellEnergySum += (*hitIter)->GetInputEnergy();
+                cellLengthScaleSum += pCaloHit->GetCellLengthScale();
+                cellNormalVectorSum += pCaloHit->GetCellNormalVector();
+                cellEnergySum += pCaloHit->GetInputEnergy();
             }
 
             clusterFitPointList.push_back(ClusterFitPoint(pCluster->GetCentroid(pseudoLayer), cellNormalVectorSum.GetUnitVector(),
@@ -222,10 +219,10 @@ StatusCode ClusterFitHelper::FitPoints(ClusterFitPointList &clusterFitPointList,
         CartesianVector positionSum(0.f, 0.f, 0.f);
         CartesianVector normalVectorSum(0.f, 0.f, 0.f);
 
-        for (ClusterFitPointList::const_iterator iter = clusterFitPointList.begin(), iterEnd = clusterFitPointList.end(); iter != iterEnd; ++iter)
+        for (const ClusterFitPoint &clusterFitPoint : clusterFitPointList)
         {
-            positionSum += iter->GetPosition();
-            normalVectorSum += iter->GetCellNormalVector();
+            positionSum += clusterFitPoint.GetPosition();
+            normalVectorSum += clusterFitPoint.GetCellNormalVector();
         }
 
         return PerformLinearFit(positionSum * (1.f / static_cast<float>(nFitPoints)), normalVectorSum.GetUnitVector(), clusterFitPointList, clusterFitResult);
@@ -256,9 +253,9 @@ StatusCode ClusterFitHelper::PerformLinearFit(const CartesianVector &centralPosi
     const CartesianVector rotationAxis((std::fabs(cosTheta) > 0.99) ? CartesianVector(1.f, 0.f, 0.f) :
         centralDirection.GetCrossProduct(chosenAxis).GetUnitVector());
 
-    for (ClusterFitPointList::const_iterator iter = clusterFitPointList.begin(), iterEnd = clusterFitPointList.end(); iter != iterEnd; ++iter)
+    for (const ClusterFitPoint &clusterFitPoint : clusterFitPointList)
     {
-        const CartesianVector position(iter->GetPosition() - centralPosition);
+        const CartesianVector position(clusterFitPoint.GetPosition() - centralPosition);
         const double weight(1.);
 
         const double p( (cosTheta + rotationAxis.GetX() * rotationAxis.GetX() * (1. - cosTheta)) * position.GetX() +
@@ -323,9 +320,9 @@ StatusCode ClusterFitHelper::PerformLinearFit(const CartesianVector &centralPosi
     double chi2_P(0.), chi2_Q(0.), rms(0.);
     double sumA(0.), sumL(0.), sumAL(0.), sumLL(0.);
 
-    for (ClusterFitPointList::const_iterator iter = clusterFitPointList.begin(), iterEnd = clusterFitPointList.end(); iter != iterEnd; ++iter)
+    for (const ClusterFitPoint &clusterFitPoint : clusterFitPointList)
     {
-        const CartesianVector position(iter->GetPosition() - centralPosition);
+        const CartesianVector position(clusterFitPoint.GetPosition() - centralPosition);
 
         const double p( (cosTheta + rotationAxis.GetX() * rotationAxis.GetX() * (1. - cosTheta)) * position.GetX() +
             (rotationAxis.GetX() * rotationAxis.GetY() * (1. - cosTheta) - rotationAxis.GetZ() * sinTheta) * position.GetY() +
@@ -337,25 +334,25 @@ StatusCode ClusterFitHelper::PerformLinearFit(const CartesianVector &centralPosi
             (rotationAxis.GetZ() * rotationAxis.GetY() * (1. - cosTheta) + rotationAxis.GetX() * sinTheta) * position.GetY() +
             (cosTheta + rotationAxis.GetZ() * rotationAxis.GetZ() * (1. - cosTheta)) * position.GetZ() );
 
-        const double error(iter->GetCellSize() / 3.46);
+        const double error(clusterFitPoint.GetCellSize() / 3.46);
         const double chiP((p - aP * r - bP) / error);
         const double chiQ((q - aQ * r - bQ) / error);
 
         chi2_P += chiP * chiP;
         chi2_Q += chiQ * chiQ;
 
-        const CartesianVector difference(iter->GetPosition() - intercept);
+        const CartesianVector difference(clusterFitPoint.GetPosition() - intercept);
         rms += (direction.GetCrossProduct(difference)).GetMagnitudeSquared();
 
         const float a(direction.GetDotProduct(difference));
-        const float l(static_cast<float>(iter->GetPseudoLayer()));
+        const float l(static_cast<float>(clusterFitPoint.GetPseudoLayer()));
         sumA += a; sumL += l; sumAL += a * l; sumLL += l * l;
     }
 
     const double nPoints(static_cast<double>(clusterFitPointList.size()));
     const double denominatorL(sumL * sumL - nPoints * sumLL);
 
-    if (0. != denominatorL)
+    if (std::fabs(denominatorL) > std::numeric_limits<double>::epsilon())
     {
         if (0. > ((sumL * sumA - nPoints * sumAL) / denominatorL))
             direction = direction * -1.f;
@@ -369,13 +366,6 @@ StatusCode ClusterFitHelper::PerformLinearFit(const CartesianVector &centralPosi
     clusterFitResult.SetSuccessFlag(true);
 
     return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-bool ClusterFitHelper::SortCaloHits(const CaloHit *const pLhs, const CaloHit *const pRhs)
-{
-    return (ClusterFitPoint(pLhs) < ClusterFitPoint(pRhs));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

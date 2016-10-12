@@ -94,9 +94,9 @@ private:
      * 
      *  @param  pXmlElement address of the xml element describing the algorithm type and settings
      *  @param  algorithmName to receive the name of the algorithm instance
-     *  @param  instanceLabel to receive the label referring to a specific algorithm instance
+     *  @param  xmlInstanceLabel to receive the xml label referring to a specific algorithm instance
      */
-    StatusCode FindSpecificAlgorithmInstance(TiXmlElement *const pXmlElement, std::string &algorithmName, std::string &instanceLabel) const;
+    StatusCode FindSpecificAlgorithmInstance(TiXmlElement *const pXmlElement, std::string &algorithmName, std::string &xmlInstanceLabel) const;
 
     typedef std::map<const std::string, Algorithm *const> AlgorithmMap;
     typedef std::map<const std::string, AlgorithmFactory *const> AlgorithmFactoryMap;
@@ -107,10 +107,9 @@ private:
     SpecificAlgorithmInstanceMap    m_specificAlgorithmInstanceMap;     ///< The specific algorithm instance map
     StringVector                    m_pandoraAlgorithms;                ///< The ordered list of names of top-level algorithms, to be run by pandora
 
-    typedef std::vector<AlgorithmTool*> AlgorithmToolList;
     typedef std::map<const std::string, AlgorithmToolFactory *const> AlgorithmToolFactoryMap;
 
-    AlgorithmToolList               m_algorithmToolList;                ///< The algorithm tool list
+    AlgorithmToolVector             m_algorithmToolVector;              ///< The algorithm tool vector
     AlgorithmToolFactoryMap         m_algorithmToolFactoryMap;          ///< The algorithm tool factory map
 
     const Pandora *const            m_pPandora;                         ///< The pandora instance that will run the algorithms

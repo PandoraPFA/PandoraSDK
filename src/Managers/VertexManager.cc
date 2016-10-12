@@ -12,6 +12,8 @@
 
 #include "Pandora/ObjectFactory.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -30,10 +32,10 @@ VertexManager::~VertexManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode VertexManager::Create(const PandoraContentApi::Vertex::Parameters &parameters, const Vertex *&pVertex,
-    const ObjectFactory<PandoraContentApi::Vertex::Parameters, Vertex> &factory)
+StatusCode VertexManager::Create(const object_creation::Vertex::Parameters &parameters, const Vertex *&pVertex,
+    const ObjectFactory<object_creation::Vertex::Parameters, object_creation::Vertex::Object> &factory)
 {
-    pVertex = NULL;
+    pVertex = nullptr;
 
     try
     {
@@ -47,26 +49,24 @@ StatusCode VertexManager::Create(const PandoraContentApi::Vertex::Parameters &pa
 
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pVertex));
 
-        if (NULL == pVertex)
+        if (!pVertex)
              throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        if (!iter->second->insert(pVertex).second)
-             throw StatusCodeException(STATUS_CODE_FAILURE);
-
+        iter->second->push_back(pVertex);
         return STATUS_CODE_SUCCESS;
     }
     catch (StatusCodeException &statusCodeException)
     {
         std::cout << "Failed to create vertex: " << statusCodeException.ToString() << std::endl;
         delete pVertex;
-        pVertex = NULL;
+        pVertex = nullptr;
         return statusCodeException.GetStatusCode();
     }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode VertexManager::AlterMetadata(const Vertex *const pVertex, const PandoraContentApi::Vertex::Metadata &metadata) const
+StatusCode VertexManager::AlterMetadata(const Vertex *const pVertex, const object_creation::Vertex::Metadata &metadata) const
 {
     return this->Modifiable(pVertex)->AlterMetadata(metadata);
 }
@@ -84,8 +84,8 @@ bool VertexManager::IsAvailable(const VertexList *const pVertexList) const
 {
     bool isAvailable(true);
 
-    for (VertexList::const_iterator iter = pVertexList->begin(), iterEnd = pVertexList->end(); iter != iterEnd; ++iter)
-        isAvailable &= this->IsAvailable(*iter);
+    for (const Vertex *const pVertex : *pVertexList)
+        isAvailable &= this->IsAvailable(pVertex);
 
     return isAvailable;
 }
@@ -101,8 +101,8 @@ void VertexManager::SetAvailability(const Vertex *const pVertex, bool isAvailabl
 template <>
 void VertexManager::SetAvailability(const VertexList *const pVertexList, bool isAvailable) const
 {
-    for (VertexList::const_iterator iter = pVertexList->begin(), iterEnd = pVertexList->end(); iter != iterEnd; ++iter)
-        this->SetAvailability(*iter, isAvailable);
+    for (const Vertex *const pVertex : *pVertexList)
+        this->SetAvailability(pVertex, isAvailable);
 }
 
 } // namespace pandora

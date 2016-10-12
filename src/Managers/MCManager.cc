@@ -12,8 +12,11 @@
 
 #include "Pandora/ObjectFactory.h"
 #include "Pandora/Pandora.h"
+#include "Pandora/PandoraInternal.h"
 #include "Pandora/PandoraSettings.h"
 #include "Pandora/PdgTable.h"
+
+#include <algorithm>
 
 namespace pandora
 {
@@ -37,10 +40,10 @@ MCManager::~MCManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MCManager::Create(const PandoraApi::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle,
-    const ObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle> &factory)
+StatusCode MCManager::Create(const object_creation::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle,
+    const ObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object> &factory)
 {
-    pMCParticle = NULL;
+    pMCParticle = nullptr;
 
     try
     {
@@ -48,22 +51,20 @@ StatusCode MCManager::Create(const PandoraApi::MCParticle::Parameters &parameter
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
 
-        if ((NULL == pMCParticle) || (m_nameToListMap.end() == inputIter) || (inputIter->second->end() != inputIter->second->find(pMCParticle)))
+        if (!pMCParticle || (m_nameToListMap.end() == inputIter))
             throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        if (m_uidToMCParticleMap.end() != m_uidToMCParticleMap.find(pMCParticle->GetUid()))
+        if (!m_uidToMCParticleMap.insert(UidToMCParticleMap::value_type(pMCParticle->GetUid(), pMCParticle)).second)
             throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
 
-        (void) inputIter->second->insert(pMCParticle);
-        (void) m_uidToMCParticleMap.insert(UidToMCParticleMap::value_type(pMCParticle->GetUid(), pMCParticle));
-
+        inputIter->second->push_back(pMCParticle);
         return STATUS_CODE_SUCCESS;
     }
     catch (StatusCodeException &statusCodeException)
     {
         std::cout << "Failed to create mc particle: " << statusCodeException.ToString() << std::endl;
         delete pMCParticle;
-        pMCParticle = NULL;
+        pMCParticle = nullptr;
         return statusCodeException.GetStatusCode();
     }
 }
@@ -98,12 +99,12 @@ StatusCode MCManager::IdentifyPfoTargets()
     if (m_nameToListMap.end() == inputIter)
         return STATUS_CODE_FAILURE;
 
-    for (MCParticleList::const_iterator iter = inputIter->second->begin(), iterEnd = inputIter->second->end(); iter != iterEnd; ++iter)
+    for (const MCParticle *const pMCParticle : *inputIter->second)
     {
-        MCParticleList mcPfoCandidates;
+        MCParticleSet mcPfoSet;
 
-        if ((*iter)->IsRootParticle())
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ApplyPfoSelectionRules((*iter), mcPfoCandidates));
+        if (pMCParticle->IsRootParticle())
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ApplyPfoSelectionRules(pMCParticle, mcPfoSet));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -122,28 +123,30 @@ StatusCode MCManager::SelectPfoTargets()
     NameToListMap::iterator selectedIter = m_nameToListMap.find(SELECTED_LIST_NAME);
 
     if (m_nameToListMap.end() != selectedIter)
+    {
+        delete selectedIter->second;
         m_nameToListMap.erase(selectedIter);
+    }
 
     // Strip down mc particles and relationships to just those of pfo targets, if specified
     const bool shouldCollapseMCParticlesToPfoTarget(m_pPandora->GetSettings()->ShouldCollapseMCParticlesToPfoTarget());
 
     MCParticleList selectedMCPfoList;
 
-    for (MCParticleList::const_iterator iter = inputIter->second->begin(), iterEnd = inputIter->second->end(); iter != iterEnd; ++iter)
+    for (const MCParticle *const pMCParticle : *inputIter->second)
     {
-        const bool isPfoTarget((*iter)->IsPfoTarget());
+        const bool isPfoTarget(pMCParticle->IsPfoTarget());
 
         if (!isPfoTarget && shouldCollapseMCParticlesToPfoTarget)
         {
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveMCParticleRelationships(*iter));
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveMCParticleRelationships(pMCParticle));
         }
 
         if (isPfoTarget || !shouldCollapseMCParticlesToPfoTarget)
         {
-            selectedMCPfoList.insert(*iter);
+            selectedMCPfoList.push_back(pMCParticle);
         }
     }
-
 
     // Save selected pfo target list
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SaveList(SELECTED_LIST_NAME, selectedMCPfoList));
@@ -154,7 +157,7 @@ StatusCode MCManager::SelectPfoTargets()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode MCManager::ApplyPfoSelectionRules(const MCParticle *const pMCParticle, MCParticleList &mcPfoList) const
+StatusCode MCManager::ApplyPfoSelectionRules(const MCParticle *const pMCParticle, MCParticleSet &mcPfoSet) const
 {
     const float selectionRadius(m_pPandora->GetSettings()->GetMCPfoSelectionRadius());
     const float selectionMomentum(m_pPandora->GetSettings()->GetMCPfoSelectionMomentum());
@@ -163,21 +166,20 @@ StatusCode MCManager::ApplyPfoSelectionRules(const MCParticle *const pMCParticle
     const int particleId(pMCParticle->GetParticleId());
 
     // ATTN: Don't take particles from previously used decay chains; could happen because mc particles can have multiple parents.
-    if ((mcPfoList.find(pMCParticle) == mcPfoList.end()) &&
+    if (!mcPfoSet.count(pMCParticle) &&
         (pMCParticle->GetOuterRadius() > selectionRadius) &&
         (pMCParticle->GetInnerRadius() <= selectionRadius) &&
         (pMCParticle->GetMomentum().GetMagnitude() > selectionMomentum) &&
         !((particleId == PROTON || particleId == NEUTRON) && (pMCParticle->GetEnergy() < selectionEnergyCutOffProtonsNeutrons)))
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTargetInTree(pMCParticle, pMCParticle, true));
-        mcPfoList.insert(pMCParticle);
+        mcPfoSet.insert(pMCParticle);
     }
     else
     {
-        for(MCParticleList::const_iterator iter = pMCParticle->m_daughterList.begin(), iterEnd = pMCParticle->m_daughterList.end();
-            iter != iterEnd; ++iter)
+        for (const MCParticle *const pDaughterMCParticle : pMCParticle->GetDaughterList())
         {
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ApplyPfoSelectionRules(*iter, mcPfoList));
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ApplyPfoSelectionRules(pDaughterMCParticle, mcPfoSet));
         }
     }
 
@@ -193,16 +195,16 @@ StatusCode MCManager::SetPfoTargetInTree(const MCParticle *const pMCParticle, co
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pMCParticle)->SetPfoTarget(pPfoTarget));
 
-    for (MCParticleList::const_iterator iter = pMCParticle->GetDaughterList().begin(), iterEnd = pMCParticle->GetDaughterList().end(); iter != iterEnd; ++iter)
+    for (const MCParticle *const pDaughterMCParticle : pMCParticle->GetDaughterList())
     {
-       PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTargetInTree(*iter, pPfoTarget));
+       PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTargetInTree(pDaughterMCParticle, pPfoTarget));
     }
 
     if (!onlyDaughters)
     {
-        for (MCParticleList::const_iterator iter = pMCParticle->GetParentList().begin(), iterEnd = pMCParticle->GetParentList().end(); iter != iterEnd; ++iter)
+        for (const MCParticle *const pParentMCParticle : pMCParticle->GetParentList())
         {
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTargetInTree(*iter, pPfoTarget));
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTargetInTree(pParentMCParticle, pPfoTarget));
         }
     }
 
@@ -213,23 +215,37 @@ StatusCode MCManager::SetPfoTargetInTree(const MCParticle *const pMCParticle, co
 
 StatusCode MCManager::AddMCParticleRelationships() const
 {
-    for (MCParticleRelationMap::const_iterator uidIter = m_parentDaughterRelationMap.begin(), uidIterEnd = m_parentDaughterRelationMap.end();
-        uidIter != uidIterEnd; ++uidIter)
+    if (m_parentDaughterRelationMap.empty())
+        return STATUS_CODE_SUCCESS;
+
+    const MCParticleList *pInputList(nullptr);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetList(INPUT_LIST_NAME, pInputList));
+
+    for (const MCParticle *const pParentMCParticle : *pInputList)
     {
-        UidToMCParticleMap::const_iterator parentIter = m_uidToMCParticleMap.find(uidIter->first);
-        UidToMCParticleMap::const_iterator daughterIter = m_uidToMCParticleMap.find(uidIter->second);
+        const auto range(m_parentDaughterRelationMap.equal_range(pParentMCParticle->GetUid()));
 
-        if ((m_uidToMCParticleMap.end() == parentIter) || (m_uidToMCParticleMap.end() == daughterIter))
-            continue;
+        MCParticleList daughterList;
+        for (MCParticleRelationMap::const_iterator relIter = range.first; relIter != range.second; ++relIter)
+        {
+            UidToMCParticleMap::const_iterator daughterIter = m_uidToMCParticleMap.find(relIter->second);
 
-        const StatusCode firstStatusCode(this->Modifiable(parentIter->second)->AddDaughter(daughterIter->second));
-        const StatusCode secondStatusCode(this->Modifiable(daughterIter->second)->AddParent(parentIter->second));
+            if ((m_uidToMCParticleMap.end() != daughterIter) && (daughterList.end() == std::find(daughterList.begin(), daughterList.end(), daughterIter->second)))
+                daughterList.push_back(daughterIter->second);
+        }
+        daughterList.sort(PointerLessThan<MCParticle>());
 
-        if (firstStatusCode != secondStatusCode)
-            return STATUS_CODE_FAILURE;
+        for (const MCParticle *const pDaughterMCParticle : daughterList)
+        {
+            const StatusCode firstStatusCode(this->Modifiable(pParentMCParticle)->AddDaughter(pDaughterMCParticle));
+            const StatusCode secondStatusCode(this->Modifiable(pDaughterMCParticle)->AddParent(pParentMCParticle));
 
-        if ((firstStatusCode != STATUS_CODE_SUCCESS) && (firstStatusCode != STATUS_CODE_ALREADY_PRESENT))
-            return firstStatusCode;
+            if (firstStatusCode != secondStatusCode)
+                return STATUS_CODE_FAILURE;
+
+            if ((firstStatusCode != STATUS_CODE_SUCCESS) && (firstStatusCode != STATUS_CODE_ALREADY_PRESENT))
+                return firstStatusCode;
+        }
     }
 
     return STATUS_CODE_SUCCESS;
@@ -244,8 +260,8 @@ StatusCode MCManager::RemoveAllMCParticleRelationships()
     if (m_nameToListMap.end() == inputIter)
         return STATUS_CODE_FAILURE;
 
-    for (MCParticleList::const_iterator iter = inputIter->second->begin(), iterEnd = inputIter->second->end(); iter != iterEnd; ++iter)
-        this->RemoveMCParticleRelationships(*iter);
+    for (const MCParticle *const pMCParticle : *inputIter->second)
+        this->RemoveMCParticleRelationships(pMCParticle);
 
     m_uidToMCParticleMap.clear();
     m_parentDaughterRelationMap.clear();
@@ -261,18 +277,18 @@ StatusCode MCManager::RemoveMCParticleRelationships(const MCParticle *const pMCP
 {
     const MCParticleList parentList(pMCParticle->GetParentList());
 
-    for (MCParticleList::const_iterator iter = parentList.begin(), iterEnd = parentList.end(); iter != iterEnd; ++iter)
+    for (const MCParticle *const pParentMCParticle : parentList)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(*iter)->RemoveDaughter(pMCParticle));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pMCParticle)->RemoveParent(*iter));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pParentMCParticle)->RemoveDaughter(pMCParticle));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pMCParticle)->RemoveParent(pParentMCParticle));
     }
 
     const MCParticleList daughterList(pMCParticle->GetDaughterList());
 
-    for (MCParticleList::const_iterator iter = daughterList.begin(), iterEnd = daughterList.end(); iter != iterEnd; ++iter)
+    for (const MCParticle *const pDaughterMCParticle : daughterList)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(*iter)->RemoveParent(pMCParticle));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pMCParticle)->RemoveDaughter(*iter));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pDaughterMCParticle)->RemoveParent(pMCParticle));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pMCParticle)->RemoveDaughter(pDaughterMCParticle));
     }
 
     return this->Modifiable(pMCParticle)->RemovePfoTarget();
@@ -319,39 +335,36 @@ StatusCode MCManager::CreateUidToPfoTargetsMap(UidToMCParticleWeightMap &uidToMC
     if (m_uidToMCParticleMap.empty())
         return STATUS_CODE_SUCCESS;
 
-    const bool shouldCollapseMCParticlesToPfoTarget(m_pPandora->GetSettings()->ShouldCollapseMCParticlesToPfoTarget());
+    const bool collapseToPfoTarget(m_pPandora->GetSettings()->ShouldCollapseMCParticlesToPfoTarget());
 
-    for (ObjectRelationMap::const_iterator relationIter = objectRelationMap.begin(), relationIterEnd = objectRelationMap.end();
-        relationIter != relationIterEnd; ++relationIter)
+    for (const ObjectRelationMap::value_type &relationEntry : objectRelationMap)
     {
-        const Uid objectUid(relationIter->first);
-        const UidToWeightMap &uidToWeightMap(relationIter->second);
+        MCParticleSet mcParticleSet;
 
-        for (UidToWeightMap::const_iterator weightIter = uidToWeightMap.begin(), weightIterEnd = uidToWeightMap.end();
-            weightIter != weightIterEnd; ++weightIter)
+        for (const UidToWeightMap::value_type &weightEntry : relationEntry.second)
         {
-            const Uid mcParticleUid(weightIter->first);
-            const float mcParticleWeight(weightIter->second);
-            UidToMCParticleMap::const_iterator mcParticleIter = m_uidToMCParticleMap.find(mcParticleUid);
+            UidToMCParticleMap::const_iterator mcParticleIter = m_uidToMCParticleMap.find(weightEntry.first);
 
-            if (m_uidToMCParticleMap.end() == mcParticleIter)
+            if (m_uidToMCParticleMap.end() != mcParticleIter)
+                mcParticleSet.insert(mcParticleIter->second);
+        }
+
+        if (mcParticleSet.empty())
+            continue;
+
+        MCParticleList mcParticleList(mcParticleSet.begin(), mcParticleSet.end());
+        mcParticleList.sort(PointerLessThan<MCParticle>());
+        MCParticleWeightMap &mcParticleWeightMap(uidToMCParticleWeightMap[relationEntry.first]);
+
+        for (const MCParticle *const pMCParticle : mcParticleList)
+        {
+            const float mcParticleWeight(relationEntry.second.at(pMCParticle->GetUid()));
+            const MCParticle *const pTargetMCParticle(!collapseToPfoTarget ? pMCParticle : pMCParticle->m_pPfoTarget);
+
+            if (!pTargetMCParticle)
                 continue;
 
-            const MCParticle *pMCParticle = NULL;
-
-            if (!shouldCollapseMCParticlesToPfoTarget)
-            {
-                pMCParticle = mcParticleIter->second;
-            }
-            else
-            {
-                pMCParticle = mcParticleIter->second->m_pPfoTarget;
-            }
-
-            if (pMCParticle == NULL)
-                continue;
-
-            uidToMCParticleWeightMap[objectUid][pMCParticle] += mcParticleWeight;
+            mcParticleWeightMap[pTargetMCParticle] += mcParticleWeight;
         }
     }
 

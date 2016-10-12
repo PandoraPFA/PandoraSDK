@@ -21,9 +21,9 @@ class MCParticleHelper
 {
 public:
     /**
-     *  @brief  Find the mc particle making the largest contribution to a specified calo hit or cluster
+     *  @brief  Find the mc particle making the largest contribution to a specified calo hit, track or cluster
      * 
-     *  @param  pT address of the calo hit or cluster to examine
+     *  @param  pT address of the calo hit, track or cluster to examine
      * 
      *  @return address of the main mc particle
      */

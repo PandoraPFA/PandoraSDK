@@ -10,6 +10,8 @@
 
 #include "Objects/CartesianVector.h"
 
+#include <iostream>
+
 namespace pandora
 {
 

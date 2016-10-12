@@ -41,7 +41,7 @@ Histogram::Histogram(const TiXmlHandle *const pXmlHandle, const std::string &xml
 {
     TiXmlElement *const pXmlElement(pXmlHandle->FirstChild(xmlElementName).Element());
 
-    if (NULL == pXmlElement)
+    if (!pXmlElement)
     {
         std::cout << "Construct Histogram from xml: cannot find xml element with name " << xmlElementName << std::endl;
         throw StatusCodeException(STATUS_CODE_NOT_FOUND);
@@ -247,9 +247,9 @@ void Histogram::Fill(const float valueX, const float weight)
 
 void Histogram::Scale(const float scaleFactor)
 {
-    for (HistogramMap::iterator iter = m_histogramMap.begin(), iterEnd = m_histogramMap.end(); iter != iterEnd; ++iter)
+    for (HistogramMap::value_type &mapEntry : m_histogramMap)
     {
-        iter->second = (iter->second * scaleFactor);
+        mapEntry.second = (mapEntry.second * scaleFactor);
     }
 }
 
@@ -313,7 +313,7 @@ TwoDHistogram::TwoDHistogram(const TiXmlHandle *const pXmlHandle, const std::str
 {
     TiXmlElement *const pXmlElement(pXmlHandle->FirstChild(xmlElementName).Element());
 
-    if (NULL == pXmlElement)
+    if (!pXmlElement)
     {
         std::cout << "Construct Histogram from xml: cannot find xml element with name " << xmlElementName << std::endl;
         throw StatusCodeException(STATUS_CODE_NOT_FOUND);
@@ -678,19 +678,19 @@ void TwoDHistogram::Fill(const float valueX, const float valueY, const float wei
 
 void TwoDHistogram::Scale(const float scaleFactor)
 {
-    for (TwoDHistogramMap::iterator iterX = m_xyHistogramMap.begin(), iterXEnd = m_xyHistogramMap.end(); iterX != iterXEnd; ++iterX)
+    for (TwoDHistogramMap::value_type &mapEntryX : m_xyHistogramMap)
     {
-        for (HistogramMap::iterator iterY = iterX->second.begin(), iterYEnd = iterX->second.end(); iterY != iterYEnd; ++iterY)
+        for (HistogramMap::value_type &mapEntryY : mapEntryX.second)
         {
-            iterY->second = (iterY->second * scaleFactor);
+            mapEntryY.second = (mapEntryY.second * scaleFactor);
         }
     }
 
-    for (TwoDHistogramMap::iterator iterY = m_yxHistogramMap.begin(), iterYEnd = m_yxHistogramMap.end(); iterY != iterYEnd; ++iterY)
+    for (TwoDHistogramMap::value_type &mapEntryY : m_yxHistogramMap)
     {
-        for (HistogramMap::iterator iterX = iterY->second.begin(), iterXEnd = iterY->second.end(); iterX != iterXEnd; ++iterX)
+        for (HistogramMap::value_type &mapEntryX : mapEntryY.second)
         {
-            iterX->second = (iterX->second * scaleFactor);
+            mapEntryX.second = (mapEntryX.second * scaleFactor);
         }
     }
 }

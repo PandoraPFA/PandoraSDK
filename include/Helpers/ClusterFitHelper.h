@@ -270,14 +270,6 @@ public:
      */
     static StatusCode FitPoints(ClusterFitPointList &clusterFitPointList, ClusterFitResult &clusterFitResult);
 
-    /**
-     *  @brief  Sort calo hits using the prescription applied to cluster fit points
-     *
-     *  @param  pLhs address of first calo hit
-     *  @param  pRhs address of second calo hit
-     */
-    static bool SortCaloHits(const CaloHit *const pLhs, const CaloHit *const pRhs);
-
 private:
     /**
      *  @brief  Perform linear fit to cluster fit points

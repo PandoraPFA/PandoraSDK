@@ -39,6 +39,13 @@ public:
     const std::string &GetType() const;
 
     /**
+     *  @brief  Get the instance name
+     * 
+     *  @return The instance name
+     */
+    const std::string &GetInstanceName() const;
+
+    /**
      *  @brief  Get the associated pandora instance
      * 
      *  @return the associated pandora instance
@@ -68,18 +75,20 @@ protected:
      * 
      *  @param  pPandora address of the pandora object that will run the process
      *  @param  type the process type
+     *  @param  instanceName the process instance name
      */
-    StatusCode RegisterDetails(const Pandora *const pPandora, const std::string &type);
+    StatusCode RegisterDetails(const Pandora *const pPandora, const std::string &type, const std::string &instanceName);
 
     const Pandora          *m_pPandora;             ///< The pandora object that will run the process
     std::string             m_type;                 ///< The process type
+    std::string             m_instanceName;         ///< The process instance name
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 inline Process::Process() :
-    m_pPandora(NULL)
+    m_pPandora(nullptr)
 {
 }
 
@@ -92,9 +101,16 @@ inline const std::string &Process::GetType() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+inline const std::string &Process::GetInstanceName() const
+{
+    return m_instanceName;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 inline const Pandora &Process::GetPandora() const
 {
-    if (NULL == m_pPandora)
+    if (!m_pPandora)
         throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
     return *m_pPandora;
@@ -115,13 +131,17 @@ inline Process::~Process()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline StatusCode Process::RegisterDetails(const Pandora *const pPandora, const std::string &type)
+inline StatusCode Process::RegisterDetails(const Pandora *const pPandora, const std::string &type, const std::string &instanceName)
 {
-    if ((NULL == pPandora) || (type.empty()))
-        return STATUS_CODE_FAILURE;
+    if (!pPandora || type.empty() || instanceName.empty())
+        return STATUS_CODE_INVALID_PARAMETER;
+
+    if (m_pPandora || !m_type.empty() || !m_instanceName.empty())
+        return STATUS_CODE_ALREADY_PRESENT;
 
     m_pPandora = pPandora;
     m_type = type;
+    m_instanceName = instanceName;
 
     return STATUS_CODE_SUCCESS;
 }

@@ -8,12 +8,10 @@
 #ifndef PANDORA_CALO_HIT_MANAGER_H
 #define PANDORA_CALO_HIT_MANAGER_H 1
 
-#include "Api/PandoraApi.h"
-#include "Api/PandoraContentApi.h"
-
 #include "Managers/InputObjectManager.h"
 #include "Managers/Metadata.h"
 
+#include "Pandora/ObjectCreation.h"
 #include "Pandora/PandoraInternal.h"
 
 namespace pandora
@@ -45,8 +43,8 @@ private:
      *  @param  pCaloHit to receive the address of the calo hit
      *  @param  factory the factory that performs the object allocation
      */
-    StatusCode Create(const PandoraApi::CaloHit::Parameters &parameters, const CaloHit *&pCaloHit,
-        const ObjectFactory<PandoraApi::CaloHit::Parameters, CaloHit> &factory);
+    StatusCode Create(const object_creation::CaloHit::Parameters &parameters, const CaloHit *&pCaloHit,
+        const ObjectFactory<object_creation::CaloHit::Parameters, object_creation::CaloHit::Object> &factory);
 
     /**
      *  @brief  Alter the metadata information stored in a calo hit
@@ -54,7 +52,7 @@ private:
      *  @param  pCaloHit address of the calo hit to modify
      *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
      */
-    StatusCode AlterMetadata(const CaloHit *const pCaloHit, const PandoraContentApi::CaloHit::Metadata &metadata) const;
+    StatusCode AlterMetadata(const CaloHit *const pCaloHit, const object_creation::CaloHit::Metadata &metadata) const;
 
     /**
      *  @brief  Is a calo hit, or a list of calo hits, available to add to a cluster
@@ -113,7 +111,7 @@ private:
      *  @param  factory to create the calo hit fragments
      */
     StatusCode FragmentCaloHit(const CaloHit *const pOriginalCaloHit, const float fraction1, const CaloHit *&pDaughterCaloHit1,
-        const CaloHit *&pDaughterCaloHit2, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory);
+        const CaloHit *&pDaughterCaloHit2, const ObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object> &factory);
 
     /**
      *  @brief  Merge two calo hit fragments, originally from the same parent hit, to form a new calo hit
@@ -124,7 +122,7 @@ private:
      *  @param  factory to create the merged calo hit
      */
     StatusCode MergeCaloHitFragments(const CaloHit *const pFragmentCaloHit1, const CaloHit *const pFragmentCaloHit2,
-        const CaloHit *&pMergedCaloHit, const ObjectFactory<PandoraContentApi::CaloHitFragment::Parameters, CaloHit> &factory);
+        const CaloHit *&pMergedCaloHit, const ObjectFactory<object_creation::CaloHitFragment::Parameters, object_creation::CaloHitFragment::Object> &factory);
 
     /**
      *  @brief  Whether a calo hit can be fragmented into two daughter calo hits with the specified energy division

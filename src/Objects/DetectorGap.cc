@@ -11,7 +11,14 @@
 namespace pandora
 {
 
-LineGap::LineGap(const PandoraApi::Geometry::LineGap::Parameters &parameters) :
+DetectorGap::~DetectorGap()
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+LineGap::LineGap(const object_creation::Geometry::LineGap::Parameters &parameters) :
     m_hitType(parameters.m_hitType.Get()),
     m_lineStartZ(parameters.m_lineStartZ.Get()),
     m_lineEndZ(parameters.m_lineEndZ.Get())
@@ -41,7 +48,7 @@ bool LineGap::IsInGap(const CartesianVector &positionVector, const HitType hitTy
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-BoxGap::BoxGap(const PandoraApi::Geometry::BoxGap::Parameters &parameters) :
+BoxGap::BoxGap(const object_creation::Geometry::BoxGap::Parameters &parameters) :
     m_vertex(parameters.m_vertex.Get()),
     m_side1(parameters.m_side1.Get()),
     m_side2(parameters.m_side2.Get()),
@@ -79,7 +86,7 @@ bool BoxGap::IsInGap(const CartesianVector &positionVector, const HitType hitTyp
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-ConcentricGap::ConcentricGap(const PandoraApi::Geometry::ConcentricGap::Parameters &parameters) :
+ConcentricGap::ConcentricGap(const object_creation::Geometry::ConcentricGap::Parameters &parameters) :
     m_minZCoordinate(parameters.m_minZCoordinate.Get()),
     m_maxZCoordinate(parameters.m_maxZCoordinate.Get()),
     m_innerRCoordinate(parameters.m_innerRCoordinate.Get()),

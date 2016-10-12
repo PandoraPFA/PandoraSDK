@@ -8,10 +8,9 @@
 #ifndef PANDORA_MC_MANAGER_H
 #define PANDORA_MC_MANAGER_H 1
 
-#include "Api/PandoraApi.h"
-
 #include "Managers/InputObjectManager.h"
 
+#include "Pandora/ObjectCreation.h"
 #include "Pandora/PandoraInternal.h"
 
 namespace pandora
@@ -43,8 +42,8 @@ private:
      *  @param  pMCParticle address of the mc particle
      *  @param  factory the factory that performs the object allocation
      */
-    StatusCode Create(const PandoraApi::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle,
-        const ObjectFactory<PandoraApi::MCParticle::Parameters, MCParticle> &factory);
+    StatusCode Create(const object_creation::MCParticle::Parameters &parameters, const MCParticle *&pMCParticle,
+        const ObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object> &factory);
 
     /**
      *  @brief  Erase all mc manager content
@@ -91,9 +90,9 @@ private:
      *  @brief  Apply mc pfo selection rules 
      *
      *  @param  mcRootParticle address of the mc root particle
-     *  @param  mcPfoList reference to list with all MCPFOs which have been selected so far
+     *  @param  mcPfoSet set of all MCPFOs selected so far
      */
-    StatusCode ApplyPfoSelectionRules(const MCParticle *const mcRootParticle, MCParticleList &mcPfoList) const;
+    StatusCode ApplyPfoSelectionRules(const MCParticle *const mcRootParticle, MCParticleSet &mcPfoSet) const;
 
     /**
      *  @brief  Set pfo target for a mc tree
@@ -135,9 +134,9 @@ private:
      */
     StatusCode RemoveMCParticleRelationships(const MCParticle *const pMCParticle) const;
 
-    typedef std::map<Uid, float> UidToWeightMap;
-    typedef std::map<Uid, UidToWeightMap> ObjectRelationMap;
-    typedef std::multimap<Uid, Uid> MCParticleRelationMap;
+    typedef std::unordered_map<Uid, float> UidToWeightMap;
+    typedef std::unordered_map<Uid, UidToWeightMap> ObjectRelationMap;
+    typedef std::unordered_multimap<Uid, Uid> MCParticleRelationMap;
 
     /**
      *  @brief  Set an object (e.g. calo hit or track) to mc particle relationship

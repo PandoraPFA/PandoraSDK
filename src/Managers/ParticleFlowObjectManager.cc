@@ -12,6 +12,8 @@
 
 #include "Pandora/ObjectFactory.h"
 
+#include <algorithm>
+
 namespace pandora
 {
 
@@ -30,10 +32,10 @@ ParticleFlowObjectManager::~ParticleFlowObjectManager()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObjectManager::Create(const PandoraContentApi::ParticleFlowObject::Parameters &parameters, const ParticleFlowObject *&pPfo,
-    const ObjectFactory<PandoraContentApi::ParticleFlowObject::Parameters, ParticleFlowObject> &factory)
+StatusCode ParticleFlowObjectManager::Create(const object_creation::ParticleFlowObject::Parameters &parameters, const ParticleFlowObject *&pPfo,
+    const ObjectFactory<object_creation::ParticleFlowObject::Parameters, object_creation::ParticleFlowObject::Object> &factory)
 {
-    pPfo = NULL;
+    pPfo = nullptr;
 
     try
     {
@@ -47,26 +49,24 @@ StatusCode ParticleFlowObjectManager::Create(const PandoraContentApi::ParticleFl
 
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pPfo));
 
-        if (NULL == pPfo)
+        if (!pPfo)
              throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        if (!iter->second->insert(pPfo).second)
-             throw StatusCodeException(STATUS_CODE_FAILURE);
-
+        iter->second->push_back(pPfo);
         return STATUS_CODE_SUCCESS;
     }
     catch (StatusCodeException &statusCodeException)
     {
         std::cout << "Failed to create particle flow object: " << statusCodeException.ToString() << std::endl;
         delete pPfo;
-        pPfo = NULL;
+        pPfo = nullptr;
         return statusCodeException.GetStatusCode();
     }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode ParticleFlowObjectManager::AlterMetadata(const ParticleFlowObject *const pPfo, const PandoraContentApi::ParticleFlowObject::Metadata &metadata) const
+StatusCode ParticleFlowObjectManager::AlterMetadata(const ParticleFlowObject *const pPfo, const object_creation::ParticleFlowObject::Metadata &metadata) const
 {
     return this->Modifiable(pPfo)->AlterMetadata(metadata);
 }

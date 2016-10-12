@@ -22,8 +22,8 @@ namespace pandora
 
 XmlFileWriter::XmlFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode) :
     FileWriter(pandora, fileName),
-    m_pContainerXmlElement(NULL),
-    m_pCurrentXmlElement(NULL)
+    m_pContainerXmlElement(nullptr),
+    m_pCurrentXmlElement(nullptr)
 {
     m_fileType = XML;
 
@@ -104,9 +104,9 @@ StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsMirroredInZ", pSubDetector->IsMirroredInZ()));
 
     const unsigned int nLayers(pSubDetector->GetNLayers());
-    const SubDetector::SubDetectorLayerList &subDetectorLayerList(pSubDetector->GetSubDetectorLayerList());
+    const SubDetector::SubDetectorLayerVector &subDetectorLayerVector(pSubDetector->GetSubDetectorLayerVector());
 
-    if (subDetectorLayerList.size() != nLayers)
+    if (subDetectorLayerVector.size() != nLayers)
         return STATUS_CODE_FAILURE;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("NLayers", nLayers));
@@ -117,9 +117,9 @@ StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector
 
         for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
         {
-            closestDistanceToIpString += TypeToString(subDetectorLayerList[iLayer].GetClosestDistanceToIp()) + " ";
-            nRadiationLengthsString += TypeToString(subDetectorLayerList[iLayer].GetNRadiationLengths()) + " ";
-            nInteractionLengthsString += TypeToString(subDetectorLayerList[iLayer].GetNInteractionLengths()) + " ";
+            closestDistanceToIpString += TypeToString(subDetectorLayerVector.at(iLayer).GetClosestDistanceToIp()) + " ";
+            nRadiationLengthsString += TypeToString(subDetectorLayerVector.at(iLayer).GetNRadiationLengths()) + " ";
+            nInteractionLengthsString += TypeToString(subDetectorLayerVector.at(iLayer).GetNInteractionLengths()) + " ";
         }
 
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ClosestDistanceToIp", closestDistanceToIpString));
@@ -128,7 +128,7 @@ StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector
     }
 
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
-    m_pCurrentXmlElement = NULL;
+    m_pCurrentXmlElement = nullptr;
 
     return STATUS_CODE_SUCCESS;
 }
@@ -140,16 +140,16 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
     if (GEOMETRY != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    const LineGap *pLineGap = NULL;
+    const LineGap *pLineGap(nullptr);
     pLineGap = dynamic_cast<const LineGap *>(pDetectorGap);
 
-    const BoxGap *pBoxGap = NULL;
+    const BoxGap *pBoxGap(nullptr);
     pBoxGap = dynamic_cast<const BoxGap *>(pDetectorGap);
 
-    const ConcentricGap *pConcentricGap = NULL;
+    const ConcentricGap *pConcentricGap(nullptr);
     pConcentricGap = dynamic_cast<const ConcentricGap *>(pDetectorGap);
 
-    if (NULL != pLineGap)
+    if (nullptr != pLineGap)
     {
         m_pCurrentXmlElement = new TiXmlElement("LineGap");
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Write(pLineGap, *this));
@@ -159,9 +159,9 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LineEndZ", pLineGap->GetLineEndZ()));
 
         m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
-        m_pCurrentXmlElement = NULL;
+        m_pCurrentXmlElement = nullptr;
     }
-    else if (NULL != pBoxGap)
+    else if (nullptr != pBoxGap)
     {
         m_pCurrentXmlElement = new TiXmlElement("BoxGap");
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBoxGapFactory->Write(pBoxGap, *this));
@@ -172,9 +172,9 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side3", pBoxGap->GetSide3()));
 
         m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
-        m_pCurrentXmlElement = NULL;
+        m_pCurrentXmlElement = nullptr;
     }
-    else if (NULL != pConcentricGap)
+    else if (nullptr != pConcentricGap)
     {
         m_pCurrentXmlElement = new TiXmlElement("ConcentricGap");
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pConcentricGapFactory->Write(pConcentricGap, *this));
@@ -189,7 +189,7 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterSymmetryOrder", pConcentricGap->GetOuterSymmetryOrder()));
 
         m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
-        m_pCurrentXmlElement = NULL;
+        m_pCurrentXmlElement = nullptr;
     }
     else
     {
@@ -227,12 +227,12 @@ StatusCode XmlFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("HitRegion", pCaloHit->GetHitRegion()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Layer", pCaloHit->GetLayer()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsInOuterSamplingLayer", pCaloHit->IsInOuterSamplingLayer()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ParentCaloHitAddress", pCaloHit->GetParentCaloHitAddress()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ParentCaloHitAddress", pCaloHit->GetParentAddress()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CellSize0", pCaloHit->GetCellSize0()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CellSize1", pCaloHit->GetCellSize1()));
 
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
-    m_pCurrentXmlElement = NULL;
+    m_pCurrentXmlElement = nullptr;
 
     return STATUS_CODE_SUCCESS;
 }
@@ -261,10 +261,10 @@ StatusCode XmlFileWriter::WriteTrack(const Track *const pTrack)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsProjectedToEndCap", pTrack->IsProjectedToEndCap()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CanFormPfo", pTrack->CanFormPfo()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CanFormClusterlessPfo", pTrack->CanFormClusterlessPfo()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ParentTrackAddress", pTrack->GetParentTrackAddress()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ParentTrackAddress", pTrack->GetParentAddress()));
 
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
-    m_pCurrentXmlElement = NULL;
+    m_pCurrentXmlElement = nullptr;
 
     return STATUS_CODE_SUCCESS;
 }
@@ -288,7 +288,7 @@ StatusCode XmlFileWriter::WriteMCParticle(const MCParticle *const pMCParticle)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Uid", pMCParticle->GetUid()));
 
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
-    m_pCurrentXmlElement = NULL;
+    m_pCurrentXmlElement = nullptr;
 
     return STATUS_CODE_SUCCESS;
 }
@@ -308,7 +308,7 @@ StatusCode XmlFileWriter::WriteRelationship(const RelationshipId relationshipId,
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Weight", weight));
 
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
-    m_pCurrentXmlElement = NULL;
+    m_pCurrentXmlElement = nullptr;
 
     return STATUS_CODE_SUCCESS;
 }
