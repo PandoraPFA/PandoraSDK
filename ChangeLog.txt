@@ -1,4 +1,17 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
+TAG v03-00-00
+--------------------------------------------------------------------------------------------------------------------------------------------
+Switched managed container from std::unordered_set to std::list.
+Improved separation of api, objects and object creation mechanics.
+Altered names by which algorithm and tools are stored/accessed, providing well-defined names for temporary object lists.
+Added particle id functionality for pfos, in addition to clusters.
+Changes to object interfaces for improved consistency.
+Prefer range-based for loops and use of nullptr.
+Checked all use of unordered containers.
+CMake: No longer any option to proceed without support for specified cxx flags.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------
 TAG v02-03-02
 --------------------------------------------------------------------------------------------------------------------------------------------
 Add sorting functionality for ClusterFitPoints and use in linear fits.
