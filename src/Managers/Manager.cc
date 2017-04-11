@@ -14,14 +14,10 @@ namespace pandora
 {
 
 template<typename T>
-const std::string Manager<T>::NULL_LIST_NAME = "NullList";
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template<typename T>
 Manager<T>::Manager(const Pandora *const pPandora) :
-    m_currentListName(NULL_LIST_NAME),
-    m_pPandora(pPandora)
+    m_nullListName("NullList"),
+    m_pPandora(pPandora),
+    m_currentListName(m_nullListName)
 {
 }
 
@@ -137,7 +133,7 @@ StatusCode Manager<T>::ReplaceCurrentAndAlgorithmInputLists(const Algorithm *con
 template<typename T>
 StatusCode Manager<T>::DropCurrentList(const Algorithm *const pAlgorithm)
 {
-    return this->ReplaceCurrentAndAlgorithmInputLists(pAlgorithm, NULL_LIST_NAME);
+    return this->ReplaceCurrentAndAlgorithmInputLists(pAlgorithm, m_nullListName);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -228,7 +224,7 @@ StatusCode Manager<T>::EraseAllContent()
     for (const typename NameToListMap::value_type &mapEntry : m_nameToListMap)
         delete mapEntry.second;
 
-    m_currentListName = NULL_LIST_NAME;
+    m_currentListName = m_nullListName;
     m_nameToListMap.clear();
     m_savedLists.clear();
 
@@ -243,8 +239,8 @@ StatusCode Manager<T>::CreateInitialLists()
     if (!m_nameToListMap.empty() || !m_savedLists.empty())
         return STATUS_CODE_NOT_ALLOWED;
 
-    m_nameToListMap[NULL_LIST_NAME] = new ObjectList;
-    m_savedLists.insert(NULL_LIST_NAME);
+    m_nameToListMap[m_nullListName] = new ObjectList;
+    m_savedLists.insert(m_nullListName);
 
     return STATUS_CODE_SUCCESS;
 }

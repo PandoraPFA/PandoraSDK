@@ -21,13 +21,9 @@ namespace pandora
 {
 
 template<typename T>
-const std::string InputObjectManager<T>::INPUT_LIST_NAME = "Input";
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template<typename T>
 InputObjectManager<T>::InputObjectManager(const Pandora *const pPandora) :
-    Manager<T>(pPandora)
+    Manager<T>(pPandora),
+    m_inputListName("Input")
 {
 }
 
@@ -43,7 +39,7 @@ InputObjectManager<T>::~InputObjectManager()
 template<typename T>
 StatusCode InputObjectManager<T>::CreateInputList()
 {
-    typename Manager<T>::NameToListMap::iterator existingListIter = Manager<T>::m_nameToListMap.find(INPUT_LIST_NAME);
+    typename Manager<T>::NameToListMap::iterator existingListIter = Manager<T>::m_nameToListMap.find(m_inputListName);
 
     if (Manager<T>::m_nameToListMap.end() == existingListIter)
         return STATUS_CODE_FAILURE;
@@ -51,7 +47,7 @@ StatusCode InputObjectManager<T>::CreateInputList()
     // ATTN Defined ordering of input objects. After this, algorithms must control object sorting.
     existingListIter->second->sort(PointerLessThan<T>());
 
-    Manager<T>::m_currentListName = INPUT_LIST_NAME;
+    Manager<T>::m_currentListName = m_inputListName;
     return STATUS_CODE_SUCCESS;
 }
 
@@ -94,7 +90,7 @@ StatusCode InputObjectManager<T>::SaveList(const std::string &listName, const Ob
 template<typename T>
 StatusCode InputObjectManager<T>::AddObjectsToList(const std::string &listName, const ObjectList &objectList)
 {
-    if (Manager<T>::NULL_LIST_NAME == listName)
+    if (Manager<T>::m_nullListName == listName)
         return STATUS_CODE_NOT_ALLOWED;
 
     typename Manager<T>::NameToListMap::iterator listIter = Manager<T>::m_nameToListMap.find(listName);
@@ -153,7 +149,7 @@ StatusCode InputObjectManager<T>::RemoveObjectsFromList(const std::string &listN
 template<typename T>
 StatusCode InputObjectManager<T>::EraseAllContent()
 {
-    typename Manager<T>::NameToListMap::const_iterator inputIter = Manager<T>::m_nameToListMap.find(INPUT_LIST_NAME);
+    typename Manager<T>::NameToListMap::const_iterator inputIter = Manager<T>::m_nameToListMap.find(m_inputListName);
 
     if (Manager<T>::m_nameToListMap.end() == inputIter)
     {
@@ -174,8 +170,8 @@ template<typename T>
 StatusCode InputObjectManager<T>::CreateInitialLists()
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, Manager<T>::CreateInitialLists());
-    Manager<T>::m_nameToListMap[INPUT_LIST_NAME] = new ObjectList;
-    Manager<T>::m_savedLists.insert(INPUT_LIST_NAME);
+    Manager<T>::m_nameToListMap[m_inputListName] = new ObjectList;
+    Manager<T>::m_savedLists.insert(m_inputListName);
 
     return STATUS_CODE_SUCCESS;
 }

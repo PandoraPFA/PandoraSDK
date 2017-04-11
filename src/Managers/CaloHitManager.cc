@@ -50,7 +50,7 @@ StatusCode CaloHitManager::Create(const object_creation::CaloHit::Parameters &pa
     {
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pCaloHit));
 
-        NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
+        NameToListMap::iterator inputIter = m_nameToListMap.find(m_inputListName);
 
         if (!pCaloHit || (m_nameToListMap.end() == inputIter))
             throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -172,7 +172,7 @@ StatusCode CaloHitManager::MatchCaloHitsToMCPfoTargets(const UidToMCParticleWeig
     if (caloHitToPfoTargetsMap.empty())
         return STATUS_CODE_SUCCESS;
 
-    NameToListMap::const_iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
+    NameToListMap::const_iterator inputIter = m_nameToListMap.find(m_inputListName);
 
     if (m_nameToListMap.end() == inputIter)
         return STATUS_CODE_FAILURE;
@@ -194,7 +194,7 @@ StatusCode CaloHitManager::MatchCaloHitsToMCPfoTargets(const UidToMCParticleWeig
 
 StatusCode CaloHitManager::RemoveAllMCParticleRelationships()
 {
-    NameToListMap::const_iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
+    NameToListMap::const_iterator inputIter = m_nameToListMap.find(m_inputListName);
 
     if (m_nameToListMap.end() == inputIter)
         return STATUS_CODE_FAILURE;

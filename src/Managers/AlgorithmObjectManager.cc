@@ -96,7 +96,7 @@ template<typename T>
 StatusCode AlgorithmObjectManager<T>::MoveObjectsBetweenLists(const std::string &targetListName, const std::string &sourceListName,
     const ObjectList *const pObjectSubset)
 {
-    if (Manager<T>::NULL_LIST_NAME == targetListName)
+    if (Manager<T>::m_nullListName == targetListName)
         return STATUS_CODE_NOT_ALLOWED;
 
     typename Manager<T>::NameToListMap::iterator sourceListIter = Manager<T>::m_nameToListMap.find(sourceListName);
