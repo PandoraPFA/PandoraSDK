@@ -42,7 +42,7 @@ StatusCode TrackManager::Create(const object_creation::Track::Parameters &parame
     {
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pTrack));
 
-        NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
+        NameToListMap::iterator inputIter = m_nameToListMap.find(m_inputListName);
 
         if (!pTrack || (m_nameToListMap.end() == inputIter))
             throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -114,7 +114,7 @@ StatusCode TrackManager::MatchTracksToMCPfoTargets(const UidToMCParticleWeightMa
     if (trackToPfoTargetsMap.empty())
         return STATUS_CODE_SUCCESS;
 
-    NameToListMap::const_iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
+    NameToListMap::const_iterator inputIter = m_nameToListMap.find(m_inputListName);
 
     if (m_nameToListMap.end() == inputIter)
         return STATUS_CODE_FAILURE;
@@ -136,7 +136,7 @@ StatusCode TrackManager::MatchTracksToMCPfoTargets(const UidToMCParticleWeightMa
 
 StatusCode TrackManager::RemoveAllMCParticleRelationships()
 {
-    NameToListMap::const_iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
+    NameToListMap::const_iterator inputIter = m_nameToListMap.find(m_inputListName);
 
     if (m_nameToListMap.end() == inputIter)
         return STATUS_CODE_FAILURE;
@@ -183,7 +183,7 @@ StatusCode TrackManager::AddParentDaughterAssociations() const
         return STATUS_CODE_SUCCESS;
 
     const TrackList *pInputList(nullptr);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetList(INPUT_LIST_NAME, pInputList));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetList(m_inputListName, pInputList));
 
     for (const Track *const pParentTrack : *pInputList)
     {
@@ -223,7 +223,7 @@ StatusCode TrackManager::AddSiblingAssociations() const
         return STATUS_CODE_SUCCESS;
 
     const TrackList *pInputList(nullptr);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetList(INPUT_LIST_NAME, pInputList));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetList(m_inputListName, pInputList));
 
     for (const Track *const pTrack : *pInputList)
     {
@@ -273,7 +273,7 @@ StatusCode TrackManager::RemoveAssociatedCluster(const Track *const pTrack, cons
 
 StatusCode TrackManager::RemoveAllClusterAssociations() const
 {
-    NameToListMap::const_iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
+    NameToListMap::const_iterator inputIter = m_nameToListMap.find(m_inputListName);
 
     if (m_nameToListMap.end() == inputIter)
         return STATUS_CODE_FAILURE;

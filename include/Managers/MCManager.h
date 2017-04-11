@@ -157,12 +157,12 @@ private:
      */
     StatusCode CreateUidToPfoTargetsMap(UidToMCParticleWeightMap &uidToMCParticleWeightMap, const ObjectRelationMap &objectRelationMap) const;
 
+    const std::string               m_selectedListName;                 ///< The name of the selected list
+
     UidToMCParticleMap              m_uidToMCParticleMap;               ///< The uid to mc particle map
     MCParticleRelationMap           m_parentDaughterRelationMap;        ///< The mc particle parent-daughter relation map
     ObjectRelationMap               m_caloHitToMCParticleMap;           ///< The calo hit to mc particle relation map
     ObjectRelationMap               m_trackToMCParticleMap;             ///< The track to mc particle relation map
-
-    static const std::string        SELECTED_LIST_NAME;                 ///< The name of the input list
 
     friend class PandoraApiImpl;
     friend class PandoraContentApiImpl;

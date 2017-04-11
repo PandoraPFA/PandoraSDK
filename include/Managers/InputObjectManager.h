@@ -86,7 +86,7 @@ protected:
      */
     virtual StatusCode CreateInitialLists();
 
-    static const std::string        INPUT_LIST_NAME;                    ///< The name of the input list
+    const std::string               m_inputListName;                    ///< The name of the input list
 };
 
 } // namespace pandora

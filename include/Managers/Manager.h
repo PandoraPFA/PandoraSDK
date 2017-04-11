@@ -161,6 +161,9 @@ protected:
         unsigned int                m_numberOfListsCreated;             ///< The number of lists created by the algorithm
     };
 
+    const std::string               m_nullListName;                     ///< The name of the default empty (NULL) list
+    const Pandora *const            m_pPandora;                         ///< The associated pandora object
+
     typedef std::map<std::string, ObjectList *> NameToListMap;
     typedef std::unordered_map<const Algorithm *, AlgorithmInfo> AlgorithmInfoMap;
 
@@ -169,9 +172,6 @@ protected:
 
     std::string                     m_currentListName;                  ///< The name of the current list
     StringSet                       m_savedLists;                       ///< The set of saved lists
-    static const std::string        NULL_LIST_NAME;                     ///< The name of the default empty (NULL) list
-
-    const Pandora *const            m_pPandora;                         ///< The associated pandora object
 };
 
 } // namespace pandora

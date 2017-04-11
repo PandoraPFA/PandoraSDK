@@ -21,12 +21,9 @@
 namespace pandora
 {
 
-const std::string MCManager::SELECTED_LIST_NAME = "Selected";
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 MCManager::MCManager(const Pandora *const pPandora) :
-    InputObjectManager<MCParticle>(pPandora)
+    InputObjectManager<MCParticle>(pPandora),
+    m_selectedListName("Selected")
 {
     PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateInitialLists());
 }
@@ -49,7 +46,7 @@ StatusCode MCManager::Create(const object_creation::MCParticle::Parameters &para
     {
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pMCParticle));
 
-        NameToListMap::iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
+        NameToListMap::iterator inputIter = m_nameToListMap.find(m_inputListName);
 
         if (!pMCParticle || (m_nameToListMap.end() == inputIter))
             throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -94,7 +91,7 @@ StatusCode MCManager::SetMCParentDaughterRelationship(const Uid parentUid, const
 
 StatusCode MCManager::IdentifyPfoTargets()
 {
-    NameToListMap::const_iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
+    NameToListMap::const_iterator inputIter = m_nameToListMap.find(m_inputListName);
 
     if (m_nameToListMap.end() == inputIter)
         return STATUS_CODE_FAILURE;
@@ -115,12 +112,12 @@ StatusCode MCManager::IdentifyPfoTargets()
 StatusCode MCManager::SelectPfoTargets()
 {
     // Check for presence of input list and remove any existing selected list
-    NameToListMap::const_iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
+    NameToListMap::const_iterator inputIter = m_nameToListMap.find(m_inputListName);
 
     if (m_nameToListMap.end() == inputIter)
         return STATUS_CODE_FAILURE;
 
-    NameToListMap::iterator selectedIter = m_nameToListMap.find(SELECTED_LIST_NAME);
+    NameToListMap::iterator selectedIter = m_nameToListMap.find(m_selectedListName);
 
     if (m_nameToListMap.end() != selectedIter)
     {
@@ -149,8 +146,8 @@ StatusCode MCManager::SelectPfoTargets()
     }
 
     // Save selected pfo target list
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SaveList(SELECTED_LIST_NAME, selectedMCPfoList));
-    m_currentListName = SELECTED_LIST_NAME;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SaveList(m_selectedListName, selectedMCPfoList));
+    m_currentListName = m_selectedListName;
 
     return STATUS_CODE_SUCCESS;
 }
@@ -219,7 +216,7 @@ StatusCode MCManager::AddMCParticleRelationships() const
         return STATUS_CODE_SUCCESS;
 
     const MCParticleList *pInputList(nullptr);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetList(INPUT_LIST_NAME, pInputList));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetList(m_inputListName, pInputList));
 
     for (const MCParticle *const pParentMCParticle : *pInputList)
     {
@@ -255,7 +252,7 @@ StatusCode MCManager::AddMCParticleRelationships() const
 
 StatusCode MCManager::RemoveAllMCParticleRelationships()
 {
-    NameToListMap::const_iterator inputIter = m_nameToListMap.find(INPUT_LIST_NAME);
+    NameToListMap::const_iterator inputIter = m_nameToListMap.find(m_inputListName);
 
     if (m_nameToListMap.end() == inputIter)
         return STATUS_CODE_FAILURE;
