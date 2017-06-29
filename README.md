@@ -1,5 +1,6 @@
 # PandoraSDK
 [![Build Status](https://travis-ci.org/PandoraPFA/PandoraSDK.svg?branch=master)](https://travis-ci.org/PandoraPFA/PandoraSDK)
+[![Coverity Scan Build Status](https://scan.coverity.com/projects/13053/badge.svg)](https://scan.coverity.com/projects/pandorapfa-pandorasdk)
 
 Pandora Software Development Kit for pattern-recognition algorithms
 
