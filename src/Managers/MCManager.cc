@@ -121,8 +121,9 @@ StatusCode MCManager::SelectPfoTargets()
 
     if (m_nameToListMap.end() != selectedIter)
     {
-        delete selectedIter->second;
-        m_nameToListMap.erase(selectedIter);
+        ObjectList *const pObjectList(selectedIter->second);
+        selectedIter = m_nameToListMap.erase(selectedIter);
+        delete pObjectList;
     }
 
     // Strip down mc particles and relationships to just those of pfo targets, if specified

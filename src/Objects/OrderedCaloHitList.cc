@@ -191,12 +191,12 @@ StatusCode OrderedCaloHitList::Remove(const CaloHit *const pCaloHit, const unsig
     if (listIter->second->end() == caloHitIter)
         return STATUS_CODE_NOT_FOUND;
 
-    listIter->second->erase(caloHitIter);
+    caloHitIter = listIter->second->erase(caloHitIter);
 
     if (listIter->second->empty())
     {
         delete listIter->second;
-        m_theList.erase(listIter);
+        listIter = m_theList.erase(listIter);
     }
 
     return STATUS_CODE_SUCCESS;

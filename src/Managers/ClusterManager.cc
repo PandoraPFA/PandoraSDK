@@ -155,8 +155,8 @@ StatusCode ClusterManager::MergeAndDeleteClusters(const Cluster *const pClusterT
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pClusterToEnlarge)->AddHitsFromSecondCluster(pClusterToDelete));
 
+    clusterToDeleteIter = deleteListIter->second->erase(clusterToDeleteIter);
     delete pClusterToDelete;
-    deleteListIter->second->erase(clusterToDeleteIter);
 
     return STATUS_CODE_SUCCESS;
 }

@@ -142,6 +142,9 @@ StatusCode CaloHitMetadata::Update(const CaloHitReplacement &caloHitReplacement)
             return STATUS_CODE_ALREADY_PRESENT;
     }
 
+    if (m_pCaloHitList == &caloHitReplacement.m_oldCaloHits)
+        return STATUS_CODE_FAILURE;
+
     for (const CaloHit *const pCaloHit : caloHitReplacement.m_oldCaloHits)
     {
         CaloHitList::iterator listIter = std::find(m_pCaloHitList->begin(), m_pCaloHitList->end(), pCaloHit);
@@ -149,14 +152,14 @@ StatusCode CaloHitMetadata::Update(const CaloHitReplacement &caloHitReplacement)
         if (m_pCaloHitList->end() == listIter)
             return STATUS_CODE_FAILURE;
 
-        m_pCaloHitList->erase(listIter);
+        listIter = m_pCaloHitList->erase(listIter);
 
         CaloHitUsageMap::iterator mapIter = m_caloHitUsageMap.find(pCaloHit);
 
         if (m_caloHitUsageMap.end() == mapIter)
             return STATUS_CODE_FAILURE;
 
-        m_caloHitUsageMap.erase(mapIter);
+        mapIter = m_caloHitUsageMap.erase(mapIter);
     }
 
     m_caloHitReplacementList.push_back(new CaloHitReplacement(caloHitReplacement));
@@ -222,7 +225,7 @@ StatusCode ReclusterMetadata::ExtractCaloHitMetadata(const std::string &recluste
         return STATUS_CODE_FAILURE;
 
     pCaloHitMetaData = iter->second;
-    m_nameToMetadataMap.erase(iter);
+    iter = m_nameToMetadataMap.erase(iter);
 
     return STATUS_CODE_SUCCESS;
 }

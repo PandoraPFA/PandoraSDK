@@ -138,7 +138,7 @@ StatusCode InputObjectManager<T>::RemoveObjectsFromList(const std::string &listN
         typename ObjectList::iterator savedObjectIter = std::find(pSavedList->begin(), pSavedList->end(), pT);
 
         if (pSavedList->end() != savedObjectIter)
-            pSavedList->erase(savedObjectIter);
+            savedObjectIter = pSavedList->erase(savedObjectIter);
     }
 
     return STATUS_CODE_SUCCESS;

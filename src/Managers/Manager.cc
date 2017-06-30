@@ -192,15 +192,16 @@ StatusCode Manager<T>::ResetAlgorithmInfo(const Algorithm *const pAlgorithm, boo
         if (m_nameToListMap.end() == iter)
             return STATUS_CODE_FAILURE;
 
-        delete iter->second;
-        m_nameToListMap.erase(iter);
+        ObjectList *const pObjectList(iter->second);
+        iter = m_nameToListMap.erase(iter);
+        delete pObjectList;
     }
 
     algorithmIter->second.m_temporaryListNames.clear();
     m_currentListName = algorithmIter->second.m_parentListName;
 
     if (isAlgorithmFinished)
-        m_algorithmInfoMap.erase(algorithmIter);
+        algorithmIter = m_algorithmInfoMap.erase(algorithmIter);
 
     return STATUS_CODE_SUCCESS;
 }

@@ -140,7 +140,7 @@ StatusCode AlgorithmObjectManager<T>::MoveObjectsBetweenLists(const std::string 
                 return STATUS_CODE_ALREADY_PRESENT;
 
             targetListIter->second->push_back(pT);
-            sourceListIter->second->erase(objectIter);
+            objectIter = sourceListIter->second->erase(objectIter);
         }
     }
 
@@ -176,8 +176,8 @@ StatusCode AlgorithmObjectManager<T>::DeleteObject(const T *const pT, const std:
     if (listIter->second->end() == deletionIter)
         return STATUS_CODE_NOT_FOUND;
 
+    deletionIter = listIter->second->erase(deletionIter);
     delete pT;
-    listIter->second->erase(deletionIter);
 
     return STATUS_CODE_SUCCESS;
 }
@@ -202,8 +202,8 @@ StatusCode AlgorithmObjectManager<T>::DeleteObjects(const ObjectList &objectList
         if (listIter->second->end() == deletionIter)
             return STATUS_CODE_NOT_FOUND;
 
+        deletionIter = listIter->second->erase(deletionIter);
         delete pT;
-        listIter->second->erase(deletionIter);
     }
 
     return STATUS_CODE_SUCCESS;

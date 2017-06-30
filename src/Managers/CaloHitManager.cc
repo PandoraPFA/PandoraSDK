@@ -447,6 +447,9 @@ StatusCode CaloHitManager::Update(CaloHitList *const pCaloHitList, const CaloHit
     if (caloHitReplacement.m_newCaloHits.empty() || caloHitReplacement.m_oldCaloHits.empty())
         return STATUS_CODE_NOT_INITIALIZED;
 
+    if (pCaloHitList == &caloHitReplacement.m_oldCaloHits)
+        return STATUS_CODE_FAILURE;
+
     bool replacementFound(false), allReplacementsFound(true);
 
     for (const CaloHit *const pCaloHit : caloHitReplacement.m_oldCaloHits)
@@ -455,7 +458,7 @@ StatusCode CaloHitManager::Update(CaloHitList *const pCaloHitList, const CaloHit
 
         if (pCaloHitList->end() != listIter)
         {
-            pCaloHitList->erase(listIter);
+            listIter = pCaloHitList->erase(listIter);
             replacementFound = true;
             continue;
         }

@@ -37,7 +37,10 @@ Histogram::Histogram(const unsigned int nBinsX, const float xLow, const float xH
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-Histogram::Histogram(const TiXmlHandle *const pXmlHandle, const std::string &xmlElementName)
+Histogram::Histogram(const TiXmlHandle *const pXmlHandle, const std::string &xmlElementName) :
+    m_nBinsX(0),
+    m_xLow(0.f),
+    m_xHigh(0.f)
 {
     TiXmlElement *const pXmlElement(pXmlHandle->FirstChild(xmlElementName).Element());
 
@@ -309,7 +312,13 @@ TwoDHistogram::TwoDHistogram(const unsigned int nBinsX, const float xLow, const 
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-TwoDHistogram::TwoDHistogram(const TiXmlHandle *const pXmlHandle, const std::string &xmlElementName)
+TwoDHistogram::TwoDHistogram(const TiXmlHandle *const pXmlHandle, const std::string &xmlElementName) :
+    m_nBinsX(0),
+    m_xLow(0.f),
+    m_xHigh(0.f),
+    m_nBinsY(0),
+    m_yLow(0.f),
+    m_yHigh(0.f)
 {
     TiXmlElement *const pXmlElement(pXmlHandle->FirstChild(xmlElementName).Element());
 
