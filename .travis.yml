@@ -37,7 +37,7 @@ script:
         docker exec -it pandora /bin/bash -c "cd /pandora/package && source /pandora/build_pandora_sdk.sh";
     fi
   - if [[ "${COVERITY_BUILD}" == true ]]; then
-      curl --form token=${COVERITY_SCAN_TOKEN} --form email=marshall@hep.phy.cam.ac.uk --form file=@build/coverity_build.tgz --form version="master" --form description="${COVERITY_DESC}" https://scan.coverity.com/builds?project=${COVERITY_REPO};
+      curl --form token=${COVERITY_SCAN_TOKEN} --form email=${COVERITY_TARGET_EMAIL} --form file=@build/coverity_build.tgz --form version="master" --form description="${COVERITY_DESC}" https://scan.coverity.com/builds?project=${COVERITY_REPO};
     fi
 
 notifications:
