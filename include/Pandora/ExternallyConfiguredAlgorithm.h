@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/include/Pandora/ExternallyConfiguredAlgorithm.h
- * 
+ *
  *  @brief  Header file for the externally configured algorithm class.
- * 
+ *
  *  $Log: $
  */
 #ifndef PANDORA_EXTERNALLY_CONFIGURED_ALGORITHM_H
@@ -10,6 +10,7 @@
 
 #include "Pandora/Algorithm.h"
 
+#include <map>
 #include <unordered_map>
 
 namespace pandora
@@ -44,7 +45,7 @@ public:
          */
         void RegisterParameterAccessAttempt();
 
-        unsigned int m_nParameterAccessAttempts;    ///< The number of attempts made (by algorithm instances) to access the external parameters
+        unsigned int m_nParameterAccessAttempts;            ///< The number of attempts made to access the external parameters
 
         friend class ExternallyConfiguredAlgorithm;
     };
@@ -55,30 +56,29 @@ public:
     virtual ~ExternallyConfiguredAlgorithm();
 
     /**
-     *  @brief  Set the external parameters associated with algorithm instances created by a given Pandora instance
-     * 
+     *  @brief  Set the external parameters associated with an algorithm instance of a specific type, created by the given Pandora instance
+     *
      *  @param  pandora the pandora instance
+     *  @param  algorithmType the algorithm type
      *  @param  pExternalParameters the address of the external parameters instance
-     * 
-     *  @return status code
      */
-    static StatusCode SetExternalParameters(const Pandora &pandora, ExternalParameters *const pExternalParameters);
+    static StatusCode SetExternalParameters(const Pandora &pandora, const std::string &algorithmType, ExternalParameters *const pExternalParameters);
 
 protected:
     /**
      *  @brief  Whether external parameters are present
-     * 
+     *
      *  @param  pandora the pandora instance
-     * 
+     *
      *  @return boolean
      */
     bool ExternalParametersPresent() const;
 
     /**
      *  @brief  Get the external parameters associated with algorithm instances created by a given Pandora instance
-     * 
+     *
      *  @param  pandora the pandora instance
-     * 
+     *
      *  @return the address of the external parameters
      */
     ExternalParameters *GetExternalParameters() const;
@@ -88,7 +88,8 @@ protected:
      */
     void RegisterParameterAccessAttempt();
 
-    typedef std::unordered_map<const Pandora*, ExternalParameters*> ExternalParametersMap;
+    typedef std::map<const std::string, ExternalParameters*> AlgTypeToParametersMap;
+    typedef std::unordered_map<const Pandora*, AlgTypeToParametersMap> ExternalParametersMap;
 
     static ExternalParametersMap m_externalParametersMap;   ///< The external parameters map
 };
