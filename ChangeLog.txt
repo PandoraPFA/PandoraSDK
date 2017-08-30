@@ -1,4 +1,11 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
+TAG v03-01-00
+--------------------------------------------------------------------------------------------------------------------------------------------
+Added ExternallyConfigured algorithm, offering extended configuration functionality for single instances of a given algorithm type per Pandora instance.
+Made external parameter functionality availability in event reading algorithm. Added ability to read lists of event files and terminate when last event reached.
+Added StopProcessingException.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
 TAG v03-00-02
 --------------------------------------------------------------------------------------------------------------------------------------------
 Selected license: GPLv3.
