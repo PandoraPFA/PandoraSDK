@@ -58,14 +58,10 @@ ExternallyConfiguredAlgorithm::ExternalParameters *ExternallyConfiguredAlgorithm
     if (!this->ExternalParametersPresent())
         throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
-    return m_externalParametersMap.at(&(this->GetPandora())).at(this->GetType());
-}
+    ExternalParameters *const pExternalParameters(m_externalParametersMap.at(&(this->GetPandora())).at(this->GetType()));
+    pExternalParameters->RegisterParameterAccessAttempt();
 
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void ExternallyConfiguredAlgorithm::RegisterParameterAccessAttempt()
-{
-    ExternallyConfiguredAlgorithm::GetExternalParameters()->RegisterParameterAccessAttempt();
+    return pExternalParameters;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -18,7 +18,8 @@ namespace pandora
 
 /**
  *  @brief  Externally configured algorithm class. Provides ability for external specification of algorithm-defined parameter blocks.
- *          A single algorithm instance per Pandora instance is currently enforced.
+ *          A single call to GetExternalParameters per algorithm type, per Pandora instance is enforced to prevent misuse.
+ *          In the case of multiple instances of a given algorithm type, must revert to standard xml-based configuration.
  */
 class ExternallyConfiguredAlgorithm : public Algorithm
 {
@@ -75,18 +76,14 @@ protected:
     bool ExternalParametersPresent() const;
 
     /**
-     *  @brief  Get the external parameters associated with algorithm instances created by a given Pandora instance
+     *  @brief  Get the external parameters associated with algorithm instances created by a given Pandora instance.
+     *          A single call to this function per algorithm type, per Pandora instance is enforced to prevent misuse.
      *
      *  @param  pandora the pandora instance
      *
      *  @return the address of the external parameters
      */
     ExternalParameters *GetExternalParameters() const;
-
-    /**
-     *  @brief  Register an attempt to access the external parameters during algorithm configuration
-     */
-    void RegisterParameterAccessAttempt();
 
     typedef std::map<const std::string, ExternalParameters*> AlgTypeToParametersMap;
     typedef std::unordered_map<const Pandora*, AlgTypeToParametersMap> ExternalParametersMap;
