@@ -11,8 +11,8 @@ project(PandoraSDK)
 
 # project version
 set(${PROJECT_NAME}_VERSION_MAJOR 03)
-set(${PROJECT_NAME}_VERSION_MINOR 00)
-set(${PROJECT_NAME}_VERSION_PATCH 02)
+set(${PROJECT_NAME}_VERSION_MINOR 01)
+set(${PROJECT_NAME}_VERSION_PATCH 00)
 set(${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}")
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
