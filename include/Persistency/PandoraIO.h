@@ -8,6 +8,8 @@
 #ifndef PANDORA_IO_H
 #define PANDORA_IO_H 1
 
+#include <string>
+
 namespace pandora
 {
 
@@ -83,6 +85,72 @@ enum FileMode
     OVERWRITE,
     UNKNOWN_MODE
 };
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ *  @brief  Stop processing exception class
+ */
+class StopProcessingException
+{
+public:
+    /**
+     *  @brief  Constructor
+     *
+     *  @param  description the description of the context under which exception was raised
+     */
+    StopProcessingException(const std::string &description);
+
+    /**
+     *  @brief  Copy constructor
+     *
+     *  @param  rhs the instance to copy
+     */
+    StopProcessingException(const StopProcessingException &rhs);
+
+    /**
+     *  @brief  Destructor
+     */
+    ~StopProcessingException();
+
+    /**
+     *  @brief  Get the description of the context under which exception was raised
+     *
+     *  @return the description
+     */
+    const std::string &GetDescription() const;
+
+private:
+    const std::string   m_description;      ///< Description of the context under which exception was raised
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline StopProcessingException::StopProcessingException(const std::string &description) :
+    m_description(description)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline StopProcessingException::StopProcessingException(const StopProcessingException &rhs) :
+    m_description(rhs.GetDescription())
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline StopProcessingException::~StopProcessingException()
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const std::string &StopProcessingException::GetDescription() const
+{
+    return m_description;
+}
 
 } // namespace pandora
 

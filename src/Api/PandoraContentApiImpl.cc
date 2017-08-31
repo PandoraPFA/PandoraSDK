@@ -30,6 +30,8 @@
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraSettings.h"
 
+#include "Persistency/PandoraIO.h"
+
 namespace pandora
 {
 
@@ -228,14 +230,20 @@ StatusCode PandoraContentApiImpl::RunAlgorithm(const std::string &algorithmName)
 
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, iter->second->Run());
     }
-    catch (StatusCodeException &statusCodeException)
+    catch (const StatusCodeException &exception)
     {
-        std::cout << "Failure in algorithm " << iter->first << ", " << iter->second->GetType() << ", " << statusCodeException.ToString()
-                  << statusCodeException.GetBackTrace() << std::endl;
+        std::cout << "Failure in algorithm " << iter->first << ", " << iter->second->GetType() << ", " << exception.ToString()
+                  << exception.GetBackTrace() << std::endl;
+    }
+    catch (const StopProcessingException &exception)
+    {
+        std::cout << "Algorithm " << iter->first << ", " << iter->second->GetType() << " raised stop processing exception: "
+                  << exception.GetDescription() << std::endl;
+        throw exception;
     }
     catch (...)
     {
-        std::cout << "Failure in algorithm " << iter->first << ", " << iter->second->GetType() << ", unrecognized exception" << std::endl;
+        std::cout << "Failure in algorithm " << iter->first << ", " << iter->second->GetType() << ", unknown exception" << std::endl;
     }
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->PostRunAlgorithm(iter->second));
