@@ -17,16 +17,22 @@ ExternallyConfiguredAlgorithm::ExternalParametersMap ExternallyConfiguredAlgorit
 
 ExternallyConfiguredAlgorithm::~ExternallyConfiguredAlgorithm()
 {
-    if (this->ExternalParametersPresent())
+    try
     {
-        AlgTypeToParametersMap &algTypeToParametersMap(m_externalParametersMap[&(this->GetPandora())]);
-        AlgTypeToParametersMap::iterator iter(algTypeToParametersMap.find(this->GetType()));
-
-        if (algTypeToParametersMap.end() != iter)
+        if (this->ExternalParametersPresent())
         {
-            delete iter->second;
-            algTypeToParametersMap.erase(iter);
+            AlgTypeToParametersMap &algTypeToParametersMap(m_externalParametersMap[&(this->GetPandora())]);
+            AlgTypeToParametersMap::iterator iter(algTypeToParametersMap.find(this->GetType()));
+
+            if (algTypeToParametersMap.end() != iter)
+            {
+                delete iter->second;
+                algTypeToParametersMap.erase(iter);
+            }
         }
+    }
+    catch (const StatusCodeException &)
+    {
     }
 }
 
