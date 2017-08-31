@@ -79,7 +79,10 @@ ContainerId BinaryFileReader::GetNextContainerId()
     const std::ifstream::pos_type initialPosition(m_fileStream.tellg());
 
     std::string fileHash;
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(fileHash));
+    const StatusCode fileHashStatusCode(this->ReadVariable(fileHash));
+
+    if (STATUS_CODE_SUCCESS != fileHashStatusCode)
+        throw StatusCodeException(fileHashStatusCode);
 
     if (PANDORA_FILE_HASH != fileHash)
         throw StatusCodeException(STATUS_CODE_FAILURE);
