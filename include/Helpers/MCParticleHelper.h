@@ -29,6 +29,14 @@ public:
      */
     template <typename T>
     static const MCParticle *GetMainMCParticle(const T *const pT);
+
+    /**
+     *  @brief  Find the main mc particle making the largest contribution to a specified calo hit list 
+     *
+     *  @param caloHitList to recieve the address of the calo hit list under consideration
+     *  @param pBestMCParticle address of mc particle making the largest contribution to calo hit list
+     */
+    static StatusCode FindMainMCParticle(const OrderedCaloHitList &caloHitList, const MCParticle *&pBestMCParticle);
 };
 
 } // namespace pandora
