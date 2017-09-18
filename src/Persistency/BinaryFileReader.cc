@@ -318,14 +318,20 @@ StatusCode BinaryFileReader::ReadLineGap(bool checkComponentId)
     {
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Read(*pParameters, *this));
 
-        HitType hitType(ECAL);
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(hitType));
+        LineGapType lineGapType(TPC_WIRE_GAP_VIEW_U);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineGapType));
+        float lineStartX(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineStartX));
+        float lineEndX(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineEndX));
         float lineStartZ(0.f);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineStartZ));
         float lineEndZ(0.f);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineEndZ));
 
-        pParameters->m_hitType = hitType;
+        pParameters->m_lineGapType = lineGapType;
+        pParameters->m_lineStartX = lineStartX;
+        pParameters->m_lineEndX = lineEndX;
         pParameters->m_lineStartZ = lineStartZ;
         pParameters->m_lineEndZ = lineEndZ;
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*m_pPandora, *pParameters, *m_pLineGapFactory));

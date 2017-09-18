@@ -19,11 +19,13 @@ DetectorGap::~DetectorGap()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 LineGap::LineGap(const object_creation::Geometry::LineGap::Parameters &parameters) :
-    m_hitType(parameters.m_hitType.Get()),
+    m_lineGapType(parameters.m_lineGapType.Get()),
+    m_lineStartX(parameters.m_lineStartX.Get()),
+    m_lineEndX(parameters.m_lineEndX.Get()),
     m_lineStartZ(parameters.m_lineStartZ.Get()),
     m_lineEndZ(parameters.m_lineEndZ.Get())
 {
-    if ((m_lineEndZ < m_lineStartZ) || !((TPC_VIEW_U == m_hitType) || (TPC_VIEW_V == m_hitType) || (TPC_VIEW_W == m_hitType)))
+    if ((m_lineEndX < m_lineStartX) || (m_lineEndZ < m_lineStartZ))
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 }
 
@@ -31,18 +33,23 @@ LineGap::LineGap(const object_creation::Geometry::LineGap::Parameters &parameter
 
 bool LineGap::IsInGap(const CartesianVector &positionVector, const HitType hitType, const float gapTolerance) const
 {
-    if (!((TPC_VIEW_U == hitType) || (TPC_VIEW_V == hitType) || (TPC_VIEW_W == hitType)))
+    if (!((TPC_VIEW_U == hitType) || (TPC_VIEW_V == hitType) || (TPC_VIEW_W == hitType) || (TPC_3D == hitType)))
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
-    if (m_hitType != hitType)
-        return false;
+    if (((TPC_VIEW_U == hitType) && (TPC_WIRE_GAP_VIEW_U == m_lineGapType)) ||
+        ((TPC_VIEW_V == hitType) && (TPC_WIRE_GAP_VIEW_V == m_lineGapType)) ||
+        ((TPC_VIEW_W == hitType) && (TPC_WIRE_GAP_VIEW_W == m_lineGapType)))
+    {
+        if ((positionVector.GetZ() > m_lineStartZ - gapTolerance) && (positionVector.GetZ() < m_lineEndZ + gapTolerance))
+            return true;
+    }
+    else if (TPC_DRIFT_GAP == m_lineGapType)
+    {
+        if ((positionVector.GetX() > m_lineStartX - gapTolerance) && (positionVector.GetX() < m_lineEndX + gapTolerance))
+            return true;
+    }
 
-    const float positionZ(positionVector.GetZ());
-
-    if ((positionZ < m_lineStartZ - gapTolerance) || (positionZ > m_lineEndZ + gapTolerance))
-        return false;
-
-    return true;
+    return false;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

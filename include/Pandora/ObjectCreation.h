@@ -236,7 +236,9 @@ public:
     class LineGapParameters : public ObjectParameters
     {
     public:
-        pandora::InputHitType           m_hitType;                  ///< The hit type associated with the line gap
+        pandora::InputLineGapType       m_lineGapType;              ///< The type of line gap, e.g. TPC wire-type gap (u, v, w), or drift-type gap
+        pandora::InputFloat             m_lineStartX;               ///< The line start x coordinate, units mm
+        pandora::InputFloat             m_lineEndX;                 ///< The line end x coordinate, units mm
         pandora::InputFloat             m_lineStartZ;               ///< The line start z coordinate, units mm
         pandora::InputFloat             m_lineEndZ;                 ///< The line end z coordinate, units mm
     };

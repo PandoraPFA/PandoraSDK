@@ -324,15 +324,21 @@ StatusCode XmlFileReader::ReadLineGap()
     {
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Read(*pParameters, *this));
 
-        unsigned int hitTypeInput(0);
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("HitType", hitTypeInput));
-        const HitType hitType(static_cast<HitType>(hitTypeInput));
+        unsigned int lineGapTypeInput(0);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("LineGapType", lineGapTypeInput));
+        const LineGapType lineGapType(static_cast<LineGapType>(lineGapTypeInput));
+        float lineStartX(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("LineStartX", lineStartX));
+        float lineEndX(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("LineEndX", lineEndX));
         float lineStartZ(0.f);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("LineStartZ", lineStartZ));
         float lineEndZ(0.f);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("LineEndZ", lineEndZ));
 
-        pParameters->m_hitType = hitType;
+        pParameters->m_lineGapType = lineGapType;
+        pParameters->m_lineStartX = lineStartX;
+        pParameters->m_lineEndX = lineEndX;
         pParameters->m_lineStartZ = lineStartZ;
         pParameters->m_lineEndZ = lineEndZ;
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*m_pPandora, *pParameters, *m_pLineGapFactory));
