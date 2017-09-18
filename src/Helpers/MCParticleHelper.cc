@@ -52,9 +52,35 @@ const MCParticle *MCParticleHelper::GetMainMCParticle(const T *const pT)
 template <>
 const MCParticle *MCParticleHelper::GetMainMCParticle(const Cluster *const pCluster)
 {
+    const MCParticle *pBestMCParticle(nullptr);
+    FindMainMCParticle(pCluster->GetOrderedCaloHitList(), pBestMCParticle);
+    return pBestMCParticle;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <>
+const MCParticle *MCParticleHelper::GetMainMCParticle(const ClusterList *const pClusterList)
+{
+    OrderedCaloHitList orderedCaloHitList;
+
+    for (const Cluster *const pCluster : *pClusterList)
+    {
+        orderedCaloHitList.Add(pCluster->GetOrderedCaloHitList());
+    }
+
+    const MCParticle *pBestMCParticle(nullptr);
+    FindMainMCParticle(orderedCaloHitList, pBestMCParticle);
+    return pBestMCParticle;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode MCParticleHelper::FindMainMCParticle(const OrderedCaloHitList &caloHitList, const MCParticle *&pBestMCParticle)
+{
     MCParticleWeightMap mcParticleWeightMap;
 
-    for (const OrderedCaloHitList::value_type &layerIter : pCluster->GetOrderedCaloHitList())
+    for (const OrderedCaloHitList::value_type &layerIter : caloHitList)
     {
         for (const CaloHit *const pCaloHit : *layerIter.second)
         {
@@ -73,7 +99,6 @@ const MCParticle *MCParticleHelper::GetMainMCParticle(const Cluster *const pClus
     }
 
     float bestWeight(0.f);
-    const MCParticle *pBestMCParticle(nullptr);
 
     MCParticleVector mcParticleVector;
     for (const MCParticleWeightMap::value_type &mapEntry : mcParticleWeightMap) mcParticleVector.push_back(mapEntry.first);
@@ -93,7 +118,7 @@ const MCParticle *MCParticleHelper::GetMainMCParticle(const Cluster *const pClus
     if (!pBestMCParticle)
         throw StatusCodeException(STATUS_CODE_NOT_FOUND);
 
-    return pBestMCParticle;
+    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
