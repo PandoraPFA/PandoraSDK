@@ -115,12 +115,13 @@ typedef PandoraInputType<bool> InputBool;
 typedef PandoraInputType<std::string> InputString;
 
 typedef PandoraInputType<CellGeometry> InputCellGeometry;
-typedef PandoraInputType<HitType> InputHitType;
 typedef PandoraInputType<HitRegion> InputHitRegion;
+typedef PandoraInputType<HitType> InputHitType;
+typedef PandoraInputType<LineGapType> InputLineGapType;
 typedef PandoraInputType<MCParticleType> InputMCParticleType;
 typedef PandoraInputType<SubDetectorType> InputSubDetectorType;
-typedef PandoraInputType<VertexType> InputVertexType;
 typedef PandoraInputType<VertexLabel> InputVertexLabel;
+typedef PandoraInputType<VertexType> InputVertexType;
 
 typedef PandoraInputType<CartesianVector> InputCartesianVector;
 typedef PandoraInputType<TrackState> InputTrackState;
@@ -276,13 +277,19 @@ inline bool PandoraInputType<CellGeometry>::IsValid(const CellGeometry &t) const
 }
 
 template <>
+inline bool PandoraInputType<HitRegion>::IsValid(const HitRegion &t) const
+{
+    return !(std::isnan(static_cast<unsigned int>(t)) || std::isinf(static_cast<unsigned int>(t)));
+}
+
+template <>
 inline bool PandoraInputType<HitType>::IsValid(const HitType &t) const
 {
     return !(std::isnan(static_cast<unsigned int>(t)) || std::isinf(static_cast<unsigned int>(t)));
 }
 
 template <>
-inline bool PandoraInputType<HitRegion>::IsValid(const HitRegion &t) const
+inline bool PandoraInputType<LineGapType>::IsValid(const LineGapType &t) const
 {
     return !(std::isnan(static_cast<unsigned int>(t)) || std::isinf(static_cast<unsigned int>(t)));
 }
@@ -300,13 +307,13 @@ inline bool PandoraInputType<SubDetectorType>::IsValid(const SubDetectorType &t)
 }
 
 template <>
-inline bool PandoraInputType<VertexType>::IsValid(const VertexType &t) const
+inline bool PandoraInputType<VertexLabel>::IsValid(const VertexLabel &t) const
 {
     return !(std::isnan(static_cast<unsigned int>(t)) || std::isinf(static_cast<unsigned int>(t)));
 }
 
 template <>
-inline bool PandoraInputType<VertexLabel>::IsValid(const VertexLabel &t) const
+inline bool PandoraInputType<VertexType>::IsValid(const VertexType &t) const
 {
     return !(std::isnan(static_cast<unsigned int>(t)) || std::isinf(static_cast<unsigned int>(t)));
 }
