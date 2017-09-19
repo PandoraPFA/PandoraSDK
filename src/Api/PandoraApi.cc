@@ -9,6 +9,8 @@
 #include "Api/PandoraApi.h"
 #include "Api/PandoraApiImpl.h"
 
+#include "Pandora/ExternallyConfiguredAlgorithm.h"
+
 pandora::StatusCode PandoraApi::ProcessEvent(const pandora::Pandora &pandora)
 {
     return pandora.GetPandoraApiImpl()->ProcessEvent();
@@ -94,6 +96,14 @@ pandora::StatusCode PandoraApi::GetPfoList(const pandora::Pandora &pandora, cons
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+pandora::StatusCode PandoraApi::SetExternalParameters(const pandora::Pandora &pandora, const std::string &algorithmType,
+    pandora::ExternalParameters *const pExternalParameters)
+{
+    return pandora::ExternallyConfiguredAlgorithm::SetExternalParameters(pandora, algorithmType, pExternalParameters);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 pandora::StatusCode PandoraApi::SetHitTypeGranularity(const pandora::Pandora &pandora, const pandora::HitType hitType,
     const pandora::Granularity granularity)
 {
@@ -105,6 +115,13 @@ pandora::StatusCode PandoraApi::SetHitTypeGranularity(const pandora::Pandora &pa
 pandora::StatusCode PandoraApi::SetBFieldPlugin(const pandora::Pandora &pandora, pandora::BFieldPlugin *const pBFieldPlugin)
 {
     return pandora.GetPandoraApiImpl()->SetBFieldPlugin(pBFieldPlugin);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+pandora::StatusCode PandoraApi::SetLArTransformationPlugin(const pandora::Pandora &pandora, pandora::LArTransformationPlugin *const pLArTransformationPlugin)
+{
+    return pandora.GetPandoraApiImpl()->SetLArTransformationPlugin(pLArTransformationPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

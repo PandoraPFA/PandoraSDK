@@ -136,6 +136,13 @@ private:
     StatusCode SetBFieldPlugin(BFieldPlugin *const pBFieldPlugin) const;
 
     /**
+     *  @brief  Set the lar transformation plugin used by pandora
+     * 
+     *  @param  pLArTransformationPlugin address of the lar transformation plugin (will pass ownership to pandora)
+     */
+    StatusCode SetLArTransformationPlugin(LArTransformationPlugin *const pLArTransformationPlugin) const;
+
+    /**
      *  @brief  Set the pseudo layer plugin used by pandora
      * 
      *  @param  pPseudoLayerPlugin address of the pseudo layer plugin (will pass ownership to pandora)

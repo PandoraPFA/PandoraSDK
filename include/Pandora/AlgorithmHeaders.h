@@ -10,6 +10,10 @@
 
 #include "Api/PandoraContentApi.h"
 
+#include "Geometry/DetectorGap.h"
+#include "Geometry/LArTPC.h"
+#include "Geometry/SubDetector.h"
+
 #include "Helpers/ClusterFitHelper.h"
 #include "Helpers/MCParticleHelper.h"
 #include "Helpers/XmlHelper.h"
@@ -20,13 +24,11 @@
 #include "Objects/CaloHit.h"
 #include "Objects/CartesianVector.h"
 #include "Objects/Cluster.h"
-#include "Objects/DetectorGap.h"
 #include "Objects/Helix.h"
 #include "Objects/Histograms.h"
 #include "Objects/MCParticle.h"
 #include "Objects/OrderedCaloHitList.h"
 #include "Objects/ParticleFlowObject.h"
-#include "Objects/SubDetector.h"
 #include "Objects/Track.h"
 #include "Objects/TrackState.h"
 #include "Objects/Vertex.h"

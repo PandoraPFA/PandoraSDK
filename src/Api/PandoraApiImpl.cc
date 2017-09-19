@@ -19,6 +19,7 @@
 #include "Managers/TrackManager.h"
 #include "Managers/VertexManager.h"
 
+#include "Pandora/ExternallyConfiguredAlgorithm.h"
 #include "Pandora/ObjectCreation.h"
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraSettings.h"
@@ -178,6 +179,13 @@ StatusCode PandoraApiImpl::SetHitTypeGranularity(const HitType hitType, const Gr
 StatusCode PandoraApiImpl::SetBFieldPlugin(BFieldPlugin *const pBFieldPlugin) const
 {
     return m_pPandora->m_pPluginManager->SetBFieldPlugin(pBFieldPlugin);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PandoraApiImpl::SetLArTransformationPlugin(LArTransformationPlugin *const pLArTransformationPlugin) const
+{
+    return m_pPandora->m_pPluginManager->SetLArTransformationPlugin(pLArTransformationPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

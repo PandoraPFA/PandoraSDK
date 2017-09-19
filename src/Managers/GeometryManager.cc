@@ -6,10 +6,10 @@
  *  $Log: $
  */
 
-#include "Managers/GeometryManager.h"
+#include "Geometry/DetectorGap.h"
+#include "Geometry/SubDetector.h"
 
-#include "Objects/DetectorGap.h"
-#include "Objects/SubDetector.h"
+#include "Managers/GeometryManager.h"
 
 #include "Pandora/ObjectFactory.h"
 

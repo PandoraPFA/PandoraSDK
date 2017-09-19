@@ -14,6 +14,7 @@ namespace pandora
 {
 
 class BFieldPlugin;
+class LArTransformationPlugin;
 class PseudoLayerPlugin;
 class ShowerProfilePlugin;
 
@@ -44,11 +45,46 @@ public:
     ~PluginManager();
 
     /**
+     *  @brief  Whether the b field plugin is available
+     * 
+     *  @return boolean
+     */
+    bool HasBFieldPlugin() const;
+
+    /**
+     *  @brief  Whether the lar transformation plugin is available
+     * 
+     *  @return boolean
+     */
+    bool HasLArTransformationPlugin() const;
+
+    /**
+     *  @brief  Whether the pseudo layer plugin is available
+     * 
+     *  @return boolean
+     */
+    bool HasPseudoLayerPlugin() const;
+
+    /**
+     *  @brief  Whether the shower profile plugin is available
+     * 
+     *  @return boolean
+     */
+    bool HasShowerProfilePlugin() const;
+
+    /**
      *  @brief  Get the address of the b field plugin
      * 
      *  @return the address of the b field plugin
      */
     const BFieldPlugin *GetBFieldPlugin() const;
+
+    /**
+     *  @brief  Get the address of the lar transformation plugin
+     * 
+     *  @return the address of the lar transformation plugin
+     */
+    const LArTransformationPlugin *GetLArTransformationPlugin() const;
 
     /**
      *  @brief  Get the address of the pseudo layer plugin
@@ -87,6 +123,13 @@ private:
     StatusCode SetBFieldPlugin(BFieldPlugin *const pBFieldPlugin);
 
     /**
+     *  @brief  Set the lar transformation plugin
+     * 
+     *  @param  pLArTransformationPlugin address of the lar transformation plugin
+     */
+    StatusCode SetLArTransformationPlugin(LArTransformationPlugin *const pLArTransformationPlugin);
+
+    /**
      *  @brief  Set the pseudo layer plugin
      * 
      *  @param  pPseudoLayerPlugin address of the pseudo layer plugin
@@ -108,6 +151,7 @@ private:
     StatusCode InitializePlugins(const TiXmlHandle *const pXmlHandle);
 
     BFieldPlugin                   *m_pBFieldPlugin;                    ///< Address of the bfield plugin
+    LArTransformationPlugin        *m_pLArTransformationPlugin;         ///< Address of the lar transformation plugin
     PseudoLayerPlugin              *m_pPseudoLayerPlugin;               ///< Address of the pseudolayer plugin
     ShowerProfilePlugin            *m_pShowerProfilePlugin;             ///< The shower profile plugin
 

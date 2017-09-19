@@ -9,12 +9,14 @@
 #include "Pandora/ObjectCreation.h"
 #include "Pandora/PandoraObjectFactories.h"
 
+#include "Geometry/DetectorGap.h"
+#include "Geometry/LArTPC.h"
+#include "Geometry/SubDetector.h"
+
 #include "Objects/CaloHit.h"
 #include "Objects/Cluster.h"
-#include "Objects/DetectorGap.h"
 #include "Objects/MCParticle.h"
 #include "Objects/ParticleFlowObject.h"
-#include "Objects/SubDetector.h"
 #include "Objects/Track.h"
 #include "Objects/Vertex.h"
 

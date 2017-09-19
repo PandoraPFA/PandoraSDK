@@ -15,6 +15,28 @@ ExternallyConfiguredAlgorithm::ExternalParametersMap ExternallyConfiguredAlgorit
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+ExternalParameters::ExternalParameters() :
+    m_nParameterAccessAttempts(0)
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+ExternalParameters::~ExternalParameters()
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void ExternalParameters::RegisterParameterAccessAttempt()
+{
+    if (++m_nParameterAccessAttempts > 1)
+        throw StatusCodeException(STATUS_CODE_NOT_ALLOWED);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 ExternallyConfiguredAlgorithm::~ExternallyConfiguredAlgorithm()
 {
     try
@@ -59,7 +81,7 @@ bool ExternallyConfiguredAlgorithm::ExternalParametersPresent() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-ExternallyConfiguredAlgorithm::ExternalParameters *ExternallyConfiguredAlgorithm::GetExternalParameters() const
+ExternalParameters *ExternallyConfiguredAlgorithm::GetExternalParameters() const
 {
     if (!this->ExternalParametersPresent())
         throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
@@ -68,28 +90,6 @@ ExternallyConfiguredAlgorithm::ExternalParameters *ExternallyConfiguredAlgorithm
     pExternalParameters->RegisterParameterAccessAttempt();
 
     return pExternalParameters;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-ExternallyConfiguredAlgorithm::ExternalParameters::ExternalParameters() :
-    m_nParameterAccessAttempts(0)
-{
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-ExternallyConfiguredAlgorithm::ExternalParameters::~ExternalParameters()
-{
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void ExternallyConfiguredAlgorithm::ExternalParameters::RegisterParameterAccessAttempt()
-{
-    if (++m_nParameterAccessAttempts > 1)
-        throw StatusCodeException(STATUS_CODE_NOT_ALLOWED);
 }
 
 } // namespace pandora
