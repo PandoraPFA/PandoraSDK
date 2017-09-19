@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraSDK/include/Objects/DetectorGap.h
+ *  @file   PandoraSDK/include/Geometry/DetectorGap.h
  * 
  *  @brief  Header file for the detector gap class.
  * 

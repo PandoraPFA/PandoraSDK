@@ -9,10 +9,12 @@
 #include "Api/PandoraContentApi.h"
 #include "Api/PandoraContentApiImpl.h"
 
+#include "Geometry/DetectorGap.h"
+#include "Geometry/LArTPC.h"
+#include "Geometry/SubDetector.h"
+
 #include "Objects/CaloHit.h"
-#include "Objects/DetectorGap.h"
 #include "Objects/MCParticle.h"
-#include "Objects/SubDetector.h"
 #include "Objects/Track.h"
 
 #include "Persistency/XmlFileWriter.h"

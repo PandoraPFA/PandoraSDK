@@ -23,6 +23,7 @@ INCLUDES = -I$(PROJECT_INCLUDE_DIR)
 
 SOURCES  = $(wildcard $(PROJECT_DIR)/src/*.cc)
 SOURCES += $(wildcard $(PROJECT_DIR)/src/Api/*.cc)
+SOURCES += $(wildcard $(PROJECT_DIR)/src/Geometry/*.cc)
 SOURCES += $(wildcard $(PROJECT_DIR)/src/Helpers/*.cc)
 SOURCES += $(wildcard $(PROJECT_DIR)/src/Managers/*.cc)
 SOURCES += $(wildcard $(PROJECT_DIR)/src/Objects/*.cc)

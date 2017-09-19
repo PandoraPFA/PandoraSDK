@@ -1,12 +1,12 @@
 /**
- *  @file   PandoraSDK/src/Objects/DetectorGap.cc
+ *  @file   PandoraSDK/src/Geometry/DetectorGap.cc
  * 
  *  @brief  Implementation of the detector gap class.
  * 
  *  $Log: $
  */
 
-#include "Objects/DetectorGap.h"
+#include "Geometry/DetectorGap.h"
 
 namespace pandora
 {
