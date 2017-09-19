@@ -79,6 +79,7 @@ protected:
     ObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object>                                      *m_pTrackFactory;         ///< Address of the track factory
     ObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object>                            *m_pMCParticleFactory;    ///< Address of the mc particle factory
     ObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object>      *m_pSubDetectorFactory;   ///< Address of the sub detector factory
+    ObjectFactory<object_creation::Geometry::LArTPC::Parameters, object_creation::Geometry::LArTPC::Object>                *m_pLArTPCFactory;        ///< Address of the lar tpc factory
     ObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object>              *m_pLineGapFactory;       ///< Address of the line gap factory
     ObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object>                *m_pBoxGapFactory;        ///< Address of the box gap factory
     ObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object>  *m_pConcentricGapFactory; ///< Address of the concentric gap factory

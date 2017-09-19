@@ -28,14 +28,14 @@ FileReader::~FileReader()
 
 StatusCode FileReader::ReadGeometry()
 {
-    if (GEOMETRY != this->GetNextContainerId())
+    if (GEOMETRY_CONTAINER != this->GetNextContainerId())
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextGeometry());
     }
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadHeader());
 
-    if (GEOMETRY != m_containerId)
+    if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     try
@@ -57,7 +57,7 @@ StatusCode FileReader::ReadGeometry()
 
 StatusCode FileReader::ReadEvent()
 {
-    if (EVENT != this->GetNextContainerId())
+    if (EVENT_CONTAINER != this->GetNextContainerId())
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextEvent());
     }
@@ -87,7 +87,7 @@ StatusCode FileReader::GoToNextGeometry()
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextContainer());
     }
-    while (GEOMETRY != this->GetNextContainerId());
+    while (GEOMETRY_CONTAINER != this->GetNextContainerId());
 
     return STATUS_CODE_SUCCESS;
 }
@@ -100,7 +100,7 @@ StatusCode FileReader::GoToNextEvent()
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextContainer());
     }
-    while (EVENT != this->GetNextContainerId());
+    while (EVENT_CONTAINER != this->GetNextContainerId());
 
     return STATUS_CODE_SUCCESS;
 }

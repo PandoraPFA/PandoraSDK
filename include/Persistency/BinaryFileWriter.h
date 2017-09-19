@@ -50,6 +50,7 @@ private:
     StatusCode WriteHeader(const ContainerId containerId);
     StatusCode WriteFooter();
     StatusCode WriteSubDetector(const SubDetector *const pSubDetector);
+    StatusCode WriteLArTPC(const LArTPC *const pLArTPC);
     StatusCode WriteDetectorGap(const DetectorGap *const pDetectorGap);
     StatusCode WriteCaloHit(const CaloHit *const pCaloHit);
     StatusCode WriteTrack(const Track *const pTrack);

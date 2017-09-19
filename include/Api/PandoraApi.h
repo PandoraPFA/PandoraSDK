@@ -35,6 +35,7 @@ public:
     public:
         typedef object_creation::Geometry::LayerParameters LayerParameters;
         typedef object_creation::Geometry::SubDetector SubDetector;
+        typedef object_creation::Geometry::LArTPC LArTPC;
         typedef object_creation::Geometry::LineGap LineGap;
         typedef object_creation::Geometry::BoxGap BoxGap;
         typedef object_creation::Geometry::ConcentricGap ConcentricGap;

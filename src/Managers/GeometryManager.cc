@@ -66,7 +66,7 @@ const LArTPC &GeometryManager::GetLArTPC() const
     if (1 != m_larTPCMap.size())
         throw StatusCodeException(STATUS_CODE_OUT_OF_RANGE);
 
-    return *(m_larTPCMap.begin())->second;
+    return *(m_larTPCMap.begin()->second);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

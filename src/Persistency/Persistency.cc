@@ -22,6 +22,7 @@ Persistency::Persistency(const pandora::Pandora &pandora, const std::string &fil
     m_pTrackFactory(new PandoraObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object>()),
     m_pMCParticleFactory(new PandoraObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object>()),
     m_pSubDetectorFactory(new PandoraObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object>()),
+    m_pLArTPCFactory(new PandoraObjectFactory<object_creation::Geometry::LArTPC::Parameters, object_creation::Geometry::LArTPC::Object>()),
     m_pLineGapFactory(new PandoraObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object>()),
     m_pBoxGapFactory(new PandoraObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object>()),
     m_pConcentricGapFactory(new PandoraObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object>())
@@ -36,6 +37,7 @@ Persistency::~Persistency()
     delete m_pTrackFactory;
     delete m_pMCParticleFactory;
     delete m_pSubDetectorFactory;
+    delete m_pLArTPCFactory;
     delete m_pLineGapFactory;
     delete m_pBoxGapFactory;
     delete m_pConcentricGapFactory;
@@ -84,6 +86,13 @@ void Persistency::ReplaceCurrentFactory(ObjectFactory<object_creation::Geometry:
 }
 
 template<>
+void Persistency::ReplaceCurrentFactory(ObjectFactory<object_creation::Geometry::LArTPC::Parameters, object_creation::Geometry::LArTPC::Object> *const pFactory)
+{
+    delete m_pLArTPCFactory;
+    m_pLArTPCFactory = pFactory;
+}
+
+template<>
 void Persistency::ReplaceCurrentFactory(ObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object> *const pFactory)
 {
     delete m_pLineGapFactory;
@@ -111,6 +120,7 @@ template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::CaloH
 template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object> *const);
 template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::MCParticle::Parameters, object_creation::MCParticle::Object> *const);
 template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object> *const);
+template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::Geometry::LArTPC::Parameters, object_creation::Geometry::LArTPC::Object> *const);
 template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object> *const);
 template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object> *const);
 template StatusCode Persistency::SetFactory(ObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object> *const);

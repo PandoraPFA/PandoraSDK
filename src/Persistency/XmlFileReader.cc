@@ -47,7 +47,7 @@ StatusCode XmlFileReader::ReadHeader()
     m_pCurrentXmlElement = nullptr;
     m_containerId = this->GetNextContainerId();
 
-    if ((EVENT != m_containerId) && (GEOMETRY != m_containerId))
+    if ((EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
     return STATUS_CODE_SUCCESS;
@@ -85,11 +85,11 @@ ContainerId XmlFileReader::GetNextContainerId()
 
     if (std::string("Event") == containerId)
     {
-        return EVENT;
+        return EVENT_CONTAINER;
     }
     else if (std::string("Geometry") == containerId)
     {
-        return GEOMETRY;
+        return GEOMETRY_CONTAINER;
     }
     else
     {
@@ -106,7 +106,7 @@ StatusCode XmlFileReader::GoToGeometry(const unsigned int geometryNumber)
     m_pContainerXmlNode = nullptr;
     m_pCurrentXmlElement = nullptr;
 
-    if (GEOMETRY != this->GetNextContainerId())
+    if (GEOMETRY_CONTAINER != this->GetNextContainerId())
         --nGeometriesRead;
 
     while (nGeometriesRead < static_cast<int>(geometryNumber))
@@ -127,7 +127,7 @@ StatusCode XmlFileReader::GoToEvent(const unsigned int eventNumber)
     m_pContainerXmlNode = nullptr;
     m_pCurrentXmlElement = nullptr;
 
-    if (EVENT != this->GetNextContainerId())
+    if (EVENT_CONTAINER != this->GetNextContainerId())
         --nEventsRead;
 
     while (nEventsRead < static_cast<int>(eventNumber))
@@ -164,6 +164,10 @@ StatusCode XmlFileReader::ReadNextGeometryComponent()
     if (std::string("SubDetector") == componentName)
     {
         return this->ReadSubDetector();
+    }
+    if (std::string("LArTPC") == componentName)
+    {
+        return this->ReadLArTPC();
     }
     if (std::string("LineGap") == componentName)
     {
@@ -231,7 +235,7 @@ StatusCode XmlFileReader::ReadNextEventComponent()
 
 StatusCode XmlFileReader::ReadSubDetector()
 {
-    if (GEOMETRY != m_containerId)
+    if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     PandoraApi::Geometry::SubDetector::Parameters *pParameters = m_pSubDetectorFactory->NewParameters();
@@ -313,9 +317,75 @@ StatusCode XmlFileReader::ReadSubDetector()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode XmlFileReader::ReadLArTPC()
+{
+    if (GEOMETRY_CONTAINER != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    PandoraApi::Geometry::LArTPC::Parameters *pParameters = m_pLArTPCFactory->NewParameters();
+
+    try
+    {
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Read(*pParameters, *this));
+
+        std::string larTPCName;
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("LArTPCName", larTPCName));
+        float centerX(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("CenterX", centerX));
+        float centerY(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("CenterY", centerY));
+        float centerZ(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("CenterZ", centerZ));
+        float widthX(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("WidthX", widthX));
+        float widthY(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("WidthY", widthY));
+        float widthZ(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("WidthZ", widthZ));
+        float wirePitchU(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("WirePitchU", wirePitchU));
+        float wirePitchV(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("WirePitchV", wirePitchV));
+        float wirePitchW(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("WirePitchW", wirePitchW));
+        float thetaU(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("ThetaU", thetaU));
+        float thetaV(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("ThetaV", thetaV));
+        bool isDriftInPositiveX(false);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("IsDriftInPositiveX", isDriftInPositiveX));
+
+        pParameters->m_larTPCName = larTPCName;
+        pParameters->m_centerX = centerX;
+        pParameters->m_centerY = centerY;
+        pParameters->m_centerZ = centerZ;
+        pParameters->m_widthX = widthX;
+        pParameters->m_widthY = widthY;
+        pParameters->m_widthZ = widthZ;
+        pParameters->m_wirePitchU = wirePitchU;
+        pParameters->m_wirePitchV = wirePitchV;
+        pParameters->m_wirePitchW = wirePitchW;
+        pParameters->m_thetaU = thetaU;
+        pParameters->m_thetaV = thetaV;
+        pParameters->m_isDriftInPositiveX = isDriftInPositiveX;
+
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LArTPC::Create(*m_pPandora, *pParameters, *m_pLArTPCFactory));
+        delete pParameters;
+    }
+    catch (StatusCodeException &statusCodeException)
+    {
+        delete pParameters;
+        return statusCodeException.GetStatusCode();
+    }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode XmlFileReader::ReadLineGap()
 {
-    if (GEOMETRY != m_containerId)
+    if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     PandoraApi::Geometry::LineGap::Parameters *pParameters = m_pLineGapFactory->NewParameters();
@@ -357,7 +427,7 @@ StatusCode XmlFileReader::ReadLineGap()
 
 StatusCode XmlFileReader::ReadBoxGap()
 {
-    if (GEOMETRY != m_containerId)
+    if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     PandoraApi::Geometry::BoxGap::Parameters *pParameters = m_pBoxGapFactory->NewParameters();
@@ -395,7 +465,7 @@ StatusCode XmlFileReader::ReadBoxGap()
 
 StatusCode XmlFileReader::ReadConcentricGap()
 {
-    if (GEOMETRY != m_containerId)
+    if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     PandoraApi::Geometry::ConcentricGap::Parameters *pParameters = m_pConcentricGapFactory->NewParameters();
@@ -445,7 +515,7 @@ StatusCode XmlFileReader::ReadConcentricGap()
 
 StatusCode XmlFileReader::ReadCaloHit()
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     PandoraApi::CaloHit::Parameters *pParameters = m_pCaloHitFactory->NewParameters();
@@ -534,7 +604,7 @@ StatusCode XmlFileReader::ReadCaloHit()
 
 StatusCode XmlFileReader::ReadTrack()
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     PandoraApi::Track::Parameters *pParameters = m_pTrackFactory->NewParameters();
@@ -605,7 +675,7 @@ StatusCode XmlFileReader::ReadTrack()
 
 StatusCode XmlFileReader::ReadMCParticle()
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     PandoraApi::MCParticle::Parameters *pParameters = m_pMCParticleFactory->NewParameters();
@@ -653,7 +723,7 @@ StatusCode XmlFileReader::ReadMCParticle()
 
 StatusCode XmlFileReader::ReadRelationship()
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     unsigned int relationshipIdInput(0);
@@ -668,15 +738,15 @@ StatusCode XmlFileReader::ReadRelationship()
 
     switch (relationshipId)
     {
-    case CALO_HIT_TO_MC:
+    case CALO_HIT_TO_MC_RELATIONSHIP:
         return PandoraApi::SetCaloHitToMCParticleRelationship(*m_pPandora, address1, address2, weight);
-    case TRACK_TO_MC:
+    case TRACK_TO_MC_RELATIONSHIP:
         return PandoraApi::SetTrackToMCParticleRelationship(*m_pPandora, address1, address2, weight);
-    case MC_PARENT_DAUGHTER:
+    case MC_PARENT_DAUGHTER_RELATIONSHIP:
         return PandoraApi::SetMCParentDaughterRelationship(*m_pPandora, address1, address2);
-    case TRACK_PARENT_DAUGHTER:
+    case TRACK_PARENT_DAUGHTER_RELATIONSHIP:
         return PandoraApi::SetTrackParentDaughterRelationship(*m_pPandora, address1, address2);
-    case TRACK_SIBLING:
+    case TRACK_SIBLING_RELATIONSHIP:
         return PandoraApi::SetTrackSiblingRelationship(*m_pPandora, address1, address2);
     default:
         return STATUS_CODE_FAILURE;
