@@ -54,21 +54,28 @@ public:
     /**
      *  @brief  Get the map from name to sub detector parameters
      * 
-     *  @return The map from name to sub detector parameters
+     *  @return the map from name to sub detector parameters
      */
     const SubDetectorMap &GetSubDetectorMap() const;
 
     /**
+     *  @brief  If there is exactly one registered lar tpc instance, return it; else raise an exception
+     * 
+     *  @return the lar tpc instance
+     */
+    const LArTPC &GetLArTPC() const;
+
+    /**
      *  @brief  Get the map from name to lar tpc parameters
      * 
-     *  @return The map from name to lar tpc paramters
+     *  @return the map from name to lar tpc paramters
      */
     const LArTPCMap &GetLArTPCMap() const;
 
     /**
      *  @brief  Get the list of gaps in the active detector volume
      * 
-     *  @return The list of gaps in the active detector volume
+     *  @return the list of gaps in the active detector volume
      */
     const DetectorGapList &GetDetectorGapList() const;
 

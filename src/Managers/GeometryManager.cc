@@ -61,6 +61,16 @@ const SubDetector &GeometryManager::GetSubDetector(const SubDetectorType subDete
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+const LArTPC &GeometryManager::GetLArTPC() const
+{
+    if (1 != m_larTPCMap.size())
+        throw StatusCodeException(STATUS_CODE_OUT_OF_RANGE);
+
+    return *(m_larTPCMap.begin())->second;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 Granularity GeometryManager::GetHitTypeGranularity(const HitType hitType) const
 {
     HitTypeToGranularityMap::const_iterator iter = m_hitTypeToGranularityMap.find(hitType);
