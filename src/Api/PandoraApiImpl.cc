@@ -62,6 +62,13 @@ StatusCode PandoraApiImpl::Create(const object_creation::Geometry::SubDetector::
 }
 
 template <>
+StatusCode PandoraApiImpl::Create(const object_creation::Geometry::LArTPC::Parameters &parameters,
+    const ObjectFactory<object_creation::Geometry::LArTPC::Parameters, object_creation::Geometry::LArTPC::Object> &factory) const
+{
+    return m_pPandora->m_pGeometryManager->CreateLArTPC(parameters, factory);
+}
+
+template <>
 StatusCode PandoraApiImpl::Create(const object_creation::Geometry::LineGap::Parameters &parameters,
     const ObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object> &factory) const
 {

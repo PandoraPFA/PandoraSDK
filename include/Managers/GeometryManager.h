@@ -59,6 +59,13 @@ public:
     const SubDetectorMap &GetSubDetectorMap() const;
 
     /**
+     *  @brief  Get the map from name to lar tpc parameters
+     * 
+     *  @return The map from name to lar tpc paramters
+     */
+    const LArTPCMap &GetLArTPCMap() const;
+
+    /**
      *  @brief  Get the list of gaps in the active detector volume
      * 
      *  @return The list of gaps in the active detector volume
@@ -78,11 +85,20 @@ private:
     /**
      *  @brief  Create sub detector
      * 
-     *  @param  subDetectorParameters the sub detector parameters
+     *  @param  parameters the sub detector parameters
      *  @param  factory the factory that performs the object allocation
      */
-    StatusCode CreateSubDetector(const object_creation::Geometry::SubDetector::Parameters &subDetectorParameters,
+    StatusCode CreateSubDetector(const object_creation::Geometry::SubDetector::Parameters &parameters,
         const ObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object> &factory);
+
+    /**
+     *  @brief  Create lar tpc
+     * 
+     *  @param  parameters the lar tpc parameters
+     *  @param  factory the factory that performs the object allocation
+     */
+    StatusCode CreateLArTPC(const object_creation::Geometry::LArTPC::Parameters &parameters,
+        const ObjectFactory<object_creation::Geometry::LArTPC::Parameters, object_creation::Geometry::LArTPC::Object> &factory);
 
     /**
      *  @brief  Create gap
@@ -119,6 +135,7 @@ private:
 
     SubDetectorMap              m_subDetectorMap;           ///< Map from sub detector name to sub detector
     SubDetectorTypeMap          m_subDetectorTypeMap;       ///< Map from sub detector type to sub detector
+    LArTPCMap                   m_larTPCMap;                ///< Map from lar tpc name to lar tpc
     DetectorGapList             m_detectorGapList;          ///< List of gaps in the active detector volume
     HitTypeToGranularityMap     m_hitTypeToGranularityMap;  ///< The hit type to granularity map
 
@@ -132,6 +149,13 @@ private:
 inline const SubDetectorMap &GeometryManager::GetSubDetectorMap() const
 {
     return m_subDetectorMap;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const LArTPCMap &GeometryManager::GetLArTPCMap() const
+{
+    return m_larTPCMap;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

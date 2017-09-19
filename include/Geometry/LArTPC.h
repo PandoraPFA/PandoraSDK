@@ -145,7 +145,7 @@ protected:
     float           m_widthZ;                   ///< The width in z, units mm
     float           m_wirePitchU;               ///< The u wire pitch, units mm
     float           m_wirePitchV;               ///< The v wire pitch, units mm
-    float           m_wirePitchW;               ///< The w wire pitch, units mm - TODO check used to be same as z pitch
+    float           m_wirePitchW;               ///< The w wire pitch, units mm
     float           m_thetaU;                   ///< The u wire inclination, units radians
     float           m_thetaV;                   ///< The v wire inclination, units radians
     float           m_sigmaUVW;                 ///< The u, v, w resolution, units mm

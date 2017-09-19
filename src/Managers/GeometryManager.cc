@@ -7,6 +7,7 @@
  */
 
 #include "Geometry/DetectorGap.h"
+#include "Geometry/LArTPC.h"
 #include "Geometry/SubDetector.h"
 
 #include "Managers/GeometryManager.h"
@@ -73,14 +74,14 @@ Granularity GeometryManager::GetHitTypeGranularity(const HitType hitType) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode GeometryManager::CreateSubDetector(const object_creation::Geometry::SubDetector::Parameters &inputParameters,
+StatusCode GeometryManager::CreateSubDetector(const object_creation::Geometry::SubDetector::Parameters &parameters,
     const ObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object> &factory)
 {
     const SubDetector *pSubDetector = nullptr;
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(inputParameters, pSubDetector));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pSubDetector));
 
         if (!m_subDetectorMap.insert(SubDetectorMap::value_type(pSubDetector->GetSubDetectorName(), pSubDetector)).second)
             throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -92,6 +93,31 @@ StatusCode GeometryManager::CreateSubDetector(const object_creation::Geometry::S
         std::cout << "Failed to create sub detector: " << statusCodeException.ToString() << std::endl;
         delete pSubDetector;
         pSubDetector = nullptr;
+        return statusCodeException.GetStatusCode();
+    }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode GeometryManager::CreateLArTPC(const object_creation::Geometry::LArTPC::Parameters &parameters,
+    const ObjectFactory<object_creation::Geometry::LArTPC::Parameters, object_creation::Geometry::LArTPC::Object> &factory)
+{
+    const LArTPC *pLArTPC = nullptr;
+
+    try
+    {
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pLArTPC));
+
+        if (!m_larTPCMap.insert(LArTPCMap::value_type(pLArTPC->GetLArTPCName(), pLArTPC)).second)
+            throw StatusCodeException(STATUS_CODE_FAILURE);
+    }
+    catch (StatusCodeException &statusCodeException)
+    {
+        std::cout << "Failed to create lar tpc: " << statusCodeException.ToString() << std::endl;
+        delete pLArTPC;
+        pLArTPC = nullptr;
         return statusCodeException.GetStatusCode();
     }
 
@@ -131,10 +157,14 @@ StatusCode GeometryManager::EraseAllContent()
     for (const SubDetectorMap::value_type &mapEntry : m_subDetectorMap)
         delete mapEntry.second;
 
+    for (const LArTPCMap::value_type &mapEntry : m_larTPCMap)
+        delete mapEntry.second;
+
     for (const DetectorGap *const pDetectorGap : m_detectorGapList)
         delete pDetectorGap;
 
     m_subDetectorMap.clear();
+    m_larTPCMap.clear();
     m_subDetectorTypeMap.clear();
     m_detectorGapList.clear();
     m_hitTypeToGranularityMap.clear();
