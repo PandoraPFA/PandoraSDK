@@ -41,6 +41,7 @@
 #include "Pandora/PdgTable.h"
 
 #include "Plugins/BFieldPlugin.h"
+#include "Plugins/LArTransformationPlugin.h"
 #include "Plugins/EnergyCorrectionsPlugin.h"
 #include "Plugins/ParticleIdPlugin.h"
 #include "Plugins/PseudoLayerPlugin.h"
