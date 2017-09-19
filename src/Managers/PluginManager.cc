@@ -208,6 +208,17 @@ StatusCode PluginManager::InitializePlugins(const TiXmlHandle *const pXmlHandle)
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBFieldPlugin->Initialize());
     }
 
+    if (nullptr != m_pLArTransformationPlugin)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTransformationPlugin->RegisterDetails(m_pPandora, "LArTransformationPlugin", "LArTransformationPlugin"));
+        TiXmlElement *const pLArTransformationXmlElement(pXmlHandle->FirstChild("LArTransformationPlugin").Element());
+
+        if (nullptr != pLArTransformationXmlElement)
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTransformationPlugin->ReadSettings(TiXmlHandle(pLArTransformationXmlElement)));
+
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTransformationPlugin->Initialize());
+    }
+
     if (nullptr != m_pPseudoLayerPlugin)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPseudoLayerPlugin->RegisterDetails(m_pPandora, "PseudoLayerPlugin", "PseudoLayerPlugin"));

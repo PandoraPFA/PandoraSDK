@@ -16,14 +16,9 @@ namespace pandora
 /**
  *  @brief  LArTransformationPlugin class
  */
-class LArTransformationPlugin
+class LArTransformationPlugin : public Process
 {
 public:
-    /**
-     *  @brief  Destructor
-     */
-    virtual ~LArTransformationPlugin();
-
     /** 
      *  @brief  Transform from (U,V) to W position
      *
@@ -80,69 +75,6 @@ public:
      */
      virtual double YZtoV(const double y, const double z) const = 0;
 
-    /** 
-     *  @brief  Transform from (pU,pV) to pW direction
-     *
-     *  @param  pU the pU direction
-     *  @param  pV the pV direction
-     */
-     virtual double PUPVtoPW(const double pu, const double pv) const;
-
-    /** 
-     *  @brief  Transform from (pV,pW) to pU direction
-     *
-     *  @param  pV the pV direction
-     *  @param  pW the pW direction
-     */
-     virtual double PVPWtoPU(const double pv, const double pw) const;
-
-    /** 
-     *  @brief  Transform from (pW,pU) to pV direction
-     *
-     *  @param  pW the pW direction
-     *  @param  pU the pU direction
-     */
-     virtual double PWPUtoPV(const double pw, const double pu) const;
-
-    /** 
-     *  @brief  Transform from (pU,pV) to pY position
-     *
-     *  @param  pU the pU position
-     *  @param  pV the pV position
-     */
-    virtual double PUPVtoPY(const double pu, const double pv)  const;
-
-    /** 
-     *  @brief  Transform from (pU,pV) to pZ position
-     *
-     *  @param  pU the pU position
-     *  @param  pV the pV position
-     */
-     virtual double PUPVtoPZ(const double pu, const double pv) const;
-
-    /** 
-     *  @brief  Transform from (pY,pZ) to pU direction
-     * 
-     *  @param  pU the U component
-     *  @param  pV the V component
-     */
-    virtual double PYPZtoPU(const double py, const double pz) const;
-
-    /** 
-     *  @brief  Transform from (pY,pZ) to pV direction
-     * 
-     *  @param  pU the U component
-     *  @param  pV the V component
-     */
-    virtual double PYPZtoPV(const double py, const double pz) const;
-
-    /** 
-     *  @brief  Get resolution, in cm, for calculation of chi2
-     * 
-     *  @return resolution, in cm, for calculation of chi2
-     */
-    virtual double GetSigmaUVW() const = 0;
-
     /**
      *  @brief  Get the y, z position that yields the minimum chi squared value with respect to specified u, v and w coordinates
      *
@@ -196,6 +128,9 @@ public:
      */
     virtual void GetProjectedYZ(const PositionAndType &hitPositionAndType, const PositionAndType &fitPositionAndType1,
         const PositionAndType &fitPositionAndType2, const double sigmaHit, const double sigmaFit, double &y, double &z, double &chiSquared) const = 0;
+
+protected:
+    friend class PluginManager;
 };
 
 } // namespace pandora
