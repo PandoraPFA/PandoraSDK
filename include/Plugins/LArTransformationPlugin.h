@@ -8,7 +8,8 @@
 #ifndef PANDORA_LAR_TRANSFORMATION_PLUGIN_H
 #define PANDORA_LAR_TRANSFORMATION_PLUGIN_H 1
 
-#include "Pandora/PandoraInputTypes.h"
+#include "Pandora/PandoraEnumeratedTypes.h"
+#include "Pandora/Process.h"
 
 namespace pandora
 {
