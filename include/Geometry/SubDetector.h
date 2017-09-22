@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraSDK/include/Objects/SubDetector.h
+ *  @file   PandoraSDK/include/Geometry/SubDetector.h
  * 
  *  @brief  Header file for the sub detector class.
  * 

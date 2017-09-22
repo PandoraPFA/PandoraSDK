@@ -62,6 +62,11 @@ private:
     StatusCode ReadSubDetector();
 
     /**
+     *  @brief  Read a lar tpc from the current position in the file
+     */
+    StatusCode ReadLArTPC();
+
+    /**
      *  @brief  Read a line gap from the current position in the file
      */
     StatusCode ReadLineGap();

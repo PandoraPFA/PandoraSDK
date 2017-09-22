@@ -1,5 +1,5 @@
 /**
- *  @file   PandoraSDK/include/Objects/DetectorGap.h
+ *  @file   PandoraSDK/include/Geometry/DetectorGap.h
  * 
  *  @brief  Header file for the detector gap class.
  * 
@@ -52,11 +52,25 @@ public:
     bool IsInGap(const CartesianVector &positionVector, const HitType hitType, const float gapTolerance) const;
 
     /**
-     *  @brief  Get the hit type
+     *  @brief  Get the line gap type
      * 
-     *  @param  the hit type
+     *  @param  the line gap type
      */
-    HitType GetHitType() const;
+    LineGapType GetLineGapType() const;
+
+    /**
+     *  @brief  Get the line start x coordinate
+     * 
+     *  @param  the line start x coordinate
+     */
+    float GetLineStartX() const;
+
+    /**
+     *  @brief  Get the line end x coordinate
+     * 
+     *  @param  the line end x coordinate
+     */
+    float GetLineEndX() const;
 
     /**
      *  @brief  Get the line start z coordinate
@@ -80,7 +94,9 @@ private:
      */
     LineGap(const object_creation::Geometry::LineGap::Parameters &parameters);
 
-    const HitType           m_hitType;              ///< The hit type associated with the line gap
+    const LineGapType       m_lineGapType;          ///< The type of line gap, e.g. TPC wire-type gap (u, v, w), or drift-type gap
+    const float             m_lineStartX;           ///< The line x start coordinate, units mm
+    const float             m_lineEndX;             ///< The line x end coordinate, units mm
     const float             m_lineStartZ;           ///< The line z start coordinate, units mm
     const float             m_lineEndZ;             ///< The line z end coordinate, units mm
 
@@ -256,9 +272,23 @@ private:
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline HitType LineGap::GetHitType() const
+inline LineGapType LineGap::GetLineGapType() const
 {
-    return m_hitType;
+    return m_lineGapType;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LineGap::GetLineStartX() const
+{
+    return m_lineStartX;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LineGap::GetLineEndX() const
+{
+    return m_lineEndX;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

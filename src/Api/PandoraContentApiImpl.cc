@@ -864,11 +864,13 @@ StatusCode PandoraContentApiImpl::PostRunAlgorithm(Algorithm *const pAlgorithm) 
 template StatusCode PandoraContentApiImpl::AlterMetadata(const MCParticle *const, const object_creation::MCParticle::Metadata &) const;
 template StatusCode PandoraContentApiImpl::AlterMetadata(const Track *const, const object_creation::Track::Metadata &) const;
 template StatusCode PandoraContentApiImpl::AlterMetadata(const SubDetector *const, const object_creation::Geometry::SubDetector::Metadata &) const;
+template StatusCode PandoraContentApiImpl::AlterMetadata(const LArTPC *const, const object_creation::Geometry::LArTPC::Metadata &) const;
 template StatusCode PandoraContentApiImpl::AlterMetadata(const LineGap *const, const object_creation::Geometry::LineGap::Metadata &) const;
 template StatusCode PandoraContentApiImpl::AlterMetadata(const BoxGap *const, const object_creation::Geometry::BoxGap::Metadata &) const;
 template StatusCode PandoraContentApiImpl::AlterMetadata(const ConcentricGap *const, const object_creation::Geometry::ConcentricGap::Metadata &) const;
 
 template StatusCode PandoraContentApiImpl::Create(const object_creation::Geometry::SubDetector::Parameters &, const SubDetector *&, const ObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object> &) const;
+template StatusCode PandoraContentApiImpl::Create(const object_creation::Geometry::LArTPC::Parameters &, const LArTPC *&, const ObjectFactory<object_creation::Geometry::LArTPC::Parameters, object_creation::Geometry::LArTPC::Object> &) const;
 template StatusCode PandoraContentApiImpl::Create(const object_creation::Geometry::LineGap::Parameters &, const LineGap *&, const ObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object> &) const;
 template StatusCode PandoraContentApiImpl::Create(const object_creation::Geometry::BoxGap::Parameters &, const BoxGap *&, const ObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object> &) const;
 template StatusCode PandoraContentApiImpl::Create(const object_creation::Geometry::ConcentricGap::Parameters &, const ConcentricGap *&, const ObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object> &) const;

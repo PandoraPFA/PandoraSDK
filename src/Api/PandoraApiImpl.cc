@@ -19,6 +19,7 @@
 #include "Managers/TrackManager.h"
 #include "Managers/VertexManager.h"
 
+#include "Pandora/ExternallyConfiguredAlgorithm.h"
 #include "Pandora/ObjectCreation.h"
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraSettings.h"
@@ -58,6 +59,13 @@ StatusCode PandoraApiImpl::Create(const object_creation::Geometry::SubDetector::
     const ObjectFactory<object_creation::Geometry::SubDetector::Parameters, object_creation::Geometry::SubDetector::Object> &factory) const
 {
     return m_pPandora->m_pGeometryManager->CreateSubDetector(parameters, factory);
+}
+
+template <>
+StatusCode PandoraApiImpl::Create(const object_creation::Geometry::LArTPC::Parameters &parameters,
+    const ObjectFactory<object_creation::Geometry::LArTPC::Parameters, object_creation::Geometry::LArTPC::Object> &factory) const
+{
+    return m_pPandora->m_pGeometryManager->CreateLArTPC(parameters, factory);
 }
 
 template <>
@@ -178,6 +186,13 @@ StatusCode PandoraApiImpl::SetHitTypeGranularity(const HitType hitType, const Gr
 StatusCode PandoraApiImpl::SetBFieldPlugin(BFieldPlugin *const pBFieldPlugin) const
 {
     return m_pPandora->m_pPluginManager->SetBFieldPlugin(pBFieldPlugin);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PandoraApiImpl::SetLArTransformationPlugin(LArTransformationPlugin *const pLArTransformationPlugin) const
+{
+    return m_pPandora->m_pPluginManager->SetLArTransformationPlugin(pLArTransformationPlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

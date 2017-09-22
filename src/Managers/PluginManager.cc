@@ -12,6 +12,7 @@
 
 #include "Plugins/BFieldPlugin.h"
 #include "Plugins/EnergyCorrectionsPlugin.h"
+#include "Plugins/LArTransformationPlugin.h"
 #include "Plugins/ParticleIdPlugin.h"
 #include "Plugins/PseudoLayerPlugin.h"
 #include "Plugins/ShowerProfilePlugin.h"
@@ -21,6 +22,7 @@ namespace pandora
 
 PluginManager::PluginManager(const Pandora *const pPandora) :
     m_pBFieldPlugin(nullptr),
+    m_pLArTransformationPlugin(nullptr),
     m_pPseudoLayerPlugin(nullptr),
     m_pShowerProfilePlugin(nullptr),
     m_pEnergyCorrections(nullptr),
@@ -51,11 +53,40 @@ PluginManager::PluginManager(const Pandora *const pPandora) :
 PluginManager::~PluginManager()
 {
     delete m_pBFieldPlugin;
+    delete m_pLArTransformationPlugin;
     delete m_pPseudoLayerPlugin;
     delete m_pShowerProfilePlugin;
 
     delete m_pEnergyCorrections;
     delete m_pParticleId;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PluginManager::HasBFieldPlugin() const
+{
+    return (nullptr != m_pBFieldPlugin);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PluginManager::HasLArTransformationPlugin() const
+{
+    return (nullptr != m_pLArTransformationPlugin);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PluginManager::HasPseudoLayerPlugin() const
+{
+    return (nullptr != m_pPseudoLayerPlugin);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+bool PluginManager::HasShowerProfilePlugin() const
+{
+    return (nullptr != m_pShowerProfilePlugin);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -66,6 +97,16 @@ const BFieldPlugin *PluginManager::GetBFieldPlugin() const
         throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
     return m_pBFieldPlugin;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const LArTransformationPlugin *PluginManager::GetLArTransformationPlugin() const
+{
+    if (!m_pLArTransformationPlugin)
+        throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
+
+    return m_pLArTransformationPlugin;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -121,6 +162,17 @@ StatusCode PluginManager::SetBFieldPlugin(BFieldPlugin *const pBFieldPlugin)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode PluginManager::SetLArTransformationPlugin(LArTransformationPlugin *const pLArTransformationPlugin)
+{
+    if (nullptr != m_pLArTransformationPlugin)
+        return STATUS_CODE_ALREADY_INITIALIZED;
+
+    m_pLArTransformationPlugin = pLArTransformationPlugin;
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode PluginManager::SetPseudoLayerPlugin(PseudoLayerPlugin *const pPseudoLayerPlugin)
 {
     if (nullptr != m_pPseudoLayerPlugin)
@@ -154,6 +206,17 @@ StatusCode PluginManager::InitializePlugins(const TiXmlHandle *const pXmlHandle)
             PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBFieldPlugin->ReadSettings(TiXmlHandle(pBFieldXmlElement)));
 
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBFieldPlugin->Initialize());
+    }
+
+    if (nullptr != m_pLArTransformationPlugin)
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTransformationPlugin->RegisterDetails(m_pPandora, "LArTransformationPlugin", "LArTransformationPlugin"));
+        TiXmlElement *const pLArTransformationXmlElement(pXmlHandle->FirstChild("LArTransformationPlugin").Element());
+
+        if (nullptr != pLArTransformationXmlElement)
+            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTransformationPlugin->ReadSettings(TiXmlHandle(pLArTransformationXmlElement)));
+
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTransformationPlugin->Initialize());
     }
 
     if (nullptr != m_pPseudoLayerPlugin)

@@ -9,10 +9,12 @@
 #include "Api/PandoraContentApi.h"
 #include "Api/PandoraContentApiImpl.h"
 
+#include "Geometry/DetectorGap.h"
+#include "Geometry/LArTPC.h"
+#include "Geometry/SubDetector.h"
+
 #include "Objects/CaloHit.h"
-#include "Objects/DetectorGap.h"
 #include "Objects/MCParticle.h"
-#include "Objects/SubDetector.h"
 #include "Objects/Track.h"
 
 #include "Persistency/XmlFileWriter.h"
@@ -60,7 +62,7 @@ XmlFileWriter::~XmlFileWriter()
 
 StatusCode XmlFileWriter::WriteHeader(const ContainerId containerId)
 {
-    const std::string containerXmlKey((GEOMETRY == containerId) ? "Geometry" : (EVENT == containerId) ? "Event" : "Unknown");
+    const std::string containerXmlKey((GEOMETRY_CONTAINER == containerId) ? "Geometry" : (EVENT_CONTAINER == containerId) ? "Event" : "Unknown");
     m_pContainerXmlElement = new TiXmlElement(containerXmlKey);
     m_pXmlDocument->LinkEndChild(m_pContainerXmlElement);
 
@@ -73,7 +75,7 @@ StatusCode XmlFileWriter::WriteHeader(const ContainerId containerId)
 
 StatusCode XmlFileWriter::WriteFooter()
 {
-    if ((EVENT != m_containerId) && (GEOMETRY != m_containerId))
+    if ((EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
     m_containerId = UNKNOWN_CONTAINER;
@@ -85,7 +87,7 @@ StatusCode XmlFileWriter::WriteFooter()
 
 StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector)
 {
-    if (GEOMETRY != m_containerId)
+    if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     m_pCurrentXmlElement = new TiXmlElement("SubDetector");
@@ -135,9 +137,40 @@ StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode XmlFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
+{
+    if (GEOMETRY_CONTAINER != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    m_pCurrentXmlElement = new TiXmlElement("LArTPC");
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Write(pLArTPC, *this));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LArTPCName", pLArTPC->GetLArTPCName()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CenterX", pLArTPC->GetCenterX()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CenterY", pLArTPC->GetCenterY()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CenterZ", pLArTPC->GetCenterZ()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WidthX", pLArTPC->GetWidthX()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WidthY", pLArTPC->GetWidthY()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WidthZ", pLArTPC->GetWidthZ()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WirePitchU", pLArTPC->GetWirePitchU()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WirePitchV", pLArTPC->GetWirePitchV()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WirePitchW", pLArTPC->GetWirePitchW()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WireAngleU", pLArTPC->GetWireAngleU()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WireAngleV", pLArTPC->GetWireAngleV()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("SigmaUVW", pLArTPC->GetSigmaUVW()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsDriftInPositiveX", pLArTPC->IsDriftInPositiveX()));
+
+    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
+    m_pCurrentXmlElement = nullptr;
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap)
 {
-    if (GEOMETRY != m_containerId)
+    if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     const LineGap *pLineGap(nullptr);
@@ -154,7 +187,9 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
         m_pCurrentXmlElement = new TiXmlElement("LineGap");
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Write(pLineGap, *this));
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("HitType", pLineGap->GetHitType()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LineGapType", pLineGap->GetLineGapType()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LineStartX", pLineGap->GetLineStartX()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LineEndX", pLineGap->GetLineEndX()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LineStartZ", pLineGap->GetLineStartZ()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LineEndZ", pLineGap->GetLineEndZ()));
 
@@ -203,7 +238,7 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
 
 StatusCode XmlFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     m_pCurrentXmlElement = new TiXmlElement("CaloHit");
@@ -241,7 +276,7 @@ StatusCode XmlFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
 
 StatusCode XmlFileWriter::WriteTrack(const Track *const pTrack)
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     m_pCurrentXmlElement = new TiXmlElement("Track");
@@ -273,7 +308,7 @@ StatusCode XmlFileWriter::WriteTrack(const Track *const pTrack)
 
 StatusCode XmlFileWriter::WriteMCParticle(const MCParticle *const pMCParticle)
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     m_pCurrentXmlElement = new TiXmlElement("MCParticle");
@@ -297,7 +332,7 @@ StatusCode XmlFileWriter::WriteMCParticle(const MCParticle *const pMCParticle)
 
 StatusCode XmlFileWriter::WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight)
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     m_pCurrentXmlElement = new TiXmlElement("Relationship");

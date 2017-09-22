@@ -1,12 +1,12 @@
 /**
- *  @file   PandoraSDK/src/Objects/SubDetector.cc
+ *  @file   PandoraSDK/src/Geometry/SubDetector.cc
  * 
  *  @brief  Implementation of the sub detector class.
  * 
  *  $Log: $
  */
 
-#include "Objects/SubDetector.h"
+#include "Geometry/SubDetector.h"
 
 namespace pandora
 {

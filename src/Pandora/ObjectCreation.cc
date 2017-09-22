@@ -53,6 +53,7 @@ template class ObjectCreationHelper<object_creation::CaloHit::Parameters, object
 template class ObjectCreationHelper<object_creation::MCParticle::Parameters, object_creation::ObjectMetadata, object_creation::MCParticle::Object>;
 template class ObjectCreationHelper<object_creation::Track::Parameters, object_creation::ObjectMetadata, object_creation::Track::Object>;
 template class ObjectCreationHelper<object_creation::Geometry::SubDetector::Parameters, object_creation::ObjectMetadata, object_creation::Geometry::SubDetector::Object>;
+template class ObjectCreationHelper<object_creation::Geometry::LArTPC::Parameters, object_creation::ObjectMetadata, object_creation::Geometry::LArTPC::Object>;
 template class ObjectCreationHelper<object_creation::Geometry::LineGap::Parameters, object_creation::ObjectMetadata, object_creation::Geometry::LineGap::Object>;
 template class ObjectCreationHelper<object_creation::Geometry::BoxGap::Parameters, object_creation::ObjectMetadata, object_creation::Geometry::BoxGap::Object>;
 template class ObjectCreationHelper<object_creation::Geometry::ConcentricGap::Parameters, object_creation::ObjectMetadata, object_creation::Geometry::ConcentricGap::Object>;

@@ -35,6 +35,7 @@ public:
     public:
         typedef object_creation::Geometry::LayerParameters LayerParameters;
         typedef object_creation::Geometry::SubDetector SubDetector;
+        typedef object_creation::Geometry::LArTPC LArTPC;
         typedef object_creation::Geometry::LineGap LineGap;
         typedef object_creation::Geometry::BoxGap BoxGap;
         typedef object_creation::Geometry::ConcentricGap ConcentricGap;
@@ -145,6 +146,17 @@ public:
     static pandora::StatusCode GetPfoList(const pandora::Pandora &pandora, const std::string &pfoListName, const pandora::PfoList *&pPfoList);
 
     /**
+     *  @brief  Set the external parameters associated with an algorithm instance of a specific type. It is enforced that there
+     *          be only a single instance of an externally-configured algorithm, per algorithm type, per Pandora instance
+     *
+     *  @param  pandora the pandora instance
+     *  @param  algorithmType the algorithm type
+     *  @param  pExternalParameters the address of the external parameters instance
+     */
+    static pandora::StatusCode SetExternalParameters(const pandora::Pandora &pandora, const std::string &algorithmType,
+        pandora::ExternalParameters *const pExternalParameters);
+
+    /**
      *  @brief  Set the granularity level to be associated with a specified hit type
      * 
      *  @param  pandora the pandora instance to register the hit type to granularity relationship
@@ -157,15 +169,23 @@ public:
     /**
      *  @brief  Set the bfield plugin used by pandora
      * 
-     *  @param  pandora the pandora instance to register the bfield calculator with
+     *  @param  pandora the pandora instance to register the bfield plugin with
      *  @param  pBFieldPlugin address of the bfield plugin (will pass ownership to pandora)
      */
     static pandora::StatusCode SetBFieldPlugin(const pandora::Pandora &pandora, pandora::BFieldPlugin *const pBFieldPlugin);
 
     /**
+     *  @brief  Set the lar transformation plugin used by pandora
+     * 
+     *  @param  pandora the pandora instance to register the lar transformation plugin with
+     *  @param  pLArTransformationPlugin address of the lar transformation plugin (will pass ownership to pandora)
+     */
+    static pandora::StatusCode SetLArTransformationPlugin(const pandora::Pandora &pandora, pandora::LArTransformationPlugin *const pLArTransformationPlugin);
+
+    /**
      *  @brief  Set the pseudo layer plugin used by pandora
      * 
-     *  @param  pandora the pandora instance to register the pseudo layer calculator with
+     *  @param  pandora the pandora instance to register the pseudo layer plugin with
      *  @param  pPseudoLayerPlugin address of the pseudo layer plugin (will pass ownership to pandora)
      */
     static pandora::StatusCode SetPseudoLayerPlugin(const pandora::Pandora &pandora, pandora::PseudoLayerPlugin *const pPseudoLayerPlugin);
@@ -173,7 +193,7 @@ public:
     /**
      *  @brief  Set the shower profile plugin used by pandora
      * 
-     *  @param  pandora the pandora instance to register the shower profile calculator with
+     *  @param  pandora the pandora instance to register the shower profile plugin with
      *  @param  pPseudoLayerPlugin address of the pseudo layer plugin (will pass ownership to pandora)
      */
     static pandora::StatusCode SetShowerProfilePlugin(const pandora::Pandora &pandora, pandora::ShowerProfilePlugin *const pShowerProfilePlugin);

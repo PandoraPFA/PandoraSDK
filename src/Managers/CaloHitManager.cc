@@ -55,7 +55,10 @@ StatusCode CaloHitManager::Create(const object_creation::CaloHit::Parameters &pa
         if (!pCaloHit || (m_nameToListMap.end() == inputIter))
             throw StatusCodeException(STATUS_CODE_FAILURE);
 
-        const unsigned int pseudoLayer(m_pPandora->GetPlugins()->GetPseudoLayerPlugin()->GetPseudoLayer(pCaloHit->GetPositionVector()));
+        // ATTN No longer require presence of pseudo layer plugin, accepting use of a single dummy value for all hits
+        const unsigned int pseudoLayer(m_pPandora->GetPlugins()->HasPseudoLayerPlugin() ?
+            m_pPandora->GetPlugins()->GetPseudoLayerPlugin()->GetPseudoLayer(pCaloHit->GetPositionVector()) : 0);
+
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pCaloHit)->SetPseudoLayer(pseudoLayer));
 
         inputIter->second->push_back(pCaloHit);

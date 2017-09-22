@@ -17,6 +17,35 @@ namespace pandora
 {
 
 /**
+ *  @brief  External parameters class
+ */
+class ExternalParameters
+{
+public:
+    /**
+     *  @brief  Default constructor
+     */
+    ExternalParameters();
+
+    /**
+     *  @brief  Destructor
+     */
+    virtual ~ExternalParameters();
+
+private:
+    /**
+     *  @brief  Register an attempt to access the external parameters during algorithm configuration
+     */
+    void RegisterParameterAccessAttempt();
+
+    unsigned int m_nParameterAccessAttempts;            ///< The number of attempts made to access the external parameters
+
+    friend class ExternallyConfiguredAlgorithm;
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
  *  @brief  Externally configured algorithm class. Provides ability for external specification of algorithm-defined parameter blocks.
  *          A single call to GetExternalParameters per algorithm type, per Pandora instance is enforced to prevent misuse.
  *          In the case of multiple instances of a given algorithm type, must revert to standard xml-based configuration.
@@ -24,33 +53,6 @@ namespace pandora
 class ExternallyConfiguredAlgorithm : public Algorithm
 {
 public:
-    /**
-     *  @brief  External parameters class
-     */
-    class ExternalParameters
-    {
-    public:
-        /**
-         *  @brief  Default constructor
-         */
-        ExternalParameters();
-
-        /**
-         *  @brief  Destructor
-         */
-        virtual ~ExternalParameters();
-
-    private:
-        /**
-         *  @brief  Register an attempt to access the external parameters during algorithm configuration
-         */
-        void RegisterParameterAccessAttempt();
-
-        unsigned int m_nParameterAccessAttempts;            ///< The number of attempts made to access the external parameters
-
-        friend class ExternallyConfiguredAlgorithm;
-    };
-
     /**
      *  @brief  Destructor
      */

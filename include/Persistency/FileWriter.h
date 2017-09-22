@@ -73,12 +73,18 @@ protected:
     virtual StatusCode WriteFooter() = 0;
 
     /**
-     *  @brief  Write a sub detector to the current position in the file
+     *  @brief  Write a sub detector to the file
      * 
-     *  @param  subDetectorName the sub detector name
      *  @param  pSubDetector address of the sub detector
      */
     virtual StatusCode WriteSubDetector(const SubDetector *const pSubDetector) = 0;
+
+    /**
+     *  @brief  Write a lar tpc to the file
+     * 
+     *  @param  pLArTPC address of the lar tpc
+     */
+    virtual StatusCode WriteLArTPC(const LArTPC *const pLArTPC) = 0;
 
     /**
      *  @brief  Write the detector gap parameters to the file
@@ -122,6 +128,11 @@ private:
      *  @brief  Write the sub detector parameters to the file
      */
     StatusCode WriteSubDetectorList();
+
+    /**
+     *  @brief  Write the lar tpc parameters to the file
+     */
+    StatusCode WriteLArTPCList();
 
     /**
      *  @brief  Write the detector gap parameters to the file

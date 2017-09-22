@@ -9,10 +9,12 @@
 #include "Api/PandoraContentApi.h"
 #include "Api/PandoraContentApiImpl.h"
 
+#include "Geometry/DetectorGap.h"
+#include "Geometry/LArTPC.h"
+#include "Geometry/SubDetector.h"
+
 #include "Objects/CaloHit.h"
-#include "Objects/DetectorGap.h"
 #include "Objects/MCParticle.h"
-#include "Objects/SubDetector.h"
 #include "Objects/Track.h"
 
 #include "Persistency/BinaryFileWriter.h"
@@ -76,10 +78,10 @@ StatusCode BinaryFileWriter::WriteHeader(const ContainerId containerId)
 
 StatusCode BinaryFileWriter::WriteFooter()
 {
-    if ((EVENT != m_containerId) && (GEOMETRY != m_containerId))
+    if ((EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable((EVENT == m_containerId) ? EVENT_END : GEOMETRY_END));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable((EVENT_CONTAINER == m_containerId) ? EVENT_END_COMPONENT : GEOMETRY_END_COMPONENT));
     m_containerId = UNKNOWN_CONTAINER;
 
     const std::ofstream::pos_type containerSize(m_fileStream.tellp() - m_containerPosition);
@@ -103,10 +105,10 @@ StatusCode BinaryFileWriter::WriteFooter()
 
 StatusCode BinaryFileWriter::WriteSubDetector(const SubDetector *const pSubDetector)
 {
-    if (GEOMETRY != m_containerId)
+    if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(SUB_DETECTOR));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(SUB_DETECTOR_COMPONENT));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pSubDetectorFactory->Write(pSubDetector, *this));
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetSubDetectorName()));
@@ -141,9 +143,37 @@ StatusCode BinaryFileWriter::WriteSubDetector(const SubDetector *const pSubDetec
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode BinaryFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
+{
+    if (GEOMETRY_CONTAINER != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(LAR_TPC_COMPONENT));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Write(pLArTPC, *this));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetLArTPCName()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetCenterX()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetCenterY()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetCenterZ()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWidthX()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWidthY()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWidthZ()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWirePitchU()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWirePitchV()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWirePitchW()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWireAngleU()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWireAngleV()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetSigmaUVW()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->IsDriftInPositiveX()));
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap)
 {
-    if (GEOMETRY != m_containerId)
+    if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     const LineGap *pLineGap(nullptr);
@@ -157,16 +187,18 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
 
     if (nullptr != pLineGap)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(LINE_GAP));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(LINE_GAP_COMPONENT));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Write(pLineGap, *this));
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetHitType()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineGapType()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineStartX()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineEndX()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineStartZ()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineEndZ()));
     }
     else if (nullptr != pBoxGap)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(BOX_GAP));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(BOX_GAP_COMPONENT));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBoxGapFactory->Write(pBoxGap, *this));
 
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetVertex()));
@@ -176,7 +208,7 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
     }
     else if (nullptr != pConcentricGap)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(CONCENTRIC_GAP));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(CONCENTRIC_GAP_COMPONENT));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pConcentricGapFactory->Write(pConcentricGap, *this));
 
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetMinZCoordinate()));
@@ -200,10 +232,10 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
 
 StatusCode BinaryFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(CALO_HIT));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(CALO_HIT_COMPONENT));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Write(pCaloHit, *this));
 
     const CellGeometry cellGeometry(pCaloHit->GetCellGeometry());
@@ -235,10 +267,10 @@ StatusCode BinaryFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
 
 StatusCode BinaryFileWriter::WriteTrack(const Track *const pTrack)
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(TRACK));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(TRACK_COMPONENT));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pTrackFactory->Write(pTrack, *this));
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetD0()));
@@ -264,10 +296,10 @@ StatusCode BinaryFileWriter::WriteTrack(const Track *const pTrack)
 
 StatusCode BinaryFileWriter::WriteMCParticle(const MCParticle *const pMCParticle)
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(MC_PARTICLE));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(MC_PARTICLE_COMPONENT));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pMCParticleFactory->Write(pMCParticle, *this));
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetEnergy()));
@@ -285,10 +317,10 @@ StatusCode BinaryFileWriter::WriteMCParticle(const MCParticle *const pMCParticle
 
 StatusCode BinaryFileWriter::WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight)
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(RELATIONSHIP));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(RELATIONSHIP_COMPONENT));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(relationshipId));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(address1));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(address2));

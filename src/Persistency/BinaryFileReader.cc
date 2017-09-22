@@ -47,7 +47,7 @@ StatusCode BinaryFileReader::ReadHeader()
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(m_containerId));
 
-    if ((EVENT != m_containerId) && (GEOMETRY != m_containerId))
+    if ((EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
     m_containerPosition = m_fileStream.tellg();
@@ -108,7 +108,7 @@ StatusCode BinaryFileReader::GoToGeometry(const unsigned int geometryNumber)
     if (!m_fileStream.good())
         return STATUS_CODE_FAILURE;
 
-    if (GEOMETRY != this->GetNextContainerId())
+    if (GEOMETRY_CONTAINER != this->GetNextContainerId())
         --nGeometriesRead;
 
     while (nGeometriesRead < static_cast<int>(geometryNumber))
@@ -130,7 +130,7 @@ StatusCode BinaryFileReader::GoToEvent(const unsigned int eventNumber)
     if (!m_fileStream.good())
         return STATUS_CODE_FAILURE;
 
-    if (EVENT != this->GetNextContainerId())
+    if (EVENT_CONTAINER != this->GetNextContainerId())
         --nEventsRead;
 
     while (nEventsRead < static_cast<int>(eventNumber))
@@ -159,15 +159,17 @@ StatusCode BinaryFileReader::ReadNextGeometryComponent()
 
     switch (componentId)
     {
-    case SUB_DETECTOR:
+    case SUB_DETECTOR_COMPONENT:
         return this->ReadSubDetector(false);
-    case LINE_GAP:
+    case LAR_TPC_COMPONENT:
+        return this->ReadLArTPC(false);
+    case LINE_GAP_COMPONENT:
         return this->ReadLineGap(false);
-    case BOX_GAP:
+    case BOX_GAP_COMPONENT:
         return this->ReadBoxGap(false);
-    case CONCENTRIC_GAP:
+    case CONCENTRIC_GAP_COMPONENT:
         return this->ReadConcentricGap(false);
-    case GEOMETRY_END:
+    case GEOMETRY_END_COMPONENT:
         m_containerId = UNKNOWN_CONTAINER;
         return STATUS_CODE_NOT_FOUND;
     default:
@@ -192,15 +194,15 @@ StatusCode BinaryFileReader::ReadNextEventComponent()
 
     switch (componentId)
     {
-    case CALO_HIT:
+    case CALO_HIT_COMPONENT:
         return this->ReadCaloHit(false);
-    case TRACK:
+    case TRACK_COMPONENT:
         return this->ReadTrack(false);
-    case MC_PARTICLE:
+    case MC_PARTICLE_COMPONENT:
         return this->ReadMCParticle(false);
-    case RELATIONSHIP:
+    case RELATIONSHIP_COMPONENT:
         return this->ReadRelationship(false);
-    case EVENT_END:
+    case EVENT_END_COMPONENT:
         m_containerId = UNKNOWN_CONTAINER;
         return STATUS_CODE_NOT_FOUND;
     default:
@@ -212,7 +214,7 @@ StatusCode BinaryFileReader::ReadNextEventComponent()
 
 StatusCode BinaryFileReader::ReadSubDetector(bool checkComponentId)
 {
-    if (GEOMETRY != m_containerId)
+    if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
@@ -220,7 +222,7 @@ StatusCode BinaryFileReader::ReadSubDetector(bool checkComponentId)
         ComponentId componentId(UNKNOWN_COMPONENT);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
 
-        if (SUB_DETECTOR != componentId)
+        if (SUB_DETECTOR_COMPONENT != componentId)
             return STATUS_CODE_FAILURE;
     }
 
@@ -298,9 +300,9 @@ StatusCode BinaryFileReader::ReadSubDetector(bool checkComponentId)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadLineGap(bool checkComponentId)
+StatusCode BinaryFileReader::ReadLArTPC(bool checkComponentId)
 {
-    if (GEOMETRY != m_containerId)
+    if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
@@ -308,7 +310,85 @@ StatusCode BinaryFileReader::ReadLineGap(bool checkComponentId)
         ComponentId componentId(UNKNOWN_COMPONENT);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
 
-        if (LINE_GAP != componentId)
+        if (LAR_TPC_COMPONENT != componentId)
+            return STATUS_CODE_FAILURE;
+    }
+
+    PandoraApi::Geometry::LArTPC::Parameters *pParameters = m_pLArTPCFactory->NewParameters();
+
+    try
+    {
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Read(*pParameters, *this));
+
+        std::string larTPCName;
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(larTPCName));
+        float centerX(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(centerX));
+        float centerY(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(centerY));
+        float centerZ(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(centerZ));
+        float widthX(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(widthX));
+        float widthY(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(widthY));
+        float widthZ(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(widthZ));
+        float wirePitchU(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(wirePitchU));
+        float wirePitchV(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(wirePitchV));
+        float wirePitchW(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(wirePitchW));
+        float wireAngleU(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(wireAngleU));
+        float wireAngleV(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(wireAngleV));
+        float sigmaUVW(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(sigmaUVW));
+        bool isDriftInPositiveX(false);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(isDriftInPositiveX));
+
+        pParameters->m_larTPCName = larTPCName;
+        pParameters->m_centerX = centerX;
+        pParameters->m_centerY = centerY;
+        pParameters->m_centerZ = centerZ;
+        pParameters->m_widthX = widthX;
+        pParameters->m_widthY = widthY;
+        pParameters->m_widthZ = widthZ;
+        pParameters->m_wirePitchU = wirePitchU;
+        pParameters->m_wirePitchV = wirePitchV;
+        pParameters->m_wirePitchW = wirePitchW;
+        pParameters->m_wireAngleU = wireAngleU;
+        pParameters->m_wireAngleV = wireAngleV;
+        pParameters->m_sigmaUVW = sigmaUVW;
+        pParameters->m_isDriftInPositiveX = isDriftInPositiveX;
+
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LArTPC::Create(*m_pPandora, *pParameters, *m_pLArTPCFactory));
+        delete pParameters;
+    }
+    catch (StatusCodeException &statusCodeException)
+    {
+        delete pParameters;
+        return statusCodeException.GetStatusCode();
+    }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode BinaryFileReader::ReadLineGap(bool checkComponentId)
+{
+    if (GEOMETRY_CONTAINER != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    if (checkComponentId)
+    {
+        ComponentId componentId(UNKNOWN_COMPONENT);
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
+
+        if (LINE_GAP_COMPONENT != componentId)
             return STATUS_CODE_FAILURE;
     }
 
@@ -318,14 +398,20 @@ StatusCode BinaryFileReader::ReadLineGap(bool checkComponentId)
     {
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Read(*pParameters, *this));
 
-        HitType hitType(ECAL);
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(hitType));
+        LineGapType lineGapType(TPC_WIRE_GAP_VIEW_U);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineGapType));
+        float lineStartX(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineStartX));
+        float lineEndX(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineEndX));
         float lineStartZ(0.f);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineStartZ));
         float lineEndZ(0.f);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineEndZ));
 
-        pParameters->m_hitType = hitType;
+        pParameters->m_lineGapType = lineGapType;
+        pParameters->m_lineStartX = lineStartX;
+        pParameters->m_lineEndX = lineEndX;
         pParameters->m_lineStartZ = lineStartZ;
         pParameters->m_lineEndZ = lineEndZ;
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*m_pPandora, *pParameters, *m_pLineGapFactory));
@@ -344,7 +430,7 @@ StatusCode BinaryFileReader::ReadLineGap(bool checkComponentId)
 
 StatusCode BinaryFileReader::ReadBoxGap(bool checkComponentId)
 {
-    if (GEOMETRY != m_containerId)
+    if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
@@ -352,7 +438,7 @@ StatusCode BinaryFileReader::ReadBoxGap(bool checkComponentId)
         ComponentId componentId(UNKNOWN_COMPONENT);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
 
-        if (BOX_GAP != componentId)
+        if (BOX_GAP_COMPONENT != componentId)
             return STATUS_CODE_FAILURE;
     }
 
@@ -391,7 +477,7 @@ StatusCode BinaryFileReader::ReadBoxGap(bool checkComponentId)
 
 StatusCode BinaryFileReader::ReadConcentricGap(bool checkComponentId)
 {
-    if (GEOMETRY != m_containerId)
+    if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
@@ -399,7 +485,7 @@ StatusCode BinaryFileReader::ReadConcentricGap(bool checkComponentId)
         ComponentId componentId(UNKNOWN_COMPONENT);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
 
-        if (CONCENTRIC_GAP != componentId)
+        if (CONCENTRIC_GAP_COMPONENT != componentId)
                 return STATUS_CODE_FAILURE;
     }
 
@@ -450,7 +536,7 @@ StatusCode BinaryFileReader::ReadConcentricGap(bool checkComponentId)
 
 StatusCode BinaryFileReader::ReadCaloHit(bool checkComponentId)
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
@@ -458,7 +544,7 @@ StatusCode BinaryFileReader::ReadCaloHit(bool checkComponentId)
         ComponentId componentId(UNKNOWN_COMPONENT);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
 
-        if (CALO_HIT != componentId)
+        if (CALO_HIT_COMPONENT != componentId)
             return STATUS_CODE_FAILURE;
     }
 
@@ -545,7 +631,7 @@ StatusCode BinaryFileReader::ReadCaloHit(bool checkComponentId)
 
 StatusCode BinaryFileReader::ReadTrack(bool checkComponentId)
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
@@ -553,7 +639,7 @@ StatusCode BinaryFileReader::ReadTrack(bool checkComponentId)
         ComponentId componentId(UNKNOWN_COMPONENT);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
 
-        if (TRACK != componentId)
+        if (TRACK_COMPONENT != componentId)
             return STATUS_CODE_FAILURE;
     }
 
@@ -625,7 +711,7 @@ StatusCode BinaryFileReader::ReadTrack(bool checkComponentId)
 
 StatusCode BinaryFileReader::ReadMCParticle(bool checkComponentId)
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
@@ -633,7 +719,7 @@ StatusCode BinaryFileReader::ReadMCParticle(bool checkComponentId)
         ComponentId componentId(UNKNOWN_COMPONENT);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
 
-        if (MC_PARTICLE != componentId)
+        if (MC_PARTICLE_COMPONENT != componentId)
             return STATUS_CODE_FAILURE;
     }
 
@@ -681,7 +767,7 @@ StatusCode BinaryFileReader::ReadMCParticle(bool checkComponentId)
 
 StatusCode BinaryFileReader::ReadRelationship(bool checkComponentId)
 {
-    if (EVENT != m_containerId)
+    if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
@@ -689,7 +775,7 @@ StatusCode BinaryFileReader::ReadRelationship(bool checkComponentId)
         ComponentId componentId(UNKNOWN_COMPONENT);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
 
-        if (RELATIONSHIP != componentId)
+        if (RELATIONSHIP_COMPONENT != componentId)
             return STATUS_CODE_FAILURE;
     }
 
@@ -704,15 +790,15 @@ StatusCode BinaryFileReader::ReadRelationship(bool checkComponentId)
 
     switch (relationshipId)
     {
-    case CALO_HIT_TO_MC:
+    case CALO_HIT_TO_MC_RELATIONSHIP:
         return PandoraApi::SetCaloHitToMCParticleRelationship(*m_pPandora, address1, address2, weight);
-    case TRACK_TO_MC:
+    case TRACK_TO_MC_RELATIONSHIP:
         return PandoraApi::SetTrackToMCParticleRelationship(*m_pPandora, address1, address2, weight);
-    case MC_PARENT_DAUGHTER:
+    case MC_PARENT_DAUGHTER_RELATIONSHIP:
         return PandoraApi::SetMCParentDaughterRelationship(*m_pPandora, address1, address2);
-    case TRACK_PARENT_DAUGHTER:
+    case TRACK_PARENT_DAUGHTER_RELATIONSHIP:
         return PandoraApi::SetTrackParentDaughterRelationship(*m_pPandora, address1, address2);
-    case TRACK_SIBLING:
+    case TRACK_SIBLING_RELATIONSHIP:
         return PandoraApi::SetTrackSiblingRelationship(*m_pPandora, address1, address2);
     default:
         return STATUS_CODE_FAILURE;

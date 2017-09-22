@@ -1,6 +1,9 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
 TAG v03-01-00
 --------------------------------------------------------------------------------------------------------------------------------------------
+LineGaps now have a line gap type, start/end x and z positions.
+Added LArTPC treatment to Geometry manager and persistency.
+Added LArTransformation plugin as a managed Pandora Process.
 Added ExternallyConfigured algorithm, offering extended configuration functionality for single instances of a given algorithm type per Pandora instance.
 Made external parameter functionality availability in event reading algorithm. Added ability to read lists of event files and terminate when last event reached.
 Added StopProcessingException.

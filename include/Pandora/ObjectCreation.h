@@ -231,12 +231,38 @@ public:
     typedef ObjectCreationHelper<SubDetectorParameters, ObjectMetadata, pandora::SubDetector> SubDetector;
 
     /**
+     *  @brief  LArTPCParameters class
+     */
+    class LArTPCParameters : public ObjectParameters
+    {
+    public:
+        pandora::InputString            m_larTPCName;               ///< The lar tpc name, must uniquely specify a single lar tpc
+        pandora::InputFloat             m_centerX;                  ///< The center in x, units mm
+        pandora::InputFloat             m_centerY;                  ///< The center in y, units mm
+        pandora::InputFloat             m_centerZ;                  ///< The center in z, units mm
+        pandora::InputFloat             m_widthX;                   ///< The width in x, units mm
+        pandora::InputFloat             m_widthY;                   ///< The width in y, units mm
+        pandora::InputFloat             m_widthZ;                   ///< The width in z, units mm
+        pandora::InputFloat             m_wirePitchU;               ///< The u wire pitch, units mm
+        pandora::InputFloat             m_wirePitchV;               ///< The v wire pitch, units mm
+        pandora::InputFloat             m_wirePitchW;               ///< The w wire pitch, units mm
+        pandora::InputFloat             m_wireAngleU;               ///< The u wire angle to the vertical, units radians
+        pandora::InputFloat             m_wireAngleV;               ///< The v wire angle to the vertical, units radians
+        pandora::InputFloat             m_sigmaUVW;                 ///< The u, v, w resolution, units mm
+        pandora::InputBool              m_isDriftInPositiveX;       ///< Whether the electron drift is in the positive x direction
+    };
+
+    typedef ObjectCreationHelper<LArTPCParameters, ObjectMetadata, pandora::LArTPC> LArTPC;
+
+    /**
      *  @brief  LineGapParameters class
      */
     class LineGapParameters : public ObjectParameters
     {
     public:
-        pandora::InputHitType           m_hitType;                  ///< The hit type associated with the line gap
+        pandora::InputLineGapType       m_lineGapType;              ///< The type of line gap, e.g. TPC wire-type gap (u, v, w), or drift-type gap
+        pandora::InputFloat             m_lineStartX;               ///< The line start x coordinate, units mm
+        pandora::InputFloat             m_lineEndX;                 ///< The line end x coordinate, units mm
         pandora::InputFloat             m_lineStartZ;               ///< The line start z coordinate, units mm
         pandora::InputFloat             m_lineEndZ;                 ///< The line end z coordinate, units mm
     };

@@ -12,6 +12,17 @@ namespace pandora
 {
 
 /**
+ *  @brief  Cell geometry enum
+ */
+enum CellGeometry
+{
+    RECTANGULAR,
+    POINTING
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
  *  @brief  Energy correction type enum
  */
 enum EnergyCorrectionType
@@ -23,12 +34,26 @@ enum EnergyCorrectionType
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
- *  @brief  Cell geometry enum
+ *  @brief  Granularity enum
  */
-enum CellGeometry
+enum Granularity
 {
-    RECTANGULAR,
-    POINTING
+    VERY_FINE,
+    FINE,
+    COARSE,
+    VERY_COARSE
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ *  @brief  Calorimeter hit region enum
+ */
+enum HitRegion
+{
+    BARREL,
+    ENDCAP,
+    SINGLE_REGION
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,13 +77,14 @@ enum HitType
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
- *  @brief  Calorimeter hit region enum
+ *  @brief  Line gap type
  */
-enum HitRegion
+enum LineGapType
 {
-    BARREL,
-    ENDCAP,
-    SINGLE_REGION
+    TPC_WIRE_GAP_VIEW_U,
+    TPC_WIRE_GAP_VIEW_V,
+    TPC_WIRE_GAP_VIEW_W,
+    TPC_DRIFT_GAP
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -97,20 +123,6 @@ enum SubDetectorType
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
- *  @brief  Vertex type enum
- */
-enum VertexType
-{
-    VERTEX_U,
-    VERTEX_V,
-    VERTEX_W,
-    VERTEX_3D,
-    VERTEX_CUSTOM
-};
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-/**
  *  @brief  Vertex label enum
  */
 enum VertexLabel
@@ -126,14 +138,15 @@ enum VertexLabel
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
- *  @brief  Granularity enum
+ *  @brief  Vertex type enum
  */
-enum Granularity
+enum VertexType
 {
-    VERY_FINE,
-    FINE,
-    COARSE,
-    VERY_COARSE
+    VERTEX_U,
+    VERTEX_V,
+    VERTEX_W,
+    VERTEX_3D,
+    VERTEX_CUSTOM
 };
 
 } // namespace pandora

@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 #include <list>
 #include <map>
 #include <set>
@@ -25,16 +26,19 @@ namespace pandora
 class Algorithm;
 class AlgorithmTool;
 class BFieldPlugin;
+class BoxGap;
 class CaloHit;
 class CartesianVector;
 class Cluster;
-class DetectorGap;
-class LineGap;
-class BoxGap;
 class ConcentricGap;
+class DetectorGap;
 class EnergyCorrectionPlugin;
+class ExternalParameters;
 class Helix;
 class Histogram;
+class LArTPC;
+class LArTransformationPlugin;
+class LineGap;
 class MCParticle;
 class OrderedCaloHitList;
 class ParticleFlowObject;
@@ -118,6 +122,28 @@ inline std::string TypeToString(const void *const &t)
 {
     const uintptr_t address(reinterpret_cast<uintptr_t>(t));
     return TypeToString(address);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <class T>
+inline std::string TypeToStringPrecision(const T &t, const unsigned int precision = 12)
+{
+    const std::streamsize ss(std::cout.precision());
+    std::ostringstream oss;
+
+    if ((oss << std::setprecision(precision) << t << std::setprecision(ss)).fail())
+        throw;
+
+    return oss.str();
+}
+
+template <>
+inline std::string TypeToStringPrecision(const void *const &t, const unsigned int precision)
+{
+    const uintptr_t address(reinterpret_cast<uintptr_t>(t));
+    return TypeToStringPrecision(address, precision);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -406,6 +432,7 @@ inline void MyList<T>::clear()
 typedef MANAGED_CONTAINER<const CaloHit *> CaloHitList;
 typedef MANAGED_CONTAINER<const Cluster *> ClusterList;
 typedef MANAGED_CONTAINER<const DetectorGap *> DetectorGapList;
+typedef MANAGED_CONTAINER<const LArTPC *> LArTPCList;
 typedef MANAGED_CONTAINER<const MCParticle *> MCParticleList;
 typedef MANAGED_CONTAINER<const ParticleFlowObject *> ParticleFlowObjectList;
 typedef MANAGED_CONTAINER<const ParticleFlowObject *> PfoList;
@@ -416,6 +443,7 @@ typedef MANAGED_CONTAINER<const Vertex *> VertexList;
 typedef std::vector<const CaloHit *> CaloHitVector;
 typedef std::vector<const Cluster *> ClusterVector;
 typedef std::vector<const DetectorGap *> DetectorGapVector;
+typedef std::vector<const LArTPC *> LArTPCVector;
 typedef std::vector<const MCParticle *> MCParticleVector;
 typedef std::vector<const ParticleFlowObject *> ParticleFlowObjectVector;
 typedef std::vector<const ParticleFlowObject *> PfoVector;
@@ -426,6 +454,7 @@ typedef std::vector<const Vertex *> VertexVector;
 typedef std::unordered_set<const CaloHit *> CaloHitSet;
 typedef std::unordered_set<const Cluster *> ClusterSet;
 typedef std::unordered_set<const DetectorGap *> DetectorGapSet;
+typedef std::unordered_set<const LArTPC *> LArTPCSet;
 typedef std::unordered_set<const MCParticle *> MCParticleSet;
 typedef std::unordered_set<const ParticleFlowObject *> ParticleFlowObjectSet;
 typedef std::unordered_set<const ParticleFlowObject *> PfoSet;
@@ -449,6 +478,7 @@ typedef std::unordered_map<const Track *, const Cluster * > TrackToClusterMap;
 
 typedef std::set<std::string> StringSet;
 typedef std::map<std::string, const SubDetector *> SubDetectorMap;
+typedef std::map<std::string, const LArTPC *> LArTPCMap;
 
 } // namespace pandora
 

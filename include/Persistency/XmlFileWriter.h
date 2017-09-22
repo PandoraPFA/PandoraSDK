@@ -52,6 +52,7 @@ private:
     StatusCode WriteHeader(const ContainerId containerId);
     StatusCode WriteFooter();
     StatusCode WriteSubDetector(const SubDetector *const pSubDetector);
+    StatusCode WriteLArTPC(const LArTPC *const pLArTPC);
     StatusCode WriteDetectorGap(const DetectorGap *const pDetectorGap);
     StatusCode WriteCaloHit(const CaloHit *const pCaloHit);
     StatusCode WriteTrack(const Track *const pTrack);
@@ -72,7 +73,7 @@ inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const 
         return STATUS_CODE_FAILURE;
 
     TiXmlElement *const pTiXmlElement = new TiXmlElement(xmlKey);
-    pTiXmlElement->LinkEndChild(new TiXmlText(TypeToString(t)));
+    pTiXmlElement->LinkEndChild(new TiXmlText(TypeToStringPrecision(t)));
     m_pCurrentXmlElement->LinkEndChild(pTiXmlElement);
 
     return STATUS_CODE_SUCCESS;
@@ -81,14 +82,14 @@ inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const 
 template<>
 inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const CartesianVector &t)
 {
-    return this->WriteVariable(xmlKey, TypeToString(t.GetX()) + " " + TypeToString(t.GetY()) + " " + TypeToString(t.GetZ()));
+    return this->WriteVariable(xmlKey, TypeToStringPrecision(t.GetX()) + " " + TypeToStringPrecision(t.GetY()) + " " + TypeToStringPrecision(t.GetZ()));
 }
 
 template<>
 inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const TrackState &t)
 {
-    return this->WriteVariable(xmlKey, TypeToString(t.GetPosition().GetX()) + " " + TypeToString(t.GetPosition().GetY()) + " " + TypeToString(t.GetPosition().GetZ()) +
-        " " + TypeToString(t.GetMomentum().GetX()) + " " + TypeToString(t.GetMomentum().GetY()) + " " + TypeToString(t.GetMomentum().GetZ()));
+    return this->WriteVariable(xmlKey, TypeToStringPrecision(t.GetPosition().GetX()) + " " + TypeToStringPrecision(t.GetPosition().GetY()) + " " + TypeToStringPrecision(t.GetPosition().GetZ()) +
+        " " + TypeToStringPrecision(t.GetMomentum().GetX()) + " " + TypeToStringPrecision(t.GetMomentum().GetY()) + " " + TypeToStringPrecision(t.GetMomentum().GetZ()));
 }
 
 } // namespace pandora
