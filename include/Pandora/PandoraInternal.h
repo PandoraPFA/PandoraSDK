@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 #include <list>
 #include <map>
 #include <set>
@@ -121,6 +122,28 @@ inline std::string TypeToString(const void *const &t)
 {
     const uintptr_t address(reinterpret_cast<uintptr_t>(t));
     return TypeToString(address);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <class T>
+inline std::string TypeToStringPrecision(const T &t, const unsigned int precision = 12)
+{
+    const std::streamsize ss(std::cout.precision());
+    std::ostringstream oss;
+
+    if ((oss << std::setprecision(precision) << t << std::setprecision(ss)).fail())
+        throw;
+
+    return oss.str();
+}
+
+template <>
+inline std::string TypeToStringPrecision(const void *const &t, const unsigned int precision)
+{
+    const uintptr_t address(reinterpret_cast<uintptr_t>(t));
+    return TypeToStringPrecision(address, precision);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
