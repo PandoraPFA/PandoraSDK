@@ -96,18 +96,18 @@ public:
     float GetWirePitchW() const;
 
     /**
-     *  @brief  Get the u wire inclination, units radians
+     *  @brief  Get the u wire angle to the vertical, units radians
      *
-     *  @return the u wire inclination
+     *  @return the u wire angle to the vertical
      */
-    float GetThetaU() const;
+    float GetWireAngleU() const;
 
     /**
-     *  @brief  Get the v wire inclination, units radians
+     *  @brief  Get the v wire angle to the vertical, units radians
      *
-     *  @return the v wire inclination
+     *  @return the v wire angle to the vertical
      */
-    float GetThetaV() const;
+    float GetWireAngleV() const;
 
     /**
      *  @brief  Get the u, v, w resolution, units mm
@@ -146,8 +146,8 @@ protected:
     float           m_wirePitchU;               ///< The u wire pitch, units mm
     float           m_wirePitchV;               ///< The v wire pitch, units mm
     float           m_wirePitchW;               ///< The w wire pitch, units mm
-    float           m_thetaU;                   ///< The u wire inclination, units radians
-    float           m_thetaV;                   ///< The v wire inclination, units radians
+    float           m_wireAngleU;               ///< The u wire angle to the vertical, units radians
+    float           m_wireAngleV;               ///< The v wire angle to the vertical, units radians
     float           m_sigmaUVW;                 ///< The u, v, w resolution, units mm
     bool            m_isDriftInPositiveX;       ///< Whether the electron drift is in the positive x direction
 
@@ -227,16 +227,16 @@ inline float LArTPC::GetWirePitchW() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArTPC::GetThetaU() const
+inline float LArTPC::GetWireAngleU() const
 {
-    return m_thetaU;
+    return m_wireAngleU;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline float LArTPC::GetThetaV() const
+inline float LArTPC::GetWireAngleV() const
 {
-    return m_thetaV;
+    return m_wireAngleV;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

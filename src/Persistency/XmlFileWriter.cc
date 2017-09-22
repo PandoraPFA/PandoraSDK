@@ -155,8 +155,8 @@ StatusCode XmlFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WirePitchU", pLArTPC->GetWirePitchU()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WirePitchV", pLArTPC->GetWirePitchV()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WirePitchW", pLArTPC->GetWirePitchW()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ThetaU", pLArTPC->GetThetaU()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("ThetaV", pLArTPC->GetThetaV()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WireAngleU", pLArTPC->GetWireAngleU()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WireAngleV", pLArTPC->GetWireAngleV()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsDriftInPositiveX", pLArTPC->IsDriftInPositiveX()));
 
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
