@@ -157,6 +157,7 @@ StatusCode XmlFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WirePitchW", pLArTPC->GetWirePitchW()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WireAngleU", pLArTPC->GetWireAngleU()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("WireAngleV", pLArTPC->GetWireAngleV()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("SigmaUVW", pLArTPC->GetSigmaUVW()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsDriftInPositiveX", pLArTPC->IsDriftInPositiveX()));
 
     m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);

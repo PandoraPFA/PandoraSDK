@@ -352,6 +352,8 @@ StatusCode XmlFileReader::ReadLArTPC()
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("WireAngleU", wireAngleU));
         float wireAngleV(0.f);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("WireAngleV", wireAngleV));
+        float sigmaUVW(0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("SigmaUVW", sigmaUVW));
         bool isDriftInPositiveX(false);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("IsDriftInPositiveX", isDriftInPositiveX));
 
@@ -367,6 +369,7 @@ StatusCode XmlFileReader::ReadLArTPC()
         pParameters->m_wirePitchW = wirePitchW;
         pParameters->m_wireAngleU = wireAngleU;
         pParameters->m_wireAngleV = wireAngleV;
+        pParameters->m_sigmaUVW = sigmaUVW;
         pParameters->m_isDriftInPositiveX = isDriftInPositiveX;
 
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LArTPC::Create(*m_pPandora, *pParameters, *m_pLArTPCFactory));

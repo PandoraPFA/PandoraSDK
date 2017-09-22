@@ -163,6 +163,7 @@ StatusCode BinaryFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWirePitchW()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWireAngleU()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWireAngleV()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetSigmaUVW()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->IsDriftInPositiveX()));
 
     return STATUS_CODE_SUCCESS;
