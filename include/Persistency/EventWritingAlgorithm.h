@@ -41,7 +41,7 @@ public:
      */
     ~EventWritingAlgorithm();
 
-private:
+protected:
     pandora::StatusCode Initialize();
     pandora::StatusCode Run();
     pandora::StatusCode ReadSettings(const pandora::TiXmlHandle xmlHandle);

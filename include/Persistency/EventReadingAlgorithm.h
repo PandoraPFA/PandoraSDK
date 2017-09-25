@@ -54,7 +54,7 @@ public:
         pandora::InputUInt      m_skipToEvent;                  ///< Index of first event to consider in input file
     };
 
-private:
+protected:
     pandora::StatusCode Initialize();
     pandora::StatusCode Run();
 
