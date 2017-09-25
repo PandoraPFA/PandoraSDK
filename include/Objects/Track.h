@@ -199,7 +199,7 @@ protected:
     /**
      *  @brief  Constructor
      * 
-     *  @param  parameters the calo hit parameters
+     *  @param  parameters the track parameters
      */
     Track(const object_creation::Track::Parameters &parameters);
 
