@@ -290,6 +290,17 @@ StatusCode AlgorithmObjectManager<T>::DropCurrentList(const Algorithm *const pAl
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<typename T>
+StatusCode AlgorithmObjectManager<T>::RenameList(const std::string &oldListName, const std::string &newListName)
+{
+    if (m_canMakeNewObjects)
+        return STATUS_CODE_NOT_ALLOWED;
+
+    return Manager<T>::RenameList(oldListName, newListName);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template<typename T>
 StatusCode AlgorithmObjectManager<T>::ResetAlgorithmInfo(const Algorithm *const pAlgorithm, bool isAlgorithmFinished)
 {
     ObjectList objectList;

@@ -121,6 +121,14 @@ pandora::StatusCode PandoraContentApi::GetList(const pandora::Algorithm &algorit
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
+pandora::StatusCode PandoraContentApi::RenameList(const pandora::Algorithm &algorithm, const std::string &oldListName, const std::string &newListName)
+{
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->RenameList<T>(oldListName, newListName);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
 pandora::StatusCode PandoraContentApi::SaveList(const pandora::Algorithm &algorithm, const T &t, const std::string &newListName)
 {
     return algorithm.GetPandora().GetPandoraContentApiImpl()->SaveList(t, newListName);
@@ -412,6 +420,13 @@ template pandora::StatusCode PandoraContentApi::GetList<pandora::MCParticleList>
 template pandora::StatusCode PandoraContentApi::GetList<pandora::ClusterList>(const pandora::Algorithm &, const std::string &, const pandora::ClusterList *&);
 template pandora::StatusCode PandoraContentApi::GetList<pandora::PfoList>(const pandora::Algorithm &, const std::string &, const pandora::PfoList *&);
 template pandora::StatusCode PandoraContentApi::GetList<pandora::VertexList>(const pandora::Algorithm &, const std::string &, const pandora::VertexList *&);
+
+template pandora::StatusCode PandoraContentApi::RenameList<pandora::CaloHitList>(const pandora::Algorithm &, const std::string &, const std::string &);
+template pandora::StatusCode PandoraContentApi::RenameList<pandora::TrackList>(const pandora::Algorithm &, const std::string &, const std::string &);
+template pandora::StatusCode PandoraContentApi::RenameList<pandora::MCParticleList>(const pandora::Algorithm &, const std::string &, const std::string &);
+template pandora::StatusCode PandoraContentApi::RenameList<pandora::ClusterList>(const pandora::Algorithm &, const std::string &, const std::string &);
+template pandora::StatusCode PandoraContentApi::RenameList<pandora::PfoList>(const pandora::Algorithm &, const std::string &, const std::string &);
+template pandora::StatusCode PandoraContentApi::RenameList<pandora::VertexList>(const pandora::Algorithm &, const std::string &, const std::string &);
 
 template pandora::StatusCode PandoraContentApi::SaveList<pandora::CaloHitList>(const pandora::Algorithm &, const pandora::CaloHitList &, const std::string &);
 template pandora::StatusCode PandoraContentApi::SaveList<pandora::TrackList>(const pandora::Algorithm &, const pandora::TrackList &, const std::string &);

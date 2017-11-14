@@ -147,6 +147,17 @@ StatusCode InputObjectManager<T>::RemoveObjectsFromList(const std::string &listN
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<typename T>
+StatusCode InputObjectManager<T>::RenameList(const std::string &oldListName, const std::string &newListName)
+{
+    if (oldListName == m_inputListName)
+        return STATUS_CODE_NOT_ALLOWED;
+
+    return Manager<T>::RenameList(oldListName, newListName);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template<typename T>
 StatusCode InputObjectManager<T>::EraseAllContent()
 {
     typename Manager<T>::NameToListMap::const_iterator inputIter = Manager<T>::m_nameToListMap.find(m_inputListName);

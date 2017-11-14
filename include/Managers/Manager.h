@@ -104,6 +104,14 @@ protected:
     virtual StatusCode DropCurrentList(const Algorithm *const pAlgorithm);
 
     /**
+     *  @brief  Rename a saved list, altering its saved name from a specified old list name to a specified new list name
+     * 
+     *  @param  oldListName the old list name
+     *  @param  newListName the new list name
+     */
+    virtual StatusCode RenameList(const std::string &oldListName, const std::string &newListName);
+
+    /**
      *  @brief  Create a temporary list associated with a particular algorithm
      *
      *  @param  pAlgorithm address of the algorithm

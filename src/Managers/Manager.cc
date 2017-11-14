@@ -139,6 +139,41 @@ StatusCode Manager<T>::DropCurrentList(const Algorithm *const pAlgorithm)
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template<typename T>
+StatusCode Manager<T>::RenameList(const std::string &oldListName, const std::string &newListName)
+{
+    if ((oldListName == newListName) || newListName.empty())
+        return STATUS_CODE_INVALID_PARAMETER;
+
+    if (m_nameToListMap.end() == m_nameToListMap.find(oldListName))
+        return STATUS_CODE_NOT_FOUND;
+
+    if ((oldListName == m_nullListName) || (m_savedLists.end() == m_savedLists.find(oldListName)))
+        return STATUS_CODE_NOT_ALLOWED;
+
+    if (m_savedLists.end() != m_savedLists.find(newListName))
+        return STATUS_CODE_ALREADY_PRESENT;
+
+    m_nameToListMap[newListName] = m_nameToListMap.at(oldListName);
+    m_nameToListMap.erase(oldListName);
+
+    m_savedLists.insert(newListName);
+    m_savedLists.erase(oldListName);
+
+    if (oldListName == m_currentListName)
+        m_currentListName = newListName;
+
+    for (typename AlgorithmInfoMap::value_type &mapEntry : m_algorithmInfoMap)
+    {
+        if (oldListName == mapEntry.second.m_parentListName)
+            mapEntry.second.m_parentListName = newListName;
+    }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template<typename T>
 StatusCode Manager<T>::CreateTemporaryListAndSetCurrent(const Algorithm *const pAlgorithm, std::string &temporaryListName)
 {
     typename AlgorithmInfoMap::iterator iter = m_algorithmInfoMap.find(pAlgorithm);

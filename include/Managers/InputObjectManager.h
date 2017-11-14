@@ -77,6 +77,14 @@ protected:
     virtual StatusCode RemoveObjectsFromList(const std::string &listName, const ObjectList &objectList);
 
     /**
+     *  @brief  Rename a saved list, altering its saved name from a specified old list name to a specified new list name
+     * 
+     *  @param  oldListName the old list name
+     *  @param  newListName the new list name
+     */
+    virtual StatusCode RenameList(const std::string &oldListName, const std::string &newListName);
+
+    /**
      *  @brief  Erase all manager content
      */
     virtual StatusCode EraseAllContent();
