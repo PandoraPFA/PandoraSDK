@@ -149,4 +149,17 @@ EnergyCorrections::EnergyCorrectionPluginMap &EnergyCorrections::GetEnergyCorrec
     }
 }
 
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode EnergyCorrections::ResetForNextEvent()
+{
+    for (const EnergyCorrectionPluginMap::value_type &mapEntry : m_hadEnergyCorrectionPluginMap)
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, mapEntry.second->Reset());
+
+    for (const EnergyCorrectionPluginMap::value_type &mapEntry : m_emEnergyCorrectionPluginMap)
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, mapEntry.second->Reset());
+
+    return STATUS_CODE_SUCCESS;
+}
+
 } // namespace pandora

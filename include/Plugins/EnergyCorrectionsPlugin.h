@@ -108,6 +108,11 @@ private:
      */
     EnergyCorrectionPluginMap &GetEnergyCorrectionPluginMap(const EnergyCorrectionType energyCorrectionType);
 
+    /**
+     *  @brief  Call the reset callback in all managed plugins
+     */
+    StatusCode ResetForNextEvent();
+
     const Pandora *const            m_pPandora;                         ///< Address of the associated pandora instance
     EnergyCorrectionPluginMap       m_hadEnergyCorrectionPluginMap;     ///< The hadronic energy correction plugin map
     EnergyCorrectionPluginMap       m_emEnergyCorrectionPluginMap;      ///< The electromagnetic energy correction plugin map

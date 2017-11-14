@@ -220,4 +220,17 @@ StatusCode AlgorithmManager::FindSpecificAlgorithmInstance(TiXmlElement *const p
     }
 }
 
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode AlgorithmManager::ResetForNextEvent()
+{
+    for (AlgorithmMap::value_type &mapEntry : m_algorithmMap)
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, mapEntry.second->Reset());
+
+    for (AlgorithmTool *const pAlgorithmTool : m_algorithmToolVector)
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pAlgorithmTool->Reset());
+
+    return STATUS_CODE_SUCCESS;
+}
+
 } // namespace pandora

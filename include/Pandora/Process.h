@@ -66,6 +66,11 @@ protected:
     virtual StatusCode Initialize();
 
     /**
+     *  @brief  Perform any operations when pandora is reset, typically at the end of each event
+     */
+    virtual StatusCode Reset();
+
+    /**
      *  @brief  Destructor
      */
     virtual ~Process();
@@ -119,6 +124,13 @@ inline const Pandora &Process::GetPandora() const
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 inline StatusCode Process::Initialize()
+{
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline StatusCode Process::Reset()
 {
     return STATUS_CODE_SUCCESS;
 }
