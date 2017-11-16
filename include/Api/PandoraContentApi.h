@@ -170,6 +170,16 @@ public:
     template <typename T>
     static pandora::StatusCode GetList(const pandora::Algorithm &algorithm, const std::string &listName, const T *&pT);
 
+    /**
+     *  @brief  Rename a saved list, altering its saved name from a specified old list name to a specified new list name
+     * 
+     *  @param  algorithm the algorithm calling this function
+     *  @param  oldListName the old list name
+     *  @param  newListName the new list name
+     */
+    template <typename T>
+    static pandora::StatusCode RenameList(const pandora::Algorithm &algorithm, const std::string &oldListName, const std::string &newListName);
+
 
     /* List-manipulation functions: input objects only (CaloHits, Tracks, MCParticles) */
 

@@ -185,6 +185,15 @@ private:
     template <typename T>
     StatusCode GetList(const std::string &listName, const T *&pT) const;
 
+    /**
+     *  @brief  Rename a saved list, altering its saved name from a specified old list name to a specified new list name
+     * 
+     *  @param  oldListName the old list name
+     *  @param  newListName the new list name
+     */
+    template <typename T>
+    StatusCode RenameList(const std::string &oldListName, const std::string &newListName) const;
+
 
     /* List-manipulation functions: input objects only (CaloHits, Tracks, MCParticles) */
 

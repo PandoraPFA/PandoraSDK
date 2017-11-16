@@ -150,6 +150,11 @@ private:
      */
     StatusCode InitializePlugins(const TiXmlHandle *const pXmlHandle);
 
+    /**
+     *  @brief  Call the reset callback in all managed plugins
+     */
+    StatusCode ResetForNextEvent();
+
     BFieldPlugin                   *m_pBFieldPlugin;                    ///< Address of the bfield plugin
     LArTransformationPlugin        *m_pLArTransformationPlugin;         ///< Address of the lar transformation plugin
     PseudoLayerPlugin              *m_pPseudoLayerPlugin;               ///< Address of the pseudolayer plugin

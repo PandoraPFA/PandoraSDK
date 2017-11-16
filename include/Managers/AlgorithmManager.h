@@ -98,6 +98,11 @@ private:
      */
     StatusCode FindSpecificAlgorithmInstance(TiXmlElement *const pXmlElement, std::string &algorithmName, std::string &xmlInstanceLabel) const;
 
+    /**
+     *  @brief  Call the reset callback in all managed algorithms and algorithm tools
+     */
+    StatusCode ResetForNextEvent();
+
     typedef std::map<const std::string, Algorithm *const> AlgorithmMap;
     typedef std::map<const std::string, AlgorithmFactory *const> AlgorithmFactoryMap;
     typedef std::map<const std::string, const std::string> SpecificAlgorithmInstanceMap;

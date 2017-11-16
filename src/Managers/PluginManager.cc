@@ -247,4 +247,26 @@ StatusCode PluginManager::InitializePlugins(const TiXmlHandle *const pXmlHandle)
     return STATUS_CODE_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode PluginManager::ResetForNextEvent()
+{
+    if (m_pBFieldPlugin)
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBFieldPlugin->Reset());
+
+    if (m_pLArTransformationPlugin)
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTransformationPlugin->Reset());
+
+    if (m_pPseudoLayerPlugin)
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPseudoLayerPlugin->Reset());
+
+    if (m_pShowerProfilePlugin)
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pShowerProfilePlugin->Reset());
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pEnergyCorrections->ResetForNextEvent());
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pParticleId->ResetForNextEvent());
+
+    return STATUS_CODE_SUCCESS;
+}
+
 } // namespace pandora

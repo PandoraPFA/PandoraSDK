@@ -127,6 +127,11 @@ private:
      */
     StatusCode InitializePlugin(const TiXmlHandle *const pXmlHandle, const std::string &xmlTagName, ParticleIdPlugin *&pParticleIdPlugin);
 
+    /**
+     *  @brief  Call the reset callback in all managed plugins
+     */
+    StatusCode ResetForNextEvent();
+
     const Pandora *const        m_pPandora;                   ///< Address of the associated pandora instance
     ParticleIdPlugin           *m_pEmShowerPlugin;            ///< The electromagnetic shower id plugin pointer
     ParticleIdPlugin           *m_pPhotonPlugin;              ///< The photon id plugin pointer

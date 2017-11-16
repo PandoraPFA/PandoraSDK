@@ -307,6 +307,14 @@ StatusCode PandoraContentApiImpl::GetList(const std::string &listName, const T *
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
+StatusCode PandoraContentApiImpl::RenameList(const std::string &oldListName, const std::string &newListName) const
+{
+    return this->GetManager<T>()->RenameList(oldListName, newListName);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename T>
 StatusCode PandoraContentApiImpl::SaveList(const T &t, const std::string &newListName) const
 {
     return this->GetManager<T>()->SaveList(newListName, t);
@@ -909,6 +917,13 @@ template StatusCode PandoraContentApiImpl::GetList<MCParticleList>(const std::st
 template StatusCode PandoraContentApiImpl::GetList<ClusterList>(const std::string &, const ClusterList *&) const;
 template StatusCode PandoraContentApiImpl::GetList<PfoList>(const std::string &, const PfoList *&) const;
 template StatusCode PandoraContentApiImpl::GetList<VertexList>(const std::string &, const VertexList *&) const;
+
+template StatusCode PandoraContentApiImpl::RenameList<CaloHitList>(const std::string &, const std::string &) const;
+template StatusCode PandoraContentApiImpl::RenameList<TrackList>(const std::string &, const std::string &) const;
+template StatusCode PandoraContentApiImpl::RenameList<MCParticleList>(const std::string &, const std::string &) const;
+template StatusCode PandoraContentApiImpl::RenameList<ClusterList>(const std::string &, const std::string &) const;
+template StatusCode PandoraContentApiImpl::RenameList<PfoList>(const std::string &, const std::string &) const;
+template StatusCode PandoraContentApiImpl::RenameList<VertexList>(const std::string &, const std::string &) const;
 
 template StatusCode PandoraContentApiImpl::SaveList<CaloHitList>(const CaloHitList &, const std::string &) const;
 template StatusCode PandoraContentApiImpl::SaveList<TrackList>(const TrackList &, const std::string &) const;

@@ -145,6 +145,16 @@ StatusCode ParticleId::InitializePlugin(const TiXmlHandle *const pXmlHandle, con
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ParticleId::ResetForNextEvent()
+{
+    for (const ParticleIdPluginMap::value_type &mapEntry : m_particleIdPluginMap)
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, mapEntry.second->Reset());
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template bool ParticleId::IsEmShower(const Cluster *const ) const;
