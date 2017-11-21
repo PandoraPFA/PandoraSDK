@@ -320,8 +320,8 @@ StatusCode BinaryFileReader::ReadLArTPC(bool checkComponentId)
     {
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Read(*pParameters, *this));
 
-        std::string larTPCName;
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(larTPCName));
+        unsigned int larTPCVolumeId;
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(larTPCVolumeId));
         float centerX(0.f);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(centerX));
         float centerY(0.f);
@@ -349,7 +349,7 @@ StatusCode BinaryFileReader::ReadLArTPC(bool checkComponentId)
         bool isDriftInPositiveX(false);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(isDriftInPositiveX));
 
-        pParameters->m_larTPCName = larTPCName;
+        pParameters->m_larTPCVolumeId = larTPCVolumeId;
         pParameters->m_centerX = centerX;
         pParameters->m_centerY = centerY;
         pParameters->m_centerZ = centerZ;

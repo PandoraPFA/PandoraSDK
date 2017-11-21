@@ -145,7 +145,7 @@ StatusCode XmlFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
     m_pCurrentXmlElement = new TiXmlElement("LArTPC");
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Write(pLArTPC, *this));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LArTPCName", pLArTPC->GetLArTPCName()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LArTPCVolumeId", pLArTPC->GetLArTPCVolumeId()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CenterX", pLArTPC->GetCenterX()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CenterY", pLArTPC->GetCenterY()));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("CenterZ", pLArTPC->GetCenterZ()));

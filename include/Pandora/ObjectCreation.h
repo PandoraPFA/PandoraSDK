@@ -237,7 +237,7 @@ public:
     class LArTPCParameters : public ObjectParameters
     {
     public:
-        pandora::InputString            m_larTPCName;               ///< The lar tpc name, must uniquely specify a single lar tpc
+        pandora::InputUInt              m_larTPCVolumeId;           ///< The lar tpc volume id, must uniquely specify a single lar tpc
         pandora::InputFloat             m_centerX;                  ///< The center in x, units mm
         pandora::InputFloat             m_centerY;                  ///< The center in y, units mm
         pandora::InputFloat             m_centerZ;                  ///< The center in z, units mm

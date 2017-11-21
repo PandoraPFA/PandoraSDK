@@ -26,11 +26,11 @@ class LArTPC
 {
 public:
     /**
-     *  @brief  Get the lar tpc name, uniquely specifying the lar tpc
+     *  @brief  Get the lar volume id, uniquely specifying the lar tpc
      *
-     *  @return the lar tpc name
+     *  @return the lar tpc volume id
      */
-    const std::string &GetLArTPCName() const;
+    unsigned int GetLArTPCVolumeId() const;
 
     /**
      *  @brief  Get center in x, units mm
@@ -136,7 +136,7 @@ protected:
      */
     virtual ~LArTPC();
 
-    std::string     m_larTPCName;               ///< The lar tpc name, must uniquely specify a single lar tpc
+    unsigned int    m_larTPCVolumeId;           ///< The lar tpc volume id, must uniquely specify a single lar tpc
     float           m_centerX;                  ///< The center in x, units mm
     float           m_centerY;                  ///< The center in y, units mm
     float           m_centerZ;                  ///< The center in z, units mm
@@ -157,9 +157,9 @@ protected:
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const std::string &LArTPC::GetLArTPCName() const
+inline unsigned int LArTPC::GetLArTPCVolumeId() const
 {
-    return m_larTPCName;
+    return m_larTPCVolumeId;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
