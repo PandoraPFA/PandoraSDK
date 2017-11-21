@@ -51,6 +51,7 @@ bool CaloHit::operator< (const CaloHit &rhs) const
 
 CaloHit::CaloHit(const object_creation::CaloHit::Parameters &parameters) :
     m_positionVector(parameters.m_positionVector.Get()),
+    m_x0(0.f),
     m_expectedDirection(parameters.m_expectedDirection.Get().GetUnitVector()),
     m_cellNormalVector(parameters.m_cellNormalVector.Get().GetUnitVector()),
     m_cellGeometry(parameters.m_cellGeometry.Get()),
@@ -83,6 +84,7 @@ CaloHit::CaloHit(const object_creation::CaloHit::Parameters &parameters) :
 
 CaloHit::CaloHit(const object_creation::CaloHitFragment::Parameters &parameters) :
     m_positionVector(parameters.m_pOriginalCaloHit->m_positionVector),
+    m_x0(parameters.m_pOriginalCaloHit->m_x0),
     m_expectedDirection(parameters.m_pOriginalCaloHit->m_expectedDirection),
     m_cellNormalVector(parameters.m_pOriginalCaloHit->m_cellNormalVector),
     m_cellGeometry(parameters.m_pOriginalCaloHit->m_cellGeometry),
@@ -124,6 +126,13 @@ CaloHit::~CaloHit()
 
 StatusCode CaloHit::AlterMetadata(const object_creation::CaloHit::Metadata &metadata)
 {
+    if (metadata.m_x0.IsInitialized())
+    {
+        const float oldX0(m_x0);
+        m_x0 = metadata.m_x0.Get();
+        m_positionVector += CartesianVector(m_x0 - oldX0, 0.f, 0.f);
+    }
+
     if (metadata.m_isPossibleMip.IsInitialized())
         m_isPossibleMip = metadata.m_isPossibleMip.Get();
 

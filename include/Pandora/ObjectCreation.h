@@ -106,6 +106,7 @@ public:
 class CaloHitMetadata : public ObjectMetadata
 {
 public:
+    pandora::InputFloat                 m_x0;                       ///< For LArTPC usage, the x-coordinate shift associated with a drift time t0 shift, units mm
     pandora::InputBool                  m_isIsolated;               ///< The calo hit isolation flag
     pandora::InputBool                  m_isPossibleMip;            ///< The calo hit minimum ionising particle flag
 };
@@ -362,6 +363,7 @@ typedef ObjectCreationHelper<ParticleFlowObjectCreation, ParticleFlowObjectMetad
 class VertexMetadata : public ObjectMetadata
 {
 public:
+    pandora::InputFloat                 m_x0;                       ///< For LArTPC usage, the x-coordinate shift associated with a drift time t0 shift, units mm
     pandora::InputVertexLabel           m_vertexLabel;              ///< The vertex label (interaction, start, end, etc.)
     pandora::InputVertexType            m_vertexType;               ///< The vertex type (3d, view u, v, w, etc.)
 };

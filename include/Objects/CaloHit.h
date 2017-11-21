@@ -33,6 +33,13 @@ public:
     const CartesianVector &GetPositionVector() const;
 
     /**
+     *  @brief  For LArTPC usage, the x-coordinate shift associated with a drift time t0 shift, units mm
+     * 
+     *  @return the x-coordinate shift
+     */
+    float GetX0() const;
+
+    /**
      *  @brief  Get the unit vector in direction of expected hit propagation
      * 
      *  @return the expected direction
@@ -302,7 +309,8 @@ protected:
      */
     void SetAvailability(bool isAvailable);
 
-    const CartesianVector   m_positionVector;           ///< Position vector of center of calorimeter cell, units mm
+    CartesianVector         m_positionVector;           ///< Position vector of center of calorimeter cell, units mm
+    float                   m_x0;                       ///< For LArTPC usage, the x-coordinate shift associated with a drift time t0 shift, units mm
     const CartesianVector   m_expectedDirection;        ///< Unit vector in direction of expected hit propagation
     const CartesianVector   m_cellNormalVector;         ///< Unit normal to the sampling layer, pointing outwards from the origin
     const CellGeometry      m_cellGeometry;             ///< The cell geometry type, pointing or rectangular
@@ -342,6 +350,13 @@ protected:
 inline const CartesianVector &CaloHit::GetPositionVector() const
 {
     return m_positionVector;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float CaloHit::GetX0() const
+{
+    return m_x0;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

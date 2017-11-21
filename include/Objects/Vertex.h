@@ -33,6 +33,13 @@ public:
     const CartesianVector &GetPosition() const;
 
     /**
+     *  @brief  For LArTPC usage, the x-coordinate shift associated with a drift time t0 shift, units mm
+     * 
+     *  @return the x-coordinate shift
+     */
+    float GetX0() const;
+
+    /**
      *  @brief  Get the vertex label
      * 
      *  @return the vertex label
@@ -81,6 +88,7 @@ protected:
     void SetAvailability(bool isAvailable);
 
     CartesianVector         m_position;                 ///< The vertex position
+    float                   m_x0;                       ///< For LArTPC usage, the x-coordinate shift associated with a drift time t0 shift, units mm
     VertexLabel             m_vertexLabel;              ///< The vertex label (interaction, start, end, etc.)
     VertexType              m_vertexType;               ///< The vertex type (3d, view u, v, w, etc.)
     bool                    m_isAvailable;              ///< Whether the track is available to be added to a particle flow object
@@ -95,6 +103,13 @@ protected:
 inline const CartesianVector &Vertex::GetPosition() const
 {
     return m_position;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float Vertex::GetX0() const
+{
+    return m_x0;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
