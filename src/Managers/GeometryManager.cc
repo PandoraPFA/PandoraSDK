@@ -120,7 +120,7 @@ StatusCode GeometryManager::CreateLArTPC(const object_creation::Geometry::LArTPC
     {
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pLArTPC));
 
-        if (!m_larTPCMap.insert(LArTPCMap::value_type(pLArTPC->GetLArTPCName(), pLArTPC)).second)
+        if (!m_larTPCMap.insert(LArTPCMap::value_type(pLArTPC->GetLArTPCVolumeId(), pLArTPC)).second)
             throw StatusCodeException(STATUS_CODE_FAILURE);
     }
     catch (StatusCodeException &statusCodeException)

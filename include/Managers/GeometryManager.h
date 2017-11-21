@@ -142,7 +142,7 @@ private:
 
     SubDetectorMap              m_subDetectorMap;           ///< Map from sub detector name to sub detector
     SubDetectorTypeMap          m_subDetectorTypeMap;       ///< Map from sub detector type to sub detector
-    LArTPCMap                   m_larTPCMap;                ///< Map from lar tpc name to lar tpc
+    LArTPCMap                   m_larTPCMap;                ///< Map from lar tpc volume id to lar tpc
     DetectorGapList             m_detectorGapList;          ///< List of gaps in the active detector volume
     HitTypeToGranularityMap     m_hitTypeToGranularityMap;  ///< The hit type to granularity map
 

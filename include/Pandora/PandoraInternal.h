@@ -478,7 +478,7 @@ typedef std::unordered_map<const Track *, const Cluster * > TrackToClusterMap;
 
 typedef std::set<std::string> StringSet;
 typedef std::map<std::string, const SubDetector *> SubDetectorMap;
-typedef std::map<std::string, const LArTPC *> LArTPCMap;
+typedef std::map<unsigned int, const LArTPC *> LArTPCMap;
 
 } // namespace pandora
 
