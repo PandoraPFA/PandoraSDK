@@ -1,4 +1,12 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
+TAG v03-02-00
+--------------------------------------------------------------------------------------------------------------------------------------------
+LArTPC management and access is now keyed upon unique volume ids.
+For LArTPC usage, added ability to set x0 for each hit and vertex, representing x-coordinate shift associated with a drift time t0 shift.
+Added ability to rename saved object lists.
+Added callback to reset all processes at end of event, with default null implementation.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
 TAG v03-01-00
 --------------------------------------------------------------------------------------------------------------------------------------------
 LineGaps now have a line gap type, start/end x and z positions.
