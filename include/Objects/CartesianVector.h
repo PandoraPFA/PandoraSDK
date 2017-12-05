@@ -121,6 +121,15 @@ public:
     float GetOpeningAngle(const CartesianVector &rhs) const;
 
     /**
+     *  @brief  Get the distance squared of a cartesian vector with respect to a second cartesian vector
+     *
+     *  @param  rhs the second cartesian vector
+     *
+     *  @return The distance squared
+     */
+    float GetDistanceSquared(const CartesianVector &rhs) const;
+
+    /**
      *  @brief  Get the spherical coordinates of the cartesian vector
      * 
      *  @param  radius the magnitude of the vector
@@ -301,6 +310,15 @@ inline CartesianVector CartesianVector::GetCrossProduct(const CartesianVector &r
 inline float CartesianVector::GetOpeningAngle(const CartesianVector &rhs) const
 {
     return std::acos(this->GetCosOpeningAngle(rhs));
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float CartesianVector::GetDistanceSquared(const CartesianVector &rhs) const
+{
+    return (  (m_x - rhs.m_x) * (m_x - rhs.m_x)
+            + (m_y - rhs.m_y) * (m_y - rhs.m_y)
+            + (m_z - rhs.m_z) * (m_z - rhs.m_z));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
