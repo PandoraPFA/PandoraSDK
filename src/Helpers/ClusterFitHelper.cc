@@ -196,7 +196,6 @@ StatusCode ClusterFitHelper::FitLayerCentroids(const Cluster *const pCluster, co
     }
     catch (StatusCodeException &statusCodeException)
     {
-        std::cout << "ClusterFitHelper: linear fit to cluster failed. " << std::endl;
         clusterFitResult.SetSuccessFlag(false);
         return statusCodeException.GetStatusCode();
     }
