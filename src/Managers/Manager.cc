@@ -263,6 +263,7 @@ StatusCode Manager<T>::EraseAllContent()
     m_currentListName = m_nullListName;
     m_nameToListMap.clear();
     m_savedLists.clear();
+    m_algorithmInfoMap.clear();
 
     return STATUS_CODE_SUCCESS;
 }
