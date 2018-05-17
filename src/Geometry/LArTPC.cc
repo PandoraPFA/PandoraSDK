@@ -24,6 +24,7 @@ LArTPC::LArTPC(const object_creation::Geometry::LArTPC::Parameters &inputParamet
     m_wirePitchW(inputParameters.m_wirePitchW.Get()),
     m_wireAngleU(inputParameters.m_wireAngleU.Get()),
     m_wireAngleV(inputParameters.m_wireAngleV.Get()),
+    m_wireAngleW(inputParameters.m_wireAngleW.Get()),
     m_sigmaUVW(inputParameters.m_sigmaUVW.Get()),
     m_isDriftInPositiveX(inputParameters.m_isDriftInPositiveX.Get())
 {
