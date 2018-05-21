@@ -249,6 +249,7 @@ public:
         pandora::InputFloat             m_wirePitchW;               ///< The w wire pitch, units mm
         pandora::InputFloat             m_wireAngleU;               ///< The u wire angle to the vertical, units radians
         pandora::InputFloat             m_wireAngleV;               ///< The v wire angle to the vertical, units radians
+        pandora::InputFloat             m_wireAngleW;               ///< The w wire angle to the vertical, units radians
         pandora::InputFloat             m_sigmaUVW;                 ///< The u, v, w resolution, units mm
         pandora::InputBool              m_isDriftInPositiveX;       ///< Whether the electron drift is in the positive x direction
     };

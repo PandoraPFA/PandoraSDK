@@ -110,6 +110,13 @@ public:
     float GetWireAngleV() const;
 
     /**
+     *  @brief  Get the w wire angle to the vertical, units radians
+     *
+     *  @return the w wire angle to the vertical
+     */
+    float GetWireAngleW() const;
+
+    /**
      *  @brief  Get the u, v, w resolution, units mm
      *
      *  @return the u, v, w resolution
@@ -148,6 +155,7 @@ protected:
     float           m_wirePitchW;               ///< The w wire pitch, units mm
     float           m_wireAngleU;               ///< The u wire angle to the vertical, units radians
     float           m_wireAngleV;               ///< The v wire angle to the vertical, units radians
+    float           m_wireAngleW;               ///< The w wire angle to the vertical, units radians
     float           m_sigmaUVW;                 ///< The u, v, w resolution, units mm
     bool            m_isDriftInPositiveX;       ///< Whether the electron drift is in the positive x direction
 
@@ -237,6 +245,13 @@ inline float LArTPC::GetWireAngleU() const
 inline float LArTPC::GetWireAngleV() const
 {
     return m_wireAngleV;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LArTPC::GetWireAngleW() const
+{
+    return m_wireAngleW;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -20,61 +20,101 @@ namespace pandora
 class LArTransformationPlugin : public Process
 {
 public:
-    /** 
+    /**
      *  @brief  Transform from (U,V) to W position
      *
      *  @param  U the U position
      *  @param  V the V position
      */
-     virtual double UVtoW(const double u, const double v) const = 0;
+    virtual double UVtoW(const double u, const double v) const = 0;
 
-    /** 
+    /**
      *  @brief  Transform from (V,W) to U position
      *
      *  @param  V the V position
      *  @param  W the W position
      */
-     virtual double VWtoU(const double v, const double w) const = 0;
+    virtual double VWtoU(const double v, const double w) const = 0;
 
-    /** 
+    /**
      *  @brief  Transform from (W,U) to V position
      *
      *  @param  W the W position
      *  @param  U the U position
      */
-     virtual double WUtoV(const double w, const double u) const = 0;
+    virtual double WUtoV(const double w, const double u) const = 0;
 
-    /** 
+    /**
      *  @brief  Transform from (U,V) to Y position
      *
      *  @param  U the U position
      *  @param  V the V position
      */
-    virtual double UVtoY(const double u, const double v)  const = 0;
+    virtual double UVtoY(const double u, const double v) const = 0;
 
-    /** 
+    /**
      *  @brief  Transform from (U,V) to Z position
      *
      *  @param  U the U position
      *  @param  V the V position
      */
-     virtual double UVtoZ(const double u, const double v) const = 0;
+    virtual double UVtoZ(const double u, const double v) const = 0;
 
-    /** 
+    /**
+     *  @brief  Transform from (U,W) to Y position
+     *
+     *  @param  U the U position
+     *  @param  W the W position
+     */
+    virtual double UWtoY(const double u, const double w) const = 0;
+
+    /**
+     *  @brief  Transform from (U,W) to Z position
+     *
+     *  @param  U the U position
+     *  @param  W the W position
+     */
+    virtual double UWtoZ(const double u, const double w) const = 0;
+
+    /**
+     *  @brief  Transform from (V,W) to Y position
+     *
+     *  @param  V the V position
+     *  @param  W the W position
+     */
+    virtual double VWtoY(const double v, const double w) const = 0;
+
+    /**
+     *  @brief  Transform from (V,W) to Z position
+     *
+     *  @param  V the V position
+     *  @param  W the W position
+     */
+    virtual double VWtoZ(const double v, const double w) const = 0;
+
+    /**
      *  @brief  Transform from (Y,Z) to U position
-     * 
+     *
      *  @param  Y the Y position
      *  @param  Z the Z position
      */
-     virtual double YZtoU(const double y, const double z) const = 0;
+    virtual double YZtoU(const double y, const double z) const = 0;
 
-    /** 
+    /**
      *  @brief  Transform from (Y,Z) to V position
-     * 
+     *
      *  @param  Y the Y position
      *  @param  Z the Z position
      */
-     virtual double YZtoV(const double y, const double z) const = 0;
+    virtual double YZtoV(const double y, const double z) const = 0;
+
+    /**
+     *  @brief  Transform from (Y,Z) to W position
+     *
+     *  @param  Y the Y position
+     *  @param  Z the Z position
+     */
+    virtual double YZtoW(const double y, const double z) const = 0;
 
     /**
      *  @brief  Get the y, z position that yields the minimum chi squared value with respect to specified u, v and w coordinates
@@ -112,23 +152,6 @@ public:
      */
     virtual void GetMinChiSquaredYZ(const double u, const double v, const double w, const double sigmaU, const double sigmaV, const double sigmaW,
         const double uFit, const double vFit, const double wFit, const double sigmaFit, double &y, double &z, double &chiSquared) const = 0;
-
-    typedef std::pair<double, HitType> PositionAndType;
-
-    /** 
-     *  @brief  Get the y, z position that corresponds to a projection of two fit positions onto the specific wire associated with a hit
-     *
-     *  @param  hitPositionAndType the hit position and hit type
-     *  @param  fitPositionAndType1 the first fit position and hit type
-     *  @param  fitPositionAndType2 the second fit position and hit type
-     *  @param  sigmaHit the uncertainty in the hit coordinate
-     *  @param  sigmaFit the uncertainty in the fit coordinates
-     *  @param  y to receive the y coordinate
-     *  @param  z to receive the z coordinate
-     *  @param  chiSquared to receive the chi squared value
-     */
-    virtual void GetProjectedYZ(const PositionAndType &hitPositionAndType, const PositionAndType &fitPositionAndType1,
-        const PositionAndType &fitPositionAndType2, const double sigmaHit, const double sigmaFit, double &y, double &z, double &chiSquared) const = 0;
 
 protected:
     friend class PluginManager;
