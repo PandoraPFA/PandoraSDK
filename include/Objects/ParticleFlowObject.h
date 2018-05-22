@@ -137,6 +137,13 @@ public:
      */
     unsigned int GetNDaughterPfos() const;
 
+    /**
+     *  @brief  Get the map from registered property name to floating point property value
+     * 
+     *  @return The properties map
+     */
+    const PropertiesMap &GetPropertiesMap() const;
+
 protected:
     /**
      *  @brief  Constructor
@@ -201,6 +208,13 @@ protected:
      */
     StatusCode RemoveDaughter(const ParticleFlowObject *const pPfo);
 
+    /**
+     *  @brief  Update the properties map
+     * 
+     *  @param  metaData the new particle flow object metadata
+     */
+    StatusCode UpdatePropertiesMap(const object_creation::ParticleFlowObject::Metadata &metadata);
+
     int                     m_particleId;               ///< The particle flow object id (PDG code)
     int                     m_charge;                   ///< The particle flow object charge
     float                   m_mass;                     ///< The particle flow object mass
@@ -211,6 +225,7 @@ protected:
     VertexList              m_vertexList;               ///< The vertex list
     PfoList                 m_parentPfoList;            ///< The list of parent pfos
     PfoList                 m_daughterPfoList;          ///< The list of daughter pfos
+    PropertiesMap           m_propertiesMap;            ///< The map from registered property name to floating point property value
 
     friend class ParticleFlowObjectManager;
     friend class AlgorithmObjectManager<ParticleFlowObject>;
@@ -315,6 +330,13 @@ inline unsigned int ParticleFlowObject::GetNParentPfos() const
 inline unsigned int ParticleFlowObject::GetNDaughterPfos() const
 {
     return m_daughterPfoList.size();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const PropertiesMap &ParticleFlowObject::GetPropertiesMap() const
+{
+    return m_propertiesMap;
 }
 
 } // namespace pandora

@@ -341,6 +341,8 @@ public:
     pandora::InputFloat                 m_mass;                     ///< The particle flow object mass
     pandora::InputFloat                 m_energy;                   ///< The particle flow object energy
     pandora::InputCartesianVector       m_momentum;                 ///< The particle flow object momentum
+    pandora::PropertiesMap              m_propertiesToAdd;          ///< The mapping from pfo property names to new values
+    pandora::StringVector               m_propertiesToRemove;       ///< The vector of pfo property names to remove
 };
 
 /**
