@@ -233,6 +233,9 @@ StatusCode ParticleFlowObject::UpdatePropertiesMap(const object_creation::Partic
     {
         if (metadata.m_propertiesToAdd.count(propertyName))
             return STATUS_CODE_INVALID_PARAMETER;
+
+        if (!m_propertiesMap.count(propertyName))
+            return STATUS_CODE_NOT_FOUND;
     }
 
     for (const std::string &propertyName : metadata.m_propertiesToRemove)
