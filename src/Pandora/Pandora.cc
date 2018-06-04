@@ -30,7 +30,7 @@
 namespace pandora
 {
 
-Pandora::Pandora() :
+Pandora::Pandora(const std::string &name) :
     m_pAlgorithmManager(nullptr),
     m_pCaloHitManager(nullptr),
     m_pClusterManager(nullptr),
@@ -43,7 +43,8 @@ Pandora::Pandora() :
     m_pPandoraSettings(nullptr),
     m_pPandoraApiImpl(nullptr),
     m_pPandoraContentApiImpl(nullptr),
-    m_pPandoraImpl(nullptr)
+    m_pPandoraImpl(nullptr),
+    m_name(name)
 {
     try
     {
@@ -195,6 +196,13 @@ const GeometryManager *Pandora::GetGeometry() const
 const PluginManager *Pandora::GetPlugins() const
 {
     return m_pPluginManager;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+const std::string &Pandora::GetName() const
+{
+    return m_name;
 }
 
 } // namespace pandora

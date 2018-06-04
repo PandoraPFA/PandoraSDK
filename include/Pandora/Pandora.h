@@ -10,6 +10,8 @@
 
 #include "Pandora/StatusCodes.h"
 
+#include <string>
+
 namespace pandora
 {
 
@@ -39,8 +41,10 @@ class Pandora
 public:
     /**
      *  @brief  Default constructor
+     *
+     *  @param  name descriptive name or label for the pandora instance
      */
-    Pandora();
+    Pandora(const std::string &name = "");
 
     /**
      *  @brief  Destructor
@@ -82,6 +86,13 @@ public:
      */
     const PluginManager *GetPlugins() const;
 
+    /**
+     *  @brief  Get the descriptive name or label for the pandora instance
+     * 
+     *  @return the descriptive name or label for the pandora instance
+     */
+    const std::string &GetName() const;
+
 private:
     /**
      *  @brief  Prepare event, calculating properties of input objects for later use in algorithms
@@ -119,6 +130,8 @@ private:
     PandoraApiImpl              *m_pPandoraApiImpl;             ///< The pandora api implementation
     PandoraContentApiImpl       *m_pPandoraContentApiImpl;      ///< The pandora content api implementation
     PandoraImpl                 *m_pPandoraImpl;                ///< The pandora implementation
+
+    std::string                  m_name;                        ///< The descriptive name or label for the pandora instance
 
     friend class PandoraApiImpl;
     friend class PandoraContentApiImpl;

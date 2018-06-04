@@ -24,8 +24,11 @@ ParticleFlowObject::ParticleFlowObject(const object_creation::ParticleFlowObject
     m_momentum(parameters.m_momentum.Get()),
     m_trackList(parameters.m_trackList),
     m_clusterList(parameters.m_clusterList),
-    m_vertexList(parameters.m_vertexList)
+    m_vertexList(parameters.m_vertexList),
+    m_propertiesMap(parameters.m_propertiesToAdd)
 {
+    if (!parameters.m_propertiesToRemove.empty())
+        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -38,6 +41,9 @@ ParticleFlowObject::~ParticleFlowObject()
 
 StatusCode ParticleFlowObject::AlterMetadata(const object_creation::ParticleFlowObject::Metadata &metadata)
 {
+    if (!metadata.m_propertiesToAdd.empty() || !metadata.m_propertiesToRemove.empty())
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->UpdatePropertiesMap(metadata));
+
     if (metadata.m_particleId.IsInitialized())
         m_particleId = metadata.m_particleId.Get();
 
@@ -216,6 +222,28 @@ StatusCode ParticleFlowObject::RemoveDaughter(const ParticleFlowObject *const pP
         return STATUS_CODE_NOT_FOUND;
 
     m_daughterPfoList.erase(iter);
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode ParticleFlowObject::UpdatePropertiesMap(const object_creation::ParticleFlowObject::Metadata &metadata)
+{
+    for (const std::string &propertyName : metadata.m_propertiesToRemove)
+    {
+        if (metadata.m_propertiesToAdd.count(propertyName))
+            return STATUS_CODE_INVALID_PARAMETER;
+
+        if (!m_propertiesMap.count(propertyName))
+            return STATUS_CODE_NOT_FOUND;
+    }
+
+    for (const std::string &propertyName : metadata.m_propertiesToRemove)
+        m_propertiesMap.erase(propertyName);
+
+    for (const PropertiesMap::value_type &entryToAdd : metadata.m_propertiesToAdd)
+        m_propertiesMap[entryToAdd.first] = entryToAdd.second;
+
     return STATUS_CODE_SUCCESS;
 }
 

@@ -477,6 +477,7 @@ typedef std::unordered_map<const Cluster *, const Track * > ClusterToTrackMap;
 typedef std::unordered_map<const Track *, const Cluster * > TrackToClusterMap;
 
 typedef std::set<std::string> StringSet;
+typedef std::map<std::string, float> PropertiesMap;
 typedef std::map<std::string, const SubDetector *> SubDetectorMap;
 typedef std::map<unsigned int, const LArTPC *> LArTPCMap;
 
