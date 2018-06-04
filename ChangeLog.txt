@@ -1,4 +1,11 @@
 --------------------------------------------------------------------------------------------------------------------------------------------
+TAG v03-03-00
+--------------------------------------------------------------------------------------------------------------------------------------------
+Added support for LArTPC w-type wires with non-zero angle to the vertical.
+Added ability to register a descriptive name or label for the pandora instance upon construction.
+Pfo now holds a map from registered property name to floating point property value, manipulated via pfo metadata.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
 TAG v03-02-01
 --------------------------------------------------------------------------------------------------------------------------------------------
 Clear algorithm info map as a matter of course during reset procedures.
