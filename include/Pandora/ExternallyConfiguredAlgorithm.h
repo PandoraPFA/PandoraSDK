@@ -71,8 +71,6 @@ protected:
     /**
      *  @brief  Whether external parameters are present
      *
-     *  @param  pandora the pandora instance
-     *
      *  @return boolean
      */
     bool ExternalParametersPresent() const;
@@ -81,14 +79,66 @@ protected:
      *  @brief  Get the external parameters associated with algorithm instances created by a given Pandora instance.
      *          A single call to this function per algorithm type, per Pandora instance is enforced to prevent misuse.
      *
-     *  @param  pandora the pandora instance
-     *
      *  @return the address of the external parameters
      */
     ExternalParameters *GetExternalParameters() const;
 
-    typedef std::map<const std::string, ExternalParameters*> AlgTypeToParametersMap;
-    typedef std::unordered_map<const Pandora*, AlgTypeToParametersMap> ExternalParametersMap;
+private:
+    /**
+     *  @brief  External parameters map class
+     */
+    class ExternalParametersMap
+    {
+    public:
+        /**
+         *  @brief  Destructor
+         */
+        ~ExternalParametersMap();
+
+        /**
+         *  @brief  Whether external parameters are present
+         *
+         *  @param  pandora the pandora instance
+         *  @param  algorithmType the algorithm type
+         *
+         *  @return boolean
+         */
+        bool ExternalParametersPresent(const pandora::Pandora &pandora, const std::string &algorithmType) const;
+
+        /**
+         *  @brief  Get the external parameters associated with algorithm instances created by a given Pandora instance.
+         *          A single call to this function per algorithm type, per Pandora instance is enforced to prevent misuse.
+         *
+         *  @param  pandora the pandora instance
+         *  @param  algorithmType the algorithm type
+         *
+         *  @return the address of the external parameters
+         */
+        ExternalParameters *GetExternalParameters(const pandora::Pandora &pandora, const std::string &algorithmType) const;
+
+        /**
+         *  @brief  Set the external parameters associated with an algorithm instance of a specific type, created by the given Pandora instance
+         *
+         *  @param  pandora the pandora instance
+         *  @param  algorithmType the algorithm type
+         *  @param  pExternalParameters the address of the external parameters instance
+         */
+        pandora::StatusCode SetExternalParameters(const pandora::Pandora &pandora, const std::string &algorithmType, ExternalParameters *const pExternalParameters);
+
+        /**
+         *  @brief  Remove the external parameters associated with an algorithm instance of a specific type, created by the given Pandora instance
+         *
+         *  @param  pandora the pandora instance
+         *  @param  algorithmType the algorithm type
+         */
+        void RemoveExternalParameters(const pandora::Pandora &pandora, const std::string &algorithmType);
+
+    private:
+        typedef std::map<const std::string, ExternalParameters*> AlgTypeToParametersMap;
+        typedef std::unordered_map<const Pandora*, AlgTypeToParametersMap> TheMap;
+
+        TheMap  m_theMap;   ///< The underlying external parameters map
+    };
 
     static ExternalParametersMap m_externalParametersMap;   ///< The external parameters map
 };
