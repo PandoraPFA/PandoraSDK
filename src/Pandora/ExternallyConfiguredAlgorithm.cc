@@ -39,7 +39,11 @@ void ExternalParameters::RegisterParameterAccessAttempt()
 
 ExternallyConfiguredAlgorithm::~ExternallyConfiguredAlgorithm()
 {
-    m_externalParametersMap.RemoveExternalParameters(this->GetPandora(), this->GetType());
+    try
+    {
+        m_externalParametersMap.RemoveExternalParameters(this->GetPandora(), this->GetType());
+    }
+    catch (const StatusCodeException &) {}
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
