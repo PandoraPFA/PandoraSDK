@@ -131,11 +131,15 @@ template <>
 StatusCode PandoraContentApiImpl::Create(const object_creation::Cluster::Parameters &parameters, const Cluster *&pCluster,
     const pandora::ObjectFactory<object_creation::Cluster::Parameters, object_creation::Cluster::Object> &factory) const
 {
-    if (!this->GetManager<CaloHit>()->IsAvailable(&parameters.m_caloHitList))
+    if (!this->GetManager<CaloHit>()->IsAvailable(&parameters.m_caloHitList) ||
+        !this->GetManager<CaloHit>()->IsAvailable(&parameters.m_isolatedCaloHitList))
+    {
         return STATUS_CODE_NOT_ALLOWED;
+    }
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetManager<Cluster>()->Create(parameters, pCluster, factory));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetManager<CaloHit>()->SetAvailability(&parameters.m_caloHitList, false));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetManager<CaloHit>()->SetAvailability(&parameters.m_isolatedCaloHitList, false));
 
     return STATUS_CODE_SUCCESS;
 }
