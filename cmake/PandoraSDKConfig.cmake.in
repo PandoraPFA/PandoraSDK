@@ -15,5 +15,9 @@ set(@PROJECT_NAME@_INCLUDE_DIRS "${@PROJECT_NAME@_INCLUDE_DIR}")
 # - Include targets file
 include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 
+# Use C++ Standard as a component, so clients can require a specific
+# std/ABI e.g. "find_package(PandoraSDK REQUIRED cxx_std_14)"
+set(@PROJECT_NAME@_cxx_std_@CMAKE_CXX_STANDARD@ 1)
+
 # - Components
 check_required_components(@PROJECT_NAME@)
