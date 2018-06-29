@@ -61,7 +61,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 set_target_properties(${PROJECT_NAME}
   PROPERTIES
     VERSION ${PROJECT_VERSION}
-    SOVERSION ${PROJECT_MAJOR_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
     )
 
 # - Optional documents
