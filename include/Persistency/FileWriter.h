@@ -140,6 +140,11 @@ private:
     StatusCode WriteDetectorGapList();
 
     /**
+     *  @brief  Write the transient detector gap parameters to the file
+     */
+    StatusCode WriteTransientDetectorGapList();
+
+    /**
      *  @brief  Write a track list to the current position in the file
      * 
      *  @param  trackList the track list

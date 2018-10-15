@@ -31,11 +31,11 @@ public:
 
     /**
      *  @brief  Whether a specified position lies within the gap
-     * 
+     *
      *  @param  positionVector the position vector
      *  @param  hitType the hit type, providing context to aid interpretation of provided position vector
      *  @param  gapTolerance tolerance allowed when declaring a point to be "in" a gap region, units mm
-     * 
+     *
      *  @return boolean
      */
     virtual bool IsInGap(const CartesianVector &positionVector, const HitType hitType, const float gapTolerance = 0.f) const = 0;
@@ -53,43 +53,50 @@ public:
 
     /**
      *  @brief  Get the line gap type
-     * 
+     *
      *  @param  the line gap type
      */
     LineGapType GetLineGapType() const;
 
     /**
      *  @brief  Get the line start x coordinate
-     * 
+     *
      *  @param  the line start x coordinate
      */
     float GetLineStartX() const;
 
     /**
      *  @brief  Get the line end x coordinate
-     * 
+     *
      *  @param  the line end x coordinate
      */
     float GetLineEndX() const;
 
     /**
      *  @brief  Get the line start z coordinate
-     * 
+     *
      *  @param  the line start z coordinate
      */
     float GetLineStartZ() const;
 
     /**
      *  @brief  Get the line end z coordinate
-     * 
+     *
      *  @param  the line end z coordinate
      */
     float GetLineEndZ() const;
 
+    /**
+     *  @brief  Get the is transient flag
+     *
+     *  @param  the is transient flag
+     */
+    bool GetIsTransient() const;
+
 private:
     /**
      *  @brief  Constructor
-     * 
+     *
      *  @param  parameters the gap parameters
      */
     LineGap(const object_creation::Geometry::LineGap::Parameters &parameters);
@@ -99,6 +106,7 @@ private:
     const float             m_lineEndX;             ///< The line x end coordinate, units mm
     const float             m_lineStartZ;           ///< The line z start coordinate, units mm
     const float             m_lineEndZ;             ///< The line z end coordinate, units mm
+    const bool              m_isTransient;          ///< Is the gap transient
 
     friend class PandoraObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object>;
 };
@@ -115,36 +123,43 @@ public:
 
     /**
      *  @brief  Get the gap vertex
-     * 
+     *
      *  @param  the gap vertex
      */
     const CartesianVector &GetVertex() const;
 
     /**
      *  @brief  Get the vector describing first side meeting vertex
-     * 
+     *
      *  @param  the vector describing first side meeting vertex
      */
     const CartesianVector &GetSide1() const;
 
     /**
      *  @brief  Get the vector describing second side meeting vertex
-     * 
+     *
      *  @param  the vector describing second side meeting vertex
      */
     const CartesianVector &GetSide2() const;
 
     /**
      *  @brief  Get the vector describing third side meeting vertex
-     * 
+     *
      *  @param  the vector describing third side meeting vertex
      */
     const CartesianVector &GetSide3() const;
 
+    /**
+     *  @brief  Get the is transient flag
+     *
+     *  @param  the is transient flag
+     */
+    bool GetIsTransient() const;
+
 private:
     /**
      *  @brief  Constructor
-     * 
+     *
      *  @param  parameters the gap parameters
      */
     BoxGap(const object_creation::Geometry::BoxGap::Parameters &parameters);
@@ -153,6 +168,7 @@ private:
     const CartesianVector   m_side1;                ///< Cartesian vector describing first side meeting vertex, units mm
     const CartesianVector   m_side2;                ///< Cartesian vector describing second side meeting vertex, units mm
     const CartesianVector   m_side3;                ///< Cartesian vector describing third side meeting vertex, units mm
+    const bool              m_isTransient;          ///< Is the gap transient
 
     friend class PandoraObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object>;
 };
@@ -169,71 +185,78 @@ public:
 
     /**
      *  @brief  Get the min cylindrical polar z coordinate, origin interaction point
-     * 
+     *
      *  @param  the min cylindrical polar z coordinate
      */
     float GetMinZCoordinate() const;
 
     /**
      *  @brief  Get the max cylindrical polar z coordinate, origin interaction point
-     * 
+     *
      *  @param  the max cylindrical polar z coordinate
      */
     float GetMaxZCoordinate() const;
 
     /**
      *  @brief  Get the inner cylindrical polar r coordinate, origin interaction point
-     * 
+     *
      *  @param  the inner cylindrical polar r coordinate
      */
     float GetInnerRCoordinate() const;
 
     /**
      *  @brief  Get the inner cylindrical polar phi coordinate
-     * 
+     *
      *  @param  the inner cylindrical polar phi coordinate
      */
     float GetInnerPhiCoordinate() const;
 
     /**
      *  @brief  Get the order of symmetry of the innermost edge of gap
-     * 
+     *
      *  @param  the order of symmetry of the innermost edge of gap
      */
     unsigned int GetInnerSymmetryOrder() const;
 
     /**
      *  @brief  Get the outer cylindrical polar r coordinate, origin interaction point
-     * 
+     *
      *  @param  the outer cylindrical polar r coordinate
      */
     float GetOuterRCoordinate() const;
 
     /**
      *  @brief  Get the outer cylindrical polar phi coordinate
-     * 
+     *
      *  @param  the outer cylindrical polar phi coordinate
      */
     float GetOuterPhiCoordinate() const;
 
     /**
      *  @brief  Get the order of symmetry of the outermost edge of gap
-     * 
+     *
      *  @param  the order of symmetry of the outermost edge of gap
      */
     unsigned int GetOuterSymmetryOrder() const;
 
+    /**
+     *  @brief  Get the is transient flag
+     *
+     *  @param  the is transient flag
+     */
+    bool GetIsTransient() const;
+
 private:
     /**
      *  @brief  Constructor
-     * 
+     *
      *  @param  parameters the gap parameters
      */
     ConcentricGap(const object_creation::Geometry::ConcentricGap::Parameters &parameters);
 
     /**
      *  @brief  Populate list of polygon vertices, assuming regular polygon in XY plane at constant z coordinate
-     * 
+     *
      *  @brief  rCoordinate polygon r coordinate
      *  @brief  zCoordinate polygon z coordinate
      *  @brief  phiCoordinate polygon phi coordinate
@@ -245,11 +268,11 @@ private:
 
     /**
      *  @brief  Winding number test for a point in a 2D polygon in the XY plane (z coordinates are ignored)
-     * 
+     *
      *  @param  point the test point
      *  @param  vertexPointList vertex points of a polygon, with vertexPointList[symmetryOrder] = vertexPointList[0]
      *  @param  symmetryOrder order of symmetry of polygon
-     * 
+     *
      *  @return whether point is inside polygon
      */
     bool IsIn2DPolygon(const CartesianVector &point, const VertexPointList &vertexPointList, const unsigned int symmetryOrder) const;
@@ -262,6 +285,7 @@ private:
     const float             m_outerRCoordinate;     ///< Outer cylindrical polar r coordinate, origin interaction point, units mm
     const float             m_outerPhiCoordinate;   ///< Outer cylindrical polar phi coordinate (angle wrt cartesian x axis)
     const unsigned int      m_outerSymmetryOrder;   ///< Order of symmetry of the outermost edge of gap
+    const bool              m_isTransient;          ///< Is the gap transient
 
     VertexPointList         m_innerVertexPointList; ///< The vertex points of the inner polygon
     VertexPointList         m_outerVertexPointList; ///< The vertex points of the outer polygon
@@ -306,6 +330,13 @@ inline float LineGap::GetLineEndZ() const
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
+
+inline bool LineGap::GetIsTransient() const
+{
+    return m_isTransient;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 inline const CartesianVector &BoxGap::GetVertex() const
@@ -332,6 +363,13 @@ inline const CartesianVector &BoxGap::GetSide2() const
 inline const CartesianVector &BoxGap::GetSide3() const
 {
     return m_side3;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline bool BoxGap::GetIsTransient() const
+{
+    return m_isTransient;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -389,6 +427,13 @@ inline float ConcentricGap::GetOuterPhiCoordinate() const
 inline unsigned int ConcentricGap::GetOuterSymmetryOrder() const
 {
     return m_outerSymmetryOrder;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline bool ConcentricGap::GetIsTransient() const
+{
+    return m_isTransient;
 }
 
 } // namespace pandora

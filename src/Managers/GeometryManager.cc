@@ -148,7 +148,15 @@ StatusCode GeometryManager::CreateGap(const PARAMETERS &parameters, const Object
         if (!pDetectorGap)
             return STATUS_CODE_FAILURE;
 
-        m_detectorGapList.push_back(pDetectorGap);
+        if (!parameters.m_isTransient.Get())
+        {
+            m_detectorGapList.push_back(pDetectorGap);
+        }
+        else
+        {
+            m_transientDetectorGapList.push_back(pDetectorGap);
+        }
+
         return STATUS_CODE_SUCCESS;
     }
     catch (StatusCodeException &statusCodeException)
@@ -158,6 +166,18 @@ StatusCode GeometryManager::CreateGap(const PARAMETERS &parameters, const Object
         pDetectorGap = nullptr;
         return statusCodeException.GetStatusCode();
     }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode GeometryManager::ResetForNextEvent()
+{
+    for (const DetectorGap *const pDetectorGap : m_transientDetectorGapList)
+        delete pDetectorGap;
+
+    m_transientDetectorGapList.clear();
+
+    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -173,10 +193,14 @@ StatusCode GeometryManager::EraseAllContent()
     for (const DetectorGap *const pDetectorGap : m_detectorGapList)
         delete pDetectorGap;
 
+    for (const DetectorGap *const pDetectorGap : m_transientDetectorGapList)
+        delete pDetectorGap;
+
     m_subDetectorMap.clear();
     m_larTPCMap.clear();
     m_subDetectorTypeMap.clear();
     m_detectorGapList.clear();
+    m_transientDetectorGapList.clear();
     m_hitTypeToGranularityMap.clear();
 
     return STATUS_CODE_SUCCESS;

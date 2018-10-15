@@ -267,6 +267,7 @@ public:
         pandora::InputFloat             m_lineEndX;                 ///< The line end x coordinate, units mm
         pandora::InputFloat             m_lineStartZ;               ///< The line start z coordinate, units mm
         pandora::InputFloat             m_lineEndZ;                 ///< The line end z coordinate, units mm
+        pandora::InputBool              m_isTransient;              ///< Is the gap transient
     };
 
     typedef ObjectCreationHelper<LineGapParameters, ObjectMetadata, pandora::LineGap> LineGap;
@@ -281,6 +282,7 @@ public:
         pandora::InputCartesianVector   m_side1;                    ///< Cartesian vector describing first side meeting vertex, units mm
         pandora::InputCartesianVector   m_side2;                    ///< Cartesian vector describing second side meeting vertex, units mm
         pandora::InputCartesianVector   m_side3;                    ///< Cartesian vector describing third side meeting vertex, units mm
+        pandora::InputBool              m_isTransient;              ///< Is the gap transient
     };
 
     typedef ObjectCreationHelper<BoxGapParameters, ObjectMetadata, pandora::BoxGap> BoxGap;
@@ -299,6 +301,7 @@ public:
         pandora::InputFloat             m_outerRCoordinate;         ///< Outer cylindrical polar r coordinate, origin interaction point, units mm
         pandora::InputFloat             m_outerPhiCoordinate;       ///< Outer cylindrical polar phi coordinate (angle wrt cartesian x axis)
         pandora::InputUInt              m_outerSymmetryOrder;       ///< Order of symmetry of the outermost edge of gap
+        pandora::InputBool              m_isTransient;              ///< Is the gap transient
     };
 
     typedef ObjectCreationHelper<ConcentricGapParameters, ObjectMetadata, pandora::ConcentricGap> ConcentricGap;

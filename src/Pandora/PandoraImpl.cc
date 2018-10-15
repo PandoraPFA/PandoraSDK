@@ -11,6 +11,7 @@
 #include "Managers/AlgorithmManager.h"
 #include "Managers/CaloHitManager.h"
 #include "Managers/ClusterManager.h"
+#include "Managers/GeometryManager.h"
 #include "Managers/MCManager.h"
 #include "Managers/ParticleFlowObjectManager.h"
 #include "Managers/PluginManager.h"
@@ -100,6 +101,7 @@ StatusCode PandoraImpl::ResetEvent() const
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->ResetForNextEvent());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pClusterManager->ResetForNextEvent());
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pGeometryManager->ResetForNextEvent());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pMCManager->ResetForNextEvent());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPfoManager->ResetForNextEvent());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pTrackManager->ResetForNextEvent());

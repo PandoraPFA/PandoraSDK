@@ -67,6 +67,7 @@ StatusCode FileWriter::WriteEvent(const CaloHitList &caloHitList, const TrackLis
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteCaloHitList(caloHitList));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteTrackList(trackList));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteMCParticleList(mcParticleList));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteTransientDetectorGapList());
 
     if (writeMCRelationships)
     {
@@ -114,6 +115,18 @@ StatusCode FileWriter::WriteLArTPCList()
 StatusCode FileWriter::WriteDetectorGapList()
 {
     for (const DetectorGap *const pDetectorGap : m_pPandora->GetGeometry()->GetDetectorGapList())
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteDetectorGap(pDetectorGap));
+    }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode FileWriter::WriteTransientDetectorGapList()
+{
+    for (const DetectorGap *const pDetectorGap : m_pPandora->GetGeometry()->GetTransientDetectorGapList())
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteDetectorGap(pDetectorGap));
     }

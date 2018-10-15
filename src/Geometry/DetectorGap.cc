@@ -23,7 +23,8 @@ LineGap::LineGap(const object_creation::Geometry::LineGap::Parameters &parameter
     m_lineStartX(parameters.m_lineStartX.Get()),
     m_lineEndX(parameters.m_lineEndX.Get()),
     m_lineStartZ(parameters.m_lineStartZ.Get()),
-    m_lineEndZ(parameters.m_lineEndZ.Get())
+    m_lineEndZ(parameters.m_lineEndZ.Get()),
+    m_isTransient(parameters.m_isTransient.Get())
 {
     if ((m_lineEndX < m_lineStartX) || (m_lineEndZ < m_lineStartZ))
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
@@ -59,7 +60,8 @@ BoxGap::BoxGap(const object_creation::Geometry::BoxGap::Parameters &parameters) 
     m_vertex(parameters.m_vertex.Get()),
     m_side1(parameters.m_side1.Get()),
     m_side2(parameters.m_side2.Get()),
-    m_side3(parameters.m_side3.Get())
+    m_side3(parameters.m_side3.Get()),
+    m_isTransient(parameters.m_isTransient.Get())
 {
 }
 
@@ -101,7 +103,8 @@ ConcentricGap::ConcentricGap(const object_creation::Geometry::ConcentricGap::Par
     m_innerSymmetryOrder(parameters.m_innerSymmetryOrder.Get()),
     m_outerRCoordinate(parameters.m_outerRCoordinate.Get()),
     m_outerPhiCoordinate(parameters.m_outerPhiCoordinate.Get()),
-    m_outerSymmetryOrder(parameters.m_outerSymmetryOrder.Get())
+    m_outerSymmetryOrder(parameters.m_outerSymmetryOrder.Get()),
+    m_isTransient(parameters.m_isTransient.Get())
 {
     if ((0 == m_innerSymmetryOrder) || (0 == m_outerSymmetryOrder))
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
