@@ -39,6 +39,24 @@ public:
      *  @return boolean
      */
     virtual bool IsInGap(const CartesianVector &positionVector, const HitType hitType, const float gapTolerance = 0.f) const = 0;
+
+    /**
+     *  @brief  Get the is transient flag
+     *
+     *  @param  the is transient flag
+     */
+    bool GetIsTransient() const;
+
+protected:
+    /**
+     *  @brief  Constructor
+     *
+     *  @param  parameters the gap parameters
+     */
+    DetectorGap(const object_creation::Geometry::DetectorGap::Parameters &parameters);
+
+private:
+    const bool              m_isTransient;          ///< Is the gap transient
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -86,13 +104,6 @@ public:
      */
     float GetLineEndZ() const;
 
-    /**
-     *  @brief  Get the is transient flag
-     *
-     *  @param  the is transient flag
-     */
-    bool GetIsTransient() const;
-
 private:
     /**
      *  @brief  Constructor
@@ -106,7 +117,6 @@ private:
     const float             m_lineEndX;             ///< The line x end coordinate, units mm
     const float             m_lineStartZ;           ///< The line z start coordinate, units mm
     const float             m_lineEndZ;             ///< The line z end coordinate, units mm
-    const bool              m_isTransient;          ///< Is the gap transient
 
     friend class PandoraObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object>;
 };
@@ -149,13 +159,6 @@ public:
      */
     const CartesianVector &GetSide3() const;
 
-    /**
-     *  @brief  Get the is transient flag
-     *
-     *  @param  the is transient flag
-     */
-    bool GetIsTransient() const;
-
 private:
     /**
      *  @brief  Constructor
@@ -168,7 +171,6 @@ private:
     const CartesianVector   m_side1;                ///< Cartesian vector describing first side meeting vertex, units mm
     const CartesianVector   m_side2;                ///< Cartesian vector describing second side meeting vertex, units mm
     const CartesianVector   m_side3;                ///< Cartesian vector describing third side meeting vertex, units mm
-    const bool              m_isTransient;          ///< Is the gap transient
 
     friend class PandoraObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object>;
 };
@@ -239,13 +241,6 @@ public:
      */
     unsigned int GetOuterSymmetryOrder() const;
 
-    /**
-     *  @brief  Get the is transient flag
-     *
-     *  @param  the is transient flag
-     */
-    bool GetIsTransient() const;
-
 private:
     /**
      *  @brief  Constructor
@@ -285,13 +280,20 @@ private:
     const float             m_outerRCoordinate;     ///< Outer cylindrical polar r coordinate, origin interaction point, units mm
     const float             m_outerPhiCoordinate;   ///< Outer cylindrical polar phi coordinate (angle wrt cartesian x axis)
     const unsigned int      m_outerSymmetryOrder;   ///< Order of symmetry of the outermost edge of gap
-    const bool              m_isTransient;          ///< Is the gap transient
 
     VertexPointList         m_innerVertexPointList; ///< The vertex points of the inner polygon
     VertexPointList         m_outerVertexPointList; ///< The vertex points of the outer polygon
 
     friend class PandoraObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object>;
 };
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline bool DetectorGap::GetIsTransient() const
+{
+    return m_isTransient;
+}
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -330,13 +332,6 @@ inline float LineGap::GetLineEndZ() const
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool LineGap::GetIsTransient() const
-{
-    return m_isTransient;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 inline const CartesianVector &BoxGap::GetVertex() const
@@ -363,13 +358,6 @@ inline const CartesianVector &BoxGap::GetSide2() const
 inline const CartesianVector &BoxGap::GetSide3() const
 {
     return m_side3;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool BoxGap::GetIsTransient() const
-{
-    return m_isTransient;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -427,13 +415,6 @@ inline float ConcentricGap::GetOuterPhiCoordinate() const
 inline unsigned int ConcentricGap::GetOuterSymmetryOrder() const
 {
     return m_outerSymmetryOrder;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline bool ConcentricGap::GetIsTransient() const
-{
-    return m_isTransient;
 }
 
 } // namespace pandora

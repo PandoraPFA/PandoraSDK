@@ -63,14 +63,14 @@ public:
 
     /**
      *  @brief  Skip to a specified geometry number in the file
-     * 
+     *
      *  @param  geometryNumber the geometry number
      */
     virtual StatusCode GoToGeometry(const unsigned int geometryNumber) = 0;
 
     /**
      *  @brief  Skip to a specified event number in the file
-     * 
+     *
      *  @param  eventNumber the event number
      */
     virtual StatusCode GoToEvent(const unsigned int eventNumber) = 0;
@@ -88,7 +88,7 @@ protected:
 
     /**
      *  @brief  Get the id of the next container in the file without changing the current position in the file
-     * 
+     *
      *  @return The id of the next container in the file
      */
     virtual ContainerId GetNextContainerId() = 0;

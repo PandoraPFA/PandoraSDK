@@ -148,13 +148,14 @@ StatusCode GeometryManager::CreateGap(const PARAMETERS &parameters, const Object
         if (!pDetectorGap)
             return STATUS_CODE_FAILURE;
 
-        if (!parameters.m_isTransient.Get())
+
+        if (parameters.m_isTransient.IsInitialized() && parameters.m_isTransient.Get())
         {
-            m_detectorGapList.push_back(pDetectorGap);
+            m_transientDetectorGapList.push_back(pDetectorGap);
         }
         else
         {
-            m_transientDetectorGapList.push_back(pDetectorGap);
+            m_persistentDetectorGapList.push_back(pDetectorGap);
         }
 
         return STATUS_CODE_SUCCESS;
@@ -190,7 +191,7 @@ StatusCode GeometryManager::EraseAllContent()
     for (const LArTPCMap::value_type &mapEntry : m_larTPCMap)
         delete mapEntry.second;
 
-    for (const DetectorGap *const pDetectorGap : m_detectorGapList)
+    for (const DetectorGap *const pDetectorGap : m_persistentDetectorGapList)
         delete pDetectorGap;
 
     for (const DetectorGap *const pDetectorGap : m_transientDetectorGapList)
@@ -199,7 +200,7 @@ StatusCode GeometryManager::EraseAllContent()
     m_subDetectorMap.clear();
     m_larTPCMap.clear();
     m_subDetectorTypeMap.clear();
-    m_detectorGapList.clear();
+    m_persistentDetectorGapList.clear();
     m_transientDetectorGapList.clear();
     m_hitTypeToGranularityMap.clear();
 

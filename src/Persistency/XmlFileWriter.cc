@@ -169,9 +169,9 @@ StatusCode XmlFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap)
+StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap, bool transient)
 {
-    if (GEOMETRY_CONTAINER != m_containerId)
+    if ((!transient && GEOMETRY_CONTAINER != m_containerId) || (transient && EVENT_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
     const LineGap *pLineGap(nullptr);

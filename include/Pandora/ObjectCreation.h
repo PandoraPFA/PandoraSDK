@@ -26,7 +26,7 @@ namespace object_creation
 
 /**
  *  @brief  Object creation helper class
- * 
+ *
  *  @param  PARAMETERS the type of object parameters
  *  @param  METADATA the type of object metadata
  *  @param  OBJECT the type of object
@@ -62,7 +62,7 @@ public:
 
     /**
      *  @brief  Alter the metadata information stored in an object
-     * 
+     *
      *  @param  algorithm the algorithm calling this function
      *  @param  pObject address of the object to modify
      *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)
@@ -257,9 +257,20 @@ public:
     typedef ObjectCreationHelper<LArTPCParameters, ObjectMetadata, pandora::LArTPC> LArTPC;
 
     /**
+     *  @brief  DetectorGapParameters class
+     */
+    class DetectorGapParameters : public ObjectParameters
+    {
+    public:
+        pandora::InputBool              m_isTransient;              ///< Is the gap transient
+    };
+
+    typedef ObjectCreationHelper<DetectorGapParameters, ObjectMetadata, pandora::DetectorGap> DetectorGap;
+
+    /**
      *  @brief  LineGapParameters class
      */
-    class LineGapParameters : public ObjectParameters
+    class LineGapParameters : public DetectorGapParameters
     {
     public:
         pandora::InputLineGapType       m_lineGapType;              ///< The type of line gap, e.g. TPC wire-type gap (u, v, w), or drift-type gap
@@ -267,7 +278,6 @@ public:
         pandora::InputFloat             m_lineEndX;                 ///< The line end x coordinate, units mm
         pandora::InputFloat             m_lineStartZ;               ///< The line start z coordinate, units mm
         pandora::InputFloat             m_lineEndZ;                 ///< The line end z coordinate, units mm
-        pandora::InputBool              m_isTransient;              ///< Is the gap transient
     };
 
     typedef ObjectCreationHelper<LineGapParameters, ObjectMetadata, pandora::LineGap> LineGap;
@@ -275,14 +285,13 @@ public:
     /**
      *  @brief  BoxGapParameters class
      */
-    class BoxGapParameters : public ObjectParameters
+    class BoxGapParameters : public DetectorGapParameters
     {
     public:
         pandora::InputCartesianVector   m_vertex;                   ///< Cartesian coordinates of a gap vertex, units mm
         pandora::InputCartesianVector   m_side1;                    ///< Cartesian vector describing first side meeting vertex, units mm
         pandora::InputCartesianVector   m_side2;                    ///< Cartesian vector describing second side meeting vertex, units mm
         pandora::InputCartesianVector   m_side3;                    ///< Cartesian vector describing third side meeting vertex, units mm
-        pandora::InputBool              m_isTransient;              ///< Is the gap transient
     };
 
     typedef ObjectCreationHelper<BoxGapParameters, ObjectMetadata, pandora::BoxGap> BoxGap;
@@ -290,7 +299,7 @@ public:
     /**
      *  @brief  ConcentricGapParameters class
      */
-    class ConcentricGapParameters : public ObjectParameters
+    class ConcentricGapParameters : public DetectorGapParameters
     {
     public:
         pandora::InputFloat             m_minZCoordinate;           ///< Min cylindrical polar z coordinate, origin interaction point, units mm
@@ -301,7 +310,6 @@ public:
         pandora::InputFloat             m_outerRCoordinate;         ///< Outer cylindrical polar r coordinate, origin interaction point, units mm
         pandora::InputFloat             m_outerPhiCoordinate;       ///< Outer cylindrical polar phi coordinate (angle wrt cartesian x axis)
         pandora::InputUInt              m_outerSymmetryOrder;       ///< Order of symmetry of the outermost edge of gap
-        pandora::InputBool              m_isTransient;              ///< Is the gap transient
     };
 
     typedef ObjectCreationHelper<ConcentricGapParameters, ObjectMetadata, pandora::ConcentricGap> ConcentricGap;

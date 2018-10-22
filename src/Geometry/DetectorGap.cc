@@ -11,6 +11,13 @@
 namespace pandora
 {
 
+DetectorGap::DetectorGap(const object_creation::Geometry::DetectorGap::Parameters &parameters) :
+    m_isTransient(parameters.m_isTransient.Get())
+{
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 DetectorGap::~DetectorGap()
 {
 }
@@ -19,12 +26,12 @@ DetectorGap::~DetectorGap()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 LineGap::LineGap(const object_creation::Geometry::LineGap::Parameters &parameters) :
+    DetectorGap(parameters),
     m_lineGapType(parameters.m_lineGapType.Get()),
     m_lineStartX(parameters.m_lineStartX.Get()),
     m_lineEndX(parameters.m_lineEndX.Get()),
     m_lineStartZ(parameters.m_lineStartZ.Get()),
-    m_lineEndZ(parameters.m_lineEndZ.Get()),
-    m_isTransient(parameters.m_isTransient.Get())
+    m_lineEndZ(parameters.m_lineEndZ.Get())
 {
     if ((m_lineEndX < m_lineStartX) || (m_lineEndZ < m_lineStartZ))
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
@@ -57,11 +64,11 @@ bool LineGap::IsInGap(const CartesianVector &positionVector, const HitType hitTy
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 BoxGap::BoxGap(const object_creation::Geometry::BoxGap::Parameters &parameters) :
+    DetectorGap(parameters),
     m_vertex(parameters.m_vertex.Get()),
     m_side1(parameters.m_side1.Get()),
     m_side2(parameters.m_side2.Get()),
-    m_side3(parameters.m_side3.Get()),
-    m_isTransient(parameters.m_isTransient.Get())
+    m_side3(parameters.m_side3.Get())
 {
 }
 
@@ -96,6 +103,7 @@ bool BoxGap::IsInGap(const CartesianVector &positionVector, const HitType hitTyp
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 ConcentricGap::ConcentricGap(const object_creation::Geometry::ConcentricGap::Parameters &parameters) :
+    DetectorGap(parameters),
     m_minZCoordinate(parameters.m_minZCoordinate.Get()),
     m_maxZCoordinate(parameters.m_maxZCoordinate.Get()),
     m_innerRCoordinate(parameters.m_innerRCoordinate.Get()),
@@ -103,8 +111,7 @@ ConcentricGap::ConcentricGap(const object_creation::Geometry::ConcentricGap::Par
     m_innerSymmetryOrder(parameters.m_innerSymmetryOrder.Get()),
     m_outerRCoordinate(parameters.m_outerRCoordinate.Get()),
     m_outerPhiCoordinate(parameters.m_outerPhiCoordinate.Get()),
-    m_outerSymmetryOrder(parameters.m_outerSymmetryOrder.Get()),
-    m_isTransient(parameters.m_isTransient.Get())
+    m_outerSymmetryOrder(parameters.m_outerSymmetryOrder.Get())
 {
     if ((0 == m_innerSymmetryOrder) || (0 == m_outerSymmetryOrder))
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);

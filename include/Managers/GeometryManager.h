@@ -77,7 +77,14 @@ public:
      *
      *  @return the list of gaps in the active detector volume
      */
-    const DetectorGapList &GetDetectorGapList() const;
+    DetectorGapList GetDetectorGapList() const;
+
+    /**
+     *  @brief  Get the list of persistent gaps in the active detector volume
+     *
+     *  @return the list of persistent gaps in the active detector volume
+     */
+    const DetectorGapList &GetPersistentDetectorGapList() const;
 
     /**
      *  @brief  Get the list of transient gaps in the active detector volume
@@ -85,13 +92,6 @@ public:
      *  @return the list of transient gaps in the active detector volume
      */
     const DetectorGapList &GetTransientDetectorGapList() const;
-
-    /**
-     *  @brief  Get the complete list of gaps in the active detector volume
-      *
-     *  @return the complete list of gaps in the active detector volume
-     */
-    const DetectorGapList &GetCompleteDetectorGapList() const;
 
     /**
      *  @brief  Get the granularity level specified for a given calorimeter hit type
@@ -159,14 +159,14 @@ private:
 
     typedef std::multimap<SubDetectorType, const SubDetector*> SubDetectorTypeMap;
 
-    SubDetectorMap              m_subDetectorMap;           ///< Map from sub detector name to sub detector
-    SubDetectorTypeMap          m_subDetectorTypeMap;       ///< Map from sub detector type to sub detector
-    LArTPCMap                   m_larTPCMap;                ///< Map from lar tpc volume id to lar tpc
-    DetectorGapList             m_detectorGapList;          ///< List of gaps in the active detector volume
-    DetectorGapList             m_transientDetectorGapList; ///< List of transient gaps in the active detector volume
-    HitTypeToGranularityMap     m_hitTypeToGranularityMap;  ///< The hit type to granularity map
+    SubDetectorMap              m_subDetectorMap;             ///< Map from sub detector name to sub detector
+    SubDetectorTypeMap          m_subDetectorTypeMap;         ///< Map from sub detector type to sub detector
+    LArTPCMap                   m_larTPCMap;                  ///< Map from lar tpc volume id to lar tpc
+    DetectorGapList             m_persistentDetectorGapList;  ///< List of gaps in the active detector volume
+    DetectorGapList             m_transientDetectorGapList;   ///< List of transient gaps in the active detector volume
+    HitTypeToGranularityMap     m_hitTypeToGranularityMap;    ///< The hit type to granularity map
 
-    const Pandora *const        m_pPandora;                 ///< The associated pandora object
+    const Pandora *const        m_pPandora;                   ///< The associated pandora object
 
     friend class PandoraApiImpl;
     friend class PandoraImpl;
@@ -188,9 +188,19 @@ inline const LArTPCMap &GeometryManager::GetLArTPCMap() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-inline const DetectorGapList &GeometryManager::GetDetectorGapList() const
+inline DetectorGapList GeometryManager::GetDetectorGapList() const
 {
-    return m_detectorGapList;
+    DetectorGapList detectorGapList;
+    detectorGapList.insert(detectorGapList.begin(), m_persistentDetectorGapList.begin(), m_persistentDetectorGapList.end());
+    detectorGapList.insert(detectorGapList.begin(), m_transientDetectorGapList.begin(), m_transientDetectorGapList.end());
+    return detectorGapList;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const DetectorGapList &GeometryManager::GetPersistentDetectorGapList() const
+{
+    return m_persistentDetectorGapList;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

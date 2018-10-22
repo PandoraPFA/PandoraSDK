@@ -51,7 +51,7 @@ private:
     StatusCode WriteFooter();
     StatusCode WriteSubDetector(const SubDetector *const pSubDetector);
     StatusCode WriteLArTPC(const LArTPC *const pLArTPC);
-    StatusCode WriteDetectorGap(const DetectorGap *const pDetectorGap);
+    StatusCode WriteDetectorGap(const DetectorGap *const pDetectorGap, bool transient);
     StatusCode WriteCaloHit(const CaloHit *const pCaloHit);
     StatusCode WriteTrack(const Track *const pTrack);
     StatusCode WriteMCParticle(const MCParticle *const pMCParticle);
