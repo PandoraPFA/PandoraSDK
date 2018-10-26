@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/include/Managers/GeometryManager.h
- *
+ * 
  *  @brief  Header file for the geometry manager class.
- *
+ * 
  *  $Log: $
  */
 #ifndef PANDORA_GEOMETRY_MANAGER_H
