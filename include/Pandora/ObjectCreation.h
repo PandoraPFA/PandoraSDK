@@ -26,7 +26,7 @@ namespace object_creation
 
 /**
  *  @brief  Object creation helper class
- *
+ * 
  *  @param  PARAMETERS the type of object parameters
  *  @param  METADATA the type of object metadata
  *  @param  OBJECT the type of object
@@ -62,7 +62,7 @@ public:
 
     /**
      *  @brief  Alter the metadata information stored in an object
-     *
+     * 
      *  @param  algorithm the algorithm calling this function
      *  @param  pObject address of the object to modify
      *  @param  metaData the metadata (only populated metadata fields will be propagated to the object)

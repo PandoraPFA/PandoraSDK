@@ -169,9 +169,11 @@ StatusCode XmlFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap, bool transient)
+StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap)
 {
-    if ((!transient && GEOMETRY_CONTAINER != m_containerId) || (transient && EVENT_CONTAINER != m_containerId))
+    const bool isTransient(pDetectorGap->IsTransient());
+
+    if ((!isTransient && GEOMETRY_CONTAINER != m_containerId) || (isTransient && EVENT_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
     const LineGap *pLineGap(nullptr);
@@ -193,7 +195,7 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LineEndX", pLineGap->GetLineEndX()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LineStartZ", pLineGap->GetLineStartZ()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("LineEndZ", pLineGap->GetLineEndZ()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsTransient", pLineGap->GetIsTransient()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsTransient", pLineGap->IsTransient()));
 
         m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
         m_pCurrentXmlElement = nullptr;
@@ -207,7 +209,7 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side1", pBoxGap->GetSide1()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side2", pBoxGap->GetSide2()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Side3", pBoxGap->GetSide3()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsTransient", pBoxGap->GetIsTransient()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsTransient", pBoxGap->IsTransient()));
 
         m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
         m_pCurrentXmlElement = nullptr;
@@ -225,7 +227,7 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterRCoordinate", pConcentricGap->GetOuterRCoordinate()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterPhiCoordinate", pConcentricGap->GetOuterPhiCoordinate()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("OuterSymmetryOrder", pConcentricGap->GetOuterSymmetryOrder()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsTransient", pConcentricGap->GetIsTransient()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("IsTransient", pConcentricGap->IsTransient()));
 
         m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
         m_pCurrentXmlElement = nullptr;

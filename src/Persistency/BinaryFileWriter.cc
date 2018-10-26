@@ -172,9 +172,11 @@ StatusCode BinaryFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap, bool transient)
+StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap)
 {
-    if ((!transient && GEOMETRY_CONTAINER != m_containerId) || (transient && EVENT_CONTAINER != m_containerId))
+    const bool isTransient(pDetectorGap->IsTransient());
+
+    if ((!isTransient && GEOMETRY_CONTAINER != m_containerId) || (isTransient && EVENT_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
     const LineGap *pLineGap(nullptr);
@@ -196,7 +198,7 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineEndX()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineStartZ()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineEndZ()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetIsTransient()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->IsTransient()));
     }
     else if (nullptr != pBoxGap)
     {
@@ -207,7 +209,7 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide1()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide2()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide3()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetIsTransient()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->IsTransient()));
     }
     else if (nullptr != pConcentricGap)
     {
@@ -222,7 +224,7 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetOuterRCoordinate()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetOuterPhiCoordinate()));
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetOuterSymmetryOrder()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetIsTransient()));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->IsTransient()));
     }
     else
     {

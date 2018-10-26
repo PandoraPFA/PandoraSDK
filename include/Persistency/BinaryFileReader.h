@@ -56,69 +56,69 @@ private:
 
     /**
      *  @brief  Read a sub detector from the current position in the file
-     *
+     * 
      *  @param  checkComponentId whether to check the component id before deserializing
      */
-    StatusCode ReadSubDetector(bool checkComponentId = true);
+    StatusCode ReadSubDetector(const bool checkComponentId = true);
 
     /**
      *  @brief  Read a lar tpc from the current position in the file
-     *
+     * 
      *  @param  checkComponentId whether to check the component id before deserializing
      */
-    StatusCode ReadLArTPC(bool checkComponentId = true);
+    StatusCode ReadLArTPC(const bool checkComponentId = true);
 
     /**
      *  @brief  Read a line gap from the current position in the file
-     *
+     * 
+     *  @param  isTransient is the gap transient
      *  @param  checkComponentId whether to check the component id before deserializing
-     *  @param  is the gap transient
      */
-    StatusCode ReadLineGap(bool transient, bool checkComponentId = true);
+    StatusCode ReadLineGap(const bool isTransient, const bool checkComponentId = true);
 
     /**
      *  @brief  Read a box gap from the current position in the file
-     *
+     * 
+     *  @param  isTransient is the gap transient
      *  @param  checkComponentId whether to check the component id before deserializing
-     *  @param  is the gap transient
      */
-    StatusCode ReadBoxGap(bool transient, bool checkComponentId = true);
+    StatusCode ReadBoxGap(const bool isTransient, const bool checkComponentId = true);
 
     /**
      *  @brief  Read a concentric gap from the current position in the file
-     *
+     * 
+     *  @param  isTransient is the gap transient
      *  @param  checkComponentId whether to check the component id before deserializing
-     *  @param  is the gap transient
      */
-    StatusCode ReadConcentricGap(bool transient, bool checkComponentId = true);
+    StatusCode ReadConcentricGap(const bool isTransient, const bool checkComponentId = true);
 
     /**
      *  @brief  Read a calo hit from the current position in the file, recreating the stored object
-     *
+     * 
      *  @param  checkComponentId whether to check the component id before deserializing
      */
-    StatusCode ReadCaloHit(bool checkComponentId = true);
+    StatusCode ReadCaloHit(const bool checkComponentId = true);
 
     /**
      *  @brief  Read a track from the current position in the file, recreating the stored object
-     *
+     * 
      *  @param  checkComponentId whether to check the component id before deserializing
      */
-    StatusCode ReadTrack(bool checkComponentId = true);
+    StatusCode ReadTrack(const bool checkComponentId = true);
 
     /**
      *  @brief  Read a mc particle from the current position in the file, recreating the stored object
-     *
+     * 
      *  @param  checkComponentId whether to check the component id before deserializing
      */
-    StatusCode ReadMCParticle(bool checkComponentId = true);
+    StatusCode ReadMCParticle(const bool checkComponentId = true);
 
     /**
      *  @brief  Read a relationship from the current position in the file, recreating the stored relationship
-     *
+     * 
      *  @param  checkComponentId whether to check the component id before deserializing
      */
-    StatusCode ReadRelationship(bool checkComponentId = true);
+    StatusCode ReadRelationship(const bool checkComponentId = true);
 
     std::ifstream::pos_type         m_containerPosition;    ///< Position of start of the current event/geometry container object in file
     std::ifstream::pos_type         m_containerSize;        ///< Size of the current event/geometry container object in the file

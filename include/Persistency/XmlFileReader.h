@@ -28,7 +28,7 @@ class XmlFileReader : public FileReader
 public:
     /**
      *  @brief  Constructor
-     *
+     * 
      *  @param  pandora the pandora instance to be used alongside the file reader
      *  @param  fileName the name of the file containing the pandora objects
      */
@@ -41,7 +41,7 @@ public:
 
     /**
      *  @brief  Read a variable from the file
-     *
+     * 
      *  @param  xmlKey the xml key
      */
     template<typename T>
@@ -68,24 +68,24 @@ private:
 
     /**
      *  @brief  Read a line gap from the current position in the file
-     *
-     *  @param  is the gap transient
+     * 
+     *  @param  isTransient is the gap transient
      */
-    StatusCode ReadLineGap(bool transient);
+    StatusCode ReadLineGap(const bool isTransient);
 
     /**
      *  @brief  Read a box gap from the current position in the file
-     *
-     *  @param  is the gap transient
+     * 
+     *  @param  isTransient is the gap transient
      */
-    StatusCode ReadBoxGap(bool transient);
+    StatusCode ReadBoxGap(const bool isTransient);
 
     /**
      *  @brief  Read a concentric gap from the current position in the file
-     *
-     *  @param  is the gap transient
+     * 
+     *  @param  isTransient is the gap transient
      */
-    StatusCode ReadConcentricGap(bool transient);
+    StatusCode ReadConcentricGap(const bool isTransient);
 
     /**
      *  @brief  Read a calo hit from the current position in the file, recreating the stored object

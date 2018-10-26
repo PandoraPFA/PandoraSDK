@@ -218,7 +218,7 @@ StatusCode BinaryFileReader::ReadNextEventComponent()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadSubDetector(bool checkComponentId)
+StatusCode BinaryFileReader::ReadSubDetector(const bool checkComponentId)
 {
     if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
@@ -306,7 +306,7 @@ StatusCode BinaryFileReader::ReadSubDetector(bool checkComponentId)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadLArTPC(bool checkComponentId)
+StatusCode BinaryFileReader::ReadLArTPC(const bool checkComponentId)
 {
     if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
@@ -387,9 +387,9 @@ StatusCode BinaryFileReader::ReadLArTPC(bool checkComponentId)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadLineGap(bool transient, bool checkComponentId)
+StatusCode BinaryFileReader::ReadLineGap(const bool isTransient, const bool checkComponentId)
 {
-    if ((!transient && GEOMETRY_CONTAINER != m_containerId) || (transient && EVENT_CONTAINER != m_containerId))
+    if ((!isTransient && GEOMETRY_CONTAINER != m_containerId) || (isTransient && EVENT_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
@@ -417,15 +417,15 @@ StatusCode BinaryFileReader::ReadLineGap(bool transient, bool checkComponentId)
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineStartZ));
         float lineEndZ(0.f);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(lineEndZ));
-        bool isTransient(false);
-        PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, this->ReadVariable(isTransient));
+        bool isTransientLineGap(false);
+        PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, this->ReadVariable(isTransientLineGap));
 
         pParameters->m_lineGapType = lineGapType;
         pParameters->m_lineStartX = lineStartX;
         pParameters->m_lineEndX = lineEndX;
         pParameters->m_lineStartZ = lineStartZ;
         pParameters->m_lineEndZ = lineEndZ;
-        pParameters->m_isTransient = isTransient;
+        pParameters->m_isTransient = isTransientLineGap;
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*m_pPandora, *pParameters, *m_pLineGapFactory));
         delete pParameters;
     }
@@ -440,9 +440,9 @@ StatusCode BinaryFileReader::ReadLineGap(bool transient, bool checkComponentId)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadBoxGap(bool transient, bool checkComponentId)
+StatusCode BinaryFileReader::ReadBoxGap(const bool isTransient, const bool checkComponentId)
 {
-    if ((!transient && GEOMETRY_CONTAINER != m_containerId) || (transient && EVENT_CONTAINER != m_containerId))
+    if ((!isTransient && GEOMETRY_CONTAINER != m_containerId) || (isTransient && EVENT_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
@@ -468,14 +468,14 @@ StatusCode BinaryFileReader::ReadBoxGap(bool transient, bool checkComponentId)
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(side2));
         CartesianVector side3(0.f, 0.f, 0.f);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(side3));
-        bool isTransient(false);
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(isTransient));
+        bool isTransientBoxGap(false);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(isTransientBoxGap));
 
         pParameters->m_vertex = vertex;
         pParameters->m_side1 = side1;
         pParameters->m_side2 = side2;
         pParameters->m_side3 = side3;
-        pParameters->m_isTransient = isTransient;
+        pParameters->m_isTransient = isTransientBoxGap;
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::BoxGap::Create(*m_pPandora, *pParameters, *m_pBoxGapFactory));
         delete pParameters;
     }
@@ -490,9 +490,9 @@ StatusCode BinaryFileReader::ReadBoxGap(bool transient, bool checkComponentId)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadConcentricGap(bool transient, bool checkComponentId)
+StatusCode BinaryFileReader::ReadConcentricGap(const bool isTransient, const bool checkComponentId)
 {
-    if ((!transient && GEOMETRY_CONTAINER != m_containerId) || (transient && EVENT_CONTAINER != m_containerId))
+    if ((!isTransient && GEOMETRY_CONTAINER != m_containerId) || (isTransient && EVENT_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
@@ -526,8 +526,8 @@ StatusCode BinaryFileReader::ReadConcentricGap(bool transient, bool checkCompone
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(outerPhiCoordinate));
         unsigned int outerSymmetryOrder(0);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(outerSymmetryOrder));
-        bool isTransient(false);
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(isTransient));
+        bool isTransientConcentricGap(false);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(isTransientConcentricGap));
 
         pParameters->m_minZCoordinate = minZCoordinate;
         pParameters->m_maxZCoordinate = maxZCoordinate;
@@ -537,7 +537,7 @@ StatusCode BinaryFileReader::ReadConcentricGap(bool transient, bool checkCompone
         pParameters->m_outerRCoordinate = outerRCoordinate;
         pParameters->m_outerPhiCoordinate = outerPhiCoordinate;
         pParameters->m_outerSymmetryOrder = outerSymmetryOrder;
-        pParameters->m_isTransient = isTransient;
+        pParameters->m_isTransient = isTransientConcentricGap;
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::ConcentricGap::Create(*m_pPandora, *pParameters, *m_pConcentricGapFactory));
         delete pParameters;
     }
@@ -552,7 +552,7 @@ StatusCode BinaryFileReader::ReadConcentricGap(bool transient, bool checkCompone
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadCaloHit(bool checkComponentId)
+StatusCode BinaryFileReader::ReadCaloHit(const bool checkComponentId)
 {
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
@@ -647,7 +647,7 @@ StatusCode BinaryFileReader::ReadCaloHit(bool checkComponentId)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadTrack(bool checkComponentId)
+StatusCode BinaryFileReader::ReadTrack(const bool checkComponentId)
 {
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
@@ -727,7 +727,7 @@ StatusCode BinaryFileReader::ReadTrack(bool checkComponentId)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadMCParticle(bool checkComponentId)
+StatusCode BinaryFileReader::ReadMCParticle(const bool checkComponentId)
 {
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
@@ -783,7 +783,7 @@ StatusCode BinaryFileReader::ReadMCParticle(bool checkComponentId)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadRelationship(bool checkComponentId)
+StatusCode BinaryFileReader::ReadRelationship(const bool checkComponentId)
 {
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;

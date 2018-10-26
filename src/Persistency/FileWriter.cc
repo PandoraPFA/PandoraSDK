@@ -51,7 +51,7 @@ StatusCode FileWriter::WriteGeometry()
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSubDetectorList());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteLArTPCList());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteDetectorGapList());
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WritePersistentDetectorGapList());
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteFooter());
 
@@ -112,11 +112,11 @@ StatusCode FileWriter::WriteLArTPCList()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode FileWriter::WriteDetectorGapList()
+StatusCode FileWriter::WritePersistentDetectorGapList()
 {
-    for (const DetectorGap *const pDetectorGap : m_pPandora->GetGeometry()->GetDetectorGapList())
+    for (const DetectorGap *const pDetectorGap : m_pPandora->GetGeometry()->GetPersistentDetectorGapList())
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteDetectorGap(pDetectorGap, false));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteDetectorGap(pDetectorGap));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -128,7 +128,7 @@ StatusCode FileWriter::WriteTransientDetectorGapList()
 {
     for (const DetectorGap *const pDetectorGap : m_pPandora->GetGeometry()->GetTransientDetectorGapList())
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteDetectorGap(pDetectorGap, true));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteDetectorGap(pDetectorGap));
     }
 
     return STATUS_CODE_SUCCESS;

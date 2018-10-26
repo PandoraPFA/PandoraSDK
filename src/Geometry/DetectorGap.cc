@@ -12,7 +12,7 @@ namespace pandora
 {
 
 DetectorGap::DetectorGap(const object_creation::Geometry::DetectorGap::Parameters &parameters) :
-    m_isTransient(parameters.m_isTransient.Get())
+    m_isTransient(parameters.m_isTransient.IsInitialized() ? parameters.m_isTransient.Get() : false)
 {
 }
 
