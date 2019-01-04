@@ -69,23 +69,23 @@ private:
     /**
      *  @brief  Read a line gap from the current position in the file
      * 
-     *  @param  isTransient is the gap transient
+     *  @param  containerId the expected id of container being read
      */
-    StatusCode ReadLineGap(const bool isTransient);
+    StatusCode ReadLineGap(const ContainerId containerId);
 
     /**
      *  @brief  Read a box gap from the current position in the file
      * 
-     *  @param  isTransient is the gap transient
+     *  @param  containerId the expected id of container being read
      */
-    StatusCode ReadBoxGap(const bool isTransient);
+    StatusCode ReadBoxGap(const ContainerId containerId);
 
     /**
      *  @brief  Read a concentric gap from the current position in the file
      * 
-     *  @param  isTransient is the gap transient
+     *  @param  containerId the expected id of container being read
      */
-    StatusCode ReadConcentricGap(const bool isTransient);
+    StatusCode ReadConcentricGap(const ContainerId containerId);
 
     /**
      *  @brief  Read a calo hit from the current position in the file, recreating the stored object

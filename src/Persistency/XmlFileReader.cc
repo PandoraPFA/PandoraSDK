@@ -171,15 +171,15 @@ StatusCode XmlFileReader::ReadNextGeometryComponent()
     }
     if (std::string("LineGap") == componentName)
     {
-        return this->ReadLineGap(false);
+        return this->ReadLineGap(GEOMETRY_CONTAINER);
     }
     else if (std::string("BoxGap") == componentName)
     {
-        return this->ReadBoxGap(false);
+        return this->ReadBoxGap(GEOMETRY_CONTAINER);
     }
     else if (std::string("ConcentricGap") == componentName)
     {
-        return this->ReadConcentricGap(false);
+        return this->ReadConcentricGap(GEOMETRY_CONTAINER);
     }
     else
     {
@@ -227,15 +227,15 @@ StatusCode XmlFileReader::ReadNextEventComponent()
     }
     else if (std::string("LineGap") == componentName)
     {
-        return this->ReadLineGap(true);
+        return this->ReadLineGap(EVENT_CONTAINER);
     }
     else if (std::string("BoxGap") == componentName)
     {
-        return this->ReadBoxGap(true);
+        return this->ReadBoxGap(EVENT_CONTAINER);
     }
     else if (std::string("ConcentricGap") == componentName)
     {
-        return this->ReadConcentricGap(true);
+        return this->ReadConcentricGap(EVENT_CONTAINER);
     }
     else
     {
@@ -401,9 +401,9 @@ StatusCode XmlFileReader::ReadLArTPC()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode XmlFileReader::ReadLineGap(const bool isTransient)
+StatusCode XmlFileReader::ReadLineGap(const ContainerId containerId)
 {
-    if ((!isTransient && GEOMETRY_CONTAINER != m_containerId) || (isTransient && EVENT_CONTAINER != m_containerId))
+    if (containerId != m_containerId)
         return STATUS_CODE_FAILURE;
 
     PandoraApi::Geometry::LineGap::Parameters *pParameters = m_pLineGapFactory->NewParameters();
@@ -446,9 +446,9 @@ StatusCode XmlFileReader::ReadLineGap(const bool isTransient)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode XmlFileReader::ReadBoxGap(const bool isTransient)
+StatusCode XmlFileReader::ReadBoxGap(const ContainerId containerId)
 {
-    if ((!isTransient && GEOMETRY_CONTAINER != m_containerId) || (isTransient && EVENT_CONTAINER != m_containerId))
+    if (containerId != m_containerId)
         return STATUS_CODE_FAILURE;
 
     PandoraApi::Geometry::BoxGap::Parameters *pParameters = m_pBoxGapFactory->NewParameters();
@@ -487,9 +487,9 @@ StatusCode XmlFileReader::ReadBoxGap(const bool isTransient)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode XmlFileReader::ReadConcentricGap(const bool isTransient)
+StatusCode XmlFileReader::ReadConcentricGap(const ContainerId containerId)
 {
-    if ((!isTransient && GEOMETRY_CONTAINER != m_containerId) || (isTransient && EVENT_CONTAINER != m_containerId))
+    if (containerId != m_containerId)
         return STATUS_CODE_FAILURE;
 
     PandoraApi::Geometry::ConcentricGap::Parameters *pParameters = m_pConcentricGapFactory->NewParameters();

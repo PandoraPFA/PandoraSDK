@@ -167,16 +167,13 @@ StatusCode GeometryManager::CreateGap(const PARAMETERS &parameters, const Object
 
 StatusCode GeometryManager::ResetForNextEvent()
 {
-    for (const DetectorGap *const pDetectorGap : m_detectorGapList)
-        delete pDetectorGap;
-
     for (const DetectorGap *const pDetectorGap : m_transientDetectorGapList)
         delete pDetectorGap;
 
     m_detectorGapList.clear();
     m_transientDetectorGapList.clear();
 
-    m_detectorGapList.insert(m_detectorGapList.begin(), m_persistentDetectorGapList.begin(), m_persistentDetectorGapList.end());
+    m_detectorGapList = m_persistentDetectorGapList;
 
     return STATUS_CODE_SUCCESS;
 }
@@ -192,12 +189,6 @@ StatusCode GeometryManager::EraseAllContent()
         delete mapEntry.second;
 
     for (const DetectorGap *const pDetectorGap : m_detectorGapList)
-        delete pDetectorGap;
-
-    for (const DetectorGap *const pDetectorGap : m_persistentDetectorGapList)
-        delete pDetectorGap;
-
-    for (const DetectorGap *const pDetectorGap : m_transientDetectorGapList)
         delete pDetectorGap;
 
     m_subDetectorMap.clear();

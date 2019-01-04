@@ -71,26 +71,26 @@ private:
     /**
      *  @brief  Read a line gap from the current position in the file
      * 
-     *  @param  isTransient is the gap transient
+     *  @param  containerId the expected id of container being read
      *  @param  checkComponentId whether to check the component id before deserializing
      */
-    StatusCode ReadLineGap(const bool isTransient, const bool checkComponentId = true);
+    StatusCode ReadLineGap(const ContainerId containerId, const bool checkComponentId = true);
 
     /**
      *  @brief  Read a box gap from the current position in the file
      * 
-     *  @param  isTransient is the gap transient
+     *  @param  containerId the expected id of container being read
      *  @param  checkComponentId whether to check the component id before deserializing
      */
-    StatusCode ReadBoxGap(const bool isTransient, const bool checkComponentId = true);
+    StatusCode ReadBoxGap(const ContainerId containerId, const bool checkComponentId = true);
 
     /**
      *  @brief  Read a concentric gap from the current position in the file
      * 
-     *  @param  isTransient is the gap transient
+     *  @param  containerId the expected id of container being read
      *  @param  checkComponentId whether to check the component id before deserializing
      */
-    StatusCode ReadConcentricGap(const bool isTransient, const bool checkComponentId = true);
+    StatusCode ReadConcentricGap(const ContainerId containerId, const bool checkComponentId = true);
 
     /**
      *  @brief  Read a calo hit from the current position in the file, recreating the stored object

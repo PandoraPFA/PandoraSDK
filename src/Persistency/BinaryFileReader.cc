@@ -164,11 +164,11 @@ StatusCode BinaryFileReader::ReadNextGeometryComponent()
     case LAR_TPC_COMPONENT:
         return this->ReadLArTPC(false);
     case LINE_GAP_COMPONENT:
-        return this->ReadLineGap(false, false);
+        return this->ReadLineGap(GEOMETRY_CONTAINER, false);
     case BOX_GAP_COMPONENT:
-        return this->ReadBoxGap(false, false);
+        return this->ReadBoxGap(GEOMETRY_CONTAINER, false);
     case CONCENTRIC_GAP_COMPONENT:
-        return this->ReadConcentricGap(false, false);
+        return this->ReadConcentricGap(GEOMETRY_CONTAINER, false);
     case GEOMETRY_END_COMPONENT:
         m_containerId = UNKNOWN_CONTAINER;
         return STATUS_CODE_NOT_FOUND;
@@ -203,11 +203,11 @@ StatusCode BinaryFileReader::ReadNextEventComponent()
     case RELATIONSHIP_COMPONENT:
         return this->ReadRelationship(false);
     case LINE_GAP_COMPONENT:
-        return this->ReadLineGap(true, false);
+        return this->ReadLineGap(EVENT_CONTAINER, false);
     case BOX_GAP_COMPONENT:
-        return this->ReadBoxGap(true, false);
+        return this->ReadBoxGap(EVENT_CONTAINER, false);
     case CONCENTRIC_GAP_COMPONENT:
-        return this->ReadConcentricGap(true, false);
+        return this->ReadConcentricGap(EVENT_CONTAINER, false);
     case EVENT_END_COMPONENT:
         m_containerId = UNKNOWN_CONTAINER;
         return STATUS_CODE_NOT_FOUND;
@@ -387,9 +387,9 @@ StatusCode BinaryFileReader::ReadLArTPC(const bool checkComponentId)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadLineGap(const bool isTransient, const bool checkComponentId)
+StatusCode BinaryFileReader::ReadLineGap(const ContainerId containerId, const bool checkComponentId)
 {
-    if ((!isTransient && GEOMETRY_CONTAINER != m_containerId) || (isTransient && EVENT_CONTAINER != m_containerId))
+    if (containerId != m_containerId)
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
@@ -440,9 +440,9 @@ StatusCode BinaryFileReader::ReadLineGap(const bool isTransient, const bool chec
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadBoxGap(const bool isTransient, const bool checkComponentId)
+StatusCode BinaryFileReader::ReadBoxGap(const ContainerId containerId, const bool checkComponentId)
 {
-    if ((!isTransient && GEOMETRY_CONTAINER != m_containerId) || (isTransient && EVENT_CONTAINER != m_containerId))
+    if (containerId != m_containerId)
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
@@ -490,9 +490,9 @@ StatusCode BinaryFileReader::ReadBoxGap(const bool isTransient, const bool check
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadConcentricGap(const bool isTransient, const bool checkComponentId)
+StatusCode BinaryFileReader::ReadConcentricGap(const ContainerId containerId, const bool checkComponentId)
 {
-    if ((!isTransient && GEOMETRY_CONTAINER != m_containerId) || (isTransient && EVENT_CONTAINER != m_containerId))
+    if (containerId != m_containerId)
         return STATUS_CODE_FAILURE;
 
     if (checkComponentId)
