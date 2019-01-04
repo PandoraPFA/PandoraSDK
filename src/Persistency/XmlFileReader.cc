@@ -426,6 +426,9 @@ StatusCode XmlFileReader::ReadLineGap(const ContainerId containerId)
         bool isTransientLineGap(false);
         PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, this->ReadVariable("IsTransient", isTransientLineGap));
 
+        if ((GEOMETRY_CONTAINER == m_containerId && isTransientLineGap) || (EVENT_CONTAINER == m_containerId && !isTransientLineGap))
+            throw StatusCodeException(STATUS_CODE_FAILURE);
+
         pParameters->m_lineGapType = lineGapType;
         pParameters->m_lineStartX = lineStartX;
         pParameters->m_lineEndX = lineEndX;
@@ -467,6 +470,9 @@ StatusCode XmlFileReader::ReadBoxGap(const ContainerId containerId)
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Side3", side3));
         bool isTransientBoxGap(false);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("IsTransient", isTransientBoxGap));
+
+        if ((GEOMETRY_CONTAINER == m_containerId && isTransientBoxGap) || (EVENT_CONTAINER == m_containerId && !isTransientBoxGap))
+            throw StatusCodeException(STATUS_CODE_FAILURE);
 
         pParameters->m_vertex = vertex;
         pParameters->m_side1 = side1;
@@ -516,6 +522,9 @@ StatusCode XmlFileReader::ReadConcentricGap(const ContainerId containerId)
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("OuterSymmetryOrder", outerSymmetryOrder));
         bool isTransientConcentricGap(false);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("IsTransient", isTransientConcentricGap));
+
+        if ((GEOMETRY_CONTAINER == m_containerId && isTransientConcentricGap) || (EVENT_CONTAINER == m_containerId && !isTransientConcentricGap))
+            throw StatusCodeException(STATUS_CODE_FAILURE);
 
         pParameters->m_minZCoordinate = minZCoordinate;
         pParameters->m_maxZCoordinate = maxZCoordinate;

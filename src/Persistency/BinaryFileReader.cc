@@ -420,6 +420,9 @@ StatusCode BinaryFileReader::ReadLineGap(const ContainerId containerId, const bo
         bool isTransientLineGap(false);
         PANDORA_THROW_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, this->ReadVariable(isTransientLineGap));
 
+        if ((GEOMETRY_CONTAINER == m_containerId && isTransientLineGap) || (EVENT_CONTAINER == m_containerId && !isTransientLineGap))
+            throw StatusCodeException(STATUS_CODE_FAILURE);
+
         pParameters->m_lineGapType = lineGapType;
         pParameters->m_lineStartX = lineStartX;
         pParameters->m_lineEndX = lineEndX;
@@ -470,6 +473,9 @@ StatusCode BinaryFileReader::ReadBoxGap(const ContainerId containerId, const boo
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(side3));
         bool isTransientBoxGap(false);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(isTransientBoxGap));
+
+        if ((GEOMETRY_CONTAINER == m_containerId && isTransientBoxGap) || (EVENT_CONTAINER == m_containerId && !isTransientBoxGap))
+            throw StatusCodeException(STATUS_CODE_FAILURE);
 
         pParameters->m_vertex = vertex;
         pParameters->m_side1 = side1;
@@ -528,6 +534,9 @@ StatusCode BinaryFileReader::ReadConcentricGap(const ContainerId containerId, co
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(outerSymmetryOrder));
         bool isTransientConcentricGap(false);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(isTransientConcentricGap));
+
+        if ((GEOMETRY_CONTAINER == m_containerId && isTransientConcentricGap) || (EVENT_CONTAINER == m_containerId && !isTransientConcentricGap))
+            throw StatusCodeException(STATUS_CODE_FAILURE);
 
         pParameters->m_minZCoordinate = minZCoordinate;
         pParameters->m_maxZCoordinate = maxZCoordinate;

@@ -170,8 +170,8 @@ StatusCode GeometryManager::ResetForNextEvent()
     for (const DetectorGap *const pDetectorGap : m_transientDetectorGapList)
         delete pDetectorGap;
 
-    m_detectorGapList.clear();
     m_transientDetectorGapList.clear();
+    m_detectorGapList.clear();
 
     m_detectorGapList = m_persistentDetectorGapList;
 
