@@ -75,7 +75,8 @@ CaloHit::CaloHit(const object_creation::CaloHit::Parameters &parameters) :
     m_isIsolated(false),
     m_isAvailable(true),
     m_weight(1.f),
-    m_pParentAddress(parameters.m_pParentAddress.Get())
+    m_pParentAddress(parameters.m_pParentAddress.Get()),
+    m_propertiesMap()
 {
     m_cellLengthScale = this->CalculateCellLengthScale();
 }
@@ -110,7 +111,8 @@ CaloHit::CaloHit(const object_creation::CaloHitFragment::Parameters &parameters)
     m_isAvailable(parameters.m_pOriginalCaloHit->m_isAvailable),
     m_weight(parameters.m_weight.Get() * parameters.m_pOriginalCaloHit->m_weight),
     m_mcParticleWeightMap(parameters.m_pOriginalCaloHit->m_mcParticleWeightMap),
-    m_pParentAddress(parameters.m_pOriginalCaloHit->m_pParentAddress)
+    m_pParentAddress(parameters.m_pOriginalCaloHit->m_pParentAddress),
+    m_propertiesMap(parameters.m_pOriginalCaloHit->m_propertiesMap)
 {
     for (MCParticleWeightMap::value_type &mapEntry : m_mcParticleWeightMap)
         mapEntry.second = mapEntry.second * parameters.m_weight.Get();
@@ -126,6 +128,11 @@ CaloHit::~CaloHit()
 
 StatusCode CaloHit::AlterMetadata(const object_creation::CaloHit::Metadata &metadata)
 {
+    if (!metadata.m_propertiesToAdd.empty() || !metadata.m_propertiesToRemove.empty())
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->UpdatePropertiesMap(metadata));
+    }
+
     if (metadata.m_x0.IsInitialized())
     {
         const float oldX0(m_x0);
@@ -264,6 +271,27 @@ void CaloHit::GetPointingCellCorners(CartesianPointVector &cartesianPointVector)
     cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMax * sinThetaMax * cosPhiMin, rMaxAtThetaMax * sinThetaMax * sinPhiMin, rMaxAtThetaMax * cosThetaMax));
     cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMax * sinThetaMax * cosPhiMax, rMaxAtThetaMax * sinThetaMax * sinPhiMax, rMaxAtThetaMax * cosThetaMax));
     cartesianPointVector.push_back(CartesianVector(rMaxAtThetaMin * sinThetaMin * cosPhiMax, rMaxAtThetaMin * sinThetaMin * sinPhiMax, rMaxAtThetaMin * cosThetaMin));
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+StatusCode CaloHit::UpdatePropertiesMap(const object_creation::CaloHit::Metadata &metadata)
+{
+    for (const std::string &propertyName : metadata.m_propertiesToRemove)
+    {
+        if (metadata.m_propertiesToAdd.count(propertyName))
+            return STATUS_CODE_INVALID_PARAMETER;
+
+        if(!m_propertiesMap.count(propertyName))
+            return STATUS_CODE_NOT_FOUND;
+    }
+
+    for (const std::string &propertyName : metadata.m_propertiesToRemove)
+        m_propertiesMap.erase(propertyName);
+
+    for (const PropertiesMap::value_type &entryToAdd : metadata.m_propertiesToAdd)
+        m_propertiesMap[entryToAdd.first] = entryToAdd.second;
+
+    return STATUS_CODE_SUCCESS;
 }
 
 } // namespace pandora

@@ -109,6 +109,8 @@ public:
     pandora::InputFloat                 m_x0;                       ///< For LArTPC usage, the x-coordinate shift associated with a drift time t0 shift, units mm
     pandora::InputBool                  m_isIsolated;               ///< The calo hit isolation flag
     pandora::InputBool                  m_isPossibleMip;            ///< The calo hit minimum ionising particle flag
+    pandora::PropertiesMap              m_propertiesToAdd;          ///< The mapping from calo hit property names to new values
+    pandora::StringVector               m_propertiesToRemove;       ///< The vector of calo hit property names to remove
 };
 
 /**

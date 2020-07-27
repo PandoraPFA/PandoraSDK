@@ -228,6 +228,13 @@ public:
      */
     bool operator< (const CaloHit &rhs) const;
 
+    /**
+     *  @brief  Get the map from registered property name to floating point property value
+     * 
+     *  @return The properties map
+     */
+    const PropertiesMap& GetPropertiesMap () const;
+
 protected:
     /**
      *  @brief  Constructor
@@ -309,6 +316,13 @@ protected:
      */
     void SetAvailability(bool isAvailable);
 
+    /**
+     *  @brief  Update the properties map
+     * 
+     *  @param  metadata The new CaloHit metadata
+     */
+    StatusCode UpdatePropertiesMap(const object_creation::CaloHit::Metadata &metadata);
+
     CartesianVector         m_positionVector;           ///< Position vector of center of calorimeter cell, units mm
     float                   m_x0;                       ///< For LArTPC usage, the x-coordinate shift associated with a drift time t0 shift, units mm
     const CartesianVector   m_expectedDirection;        ///< Unit vector in direction of expected hit propagation
@@ -337,6 +351,7 @@ protected:
     float                   m_weight;                   ///< The calo hit weight, which may not be unity if the hit has been fragmented
     MCParticleWeightMap     m_mcParticleWeightMap;      ///< The mc particle weight map
     const void             *m_pParentAddress;           ///< The address of the parent calo hit in the user framework
+    PropertiesMap           m_propertiesMap;            ///< The map from registered property name to flaoting point property value
 
     friend class CaloHitMetadata;
     friend class CaloHitManager;
@@ -546,6 +561,11 @@ inline bool CaloHit::IsAvailable() const
 inline void CaloHit::SetAvailability(bool isAvailable)
 {
     m_isAvailable = isAvailable;
+}
+
+inline const PropertiesMap& CaloHit::GetPropertiesMap() const
+{
+    return m_propertiesMap;
 }
 
 } // namespace pandora
