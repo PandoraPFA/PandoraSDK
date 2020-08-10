@@ -166,6 +166,36 @@ float Cluster::GetShowerProfileDiscrepancy(const Pandora &pandora) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+void Cluster::GetClusterSpanX(float &xmin, float &xmax) const
+{
+    if (this->m_isValidSpan)
+    {
+        xmin = this->m_xMin;
+        xmax = this->m_xMax;
+    }
+    else
+    {
+        xmin = std::numeric_limits<float>::max();
+        xmax = -std::numeric_limits<float>::max();
+
+        for (OrderedCaloHitList::const_iterator ochIter = m_orderedCaloHitList.begin();  ochIter != m_orderedCaloHitList.end(); ++ochIter)
+        {
+            for (CaloHitList::const_iterator hIter = ochIter->second->begin(); hIter != ochIter->second->end(); ++hIter)
+            {
+                const CaloHit *const pCaloHit = *hIter;
+                const CartesianVector &hit(pCaloHit->GetPositionVector());
+                xmin = std::min(hit.GetX(), xmin);
+                xmax = std::max(hit.GetX(), xmax);
+            }
+        }
+        this->m_xMin = xmin;
+        this->m_xMax = xmax;
+        this->m_isValidSpan = true;
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 Cluster::Cluster(const object_creation::Cluster::Parameters &parameters) :
     m_nCaloHits(0),
     m_nPossibleMipHits(0),
@@ -179,6 +209,9 @@ Cluster::Cluster(const object_creation::Cluster::Parameters &parameters) :
     m_initialDirection(0.f, 0.f, 0.f),
     m_isDirectionUpToDate(false),
     m_isFitUpToDate(false),
+    m_isValidSpan(false),
+    m_xMin(0.f),
+    m_xMax(0.f),
     m_isAvailable(true)
 {
     if (parameters.m_caloHitList.empty() && parameters.m_isolatedCaloHitList.empty() && !parameters.m_pTrack.IsInitialized())
@@ -226,6 +259,7 @@ StatusCode Cluster::AddCaloHit(const CaloHit *const pCaloHit)
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_orderedCaloHitList.Add(pCaloHit));
 
+    this->InvalidateSpan();
     this->ResetOutdatedProperties();
 
     ++m_nCaloHits;
@@ -278,6 +312,7 @@ StatusCode Cluster::RemoveCaloHit(const CaloHit *const pCaloHit)
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_orderedCaloHitList.Remove(pCaloHit));
 
+    this->InvalidateSpan();
     if (m_orderedCaloHitList.empty())
         return this->ResetProperties();
 
@@ -515,6 +550,7 @@ StatusCode Cluster::ResetProperties()
 
     m_particleId = UNKNOWN_PARTICLE_TYPE;
 
+    this->InvalidateSpan();
     this->ResetOutdatedProperties();
     return STATUS_CODE_SUCCESS;
 }
@@ -557,6 +593,7 @@ StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
         m_isolatedCaloHitList.push_back(pCaloHit);
     }
 
+    this->InvalidateSpan();
     this->ResetOutdatedProperties();
 
     m_nCaloHits += pCluster->GetNCaloHits();
@@ -629,6 +666,15 @@ void Cluster::RemoveTrackSeed()
 {
     m_pTrackSeed = nullptr;
     this->UpdateInitialDirectionCache();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void Cluster::InvalidateSpan()
+{
+    this->m_isValidSpan = false;
+    this->m_xMin = 0.f;
+    this->m_xMax = 0.f;
 }
 
 } // namespace pandora
