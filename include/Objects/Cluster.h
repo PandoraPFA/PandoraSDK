@@ -266,6 +266,16 @@ public:
      */
     void GetClusterSpanX(float &xmin, float &xmax) const;
 
+    /**
+     *  @brief  Get upper and lower Z positions of the calo hits in a cluster in range xmin to xmax
+     *
+     *  @param  xmin for range in x
+     *  @param  xmax for range in x
+     *  @param  zmin the lower z for this range of x
+     *  @param  zmax the upper z for this range in x
+     */
+    void GetClusterSpanZ(const float xmin, const float xmax, float &zmin, float &zmax) const;
+
 protected:
     /**
      *  @brief  Constructor

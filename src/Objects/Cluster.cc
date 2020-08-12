@@ -196,6 +196,40 @@ void Cluster::GetClusterSpanX(float &xmin, float &xmax) const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+void Cluster::GetClusterSpanZ(const float xmin, const float xmax, float &zmin, float &zmax) const
+{
+    if (xmin > xmax)
+        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
+
+    const OrderedCaloHitList &orderedCaloHitList(this->GetOrderedCaloHitList());
+
+    zmin = std::numeric_limits<float>::max();
+    zmax = -std::numeric_limits<float>::max();
+
+    bool foundHits(false);
+
+    for (OrderedCaloHitList::const_iterator ochIter = orderedCaloHitList.begin(), ochIterEnd = orderedCaloHitList.end(); ochIter != ochIterEnd; ++ochIter)
+    {
+        for (CaloHitList::const_iterator hIter = ochIter->second->begin(), hIterEnd = ochIter->second->end(); hIter != hIterEnd; ++hIter)
+        {
+            const CaloHit *const pCaloHit = *hIter;
+            const CartesianVector &hit(pCaloHit->GetPositionVector());
+
+            if (hit.GetX() < xmin || hit.GetX() > xmax)
+                continue;
+
+            zmin = std::min(hit.GetZ(), zmin);
+            zmax = std::max(hit.GetZ(), zmax);
+            foundHits = true;
+        }
+    }
+
+    if (!foundHits)
+        throw StatusCodeException(STATUS_CODE_NOT_FOUND);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 Cluster::Cluster(const object_creation::Cluster::Parameters &parameters) :
     m_nCaloHits(0),
     m_nPossibleMipHits(0),
