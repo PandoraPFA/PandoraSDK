@@ -168,10 +168,10 @@ float Cluster::GetShowerProfileDiscrepancy(const Pandora &pandora) const
 
 void Cluster::GetClusterSpanX(float &xmin, float &xmax) const
 {
-    if (this->m_isValidSpan)
+    if (m_xMin.IsInitialized() && m_xMax.IsInitialized())
     {
-        xmin = this->m_xMin;
-        xmax = this->m_xMax;
+        xmin = m_xMin.Get();
+        xmax = m_xMax.Get();
     }
     else
     {
@@ -188,9 +188,8 @@ void Cluster::GetClusterSpanX(float &xmin, float &xmax) const
                 xmax = std::max(hit.GetX(), xmax);
             }
         }
-        this->m_xMin = xmin;
-        this->m_xMax = xmax;
-        this->m_isValidSpan = true;
+        m_xMin.Set(xmin);
+        m_xMax.Set(xmax);
     }
 }
 
@@ -243,9 +242,6 @@ Cluster::Cluster(const object_creation::Cluster::Parameters &parameters) :
     m_initialDirection(0.f, 0.f, 0.f),
     m_isDirectionUpToDate(false),
     m_isFitUpToDate(false),
-    m_isValidSpan(false),
-    m_xMin(0.f),
-    m_xMax(0.f),
     m_isAvailable(true)
 {
     if (parameters.m_caloHitList.empty() && parameters.m_isolatedCaloHitList.empty() && !parameters.m_pTrack.IsInitialized())
@@ -293,7 +289,6 @@ StatusCode Cluster::AddCaloHit(const CaloHit *const pCaloHit)
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_orderedCaloHitList.Add(pCaloHit));
 
-    this->InvalidateSpan();
     this->ResetOutdatedProperties();
 
     ++m_nCaloHits;
@@ -346,7 +341,6 @@ StatusCode Cluster::RemoveCaloHit(const CaloHit *const pCaloHit)
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_orderedCaloHitList.Remove(pCaloHit));
 
-    this->InvalidateSpan();
     if (m_orderedCaloHitList.empty())
         return this->ResetProperties();
 
@@ -584,7 +578,6 @@ StatusCode Cluster::ResetProperties()
 
     m_particleId = UNKNOWN_PARTICLE_TYPE;
 
-    this->InvalidateSpan();
     this->ResetOutdatedProperties();
     return STATUS_CODE_SUCCESS;
 }
@@ -606,6 +599,8 @@ void Cluster::ResetOutdatedProperties()
     m_trackComparisonEnergy.Reset();
     m_innerLayerHitType.Reset();
     m_outerLayerHitType.Reset();
+    m_xMin.Reset();
+    m_xMax.Reset();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -627,7 +622,6 @@ StatusCode Cluster::AddHitsFromSecondCluster(const Cluster *const pCluster)
         m_isolatedCaloHitList.push_back(pCaloHit);
     }
 
-    this->InvalidateSpan();
     this->ResetOutdatedProperties();
 
     m_nCaloHits += pCluster->GetNCaloHits();
@@ -700,15 +694,6 @@ void Cluster::RemoveTrackSeed()
 {
     m_pTrackSeed = nullptr;
     this->UpdateInitialDirectionCache();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void Cluster::InvalidateSpan()
-{
-    this->m_isValidSpan = false;
-    this->m_xMin = 0.f;
-    this->m_xMax = 0.f;
 }
 
 } // namespace pandora

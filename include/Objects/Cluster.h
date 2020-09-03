@@ -414,11 +414,6 @@ protected:
     void SetAvailability(bool isAvailable);
 
     /**
-     *  @brief  Invalidates cached cluster span values
-     */
-    void InvalidateSpan();
-
-    /**
      *  @brief  SimplePoint class
      */
     class SimplePoint
@@ -459,9 +454,8 @@ protected:
     mutable InputFloat          m_showerProfileDiscrepancy;     ///< The cluster shower profile discrepancy
     mutable InputHitType        m_innerLayerHitType;            ///< The typical inner layer hit type
     mutable InputHitType        m_outerLayerHitType;            ///< The typical outer layer hit type
-    mutable bool                m_isValidSpan;                  ///< Whether the current cached span value is valid
-    mutable float               m_xMin;                         ///< Cached cluster minimum in x
-    mutable float               m_xMax;                         ///< Cached cluster maximum in x
+    mutable InputFloat          m_xMin;                         ///< Cached cluster minimum in x
+    mutable InputFloat          m_xMax;                         ///< Cached cluster maximum in x
 
     TrackList                   m_associatedTrackList;          ///< The list of tracks associated with the cluster
     bool                        m_isAvailable;                  ///< Whether the cluster is available to be added to a particle flow object
