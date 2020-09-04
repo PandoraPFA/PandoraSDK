@@ -258,6 +258,24 @@ public:
      */
     float GetShowerProfileDiscrepancy(const Pandora &pandora) const;
 
+    /**
+     *  @brief  Get minimum and maximum X positions of the calo hits in this cluster
+     *
+     *  @param  the minimum position of x
+     *  @param  the maximum position of x
+     */
+    void GetClusterSpanX(float &xmin, float &xmax) const;
+
+    /**
+     *  @brief  Get upper and lower Z positions of the calo hits in a cluster in range xmin to xmax
+     *
+     *  @param  xmin for range in x
+     *  @param  xmax for range in x
+     *  @param  zmin the lower z for this range of x
+     *  @param  zmax the upper z for this range in x
+     */
+    void GetClusterSpanZ(const float xmin, const float xmax, float &zmin, float &zmax) const;
+
 protected:
     /**
      *  @brief  Constructor
@@ -436,6 +454,8 @@ protected:
     mutable InputFloat          m_showerProfileDiscrepancy;     ///< The cluster shower profile discrepancy
     mutable InputHitType        m_innerLayerHitType;            ///< The typical inner layer hit type
     mutable InputHitType        m_outerLayerHitType;            ///< The typical outer layer hit type
+    mutable InputFloat          m_xMin;                         ///< Cached cluster minimum in x
+    mutable InputFloat          m_xMax;                         ///< Cached cluster maximum in x
 
     TrackList                   m_associatedTrackList;          ///< The list of tracks associated with the cluster
     bool                        m_isAvailable;                  ///< Whether the cluster is available to be added to a particle flow object
