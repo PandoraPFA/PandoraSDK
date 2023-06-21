@@ -9,6 +9,7 @@
 #define PANDORA_INTERNAL_H 1
 
 #include <algorithm>
+#include <cstdint>
 #include <iostream>
 #include <iomanip>
 #include <list>
