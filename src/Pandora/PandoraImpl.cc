@@ -17,6 +17,8 @@
 #include "Managers/TrackManager.h"
 #include "Managers/VertexManager.h"
 
+#include "Objects/Event.h"
+
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraImpl.h"
 #include "Pandora/PandoraSettings.h"
@@ -96,6 +98,13 @@ StatusCode PandoraImpl::InitializePlugins(const TiXmlHandle *const pXmlHandle) c
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode PandoraImpl::InitializeEvent(const TiXmlHandle *const pXmlHandle) const
+{
+    return m_pPandora->m_pEvent->Initialize(pXmlHandle);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode PandoraImpl::ResetEvent() const
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->ResetForNextEvent());
@@ -106,6 +115,7 @@ StatusCode PandoraImpl::ResetEvent() const
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pVertexManager->ResetForNextEvent());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pAlgorithmManager->ResetForNextEvent());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pPluginManager->ResetForNextEvent());
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pEvent->ResetForNextEvent());
 
     return STATUS_CODE_SUCCESS;
 }

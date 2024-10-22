@@ -70,6 +70,13 @@ private:
     StatusCode InitializePlugins(const TiXmlHandle *const pXmlHandle) const;
 
     /**
+     *  @brief  Initialize the event record
+     * 
+     *  @param  pXmlHandle address of the relevant xml handle
+     */
+    StatusCode InitializeEvent(const TiXmlHandle *const pXmlHandle) const;
+
+    /**
      *  @brief  Ï event, calling manager reset functions and any registered reset functions
      */
     StatusCode ResetEvent() const;
