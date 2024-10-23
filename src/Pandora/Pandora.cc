@@ -184,7 +184,7 @@ const PandoraContentApiImpl *Pandora::GetPandoraContentApiImpl() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-const Event *Pandora::GetEvent() const
+Event *Pandora::GetEvent() const
 {
     return m_pEvent;
 }
