@@ -26,7 +26,7 @@ include_directories(include)
 # ``-DCMAKE_CXX_STANDARD=<standard>`` when invoking CMake
 set(CMAKE_CXX_STANDARD 17 CACHE STRING "")
 
-if(NOT CMAKE_CXX_STANDARD MATCHES "17|20")
+if(NOT CMAKE_CXX_STANDARD MATCHES "17")
   message(FATAL_ERROR "Unsupported C++ standard: ${CMAKE_CXX_STANDARD}")
 endif()
 
