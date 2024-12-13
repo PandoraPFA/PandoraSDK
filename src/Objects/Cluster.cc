@@ -525,7 +525,8 @@ void Cluster::UpdatePhotonIdCache(const Pandora &pandora) const
 {
     const bool passPhotonId(pandora.GetPlugins()->GetParticleId()->IsPhoton(this));
 
-    if (!(m_passPhotonId = passPhotonId))
+    m_passPhotonId = passPhotonId;
+    if (!m_passPhotonId.IsInitialized())
         throw StatusCodeException(STATUS_CODE_FAILURE);
 }
 
@@ -538,7 +539,8 @@ void Cluster::UpdateShowerLayerCache(const Pandora &pandora) const
     unsigned int showerStartLayer(std::numeric_limits<unsigned int>::max());
     pShowerProfilePlugin->CalculateShowerStartLayer(this, showerStartLayer);
 
-    if (!(m_showerStartLayer = showerStartLayer))
+    m_showerStartLayer = showerStartLayer;
+    if (!m_showerStartLayer.IsInitialized())
         throw StatusCodeException(STATUS_CODE_FAILURE);
 }
 
@@ -551,7 +553,10 @@ void Cluster::UpdateShowerProfileCache(const Pandora &pandora) const
     float showerProfileStart(std::numeric_limits<float>::max()), showerProfileDiscrepancy(std::numeric_limits<float>::max());
     pShowerProfilePlugin->CalculateLongitudinalProfile(this, showerProfileStart, showerProfileDiscrepancy);
 
-    if (!(m_showerProfileStart = showerProfileStart) || !(m_showerProfileDiscrepancy = showerProfileDiscrepancy))
+
+    m_showerProfileStart = showerProfileStart;
+    m_showerProfileDiscrepancy = showerProfileDiscrepancy;
+    if (!m_showerProfileStart.IsInitialized() || !m_showerProfileDiscrepancy.IsInitialized())
         throw StatusCodeException(STATUS_CODE_FAILURE);
 }
 
