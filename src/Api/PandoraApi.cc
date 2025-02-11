@@ -66,7 +66,7 @@ pandora::StatusCode PandoraApi::SetTrackSiblingRelationship(const pandora::Pando
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 pandora::StatusCode PandoraApi::SetCaloHitToMCParticleRelationship(const pandora::Pandora &pandora, const void *const pCaloHitParentAddress,
-    const void *const pMCParticleParentAddress, const float mcParticleWeight)
+    const void *const pMCParticleParentAddress, const pandora::InputFloat mcParticleWeight)
 {
     return pandora.GetPandoraApiImpl()->SetCaloHitToMCParticleRelationship(pCaloHitParentAddress, pMCParticleParentAddress, mcParticleWeight);
 }
@@ -74,7 +74,7 @@ pandora::StatusCode PandoraApi::SetCaloHitToMCParticleRelationship(const pandora
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 pandora::StatusCode PandoraApi::SetTrackToMCParticleRelationship(const pandora::Pandora &pandora, const void *const pTrackParentAddress,
-    const void *const pMCParticleParentAddress, const float mcParticleWeight)
+    const void *const pMCParticleParentAddress, const pandora::InputFloat mcParticleWeight)
 {
     return pandora.GetPandoraApiImpl()->SetTrackToMCParticleRelationship(pTrackParentAddress, pMCParticleParentAddress, mcParticleWeight);
 }

@@ -92,7 +92,7 @@ private:
      *  @param  mcParticleWeight weighting to assign to the mc particle
      */
     StatusCode SetCaloHitToMCParticleRelationship(const void *const pCaloHitParentAddress, const void *const pMCParticleParentAddress,
-        const float mcParticleWeight) const;
+        const InputFloat mcParticleWeight) const;
 
     /**
      *  @brief  Set track to mc particle relationship
@@ -102,7 +102,7 @@ private:
      *  @param  mcParticleWeight weighting to assign to the mc particle
      */
     StatusCode SetTrackToMCParticleRelationship(const void *const pTrackParentAddress, const void *const pMCParticleParentAddress,
-        const float mcParticleWeight) const;
+        const InputFloat mcParticleWeight) const;
 
     /**
      *  @brief  Get the current pfo list

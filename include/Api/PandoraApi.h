@@ -115,7 +115,7 @@ public:
      *  @param  mcParticleWeight weighting to assign to the mc particle
      */
     static pandora::StatusCode SetCaloHitToMCParticleRelationship(const pandora::Pandora &pandora, const void *const pCaloHitParentAddress,
-        const void *const pMCParticleParentAddress, const float mcParticleWeight = 1);
+        const void *const pMCParticleParentAddress, const pandora::InputFloat mcParticleWeight = 1.f);
 
     /**
      *  @brief  Set track to mc particle relationship
@@ -126,7 +126,7 @@ public:
      *  @param  mcParticleWeight weighting to assign to the mc particle
      */
     static pandora::StatusCode SetTrackToMCParticleRelationship(const pandora::Pandora &pandora, const void *const pTrackParentAddress,
-        const void *const pMCParticleParentAddress, const float mcParticleWeight = 1);
+        const void *const pMCParticleParentAddress, const pandora::InputFloat mcParticleWeight = 1.f);
 
     /**
      *  @brief  Get the current pfo list
