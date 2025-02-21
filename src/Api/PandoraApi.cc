@@ -18,6 +18,14 @@ pandora::StatusCode PandoraApi::ProcessEvent(const pandora::Pandora &pandora)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+void PandoraApi::SetEventInformation(const pandora::Pandora &pandora, const pandora::InputUInt run, 
+    const pandora::InputUInt subrun, const pandora::InputUInt event)
+{
+    pandora.GetPandoraApiImpl()->SetEventInformation(run, subrun, event);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 pandora::StatusCode PandoraApi::ReadSettings(const pandora::Pandora &pandora, const std::string &xmlFileName)
 {
     return pandora.GetPandoraApiImpl()->ReadSettings(xmlFileName);

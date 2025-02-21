@@ -22,6 +22,7 @@
 #include "Managers/VertexManager.h"
 
 #include "Pandora/Pandora.h"
+#include "Pandora/PandoraInputTypes.h"
 #include "Pandora/PandoraImpl.h"
 #include "Pandora/PandoraSettings.h"
 
@@ -203,6 +204,36 @@ const PluginManager *Pandora::GetPlugins() const
 const std::string &Pandora::GetName() const
 {
     return m_name;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+unsigned int Pandora::GetRun() const
+{
+    return m_run.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+unsigned int Pandora::GetSubrun() const
+{
+    return m_subrun.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+unsigned int Pandora::GetEvent() const
+{
+    return m_event.Get();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void Pandora::SetEventInformation(const InputUInt run, const InputUInt subrun, const InputUInt event)
+{
+    m_run = run;
+    m_subrun = subrun;
+    m_event = event;
 }
 
 } // namespace pandora

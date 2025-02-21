@@ -49,6 +49,17 @@ public:
     static pandora::StatusCode ProcessEvent(const pandora::Pandora &pandora);
 
     /**
+     *  @brief  Set the event information of the Pandora instance
+     * 
+     *  @param  pandora the pandora instance
+     *  @param  run the run number
+     *  @param  subrun the subrun number
+     *  @param  event the event number
+     */
+    static void SetEventInformation(const pandora::Pandora &pandora, const pandora::InputUInt run, 
+        const pandora::InputUInt subrun, const pandora::InputUInt event);
+
+    /**
      *  @brief  Read pandora settings
      * 
      *  @param  pandora the pandora instance to run the algorithms initialize
