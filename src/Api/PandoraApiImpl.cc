@@ -104,6 +104,13 @@ StatusCode PandoraApiImpl::ProcessEvent() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+void PandoraApiImpl::SetEventInformation(const InputUInt run, const InputUInt subrun, const InputUInt event) const
+{
+    m_pPandora->SetEventInformation(run, subrun, event);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode PandoraApiImpl::ReadSettings(const std::string &xmlFileName) const
 {
     return m_pPandora->ReadSettings(xmlFileName);

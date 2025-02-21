@@ -38,6 +38,15 @@ private:
     StatusCode ProcessEvent() const;
 
     /**
+     *  @brief  Set the event information
+     * 
+     *  @param  run the run number
+     *  @param  subrun the subrun number
+     *  @param  event the event number
+     */
+    void SetEventInformation(const InputUInt run, const InputUInt subrun, const InputUInt event) const;
+
+    /**
      *  @brief  Read pandora settings
      * 
      *  @param  xmlFileName the name of the xml file containing the settings

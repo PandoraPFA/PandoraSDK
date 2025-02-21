@@ -8,6 +8,7 @@
 #ifndef PANDORA_MAIN_H
 #define PANDORA_MAIN_H 1
 
+#include "Pandora/PandoraInputTypes.h"
 #include "Pandora/StatusCodes.h"
 
 #include <string>
@@ -44,7 +45,7 @@ public:
      *
      *  @param  name descriptive name or label for the pandora instance
      */
-    Pandora(const std::string &name = "");
+    Pandora(const std::string &name = ""); 
 
     /**
      *  @brief  Destructor
@@ -93,6 +94,27 @@ public:
      */
     const std::string &GetName() const;
 
+    /**
+     *  @brief  Get run number of the input data
+     * 
+     *  @return the run number of the input data 
+     */
+    unsigned int GetRun() const;
+
+    /**
+     *  @brief  Get subrun number of the input data
+     * 
+     *  @return the subrun number of the input data 
+     */
+    unsigned int GetSubrun() const;
+
+    /**
+     *  @brief  Get event number of the input data
+     * 
+     *  @return the event number of the input data 
+     */
+    unsigned int GetEvent() const;
+
 private:
     /**
      *  @brief  Prepare event, calculating properties of input objects for later use in algorithms
@@ -108,6 +130,15 @@ private:
      *  @brief  Reset event, calling manager reset functions and any registered reset functions
      */
     StatusCode ResetEvent();
+
+    /**
+     *  @brief  Get event number of the input data
+     * 
+     *  @param  the run number of the input data 
+     *  @param  the subrun number of the input data 
+     *  @param  the event number of the input data 
+     */
+    void SetEventInformation(const InputUInt run, const InputUInt subrun, const InputUInt event);
 
     /**
      *  @brief  Read pandora settings
@@ -132,6 +163,9 @@ private:
     PandoraImpl                 *m_pPandoraImpl;                ///< The pandora implementation
 
     std::string                  m_name;                        ///< The descriptive name or label for the pandora instance
+    InputUInt                    m_run;                         ///< the run number of the input data 
+    InputUInt                    m_subrun;                      ///< the subrun number of the input data 
+    InputUInt                    m_event;                       ///< the event number of the input data 
 
     friend class PandoraApiImpl;
     friend class PandoraContentApiImpl;
