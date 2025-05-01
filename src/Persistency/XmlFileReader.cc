@@ -225,6 +225,10 @@ StatusCode XmlFileReader::ReadNextEventComponent()
     {
         return this->ReadRelationship();
     }
+    else if (std::string("EventInfo") == componentName)
+    {
+        return this->ReadEventInformation();
+    }
     else
     {
         return STATUS_CODE_FAILURE;
@@ -760,5 +764,30 @@ StatusCode XmlFileReader::ReadRelationship()
 
     return STATUS_CODE_SUCCESS;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode XmlFileReader::ReadEventInformation()
+{
+    if (EVENT_CONTAINER != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    unsigned int run(0);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Run", run));
+    unsigned int subrun(0);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Subrun", subrun));
+    unsigned int event(0);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("Event", event));
+
+    InputUInt runUInt(run);
+    InputUInt subrunUInt(subrun);
+    InputUInt eventUInt(event);
+
+    PandoraApi::SetEventInformation(*m_pPandora, runUInt, subrunUInt, eventUInt);
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
 
 } // namespace pandora

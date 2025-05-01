@@ -117,6 +117,13 @@ private:
      */
     StatusCode ReadRelationship(bool checkComponentId = true);
 
+    /**
+     *  @brief  Read EventInfo from the current position in the file, adding the info to the pandora instance
+     * 
+     *  @param  checkComponentId whether to check the component id before deserializing
+     */
+    StatusCode ReadEventInformation(bool checkComponentId = true);
+
     std::ifstream::pos_type         m_containerPosition;    ///< Position of start of the current event/geometry container object in file
     std::ifstream::pos_type         m_containerSize;        ///< Size of the current event/geometry container object in the file
     std::ifstream                   m_fileStream;           ///< The stream class to read from the file
