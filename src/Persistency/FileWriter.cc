@@ -80,6 +80,7 @@ StatusCode FileWriter::WriteEvent(const CaloHitList &caloHitList, const TrackLis
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteTrackRelationships(trackList));
     }
 
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteEventInformation());
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteFooter());
 
     return STATUS_CODE_SUCCESS;

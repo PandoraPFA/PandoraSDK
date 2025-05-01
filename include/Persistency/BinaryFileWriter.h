@@ -56,6 +56,7 @@ private:
     StatusCode WriteTrack(const Track *const pTrack);
     StatusCode WriteMCParticle(const MCParticle *const pMCParticle);
     StatusCode WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight);
+    StatusCode WriteEventInformation();
 
     std::ofstream::pos_type     m_containerPosition;    ///< Position of start of the current event/geometry container object in file
     std::ofstream               m_fileStream;           ///< The stream class to write to the file

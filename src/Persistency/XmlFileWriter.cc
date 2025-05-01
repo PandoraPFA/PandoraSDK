@@ -349,4 +349,24 @@ StatusCode XmlFileWriter::WriteRelationship(const RelationshipId relationshipId,
     return STATUS_CODE_SUCCESS;
 }
 
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode XmlFileWriter::WriteEventInformation()
+{
+    if (EVENT_CONTAINER != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    m_pCurrentXmlElement = new TiXmlElement("EventInfo");
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Run", m_pPandora->GetRun()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Subrun", m_pPandora->GetSubrun()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("Event", m_pPandora->GetEvent()));
+
+    m_pContainerXmlElement->LinkEndChild(m_pCurrentXmlElement);
+    m_pCurrentXmlElement = nullptr;
+
+    return STATUS_CODE_SUCCESS;
+}
+
 } // namespace pandora

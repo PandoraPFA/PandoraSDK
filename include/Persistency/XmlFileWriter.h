@@ -58,6 +58,7 @@ private:
     StatusCode WriteTrack(const Track *const pTrack);
     StatusCode WriteMCParticle(const MCParticle *const pMCParticle);
     StatusCode WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight);
+    StatusCode WriteEventInformation();
 
     TiXmlDocument      *m_pXmlDocument;         ///< The xml document
     TiXmlElement       *m_pContainerXmlElement; ///< The container xml element
