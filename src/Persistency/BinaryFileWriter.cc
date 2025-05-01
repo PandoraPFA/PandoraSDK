@@ -330,4 +330,19 @@ StatusCode BinaryFileWriter::WriteRelationship(const RelationshipId relationship
     return STATUS_CODE_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode BinaryFileWriter::WriteEventInformation()
+{
+    if (EVENT_CONTAINER != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(EVENT_INFO_COMPONENT));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(m_pPandora->GetRun()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(m_pPandora->GetSubrun()));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(m_pPandora->GetEvent()));
+
+    return STATUS_CODE_SUCCESS;
+}
+
 } // namespace pandora
