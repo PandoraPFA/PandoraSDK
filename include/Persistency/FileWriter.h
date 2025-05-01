@@ -123,6 +123,12 @@ protected:
      */
     virtual StatusCode WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight = 1.f) = 0;
 
+    /**
+     *  @brief  Write event-level information
+     * 
+     */
+    virtual StatusCode WriteEventInformation() = 0;
+
 private:
     /**
      *  @brief  Write the sub detector parameters to the file
