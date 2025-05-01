@@ -202,6 +202,8 @@ StatusCode BinaryFileReader::ReadNextEventComponent()
         return this->ReadMCParticle(false);
     case RELATIONSHIP_COMPONENT:
         return this->ReadRelationship(false);
+    case EVENT_INFO_COMPONENT:
+        return this->ReadEventInformation(false);
     case EVENT_END_COMPONENT:
         m_containerId = UNKNOWN_CONTAINER;
         return STATUS_CODE_NOT_FOUND;
@@ -806,6 +808,38 @@ StatusCode BinaryFileReader::ReadRelationship(bool checkComponentId)
     default:
         return STATUS_CODE_FAILURE;
     }
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode BinaryFileReader::ReadEventInformation(bool checkComponentId)
+{
+    if (EVENT_CONTAINER != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    if (checkComponentId)
+    {
+        ComponentId componentId(UNKNOWN_COMPONENT);
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
+
+        if (EVENT_INFO_COMPONENT != componentId)
+            return STATUS_CODE_FAILURE;
+    }
+
+    unsigned int run(0);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(run));
+    unsigned int subrun(0);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(subrun));
+    unsigned int event(0);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(event));
+
+    InputUInt runUInt(run);
+    InputUInt subrunUInt(subrun);
+    InputUInt eventUInt(event);
+
+    PandoraApi::SetEventInformation(*m_pPandora, runUInt, subrunUInt, eventUInt);
 
     return STATUS_CODE_SUCCESS;
 }

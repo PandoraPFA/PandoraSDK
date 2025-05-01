@@ -101,6 +101,11 @@ private:
      */
     StatusCode ReadRelationship();
 
+    /**
+     *  @brief  Read EventInfo from the current position in the file, adding the info to the pandora instance
+     */
+    StatusCode ReadEventInformation();
+
     TiXmlDocument                  *m_pXmlDocument;         ///< The xml document
     TiXmlNode                      *m_pContainerXmlNode;    ///< The document xml node
     TiXmlElement                   *m_pCurrentXmlElement;   ///< The current xml element
