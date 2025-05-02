@@ -56,8 +56,8 @@ public:
      *  @param  subrun the subrun number
      *  @param  event the event number
      */
-    static void SetEventInformation(const pandora::Pandora &pandora, const pandora::InputUInt run, 
-        const pandora::InputUInt subrun, const pandora::InputUInt event);
+    static pandora::StatusCode SetEventInformation(const pandora::Pandora &pandora, const unsigned int run, 
+        const unsigned int subrun, const unsigned int event);
 
     /**
      *  @brief  Read pandora settings

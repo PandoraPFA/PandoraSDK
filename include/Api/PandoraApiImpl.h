@@ -44,7 +44,7 @@ private:
      *  @param  subrun the subrun number
      *  @param  event the event number
      */
-    void SetEventInformation(const InputUInt run, const InputUInt subrun, const InputUInt event) const;
+    StatusCode SetEventInformation(const unsigned int run, const unsigned int subrun, const unsigned int event) const;
 
     /**
      *  @brief  Read pandora settings
