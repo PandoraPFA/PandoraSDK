@@ -118,7 +118,7 @@ private:
     StatusCode ReadRelationship(bool checkComponentId = true);
 
     /**
-     *  @brief  Read EventInfo from the current position in the file, adding the info to the pandora instance
+     *  @brief  Read event-level information from the current position in the file, adding it to the pandora instance
      * 
      *  @param  checkComponentId whether to check the component id before deserializing
      */
