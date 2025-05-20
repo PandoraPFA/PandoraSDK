@@ -34,7 +34,7 @@ BinaryFileReader::~BinaryFileReader()
 {
     m_fileStream.close();
 }
-
+  
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode BinaryFileReader::ReadHeader()
@@ -47,7 +47,7 @@ StatusCode BinaryFileReader::ReadHeader()
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(m_containerId));
 
-    if ((EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
+    if ((HEADER_CONTAINER != m_containerId) && (EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
     m_containerPosition = m_fileStream.tellg();
@@ -144,6 +144,33 @@ StatusCode BinaryFileReader::GoToEvent(const unsigned int eventNumber)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+StatusCode BinaryFileReader::ReadNextGlobalHeaderComponent()
+{
+    ComponentId componentId(UNKNOWN_COMPONENT);
+    const StatusCode statusCode(this->ReadVariable(componentId));
+
+    if (STATUS_CODE_SUCCESS != statusCode)
+    {
+        if (STATUS_CODE_NOT_FOUND != statusCode)
+            throw StatusCodeException(statusCode);
+
+        return STATUS_CODE_NOT_FOUND;
+    }
+
+    switch (componentId)
+    {
+    case VERSION_COMPONENT:
+        return this->ReadVersion(false);
+    case HEADER_END_COMPONENT:
+        m_containerId = UNKNOWN_CONTAINER;
+        return STATUS_CODE_NOT_FOUND;
+    default:
+        throw StatusCodeException(STATUS_CODE_FAILURE);
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode BinaryFileReader::ReadNextGeometryComponent()
 {
     ComponentId componentId(UNKNOWN_COMPONENT);
@@ -210,6 +237,28 @@ StatusCode BinaryFileReader::ReadNextEventComponent()
     default:
         throw StatusCodeException(STATUS_CODE_FAILURE);
     }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------  
+
+StatusCode BinaryFileReader::ReadVersion(bool checkComponentId)
+{
+    if (HEADER_CONTAINER != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    if (checkComponentId)
+    {
+        ComponentId componentId(UNKNOWN_COMPONENT);
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
+
+        if (VERSION_COMPONENT != componentId)
+            return STATUS_CODE_FAILURE;
+    }
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(m_fileMajorVersion));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(m_fileMinorVersion));
+
+    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
