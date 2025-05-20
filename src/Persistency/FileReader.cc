@@ -14,7 +14,9 @@ namespace pandora
 {
 
 FileReader::FileReader(const pandora::Pandora &pandora, const std::string &fileName) :
-    Persistency(pandora, fileName)
+  Persistency(pandora, fileName),
+  m_fileMajorVersion(0),
+  m_fileMinorVersion(0)
 {
 }
 
@@ -22,6 +24,35 @@ FileReader::FileReader(const pandora::Pandora &pandora, const std::string &fileN
 
 FileReader::~FileReader()
 {
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode FileReader::ReadGlobalHeader()
+{
+    if (HEADER_CONTAINER != this->GetNextContainerId())
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToGlobalHeader());      
+    }
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadHeader());
+
+    if (HEADER_CONTAINER != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    try
+    {
+        while (STATUS_CODE_SUCCESS == this->ReadNextGlobalHeaderComponent())
+            continue;
+    }
+    catch (StatusCodeException &statusCodeException)
+    {
+        std::cout << " FileReader::ReadGlobalHeader() encountered unrecognized object in file: " << statusCodeException.ToString() << std::endl;
+    }
+
+    m_containerId = UNKNOWN_CONTAINER;
+
+    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -79,6 +110,19 @@ StatusCode FileReader::ReadEvent()
     return STATUS_CODE_SUCCESS;
 }
 
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode FileReader::GoToGlobalHeader()
+{
+  do
+  {
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextContainer());    
+  }
+  while (HEADER_CONTAINER != this->GetNextContainerId());
+
+  return STATUS_CODE_SUCCESS;
+}
+ 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode FileReader::GoToNextGeometry()

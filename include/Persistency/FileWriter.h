@@ -33,15 +33,22 @@ public:
      * 
      *  @param  algorithm the pandora instance to be used alongside the file writer
      *  @param  fileName the name of the output file
-     *  @param  fileMode the mode for file writing
+     *  @param  majorVersion the major version of the output file
+     *  @param  minorVersion the minor version of the output file
      */
-    FileWriter(const pandora::Pandora &pandora, const std::string &fileName);
+    FileWriter(const pandora::Pandora &pandora, const std::string &fileName, const unsigned int majorVersion = 0, 
+        const unsigned int minorVersion = 0);
 
     /**
      *  @brief  Destructor
      */
     virtual ~FileWriter();
 
+    /**
+     *  @brief  Write the global header to the file
+     */
+    StatusCode WriteGlobalHeader();
+  
     /**
      *  @brief  Write the current geometry information to the file
      */
@@ -60,6 +67,7 @@ public:
         const bool writeMCRelationships = true, const bool writeTrackRelationships = true);
 
 protected:
+
    /**
      *  @brief  Write the container header to the file
      * 
@@ -72,6 +80,12 @@ protected:
      */
     virtual StatusCode WriteFooter() = 0;
 
+    /**
+     *  @brief  Write file version information to the file
+     * 
+     */  
+    virtual StatusCode WriteVersion() = 0;  
+  
     /**
      *  @brief  Write a sub detector to the file
      * 
@@ -128,6 +142,9 @@ protected:
      * 
      */
     virtual StatusCode WriteEventInformation() = 0;
+
+    unsigned int m_fileMajorVersion; ///< Major version of the output file 
+    unsigned int m_fileMinorVersion; ///< Minor version of the output file 
 
 private:
     /**

@@ -32,8 +32,11 @@ public:
      *  @param  algorithm the pandora instance to be used alongside the file writer
      *  @param  fileName the name of the output file
      *  @param  fileMode the mode for file writing
+     *  @param  majorVersion the major version of the output file
+     *  @param  minorVersion the minor version of the output file
      */
-    BinaryFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode = APPEND);
+    BinaryFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode = APPEND,
+        const unsigned int majorVersion = 0, const unsigned int minorVersion = 0);
 
     /**
      *  @brief  Destructor
@@ -49,6 +52,7 @@ public:
 private:
     StatusCode WriteHeader(const ContainerId containerId);
     StatusCode WriteFooter();
+    StatusCode WriteVersion();  
     StatusCode WriteSubDetector(const SubDetector *const pSubDetector);
     StatusCode WriteLArTPC(const LArTPC *const pLArTPC);
     StatusCode WriteDetectorGap(const DetectorGap *const pDetectorGap);
