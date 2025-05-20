@@ -22,6 +22,7 @@ const std::string PANDORA_FILE_HASH("pandora"); ///< Look for hash each event to
  */
 enum ContainerId
 {
+    HEADER_CONTAINER,
     EVENT_CONTAINER,
     GEOMETRY_CONTAINER,
     UNKNOWN_CONTAINER
@@ -34,6 +35,8 @@ enum ContainerId
  */
 enum ComponentId
 {
+    HEADER_END_COMPONENT,
+    VERSION_COMPONENT,    
     CALO_HIT_COMPONENT,
     TRACK_COMPONENT,
     MC_PARTICLE_COMPONENT,

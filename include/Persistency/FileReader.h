@@ -42,6 +42,11 @@ public:
     virtual ~FileReader();
 
     /**
+     *  @brief  Read the global header information from the file
+     */
+    StatusCode ReadGlobalHeader();
+  
+    /**
      *  @brief  Read the current geometry information from the file
      */
     StatusCode ReadGeometry();
@@ -51,6 +56,11 @@ public:
      */
     StatusCode ReadEvent();
 
+    /**
+     *  @brief  Skip to global header container in the file
+     */  
+    StatusCode GoToGlobalHeader();
+  
     /**
      *  @brief  Skip to next geometry container in the file
      */
@@ -76,11 +86,12 @@ public:
     virtual StatusCode GoToEvent(const unsigned int eventNumber) = 0;
 
 protected:
+
     /**
      *  @brief  Read the container header from the current position in the file, checking for properly written container
      */
     virtual StatusCode ReadHeader() = 0;
-
+  
     /**
      *  @brief  Skip to next container in the file
      */
@@ -94,6 +105,11 @@ protected:
     virtual ContainerId GetNextContainerId() = 0;
 
     /**
+     *  @brief  Read the next pandora global header component from the current position in the file, recreating the stored component
+     */
+    virtual StatusCode ReadNextGlobalHeaderComponent() = 0;
+  
+    /**
      *  @brief  Read the next pandora geometry component from the current position in the file, recreating the stored component
      */
     virtual StatusCode ReadNextGeometryComponent() = 0;
@@ -102,6 +118,9 @@ protected:
      *  @brief  Read the next pandora event component from the current position in the file, recreating the stored component
      */
     virtual StatusCode ReadNextEventComponent() = 0;
+
+    unsigned int m_fileMajorVersion;  ///< The major version of the input file
+    unsigned int m_fileMinorVersion;  ///< The minor version of the input file
 };
 
 } // namespace pandora

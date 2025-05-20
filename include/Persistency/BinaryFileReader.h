@@ -51,8 +51,16 @@ private:
     ContainerId GetNextContainerId();
     StatusCode GoToGeometry(const unsigned int geometryNumber);
     StatusCode GoToEvent(const unsigned int eventNumber);
+    StatusCode ReadNextGlobalHeaderComponent();  
     StatusCode ReadNextGeometryComponent();
     StatusCode ReadNextEventComponent();
+
+    /**
+     *  @brief  Read file version information from the current position in the file
+     * 
+     *  @param  checkComponentId whether to check the component id before deserializing
+     */
+    StatusCode ReadVersion(bool checkComponentId = true);
 
     /**
      *  @brief  Read a sub detector from the current position in the file
