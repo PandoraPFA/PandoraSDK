@@ -91,7 +91,7 @@ protected:
      *  @brief  Read the container header from the current position in the file, checking for properly written container
      */
     virtual StatusCode ReadHeader() = 0;
-  
+
     /**
      *  @brief  Skip to next container in the file
      */
