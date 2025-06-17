@@ -34,7 +34,7 @@ BinaryFileReader::~BinaryFileReader()
 {
     m_fileStream.close();
 }
-  
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode BinaryFileReader::ReadHeader()

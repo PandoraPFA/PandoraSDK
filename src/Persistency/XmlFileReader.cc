@@ -52,7 +52,7 @@ StatusCode XmlFileReader::ReadHeader()
     
     return STATUS_CODE_SUCCESS;
 }
-  
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode XmlFileReader::GoToNextContainer()

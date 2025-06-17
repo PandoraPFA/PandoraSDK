@@ -36,7 +36,7 @@ public:
      *  @param  minorVersion the minor version of the output file
      */
     BinaryFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode = APPEND,
-        const unsigned int majorVersion = 0, const unsigned int minorVersion = 0);
+        const unsigned int majorVersion = 1, const unsigned int minorVersion = 0);
 
     /**
      *  @brief  Destructor
