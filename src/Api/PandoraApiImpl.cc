@@ -1,13 +1,13 @@
 /**
  *  @file   PandoraSDK/src/Api/PandoraApiImpl.cc
- * 
+ *
  *  @brief  Implementation of the pandora api class.
- * 
+ *
  *  $Log: $
  */
 
-#include "Api/PandoraApi.h"
 #include "Api/PandoraApiImpl.h"
+#include "Api/PandoraApi.h"
 
 #include "Managers/AlgorithmManager.h"
 #include "Managers/CaloHitManager.h"
@@ -90,7 +90,7 @@ StatusCode PandoraApiImpl::Create(const object_creation::Geometry::ConcentricGap
 }
 
 template <typename PARAMETERS, typename OBJECT>
-StatusCode PandoraApiImpl::Create(const PARAMETERS &/*parameters*/, const ObjectFactory<PARAMETERS, OBJECT> &/*factory*/) const
+StatusCode PandoraApiImpl::Create(const PARAMETERS & /*parameters*/, const ObjectFactory<PARAMETERS, OBJECT> & /*factory*/) const
 {
     return STATUS_CODE_NOT_ALLOWED;
 }
@@ -153,16 +153,16 @@ StatusCode PandoraApiImpl::SetTrackSiblingRelationship(const void *const pFirstS
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::SetCaloHitToMCParticleRelationship(const void *const pCaloHitParentAddress, const void *const pMCParticleParentAddress,
-    const float mcParticleWeight) const
+StatusCode PandoraApiImpl::SetCaloHitToMCParticleRelationship(
+    const void *const pCaloHitParentAddress, const void *const pMCParticleParentAddress, const float mcParticleWeight) const
 {
     return m_pPandora->m_pMCManager->SetCaloHitToMCParticleRelationship(pCaloHitParentAddress, pMCParticleParentAddress, mcParticleWeight);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::SetTrackToMCParticleRelationship(const void *const pTrackParentAddress, const void *const pMCParticleParentAddress,
-    const float mcParticleWeight) const
+StatusCode PandoraApiImpl::SetTrackToMCParticleRelationship(
+    const void *const pTrackParentAddress, const void *const pMCParticleParentAddress, const float mcParticleWeight) const
 {
     return m_pPandora->m_pMCManager->SetTrackToMCParticleRelationship(pTrackParentAddress, pMCParticleParentAddress, mcParticleWeight);
 }
@@ -218,8 +218,8 @@ StatusCode PandoraApiImpl::SetShowerProfilePlugin(ShowerProfilePlugin *const pSh
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraApiImpl::RegisterEnergyCorrectionPlugin(const std::string &name, const EnergyCorrectionType energyCorrectionType,
-    EnergyCorrectionPlugin *const pEnergyCorrectionPlugin) const
+StatusCode PandoraApiImpl::RegisterEnergyCorrectionPlugin(
+    const std::string &name, const EnergyCorrectionType energyCorrectionType, EnergyCorrectionPlugin *const pEnergyCorrectionPlugin) const
 {
     return m_pPandora->m_pPluginManager->m_pEnergyCorrections->RegisterPlugin(name, energyCorrectionType, pEnergyCorrectionPlugin);
 }
@@ -248,8 +248,11 @@ PandoraApiImpl::PandoraApiImpl(Pandora *const pPandora) :
 //------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template StatusCode PandoraApiImpl::Create(const object_creation::Cluster::Parameters &, const ObjectFactory<object_creation::Cluster::Parameters, object_creation::Cluster::Object> &) const;
-template StatusCode PandoraApiImpl::Create(const object_creation::ParticleFlowObject::Parameters &, const ObjectFactory<object_creation::ParticleFlowObject::Parameters, object_creation::ParticleFlowObject::Object> &) const;
-template StatusCode PandoraApiImpl::Create(const object_creation::Vertex::Parameters &, const ObjectFactory<object_creation::Vertex::Parameters, object_creation::Vertex::Object> &) const;
+template StatusCode PandoraApiImpl::Create(const object_creation::Cluster::Parameters &,
+    const ObjectFactory<object_creation::Cluster::Parameters, object_creation::Cluster::Object> &) const;
+template StatusCode PandoraApiImpl::Create(const object_creation::ParticleFlowObject::Parameters &,
+    const ObjectFactory<object_creation::ParticleFlowObject::Parameters, object_creation::ParticleFlowObject::Object> &) const;
+template StatusCode PandoraApiImpl::Create(const object_creation::Vertex::Parameters &,
+    const ObjectFactory<object_creation::Vertex::Parameters, object_creation::Vertex::Object> &) const;
 
 } // namespace pandora

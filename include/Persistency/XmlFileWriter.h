@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/include/Persistency/XmlFileWriter.h
- * 
+ *
  *  @brief  Header file for the xml file writer class.
- * 
+ *
  *  $Log: $
  */
 #ifndef PANDORA_XML_FILE_WRITER_H
@@ -28,14 +28,14 @@ class XmlFileWriter : public FileWriter
 public:
     /**
      *  @brief  Constructor
-     * 
+     *
      *  @param  algorithm the pandora instance to be used alongside the file writer
      *  @param  fileName the name of the output file
      *  @param  fileMode the mode for file writing
      *  @param  majorVersion the major version of the output file
      *  @param  minorVersion the minor version of the output file
      */
-    XmlFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode = APPEND, 
+    XmlFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode = APPEND,
         const unsigned int majorVersion = 1, const unsigned int minorVersion = 0);
 
     /**
@@ -45,10 +45,10 @@ public:
 
     /**
      *  @brief  Write a variable to the file
-     * 
+     *
      *  @param  xmlKey the xml key
      */
-    template<typename T>
+    template <typename T>
     StatusCode WriteVariable(const std::string &xmlKey, const T &t);
 
     StatusCode WriteGlobalHeader();
@@ -56,7 +56,7 @@ public:
 private:
     StatusCode WriteHeader(const ContainerId containerId);
     StatusCode WriteFooter();
-    StatusCode WriteVersion();  
+    StatusCode WriteVersion();
     StatusCode WriteSubDetector(const SubDetector *const pSubDetector);
     StatusCode WriteLArTPC(const LArTPC *const pLArTPC);
     StatusCode WriteDetectorGap(const DetectorGap *const pDetectorGap);
@@ -66,14 +66,14 @@ private:
     StatusCode WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight);
     StatusCode WriteEventInformation();
 
-    TiXmlDocument      *m_pXmlDocument;         ///< The xml document
-    TiXmlElement       *m_pContainerXmlElement; ///< The container xml element
-    TiXmlElement       *m_pCurrentXmlElement;   ///< The current xml element
+    TiXmlDocument *m_pXmlDocument;        ///< The xml document
+    TiXmlElement *m_pContainerXmlElement; ///< The container xml element
+    TiXmlElement *m_pCurrentXmlElement;   ///< The current xml element
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template<typename T>
+template <typename T>
 inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const T &t)
 {
     if (!m_pCurrentXmlElement)
@@ -86,17 +86,20 @@ inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const 
     return STATUS_CODE_SUCCESS;
 }
 
-template<>
+template <>
 inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const CartesianVector &t)
 {
-    return this->WriteVariable(xmlKey, TypeToStringPrecision(t.GetX()) + " " + TypeToStringPrecision(t.GetY()) + " " + TypeToStringPrecision(t.GetZ()));
+    return this->WriteVariable(
+        xmlKey, TypeToStringPrecision(t.GetX()) + " " + TypeToStringPrecision(t.GetY()) + " " + TypeToStringPrecision(t.GetZ()));
 }
 
-template<>
+template <>
 inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const TrackState &t)
 {
-    return this->WriteVariable(xmlKey, TypeToStringPrecision(t.GetPosition().GetX()) + " " + TypeToStringPrecision(t.GetPosition().GetY()) + " " + TypeToStringPrecision(t.GetPosition().GetZ()) +
-        " " + TypeToStringPrecision(t.GetMomentum().GetX()) + " " + TypeToStringPrecision(t.GetMomentum().GetY()) + " " + TypeToStringPrecision(t.GetMomentum().GetZ()));
+    return this->WriteVariable(xmlKey,
+        TypeToStringPrecision(t.GetPosition().GetX()) + " " + TypeToStringPrecision(t.GetPosition().GetY()) + " " +
+            TypeToStringPrecision(t.GetPosition().GetZ()) + " " + TypeToStringPrecision(t.GetMomentum().GetX()) + " " +
+            TypeToStringPrecision(t.GetMomentum().GetY()) + " " + TypeToStringPrecision(t.GetMomentum().GetZ()));
 }
 
 } // namespace pandora

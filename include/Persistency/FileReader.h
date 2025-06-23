@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/include/Persistency/FileReader.h
- * 
+ *
  *  @brief  Header file for the file reader class.
- * 
+ *
  *  $Log: $
  */
 #ifndef PANDORA_FILE_READER_H
@@ -30,7 +30,7 @@ class FileReader : public Persistency
 public:
     /**
      *  @brief  Constructor
-     * 
+     *
      *  @param  pandora the pandora instance to be used alongside the file reader
      *  @param  fileName the name of the file containing the pandora objects
      */
@@ -45,7 +45,7 @@ public:
      *  @brief  Read the global header information from the file
      */
     StatusCode ReadGlobalHeader();
-  
+
     /**
      *  @brief  Read the current geometry information from the file
      */
@@ -58,9 +58,9 @@ public:
 
     /**
      *  @brief  Skip to global header container in the file
-     */  
+     */
     StatusCode GoToGlobalHeader();
-  
+
     /**
      *  @brief  Skip to next geometry container in the file
      */
@@ -73,20 +73,19 @@ public:
 
     /**
      *  @brief  Skip to a specified geometry number in the file
-     * 
+     *
      *  @param  geometryNumber the geometry number
      */
     virtual StatusCode GoToGeometry(const unsigned int geometryNumber) = 0;
 
     /**
      *  @brief  Skip to a specified event number in the file
-     * 
+     *
      *  @param  eventNumber the event number
      */
     virtual StatusCode GoToEvent(const unsigned int eventNumber) = 0;
 
 protected:
-
     /**
      *  @brief  Read the container header from the current position in the file, checking for properly written container
      */
@@ -99,7 +98,7 @@ protected:
 
     /**
      *  @brief  Get the id of the next container in the file without changing the current position in the file
-     * 
+     *
      *  @return The id of the next container in the file
      */
     virtual ContainerId GetNextContainerId() = 0;
@@ -108,7 +107,7 @@ protected:
      *  @brief  Read the next pandora global header component from the current position in the file, recreating the stored component
      */
     virtual StatusCode ReadNextGlobalHeaderComponent() = 0;
-  
+
     /**
      *  @brief  Read the next pandora geometry component from the current position in the file, recreating the stored component
      */
@@ -119,8 +118,8 @@ protected:
      */
     virtual StatusCode ReadNextEventComponent() = 0;
 
-    unsigned int m_fileMajorVersion;  ///< The major version of the input file
-    unsigned int m_fileMinorVersion;  ///< The minor version of the input file
+    unsigned int m_fileMajorVersion; ///< The major version of the input file
+    unsigned int m_fileMinorVersion; ///< The minor version of the input file
 };
 
 } // namespace pandora

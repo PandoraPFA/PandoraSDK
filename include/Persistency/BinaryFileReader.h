@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/include/Persistency/BinaryFileReader.h
- * 
+ *
  *  @brief  Header file for the binary file reader class.
- * 
+ *
  *  $Log: $
  */
 #ifndef PANDORA_BINARY_FILE_READER_H
@@ -28,7 +28,7 @@ class BinaryFileReader : public FileReader
 public:
     /**
      *  @brief  Constructor
-     * 
+     *
      *  @param  pandora the pandora instance to be used alongside the file reader
      *  @param  fileName the name of the file containing the pandora objects
      */
@@ -42,7 +42,7 @@ public:
     /**
      *  @brief  Read a variable from the file
      */
-    template<typename T>
+    template <typename T>
     StatusCode ReadVariable(T &t);
 
 private:
@@ -51,101 +51,101 @@ private:
     ContainerId GetNextContainerId();
     StatusCode GoToGeometry(const unsigned int geometryNumber);
     StatusCode GoToEvent(const unsigned int eventNumber);
-    StatusCode ReadNextGlobalHeaderComponent();  
+    StatusCode ReadNextGlobalHeaderComponent();
     StatusCode ReadNextGeometryComponent();
     StatusCode ReadNextEventComponent();
 
     /**
      *  @brief  Read file version information from the current position in the file
-     * 
+     *
      *  @param  checkComponentId whether to check the component id before deserializing
      */
     StatusCode ReadVersion(bool checkComponentId = true);
 
     /**
      *  @brief  Read a sub detector from the current position in the file
-     * 
+     *
      *  @param  checkComponentId whether to check the component id before deserializing
      */
     StatusCode ReadSubDetector(bool checkComponentId = true);
 
     /**
      *  @brief  Read a lar tpc from the current position in the file
-     * 
+     *
      *  @param  checkComponentId whether to check the component id before deserializing
      */
     StatusCode ReadLArTPC(bool checkComponentId = true);
 
     /**
      *  @brief  Read a line gap from the current position in the file
-     * 
+     *
      *  @param  checkComponentId whether to check the component id before deserializing
      */
     StatusCode ReadLineGap(bool checkComponentId = true);
 
     /**
      *  @brief  Read a box gap from the current position in the file
-     * 
+     *
      *  @param  checkComponentId whether to check the component id before deserializing
      */
     StatusCode ReadBoxGap(bool checkComponentId = true);
 
     /**
      *  @brief  Read a concentric gap from the current position in the file
-     * 
+     *
      *  @param  checkComponentId whether to check the component id before deserializing
      */
     StatusCode ReadConcentricGap(bool checkComponentId = true);
 
     /**
      *  @brief  Read a calo hit from the current position in the file, recreating the stored object
-     * 
+     *
      *  @param  checkComponentId whether to check the component id before deserializing
      */
     StatusCode ReadCaloHit(bool checkComponentId = true);
 
     /**
      *  @brief  Read a track from the current position in the file, recreating the stored object
-     * 
+     *
      *  @param  checkComponentId whether to check the component id before deserializing
      */
     StatusCode ReadTrack(bool checkComponentId = true);
 
     /**
      *  @brief  Read a mc particle from the current position in the file, recreating the stored object
-     * 
+     *
      *  @param  checkComponentId whether to check the component id before deserializing
      */
     StatusCode ReadMCParticle(bool checkComponentId = true);
 
     /**
      *  @brief  Read a relationship from the current position in the file, recreating the stored relationship
-     * 
+     *
      *  @param  checkComponentId whether to check the component id before deserializing
      */
     StatusCode ReadRelationship(bool checkComponentId = true);
 
     /**
      *  @brief  Read event-level information from the current position in the file, adding it to the pandora instance
-     * 
+     *
      *  @param  checkComponentId whether to check the component id before deserializing
      */
     StatusCode ReadEventInformation(bool checkComponentId = true);
 
-    std::ifstream::pos_type         m_containerPosition;    ///< Position of start of the current event/geometry container object in file
-    std::ifstream::pos_type         m_containerSize;        ///< Size of the current event/geometry container object in the file
-    std::ifstream                   m_fileStream;           ///< The stream class to read from the file
+    std::ifstream::pos_type m_containerPosition; ///< Position of start of the current event/geometry container object in file
+    std::ifstream::pos_type m_containerSize;     ///< Size of the current event/geometry container object in the file
+    std::ifstream m_fileStream;                  ///< The stream class to read from the file
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template<typename T>
+template <typename T>
 inline StatusCode BinaryFileReader::ReadVariable(T &t)
 {
     char *const pMemBlock = new char[sizeof(T)];
     m_fileStream.read(pMemBlock, sizeof(T));
 
-    t = *(reinterpret_cast<T*>(pMemBlock));
+    t = *(reinterpret_cast<T *>(pMemBlock));
     delete[] pMemBlock;
 
     if (!m_fileStream.good())
@@ -154,7 +154,7 @@ inline StatusCode BinaryFileReader::ReadVariable(T &t)
     return STATUS_CODE_SUCCESS;
 }
 
-template<>
+template <>
 inline StatusCode BinaryFileReader::ReadVariable(std::string &t)
 {
     unsigned int stringSize;
@@ -175,7 +175,7 @@ inline StatusCode BinaryFileReader::ReadVariable(std::string &t)
     return STATUS_CODE_SUCCESS;
 }
 
-template<>
+template <>
 inline StatusCode BinaryFileReader::ReadVariable(CartesianVector &t)
 {
     float x, y, z;
@@ -187,7 +187,7 @@ inline StatusCode BinaryFileReader::ReadVariable(CartesianVector &t)
     return STATUS_CODE_SUCCESS;
 }
 
-template<>
+template <>
 inline StatusCode BinaryFileReader::ReadVariable(TrackState &t)
 {
     CartesianVector position(0.f, 0.f, 0.f), momentum(0.f, 0.f, 0.f);

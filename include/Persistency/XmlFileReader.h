@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/include/Persistency/XmlFileReader.h
- * 
+ *
  *  @brief  Header file for the xml file reader class.
- * 
+ *
  *  $Log: $
  */
 #ifndef PANDORA_XML_FILE_READER_H
@@ -28,7 +28,7 @@ class XmlFileReader : public FileReader
 public:
     /**
      *  @brief  Constructor
-     * 
+     *
      *  @param  pandora the pandora instance to be used alongside the file reader
      *  @param  fileName the name of the file containing the pandora objects
      */
@@ -41,10 +41,10 @@ public:
 
     /**
      *  @brief  Read a variable from the file
-     * 
+     *
      *  @param  xmlKey the xml key
      */
-    template<typename T>
+    template <typename T>
     StatusCode ReadVariable(const std::string &xmlKey, T &t);
 
 private:
@@ -53,15 +53,15 @@ private:
     ContainerId GetNextContainerId();
     StatusCode GoToGeometry(const unsigned int geometryNumber);
     StatusCode GoToEvent(const unsigned int eventNumber);
-    StatusCode ReadNextGlobalHeaderComponent();  
+    StatusCode ReadNextGlobalHeaderComponent();
     StatusCode ReadNextGeometryComponent();
     StatusCode ReadNextEventComponent();
 
     /**
      *  @brief  Read file version info from the current position in the file
-     */  
+     */
     StatusCode ReadVersion();
-  
+
     /**
      *  @brief  Read a sub detector from the current position in the file
      */
@@ -112,15 +112,15 @@ private:
      */
     StatusCode ReadEventInformation();
 
-    TiXmlDocument                  *m_pXmlDocument;         ///< The xml document
-    TiXmlNode                      *m_pContainerXmlNode;    ///< The document xml node
-    TiXmlElement                   *m_pCurrentXmlElement;   ///< The current xml element
-    bool                            m_isAtFileStart;        ///< Whether reader is at file start
+    TiXmlDocument *m_pXmlDocument;      ///< The xml document
+    TiXmlNode *m_pContainerXmlNode;     ///< The document xml node
+    TiXmlElement *m_pCurrentXmlElement; ///< The current xml element
+    bool m_isAtFileStart;               ///< Whether reader is at file start
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-template<typename T>
+template <typename T>
 inline StatusCode XmlFileReader::ReadVariable(const std::string &xmlKey, T &t)
 {
     if (!m_pCurrentXmlElement)
@@ -129,7 +129,7 @@ inline StatusCode XmlFileReader::ReadVariable(const std::string &xmlKey, T &t)
     return XmlHelper::ReadValue(TiXmlHandle(m_pCurrentXmlElement), xmlKey, t);
 }
 
-template<>
+template <>
 inline StatusCode XmlFileReader::ReadVariable(const std::string &xmlKey, IntVector &t)
 {
     if (!m_pCurrentXmlElement)
@@ -138,7 +138,7 @@ inline StatusCode XmlFileReader::ReadVariable(const std::string &xmlKey, IntVect
     return XmlHelper::ReadVectorOfValues(TiXmlHandle(m_pCurrentXmlElement), xmlKey, t);
 }
 
-template<>
+template <>
 inline StatusCode XmlFileReader::ReadVariable(const std::string &xmlKey, FloatVector &t)
 {
     if (!m_pCurrentXmlElement)

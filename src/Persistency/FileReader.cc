@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Persistency/FileReader.cc
- * 
+ *
  *  @brief  Implementation of the file reader class.
- * 
+ *
  *  $Log: $
  */
 
@@ -14,9 +14,9 @@ namespace pandora
 {
 
 FileReader::FileReader(const pandora::Pandora &pandora, const std::string &fileName) :
-  Persistency(pandora, fileName),
-  m_fileMajorVersion(1),
-  m_fileMinorVersion(0)
+    Persistency(pandora, fileName),
+    m_fileMajorVersion(1),
+    m_fileMinorVersion(0)
 {
 }
 
@@ -32,7 +32,7 @@ StatusCode FileReader::ReadGlobalHeader()
 {
     if (HEADER_CONTAINER != this->GetNextContainerId())
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToGlobalHeader());      
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToGlobalHeader());
     }
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadHeader());
@@ -114,15 +114,14 @@ StatusCode FileReader::ReadEvent()
 
 StatusCode FileReader::GoToGlobalHeader()
 {
-  do
-  {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextContainer());    
-  }
-  while (HEADER_CONTAINER != this->GetNextContainerId());
+    do
+    {
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextContainer());
+    } while (HEADER_CONTAINER != this->GetNextContainerId());
 
-  return STATUS_CODE_SUCCESS;
+    return STATUS_CODE_SUCCESS;
 }
- 
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode FileReader::GoToNextGeometry()
@@ -130,8 +129,7 @@ StatusCode FileReader::GoToNextGeometry()
     do
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextContainer());
-    }
-    while (GEOMETRY_CONTAINER != this->GetNextContainerId());
+    } while (GEOMETRY_CONTAINER != this->GetNextContainerId());
 
     return STATUS_CODE_SUCCESS;
 }
@@ -143,8 +141,7 @@ StatusCode FileReader::GoToNextEvent()
     do
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToNextContainer());
-    }
-    while (EVENT_CONTAINER != this->GetNextContainerId());
+    } while (EVENT_CONTAINER != this->GetNextContainerId());
 
     return STATUS_CODE_SUCCESS;
 }
