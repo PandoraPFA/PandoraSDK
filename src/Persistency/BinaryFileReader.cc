@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Persistency/BinaryFileReader.cc
- * 
+ *
  *  @brief  Implementation of the binary file reader class.
- * 
+ *
  *  $Log: $
  */
 
@@ -159,13 +159,13 @@ StatusCode BinaryFileReader::ReadNextGlobalHeaderComponent()
 
     switch (componentId)
     {
-    case VERSION_COMPONENT:
-        return this->ReadVersion(false);
-    case HEADER_END_COMPONENT:
-        m_containerId = UNKNOWN_CONTAINER;
-        return STATUS_CODE_NOT_FOUND;
-    default:
-        throw StatusCodeException(STATUS_CODE_FAILURE);
+        case VERSION_COMPONENT:
+            return this->ReadVersion(false);
+        case HEADER_END_COMPONENT:
+            m_containerId = UNKNOWN_CONTAINER;
+            return STATUS_CODE_NOT_FOUND;
+        default:
+            throw StatusCodeException(STATUS_CODE_FAILURE);
     }
 }
 
@@ -186,21 +186,21 @@ StatusCode BinaryFileReader::ReadNextGeometryComponent()
 
     switch (componentId)
     {
-    case SUB_DETECTOR_COMPONENT:
-        return this->ReadSubDetector(false);
-    case LAR_TPC_COMPONENT:
-        return this->ReadLArTPC(false);
-    case LINE_GAP_COMPONENT:
-        return this->ReadLineGap(false);
-    case BOX_GAP_COMPONENT:
-        return this->ReadBoxGap(false);
-    case CONCENTRIC_GAP_COMPONENT:
-        return this->ReadConcentricGap(false);
-    case GEOMETRY_END_COMPONENT:
-        m_containerId = UNKNOWN_CONTAINER;
-        return STATUS_CODE_NOT_FOUND;
-    default:
-        throw StatusCodeException(STATUS_CODE_FAILURE);
+        case SUB_DETECTOR_COMPONENT:
+            return this->ReadSubDetector(false);
+        case LAR_TPC_COMPONENT:
+            return this->ReadLArTPC(false);
+        case LINE_GAP_COMPONENT:
+            return this->ReadLineGap(false);
+        case BOX_GAP_COMPONENT:
+            return this->ReadBoxGap(false);
+        case CONCENTRIC_GAP_COMPONENT:
+            return this->ReadConcentricGap(false);
+        case GEOMETRY_END_COMPONENT:
+            m_containerId = UNKNOWN_CONTAINER;
+            return STATUS_CODE_NOT_FOUND;
+        default:
+            throw StatusCodeException(STATUS_CODE_FAILURE);
     }
 }
 
@@ -221,25 +221,25 @@ StatusCode BinaryFileReader::ReadNextEventComponent()
 
     switch (componentId)
     {
-    case CALO_HIT_COMPONENT:
-        return this->ReadCaloHit(false);
-    case TRACK_COMPONENT:
-        return this->ReadTrack(false);
-    case MC_PARTICLE_COMPONENT:
-        return this->ReadMCParticle(false);
-    case RELATIONSHIP_COMPONENT:
-        return this->ReadRelationship(false);
-    case EVENT_INFO_COMPONENT:
-        return this->ReadEventInformation(false);
-    case EVENT_END_COMPONENT:
-        m_containerId = UNKNOWN_CONTAINER;
-        return STATUS_CODE_NOT_FOUND;
-    default:
-        throw StatusCodeException(STATUS_CODE_FAILURE);
+        case CALO_HIT_COMPONENT:
+            return this->ReadCaloHit(false);
+        case TRACK_COMPONENT:
+            return this->ReadTrack(false);
+        case MC_PARTICLE_COMPONENT:
+            return this->ReadMCParticle(false);
+        case RELATIONSHIP_COMPONENT:
+            return this->ReadRelationship(false);
+        case EVENT_INFO_COMPONENT:
+            return this->ReadEventInformation(false);
+        case EVENT_END_COMPONENT:
+            m_containerId = UNKNOWN_CONTAINER;
+            return STATUS_CODE_NOT_FOUND;
+        default:
+            throw StatusCodeException(STATUS_CODE_FAILURE);
     }
 }
 
-//------------------------------------------------------------------------------------------------------------------------------------------  
+//------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode BinaryFileReader::ReadVersion(bool checkComponentId)
 {
@@ -540,7 +540,7 @@ StatusCode BinaryFileReader::ReadConcentricGap(bool checkComponentId)
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(componentId));
 
         if (CONCENTRIC_GAP_COMPONENT != componentId)
-                return STATUS_CODE_FAILURE;
+            return STATUS_CODE_FAILURE;
     }
 
     PandoraApi::Geometry::ConcentricGap::Parameters *pParameters = m_pConcentricGapFactory->NewParameters();
@@ -844,18 +844,18 @@ StatusCode BinaryFileReader::ReadRelationship(bool checkComponentId)
 
     switch (relationshipId)
     {
-    case CALO_HIT_TO_MC_RELATIONSHIP:
-        return PandoraApi::SetCaloHitToMCParticleRelationship(*m_pPandora, address1, address2, weight);
-    case TRACK_TO_MC_RELATIONSHIP:
-        return PandoraApi::SetTrackToMCParticleRelationship(*m_pPandora, address1, address2, weight);
-    case MC_PARENT_DAUGHTER_RELATIONSHIP:
-        return PandoraApi::SetMCParentDaughterRelationship(*m_pPandora, address1, address2);
-    case TRACK_PARENT_DAUGHTER_RELATIONSHIP:
-        return PandoraApi::SetTrackParentDaughterRelationship(*m_pPandora, address1, address2);
-    case TRACK_SIBLING_RELATIONSHIP:
-        return PandoraApi::SetTrackSiblingRelationship(*m_pPandora, address1, address2);
-    default:
-        return STATUS_CODE_FAILURE;
+        case CALO_HIT_TO_MC_RELATIONSHIP:
+            return PandoraApi::SetCaloHitToMCParticleRelationship(*m_pPandora, address1, address2, weight);
+        case TRACK_TO_MC_RELATIONSHIP:
+            return PandoraApi::SetTrackToMCParticleRelationship(*m_pPandora, address1, address2, weight);
+        case MC_PARENT_DAUGHTER_RELATIONSHIP:
+            return PandoraApi::SetMCParentDaughterRelationship(*m_pPandora, address1, address2);
+        case TRACK_PARENT_DAUGHTER_RELATIONSHIP:
+            return PandoraApi::SetTrackParentDaughterRelationship(*m_pPandora, address1, address2);
+        case TRACK_SIBLING_RELATIONSHIP:
+            return PandoraApi::SetTrackSiblingRelationship(*m_pPandora, address1, address2);
+        default:
+            return STATUS_CODE_FAILURE;
     }
 
     return STATUS_CODE_SUCCESS;

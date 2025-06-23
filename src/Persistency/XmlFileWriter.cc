@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Persistency/XmlFileWriter.cc
- * 
+ *
  *  @brief  Implementation of the file writer class.
- * 
+ *
  *  $Log: $
  */
 
@@ -22,10 +22,11 @@
 namespace pandora
 {
 
-XmlFileWriter::XmlFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode, const unsigned int majorVersion, const unsigned int minorVersion) :
-        FileWriter(pandora, fileName, majorVersion, minorVersion),
-        m_pContainerXmlElement(nullptr),
-        m_pCurrentXmlElement(nullptr)
+XmlFileWriter::XmlFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode,
+    const unsigned int majorVersion, const unsigned int minorVersion) :
+    FileWriter(pandora, fileName, majorVersion, minorVersion),
+    m_pContainerXmlElement(nullptr),
+    m_pCurrentXmlElement(nullptr)
 {
     m_fileType = XML;
 
@@ -62,9 +63,11 @@ XmlFileWriter::~XmlFileWriter()
 
 StatusCode XmlFileWriter::WriteHeader(const ContainerId containerId)
 {
-    const std::string containerXmlKey((HEADER_CONTAINER == containerId) ? "Header" :
-        (GEOMETRY_CONTAINER == containerId) ? "Geometry" : (EVENT_CONTAINER == containerId) ? "Event" : "Unknown");
-    
+    const std::string containerXmlKey((HEADER_CONTAINER == containerId) ? "Header"
+            : (GEOMETRY_CONTAINER == containerId)                       ? "Geometry"
+            : (EVENT_CONTAINER == containerId)                          ? "Event"
+                                                                        : "Unknown");
+
     m_pContainerXmlElement = new TiXmlElement(containerXmlKey);
     m_pXmlDocument->LinkEndChild(m_pContainerXmlElement);
 
@@ -91,7 +94,7 @@ StatusCode XmlFileWriter::WriteVersion()
 {
     if (HEADER_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
-  
+
     m_pCurrentXmlElement = new TiXmlElement("Version");
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("MajorVersion", m_fileMajorVersion));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable("MinorVersion", m_fileMinorVersion));
@@ -100,7 +103,7 @@ StatusCode XmlFileWriter::WriteVersion()
 
     return STATUS_CODE_SUCCESS;
 }
-  
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode XmlFileWriter::WriteSubDetector(const SubDetector *const pSubDetector)
@@ -366,7 +369,6 @@ StatusCode XmlFileWriter::WriteRelationship(const RelationshipId relationshipId,
 
     return STATUS_CODE_SUCCESS;
 }
-
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 

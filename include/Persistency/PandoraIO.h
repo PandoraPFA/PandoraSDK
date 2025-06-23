@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/include/Pandora/PandoraIO.h
- * 
+ *
  *  @brief  Header file for pandora io structures.
- * 
+ *
  *  $Log: $
  */
 #ifndef PANDORA_IO_H
@@ -24,7 +24,7 @@ enum ContainerId
 {
     EVENT_CONTAINER,
     GEOMETRY_CONTAINER,
-    HEADER_CONTAINER,    
+    HEADER_CONTAINER,
     UNKNOWN_CONTAINER
 };
 
@@ -127,7 +127,7 @@ public:
     const std::string &GetDescription() const;
 
 private:
-    const std::string   m_description;      ///< Description of the context under which exception was raised
+    const std::string m_description; ///< Description of the context under which exception was raised
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
