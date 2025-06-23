@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Api/PandoraApi.cc
- * 
+ *
  *  @brief  Redirection for pandora api class to its implementation.
- * 
+ *
  *  $Log: $
  */
 
@@ -18,8 +18,8 @@ pandora::StatusCode PandoraApi::ProcessEvent(const pandora::Pandora &pandora)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::SetEventInformation(const pandora::Pandora &pandora, const unsigned int run, 
-    const unsigned int subrun, const unsigned int event)
+pandora::StatusCode PandoraApi::SetEventInformation(
+    const pandora::Pandora &pandora, const unsigned int run, const unsigned int subrun, const unsigned int event)
 {
     return pandora.GetPandoraApiImpl()->SetEventInformation(run, subrun, event);
 }
@@ -33,40 +33,40 @@ pandora::StatusCode PandoraApi::ReadSettings(const pandora::Pandora &pandora, co
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::RegisterAlgorithmFactory(const pandora::Pandora &pandora, const std::string &algorithmType,
-    pandora::AlgorithmFactory *const pAlgorithmFactory)
+pandora::StatusCode PandoraApi::RegisterAlgorithmFactory(
+    const pandora::Pandora &pandora, const std::string &algorithmType, pandora::AlgorithmFactory *const pAlgorithmFactory)
 {
     return pandora.GetPandoraApiImpl()->RegisterAlgorithmFactory(algorithmType, pAlgorithmFactory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::RegisterAlgorithmToolFactory(const pandora::Pandora &pandora, const std::string &algorithmToolType,
-    pandora::AlgorithmToolFactory *const pAlgorithmToolFactory)
+pandora::StatusCode PandoraApi::RegisterAlgorithmToolFactory(
+    const pandora::Pandora &pandora, const std::string &algorithmToolType, pandora::AlgorithmToolFactory *const pAlgorithmToolFactory)
 {
     return pandora.GetPandoraApiImpl()->RegisterAlgorithmToolFactory(algorithmToolType, pAlgorithmToolFactory);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::SetMCParentDaughterRelationship(const pandora::Pandora &pandora, const void *const pParentAddress,
-    const void *const pDaughterAddress)
+pandora::StatusCode PandoraApi::SetMCParentDaughterRelationship(
+    const pandora::Pandora &pandora, const void *const pParentAddress, const void *const pDaughterAddress)
 {
     return pandora.GetPandoraApiImpl()->SetMCParentDaughterRelationship(pParentAddress, pDaughterAddress);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::SetTrackParentDaughterRelationship(const pandora::Pandora &pandora, const void *const pParentAddress,
-    const void *const pDaughterAddress)
+pandora::StatusCode PandoraApi::SetTrackParentDaughterRelationship(
+    const pandora::Pandora &pandora, const void *const pParentAddress, const void *const pDaughterAddress)
 {
     return pandora.GetPandoraApiImpl()->SetTrackParentDaughterRelationship(pParentAddress, pDaughterAddress);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::SetTrackSiblingRelationship(const pandora::Pandora &pandora, const void *const pFirstSiblingAddress,
-    const void *const pSecondSiblingAddress)
+pandora::StatusCode PandoraApi::SetTrackSiblingRelationship(
+    const pandora::Pandora &pandora, const void *const pFirstSiblingAddress, const void *const pSecondSiblingAddress)
 {
     return pandora.GetPandoraApiImpl()->SetTrackSiblingRelationship(pFirstSiblingAddress, pSecondSiblingAddress);
 }
@@ -104,16 +104,15 @@ pandora::StatusCode PandoraApi::GetPfoList(const pandora::Pandora &pandora, cons
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::SetExternalParameters(const pandora::Pandora &pandora, const std::string &algorithmType,
-    pandora::ExternalParameters *const pExternalParameters)
+pandora::StatusCode PandoraApi::SetExternalParameters(
+    const pandora::Pandora &pandora, const std::string &algorithmType, pandora::ExternalParameters *const pExternalParameters)
 {
     return pandora::ExternallyConfiguredAlgorithm::SetExternalParameters(pandora, algorithmType, pExternalParameters);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::SetHitTypeGranularity(const pandora::Pandora &pandora, const pandora::HitType hitType,
-    const pandora::Granularity granularity)
+pandora::StatusCode PandoraApi::SetHitTypeGranularity(const pandora::Pandora &pandora, const pandora::HitType hitType, const pandora::Granularity granularity)
 {
     return pandora.GetPandoraApiImpl()->SetHitTypeGranularity(hitType, granularity);
 }
@@ -156,8 +155,8 @@ pandora::StatusCode PandoraApi::RegisterEnergyCorrectionPlugin(const pandora::Pa
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-pandora::StatusCode PandoraApi::RegisterParticleIdPlugin(const pandora::Pandora &pandora, const std::string &name,
-    pandora::ParticleIdPlugin *const pParticleIdPlugin)
+pandora::StatusCode PandoraApi::RegisterParticleIdPlugin(
+    const pandora::Pandora &pandora, const std::string &name, pandora::ParticleIdPlugin *const pParticleIdPlugin)
 {
     return pandora.GetPandoraApiImpl()->RegisterParticleIdPlugin(name, pParticleIdPlugin);
 }

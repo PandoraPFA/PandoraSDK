@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Persistency/XmlFileReader.cc
- * 
+ *
  *  @brief  Implementation of the xml file reader class.
- * 
+ *
  *  $Log: $
  */
 
@@ -49,7 +49,7 @@ StatusCode XmlFileReader::ReadHeader()
 
     if ((HEADER_CONTAINER != m_containerId) && (EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
-    
+
     return STATUS_CODE_SUCCESS;
 }
 
@@ -82,10 +82,10 @@ StatusCode XmlFileReader::GoToNextContainer()
 ContainerId XmlFileReader::GetNextContainerId()
 {
     const std::string containerId((nullptr != m_pContainerXmlNode) ? m_pContainerXmlNode->ValueStr() : "");
-    
+
     if (std::string("Header") == containerId)
     {
-      return HEADER_CONTAINER;
+        return HEADER_CONTAINER;
     }
     else if (std::string("Event") == containerId)
     {
@@ -164,24 +164,24 @@ StatusCode XmlFileReader::ReadNextGlobalHeaderComponent()
 
     if (!m_pCurrentXmlElement)
     {
-	this->GoToNextContainer();
-	return STATUS_CODE_NOT_FOUND;
+        this->GoToNextContainer();
+        return STATUS_CODE_NOT_FOUND;
     }
 
     const std::string componentName(m_pCurrentXmlElement->ValueStr());
 
     if (std::string("Version") == componentName)
     {
-      PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVersion());
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVersion());
     }
     else
     {
         return STATUS_CODE_FAILURE;
     }
-    
+
     return STATUS_CODE_SUCCESS;
 }
-  
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode XmlFileReader::ReadNextGeometryComponent()
@@ -278,7 +278,7 @@ StatusCode XmlFileReader::ReadNextEventComponent()
     }
 }
 
-//------------------------------------------------------------------------------------------------------------------------------------------  
+//------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode XmlFileReader::ReadVersion()
 {
@@ -286,11 +286,11 @@ StatusCode XmlFileReader::ReadVersion()
         return STATUS_CODE_FAILURE;
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("MajorVersion", m_fileMajorVersion));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("MinorVersion", m_fileMinorVersion));    
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable("MinorVersion", m_fileMinorVersion));
 
     return STATUS_CODE_SUCCESS;
 }
-  
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode XmlFileReader::ReadSubDetector()
@@ -804,18 +804,18 @@ StatusCode XmlFileReader::ReadRelationship()
 
     switch (relationshipId)
     {
-    case CALO_HIT_TO_MC_RELATIONSHIP:
-        return PandoraApi::SetCaloHitToMCParticleRelationship(*m_pPandora, address1, address2, weight);
-    case TRACK_TO_MC_RELATIONSHIP:
-        return PandoraApi::SetTrackToMCParticleRelationship(*m_pPandora, address1, address2, weight);
-    case MC_PARENT_DAUGHTER_RELATIONSHIP:
-        return PandoraApi::SetMCParentDaughterRelationship(*m_pPandora, address1, address2);
-    case TRACK_PARENT_DAUGHTER_RELATIONSHIP:
-        return PandoraApi::SetTrackParentDaughterRelationship(*m_pPandora, address1, address2);
-    case TRACK_SIBLING_RELATIONSHIP:
-        return PandoraApi::SetTrackSiblingRelationship(*m_pPandora, address1, address2);
-    default:
-        return STATUS_CODE_FAILURE;
+        case CALO_HIT_TO_MC_RELATIONSHIP:
+            return PandoraApi::SetCaloHitToMCParticleRelationship(*m_pPandora, address1, address2, weight);
+        case TRACK_TO_MC_RELATIONSHIP:
+            return PandoraApi::SetTrackToMCParticleRelationship(*m_pPandora, address1, address2, weight);
+        case MC_PARENT_DAUGHTER_RELATIONSHIP:
+            return PandoraApi::SetMCParentDaughterRelationship(*m_pPandora, address1, address2);
+        case TRACK_PARENT_DAUGHTER_RELATIONSHIP:
+            return PandoraApi::SetTrackParentDaughterRelationship(*m_pPandora, address1, address2);
+        case TRACK_SIBLING_RELATIONSHIP:
+            return PandoraApi::SetTrackSiblingRelationship(*m_pPandora, address1, address2);
+        default:
+            return STATUS_CODE_FAILURE;
     }
 
     return STATUS_CODE_SUCCESS;

@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Persistency/BinaryFileWriter.cc
- * 
+ *
  *  @brief  Implementation of the file writer class.
- * 
+ *
  *  $Log: $
  */
 
@@ -22,8 +22,9 @@
 namespace pandora
 {
 
-BinaryFileWriter::BinaryFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode, const unsigned int majorVersion, const unsigned int minorVersion) :
-        FileWriter(pandora, fileName, majorVersion, minorVersion)
+BinaryFileWriter::BinaryFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode,
+    const unsigned int majorVersion, const unsigned int minorVersion) :
+    FileWriter(pandora, fileName, majorVersion, minorVersion)
 {
     m_fileType = BINARY;
 
@@ -78,12 +79,14 @@ StatusCode BinaryFileWriter::WriteHeader(const ContainerId containerId)
 
 StatusCode BinaryFileWriter::WriteFooter()
 {
-  if ((HEADER_CONTAINER != m_containerId) && (EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
+    if ((HEADER_CONTAINER != m_containerId) && (EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable((HEADER_CONTAINER == m_containerId) ? HEADER_END_COMPONENT :
-        (EVENT_CONTAINER == m_containerId) ? EVENT_END_COMPONENT : GEOMETRY_END_COMPONENT));
-    
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=,
+        this->WriteVariable((HEADER_CONTAINER == m_containerId) ? HEADER_END_COMPONENT
+                : (EVENT_CONTAINER == m_containerId)            ? EVENT_END_COMPONENT
+                                                                : GEOMETRY_END_COMPONENT));
+
     m_containerId = UNKNOWN_CONTAINER;
 
     const std::ofstream::pos_type containerSize(m_fileStream.tellp() - m_containerPosition);
@@ -116,7 +119,7 @@ StatusCode BinaryFileWriter::WriteVersion()
 
     return STATUS_CODE_SUCCESS;
 }
-  
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode BinaryFileWriter::WriteSubDetector(const SubDetector *const pSubDetector)

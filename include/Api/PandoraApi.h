@@ -12,7 +12,11 @@
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraObjectFactories.h"
 
-namespace pandora { class AlgorithmFactory; class AlgorithmToolFactory; }
+namespace pandora
+{
+class AlgorithmFactory;
+class AlgorithmToolFactory;
+} // namespace pandora
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -43,25 +47,25 @@ public:
 
     /**
      *  @brief  Process an event
-     * 
+     *
      *  @param  pandora the pandora instance to process event
      */
     static pandora::StatusCode ProcessEvent(const pandora::Pandora &pandora);
 
     /**
      *  @brief  Set the event information of the Pandora instance
-     * 
+     *
      *  @param  pandora the pandora instance
      *  @param  run the run number
      *  @param  subrun the subrun number
      *  @param  event the event number
      */
-    static pandora::StatusCode SetEventInformation(const pandora::Pandora &pandora, const unsigned int run, 
-        const unsigned int subrun, const unsigned int event);
+    static pandora::StatusCode SetEventInformation(
+        const pandora::Pandora &pandora, const unsigned int run, const unsigned int subrun, const unsigned int event);
 
     /**
      *  @brief  Read pandora settings
-     * 
+     *
      *  @param  pandora the pandora instance to run the algorithms initialize
      *  @param  xmlFileName the name of the xml file containing the settings
      */
@@ -69,57 +73,57 @@ public:
 
     /**
      *  @brief  Register an algorithm factory with pandora
-     * 
+     *
      *  @param  pandora the pandora instance to register the algorithm factory with
      *  @param  algorithmType the type of algorithm that the factory will create
      *  @param  pAlgorithmFactory the address of an algorithm factory instance
      */
-    static pandora::StatusCode RegisterAlgorithmFactory(const pandora::Pandora &pandora, const std::string &algorithmType,
-        pandora::AlgorithmFactory *const pAlgorithmFactory);
+    static pandora::StatusCode RegisterAlgorithmFactory(
+        const pandora::Pandora &pandora, const std::string &algorithmType, pandora::AlgorithmFactory *const pAlgorithmFactory);
 
     /**
      *  @brief  Register an algorithm tool factory with pandora
-     * 
+     *
      *  @param  pandora the pandora instance to register the algorithm tool factory with
      *  @param  algorithmTool Type the type of algorithm tool that the factory will create
      *  @param  pAlgorithmToolFactory the address of an algorithm tool factory instance
      */
-    static pandora::StatusCode RegisterAlgorithmToolFactory(const pandora::Pandora &pandora, const std::string &algorithmToolType,
-        pandora::AlgorithmToolFactory *const pAlgorithmToolFactory);
+    static pandora::StatusCode RegisterAlgorithmToolFactory(
+        const pandora::Pandora &pandora, const std::string &algorithmToolType, pandora::AlgorithmToolFactory *const pAlgorithmToolFactory);
 
     /**
      *  @brief  Set parent-daughter mc particle relationship
-     * 
+     *
      *  @param  pandora the pandora instance to register the relationship with
      *  @param  pParentAddress address of parent mc particle in the user framework
      *  @param  pDaughterAddress address of daughter mc particle in the user framework
      */
-    static pandora::StatusCode SetMCParentDaughterRelationship(const pandora::Pandora &pandora, const void *const pParentAddress,
-        const void *const pDaughterAddress);
+    static pandora::StatusCode SetMCParentDaughterRelationship(
+        const pandora::Pandora &pandora, const void *const pParentAddress, const void *const pDaughterAddress);
 
     /**
      *  @brief  Set parent-daughter track relationship
-     * 
+     *
      *  @param  pandora the pandora instance to register the relationship with
      *  @param  pParentAddress address of parent track in the user framework
      *  @param  pDaughterAddress address of daughter track in the user framework
      */
-    static pandora::StatusCode SetTrackParentDaughterRelationship(const pandora::Pandora &pandora, const void *const pParentAddress,
-        const void *const pDaughterAddress);
+    static pandora::StatusCode SetTrackParentDaughterRelationship(
+        const pandora::Pandora &pandora, const void *const pParentAddress, const void *const pDaughterAddress);
 
     /**
      *  @brief  Set sibling track relationship
-     * 
+     *
      *  @param  pandora the pandora instance to register the relationship with
      *  @param  pFirstSiblingAddress address of first sibling track in the user framework
      *  @param  pSecondSiblingAddress address of second sibling track in the user framework
      */
-    static pandora::StatusCode SetTrackSiblingRelationship(const pandora::Pandora &pandora, const void *const pFirstSiblingAddress,
-        const void *const pSecondSiblingAddress);
+    static pandora::StatusCode SetTrackSiblingRelationship(
+        const pandora::Pandora &pandora, const void *const pFirstSiblingAddress, const void *const pSecondSiblingAddress);
 
     /**
      *  @brief  Set calo hit to mc particle relationship
-     * 
+     *
      *  @param  pandora the pandora instance to register the relationship with
      *  @param  pCaloHitParentAddress address of calo hit in the user framework
      *  @param  pMCParticleParentAddress address of mc particle in the user framework
@@ -130,7 +134,7 @@ public:
 
     /**
      *  @brief  Set track to mc particle relationship
-     * 
+     *
      *  @param  pandora the pandora instance to register the relationship with
      *  @param  pTrackParentAddress address of track in the user framework
      *  @param  pMCParticleParentAddress address of mc particle in the user framework
@@ -141,7 +145,7 @@ public:
 
     /**
      *  @brief  Get the current pfo list
-     * 
+     *
      *  @param  pandora the pandora instance to get the objects from
      *  @param  pPfoList to receive the address of the particle flow objects
      */
@@ -149,7 +153,7 @@ public:
 
     /**
      *  @brief  Get a named pfo list
-     * 
+     *
      *  @param  pandora the pandora instance to get the objects from
      *  @param  pfoListName the name of the pfo list
      *  @param  pPfoList to receive the address of the pfo list
@@ -164,22 +168,21 @@ public:
      *  @param  algorithmType the algorithm type
      *  @param  pExternalParameters the address of the external parameters instance
      */
-    static pandora::StatusCode SetExternalParameters(const pandora::Pandora &pandora, const std::string &algorithmType,
-        pandora::ExternalParameters *const pExternalParameters);
+    static pandora::StatusCode SetExternalParameters(
+        const pandora::Pandora &pandora, const std::string &algorithmType, pandora::ExternalParameters *const pExternalParameters);
 
     /**
      *  @brief  Set the granularity level to be associated with a specified hit type
-     * 
+     *
      *  @param  pandora the pandora instance to register the hit type to granularity relationship
      *  @param  hitType the specified hit type
      *  @param  granularity the specified granularity
      */
-    static pandora::StatusCode SetHitTypeGranularity(const pandora::Pandora &pandora, const pandora::HitType hitType,
-        const pandora::Granularity granularity);
+    static pandora::StatusCode SetHitTypeGranularity(const pandora::Pandora &pandora, const pandora::HitType hitType, const pandora::Granularity granularity);
 
     /**
      *  @brief  Set the bfield plugin used by pandora
-     * 
+     *
      *  @param  pandora the pandora instance to register the bfield plugin with
      *  @param  pBFieldPlugin address of the bfield plugin (will pass ownership to pandora)
      */
@@ -187,7 +190,7 @@ public:
 
     /**
      *  @brief  Set the lar transformation plugin used by pandora
-     * 
+     *
      *  @param  pandora the pandora instance to register the lar transformation plugin with
      *  @param  pLArTransformationPlugin address of the lar transformation plugin (will pass ownership to pandora)
      */
@@ -195,7 +198,7 @@ public:
 
     /**
      *  @brief  Set the pseudo layer plugin used by pandora
-     * 
+     *
      *  @param  pandora the pandora instance to register the pseudo layer plugin with
      *  @param  pPseudoLayerPlugin address of the pseudo layer plugin (will pass ownership to pandora)
      */
@@ -203,7 +206,7 @@ public:
 
     /**
      *  @brief  Set the shower profile plugin used by pandora
-     * 
+     *
      *  @param  pandora the pandora instance to register the shower profile plugin with
      *  @param  pPseudoLayerPlugin address of the pseudo layer plugin (will pass ownership to pandora)
      */
@@ -211,7 +214,7 @@ public:
 
     /**
      *  @brief  Register an energy correction plugin
-     * 
+     *
      *  @param  pandora the pandora instance with which to register the energy correction plugin
      *  @param  name the name/label associated with the energy correction plugin
      *  @param  energyCorrectionType the energy correction type
@@ -222,17 +225,17 @@ public:
 
     /**
      *  @brief  Register a particle id plugin
-     * 
+     *
      *  @param  pandora the pandora instance with which to register the particle id plugin
      *  @param  functionName the name/label associated with the particle id plugin
      *  @param  pParticleIdPlugin address of the particle id plugin (will pass ownership to pandora)
      */
-    static pandora::StatusCode RegisterParticleIdPlugin(const pandora::Pandora &pandora, const std::string &name,
-        pandora::ParticleIdPlugin *const pParticleIdPlugin);
+    static pandora::StatusCode RegisterParticleIdPlugin(
+        const pandora::Pandora &pandora, const std::string &name, pandora::ParticleIdPlugin *const pParticleIdPlugin);
 
     /**
      *  @brief  Reset pandora to process another event
-     * 
+     *
      *  @param  pandora the pandora instance to reset
      */
     static pandora::StatusCode Reset(const pandora::Pandora &pandora);

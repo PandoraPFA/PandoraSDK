@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Pandora/Pandora.cc
- * 
+ *
  *  @brief  Implementation of the pandora class.
- * 
+ *
  *  $Log: $
  */
 
