@@ -1,73 +1,102 @@
-# cmake file for building PandoraSDK
-#-------------------------------------------------------------------------------------------------------------------------------------------
-cmake_minimum_required(VERSION 2.8.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.15 FATAL_ERROR)
 
+# Enforce out-of-source builds.
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
-    message(FATAL_ERROR "PandoraSDK requires an out-of-source build.")
+    message(FATAL_ERROR "PandoraSDK requires an out-of-source build. Please create a separate build directory.")
 endif()
 
-# project name
-project(PandoraSDK)
+project(PandoraSDK VERSION 4.0.2 LANGUAGES CXX)
 
-# project version
-set(${PROJECT_NAME}_VERSION_MAJOR 04)
-set(${PROJECT_NAME}_VERSION_MINOR 01)
-set(${PROJECT_NAME}_VERSION_PATCH 00)
-set(${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}")
-
-#-------------------------------------------------------------------------------------------------------------------------------------------
-# Dependencies
-include(PandoraCMakeSettings)
-
-# Prefer local include directory to any paths to installed header files
-include_directories(include)
-
-# Default to 17, but allow user override
-if(NOT DEFINED CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 17)
-endif()
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-#-------------------------------------------------------------------------------------------------------------------------------------------
-# Low level settings - compiler etc
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -pedantic -Wno-long-long -Wno-sign-compare -Wshadow -fno-strict-aliasing ${CMAKE_CXX_FLAGS}")
-
-include(CheckCXXCompilerFlag)
-unset(COMPILER_SUPPORTS_CXX_FLAGS CACHE)
-CHECK_CXX_COMPILER_FLAG(${CMAKE_CXX_FLAGS} COMPILER_SUPPORTS_CXX_FLAGS)
-
-if(NOT COMPILER_SUPPORTS_CXX_FLAGS)
-    message(FATAL_ERROR "The compiler ${CMAKE_CXX_COMPILER} does not support cxx flags ${CMAKE_CXX_FLAGS}")
+if(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Default install path for PandoraSDK" FORCE)
 endif()
 
-#-------------------------------------------------------------------------------------------------------------------------------------------
-# Build products
+# -------------------------------------------------------------------------------------------------------------------------------------------
+# Create the PandoraSDK library target
 
-# - Collect sources - not ideal because you have to keep running CMake to pick up changes
-file(GLOB_RECURSE PANDORA_SDK_SRCS RELATIVE ${PROJECT_SOURCE_DIR} "src/*.cc")
+# Include the list of source files from a separate file to keep this one clean.
+include(cmake/PandoraSDK_sources.cmake)
 
-# - Add library and properties
 add_library(${PROJECT_NAME} SHARED ${PANDORA_SDK_SRCS})
-set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${${PROJECT_NAME}_VERSION} SOVERSION ${${PROJECT_NAME}_SOVERSION})
+add_library(PandoraPFA::PandoraSDK ALIAS ${PROJECT_NAME})
 
-# - Optional documents
+# Set library versioning properties.
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    SOVERSION ${PROJECT_VERSION_MAJOR}
+)
+
+# Target properties (include directories, compile features, etc.)
+target_include_directories(${PROJECT_NAME} PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
+
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+target_compile_options(${PROJECT_NAME} PRIVATE
+    -Wall
+    -Wextra
+    -Werror
+    -pedantic
+    -Wno-long-long
+    -Wno-sign-compare
+    -Wshadow
+    -fno-strict-aliasing
+)
+
+# Optional documentation
 option(PandoraSDK_BUILD_DOCS "Build documentation for ${PROJECT_NAME}" OFF)
 if(PandoraSDK_BUILD_DOCS)
     add_subdirectory(doc)
 endif()
 
-#-------------------------------------------------------------------------------------------------------------------------------------------
-# Install products
+# Installation
 
-# - library
-install(TARGETS ${PROJECT_NAME} DESTINATION lib COMPONENT Runtime)
+# Install the library target.
+install(TARGETS ${PROJECT_NAME}
+    EXPORT PandoraSDKTargets
+    LIBRARY DESTINATION lib COMPONENT Runtime
+    ARCHIVE DESTINATION lib COMPONENT Development
+    RUNTIME DESTINATION bin COMPONENT Runtime
+)
 
-# - headers
-install(DIRECTORY include/ DESTINATION include COMPONENT Development FILES_MATCHING PATTERN "*.h")
+# Install the public header files.
+install(DIRECTORY include/
+    DESTINATION include
+    COMPONENT Development
+)
 
-# - support files
-PANDORA_GENERATE_PACKAGE_CONFIGURATION_FILES(${PROJECT_NAME}Config.cmake ${PROJECT_NAME}ConfigVersion.cmake ${PROJECT_NAME}LibDeps.cmake)
+# Include standard CMake modules for generating package configuration files.
+include(CMakePackageConfigHelpers)
 
-#-------------------------------------------------------------------------------------------------------------------------------------------
-# display some variables and write them to cache
-PANDORA_DISPLAY_STD_VARIABLES()
+# Generate the PandoraSDKConfigVersion.cmake file.
+# This file is used by find_package to check version compatibility.
+write_basic_package_version_file(
+    "PandoraSDKConfigVersion.cmake"
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY AnyNewerVersion
+)
+
+# Configure the PandoraSDKConfig.cmake.in file.
+# This creates the main package configuration file.
+configure_package_config_file(
+    "cmake/PandoraSDKConfig.cmake.in"
+    "PandoraSDKConfig.cmake"
+    INSTALL_DESTINATION lib/cmake/PandoraSDK
+)
+
+# Install the generated package configuration files.
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/PandoraSDKConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/PandoraSDKConfigVersion.cmake"
+    DESTINATION lib/cmake/PandoraSDK
+    COMPONENT Development
+)
+
+# Install the export file that contains information about the installed targets.
+install(EXPORT PandoraSDKTargets
+    FILE PandoraSDKTargets.cmake
+    NAMESPACE PandoraPFA::
+    DESTINATION lib/cmake/PandoraSDK
+    COMPONENT Development
+)
