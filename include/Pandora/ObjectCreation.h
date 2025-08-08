@@ -324,6 +324,7 @@ public:
     pandora::CaloHitList                m_caloHitList;              ///< The calo hit(s) to include
     pandora::CaloHitList                m_isolatedCaloHitList;      ///< The isolated calo hit(s) to include
     pandora::InputTrackAddress          m_pTrack;                   ///< The address of the track seeding the cluster
+    pandora::InputAddress               m_pParentAddress;           ///< Address of the external cluster in the user framework
 };
 
 typedef ObjectCreationHelper<ClusterParameters, ClusterMetadata, pandora::Cluster> Cluster;

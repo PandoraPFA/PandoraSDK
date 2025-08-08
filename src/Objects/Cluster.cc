@@ -239,6 +239,7 @@ Cluster::Cluster(const object_creation::Cluster::Parameters &parameters) :
     m_isolatedHadronicEnergy(0),
     m_particleId(UNKNOWN_PARTICLE_TYPE),
     m_pTrackSeed(parameters.m_pTrack.IsInitialized() ? parameters.m_pTrack.Get() : nullptr),
+    m_pParentAddress(parameters.m_pParentAddress.IsInitialized() ? parameters.m_pParentAddress.Get() : nullptr),
     m_initialDirection(0.f, 0.f, 0.f),
     m_isDirectionUpToDate(false),
     m_isFitUpToDate(false),

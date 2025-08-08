@@ -143,6 +143,11 @@ public:
     unsigned int GetOuterPseudoLayer() const;
 
     /**
+     *  @brief  Get the address of the external cluster in the user framework
+     */
+    const void *GetParentAddress() const;
+
+    /**
      *  @brief  Get unweighted centroid for cluster at a particular pseudo layer, calculated using cached values of hit coordinate sums
      * 
      *  @param  pseudoLayer the pseudo layer of interest
@@ -440,6 +445,7 @@ protected:
     PointByPseudoLayerMap       m_sumXYZByPseudoLayer;          ///< Construct to allow rapid calculation of centroid in each pseudolayer
     InputUInt                   m_innerPseudoLayer;             ///< The innermost pseudo layer in the cluster
     InputUInt                   m_outerPseudoLayer;             ///< The outermost pseudo layer in the cluster
+    const void                 *m_pParentAddress;               ///< The address of the external cluster in the user framework
 
     mutable CartesianVector     m_initialDirection;             ///< The initial direction of the cluster
     mutable bool                m_isDirectionUpToDate;          ///< Whether the initial direction of the cluster is up to date
@@ -568,6 +574,11 @@ inline unsigned int Cluster::GetInnerPseudoLayer() const
 inline unsigned int Cluster::GetOuterPseudoLayer() const
 {
     return m_outerPseudoLayer.Get();
+}
+
+inline const void *Cluster::GetParentAddress() const
+{
+    return m_pParentAddress;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
