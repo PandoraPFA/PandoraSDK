@@ -71,6 +71,8 @@ enum HitType
     TPC_VIEW_V,
     TPC_VIEW_W,
     TPC_3D,
+    SCINTILLATION,
+    CHERENKOV,
     HIT_CUSTOM
 };
 
