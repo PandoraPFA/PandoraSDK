@@ -71,6 +71,8 @@ enum HitType
     TPC_VIEW_V,
     TPC_VIEW_W,
     TPC_3D,
+    DRC_SCINT,
+    DRC_CHEREN,
     HIT_CUSTOM
 };
 
