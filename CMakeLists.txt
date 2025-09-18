@@ -12,7 +12,7 @@ project(PandoraSDK)
 # project version
 set(${PROJECT_NAME}_VERSION_MAJOR 04)
 set(${PROJECT_NAME}_VERSION_MINOR 00)
-set(${PROJECT_NAME}_VERSION_PATCH 01)
+set(${PROJECT_NAME}_VERSION_PATCH 02)
 set(${PROJECT_NAME}_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}")
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
@@ -23,7 +23,9 @@ include(PandoraCMakeSettings)
 include_directories(include)
 
 # Default to 17, but allow user override
-set(CMAKE_CXX_STANDARD 17 CACHE STRING "")
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 17)
+endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #-------------------------------------------------------------------------------------------------------------------------------------------
