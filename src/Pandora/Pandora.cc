@@ -21,7 +21,7 @@
 #include "Managers/TrackManager.h"
 #include "Managers/VertexManager.h"
 
-#include "Objects/Event.h"
+#include "Objects/EventContext.h"
 
 #include "Pandora/Pandora.h"
 #include "Pandora/PandoraImpl.h"
@@ -46,7 +46,7 @@ Pandora::Pandora(const std::string &name) :
     m_pPandoraApiImpl(nullptr),
     m_pPandoraContentApiImpl(nullptr),
     m_pPandoraImpl(nullptr),
-    m_pEvent{nullptr},
+    m_pEventContext{nullptr},
     m_name(name)
 {
     try
@@ -63,7 +63,7 @@ Pandora::Pandora(const std::string &name) :
         m_pPandoraSettings = new PandoraSettings(this);
         m_pPandoraApiImpl = new PandoraApiImpl(this);
         m_pPandoraContentApiImpl = new PandoraContentApiImpl(this);
-        m_pEvent = new Event(this),
+        m_pEventContext = new EventContext(this),
         m_pPandoraImpl = new PandoraImpl(this);
     }
     catch (StatusCodeException &statusCodeException)
@@ -97,7 +97,7 @@ Pandora::~Pandora()
     delete m_pPandoraApiImpl;
     delete m_pPandoraContentApiImpl;
     delete m_pPandoraImpl;
-    delete m_pEvent;
+    delete m_pEventContext;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -184,9 +184,9 @@ const PandoraContentApiImpl *Pandora::GetPandoraContentApiImpl() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-Event *Pandora::GetEvent() const
+EventContext *Pandora::GetEventContext() const
 {
-    return m_pEvent;
+    return m_pEventContext;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

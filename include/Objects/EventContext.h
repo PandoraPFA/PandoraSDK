@@ -1,7 +1,7 @@
 /**
- *  @file   PandoraSDK/include/Objects/Event.h
+ *  @file   PandoraSDK/include/Objects/EventContext.h
  * 
- *  @brief  Header file of the Event class.
+ *  @brief  Header file of the EventContext class.
  * 
  *  $Log: $
  */
@@ -20,12 +20,12 @@ class TiXmlHandle;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-class EventObject;
+class EventContextObject;
 
 /**
- *  @brief  The Event class provides a container for event-level quantities that should be accessible by algorithms.
+ *  @brief  The EventContext class provides a container for event-level quantities that should be accessible by algorithms.
  */
-class Event
+class EventContext
 {
 public:
     /**
@@ -33,38 +33,38 @@ public:
      * 
      *  @param  pPandora address of the associated pandora object
      */
-    Event(const Pandora *const pPandora);
+    EventContext(const Pandora *const pPandora);
 
     /**
      *  @brief  Copy constructor
      * 
      *  @param  event the event object to be copied
      */
-    Event(const Event &event);
+    EventContext(const EventContext &event);
 
     /**
      *  @brief  Destructor
      */
-    virtual ~Event();
+    virtual ~EventContext();
 
     /**
-     *  @brief  Adds an EventObject object to this event.
+     *  @brief  Adds an EventContextObject object to this event.
      *
      *  @param  key the key to associated with the event object
      *  @param  eventObj the object to be stored
      */
-    void AddEventObject(const std::string &key, EventObject &eventObject);
+    void AddEventContextObject(const std::string &key, EventContextObject &eventObject);
 
     /**
-    *  @brief  Retrieves the EventObject object associated with a key.
+    *  @brief  Retrieves the EventContextObject object associated with a key.
     *
     *  @param  key the key associated with the desired event object
     *  @return the event object associated with the specified key
     */
-   const EventObject *GetEventObject(const std::string &key);
+   const EventContextObject *GetEventContextObject(const std::string &key);
    
     /**
-    *  @brief  Checks if an EventObject object is associated with a key.
+    *  @brief  Checks if an EventContextObject object is associated with a key.
     *
     *  @param  key the key associated with the desired event object
     *  @return true if there is an event object associated with the specified key
@@ -88,12 +88,9 @@ private:
      */
     StatusCode ResetForNextEvent();
 
-    typedef std::map<std::string, EventObject *> EventObjectMap;
+    typedef std::map<std::string, EventContextObject *> EventContextObjectMap;
 
-    int m_event; ///< The event number
-    int m_run; ///< The run number
-    int m_subrun; ///< The subrun number
-    EventObjectMap m_eventObjectMap; ///< A map to all event objects
+    EventContextObjectMap m_eventObjectMap; ///< A map to all event objects
     const Pandora *const m_pPandora; ///< The associated pandora object
 
     friend class PandoraImpl;
@@ -102,9 +99,9 @@ private:
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
- *  @brief  The EventObject class provides a pure virtual class for custom information to be added to an Event object.
+ *  @brief  The EventContextObject class provides a pure virtual class for custom information to be added to an EventContext object.
  */
-class EventObject
+class EventContextObject
 {
 public:
     /**
