@@ -25,7 +25,7 @@ class MCManager;
 class PandoraApiImpl;
 class PandoraContentApiImpl;
 class PandoraImpl;
-class Event;
+class EventContext;
 class PandoraSettings;
 class ParticleFlowObjectManager;
 class ParticleIdPlugin;
@@ -72,7 +72,7 @@ public:
      * 
      *  @return the address of the pandora event instance
      */
-    Event *GetEvent() const;
+    EventContext *GetEventContext() const;
 
     /**
      *  @brief  Get the pandora settings instance
@@ -169,7 +169,7 @@ private:
     PandoraApiImpl *m_pPandoraApiImpl;               ///< The pandora api implementation
     PandoraContentApiImpl *m_pPandoraContentApiImpl; ///< The pandora content api implementation
     PandoraImpl *m_pPandoraImpl;                     ///< The pandora implementation
-    Event                       *m_pEvent;                      ///< The event instance
+    EventContext *m_pEventContext;  ///< The event instance
 
     std::string m_name; ///< The descriptive name or label for the pandora instance
     InputUInt m_run;    ///< the run number of the input data
