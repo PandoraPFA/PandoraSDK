@@ -12,6 +12,13 @@
 #include "Pandora/Algorithm.h"
 #include "Pandora/Pandora.h"
 
+pandora::EventContext *PandoraContentApi::GetEventContext(const pandora::Algorithm &algorithm)
+{
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->GetEventContext();
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 const pandora::PandoraSettings *PandoraContentApi::GetSettings(const pandora::Algorithm &algorithm)
 {
     return algorithm.GetPandora().GetPandoraContentApiImpl()->GetSettings();
