@@ -74,6 +74,13 @@ private:
     /* Accessors for plugins and global settings */
 
     /**
+     *  @brief  Get the pandora event context instance
+     *
+     *  @return the address of the pandora event context instance
+     */
+    pandora::EventContext *GetEventContext() const;
+
+    /**
      *  @brief  Get the pandora settings instance
      * 
      *  @return the address of the pandora settings instance

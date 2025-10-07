@@ -72,7 +72,7 @@ public:
      * 
      *  @return the address of the pandora event instance
      */
-    EventContext *GetEventContext() const;
+    const EventContext *GetEventContext() const;
 
     /**
      *  @brief  Get the pandora settings instance

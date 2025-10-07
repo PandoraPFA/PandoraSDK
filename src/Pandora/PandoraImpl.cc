@@ -98,13 +98,6 @@ StatusCode PandoraImpl::InitializePlugins(const TiXmlHandle *const pXmlHandle) c
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode PandoraImpl::InitializeEventContext(const TiXmlHandle *const pXmlHandle) const
-{
-    return m_pPandora->m_pEventContext->Initialize(pXmlHandle);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 StatusCode PandoraImpl::ResetEvent() const
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pPandora->m_pCaloHitManager->ResetForNextEvent());

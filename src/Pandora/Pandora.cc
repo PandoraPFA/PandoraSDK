@@ -184,7 +184,7 @@ const PandoraContentApiImpl *Pandora::GetPandoraContentApiImpl() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-EventContext *Pandora::GetEventContext() const
+const EventContext *Pandora::GetEventContext() const
 {
     return m_pEventContext;
 }

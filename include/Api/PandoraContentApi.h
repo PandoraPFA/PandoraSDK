@@ -34,6 +34,15 @@ public:
     /* Accessors for plugins and global settings */
 
     /**
+     *  @brief  Get the pandora event context instance
+     *
+     *  @param  algorithm the algorithm calling this function
+     *
+     *  @return the address of the pandora event context instance
+     */
+    static pandora::EventContext *GetEventContext(const pandora::Algorithm &algorithm);
+
+    /**
      *  @brief  Get the pandora settings instance
      * 
      *  @param  algorithm the algorithm calling this function

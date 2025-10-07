@@ -171,6 +171,13 @@ StatusCode PandoraContentApiImpl::Create(const PARAMETERS &/*parameters*/, const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+EventContext *PandoraContentApiImpl::GetEventContext() const
+{
+    return const_cast<EventContext *>(m_pPandora->GetEventContext());
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 const PandoraSettings *PandoraContentApiImpl::GetSettings() const
 {
     return m_pPandora->GetSettings();
