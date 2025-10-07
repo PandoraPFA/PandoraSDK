@@ -41,7 +41,7 @@ void EventContext::AddEventContextObject(const std::string &key, EventContextObj
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-const EventContextObject *EventContext::GetEventContextObject(const std::string &key)
+const EventContextObject *EventContext::GetEventContextObject(const std::string &key) const
 {
     if (this->m_eventObjectMap.find(key) == this->m_eventObjectMap.end())
         throw StatusCodeException(STATUS_CODE_NOT_FOUND);
@@ -50,16 +50,9 @@ const EventContextObject *EventContext::GetEventContextObject(const std::string 
 
 //------------------------------------------------------------------------------------------------------------------------------------------
   
-bool EventContext::Exists(const std::string &key)
+bool EventContext::DoesKeyExist(const std::string &key) const
 {
     return this->m_eventObjectMap.find(key) != this->m_eventObjectMap.end();
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-StatusCode EventContext::Initialize(const TiXmlHandle *const /*pXmlHandle*/)
-{
-    return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -67,7 +60,7 @@ StatusCode EventContext::Initialize(const TiXmlHandle *const /*pXmlHandle*/)
 StatusCode EventContext::ResetForNextEvent()
 {
     for (auto &[key, object] : this->m_eventObjectMap)
-        object->Clear();
+        object->ResetForNextEvent();
     this->m_eventObjectMap.clear();
 
     return STATUS_CODE_SUCCESS;

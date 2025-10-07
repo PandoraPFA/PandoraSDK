@@ -61,7 +61,7 @@ public:
     *  @param  key the key associated with the desired event object
     *  @return the event object associated with the specified key
     */
-   const EventContextObject *GetEventContextObject(const std::string &key);
+   const EventContextObject *GetEventContextObject(const std::string &key) const;
    
     /**
     *  @brief  Checks if an EventContextObject object is associated with a key.
@@ -69,18 +69,11 @@ public:
     *  @param  key the key associated with the desired event object
     *  @return true if there is an event object associated with the specified key
     */
-   bool Exists(const std::string &key);
+   bool DoesKeyExist(const std::string &key) const;
 
    // Needs persistency functions
 
 private:
-    /**
-     *  @brief  Initialize event
-     * 
-     *  @param  pXmlHandle address of the relevant xml handle
-     */
-    StatusCode Initialize(const TiXmlHandle *const pXmlHandle);
-
     /**
      *  @brief  Resets all event level properties
      *
@@ -105,9 +98,9 @@ class EventContextObject
 {
 public:
     /**
-     *  @brief  Clean up the event object
+     *  @brief  Erase all elements from this object, invalidate and references, pointers and iterators
      */
-    virtual void Clear() = 0;
+    virtual void ResetForNextEvent() = 0;
 };
 
 } // namespace pandora
