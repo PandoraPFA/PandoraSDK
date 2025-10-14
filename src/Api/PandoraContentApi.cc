@@ -12,9 +12,30 @@
 #include "Pandora/Algorithm.h"
 #include "Pandora/Pandora.h"
 
-pandora::EventContext *PandoraContentApi::GetEventContext(const pandora::Algorithm &algorithm)
+const pandora::EventContextObject *PandoraContentApi::GetEventContextObject(const pandora::Algorithm &algorithm, const std::string &key)
 {
-    return algorithm.GetPandora().GetPandoraContentApiImpl()->GetEventContext();
+    return algorithm.GetPandora().GetPandoraContentApiImpl()->GetEventContextObject(key);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void PandoraContentApi::AddEventContextObject(const pandora::Algorithm &algorithm, const std::string &key, const pandora::EventContextObject *const eventObject)
+{
+    algorithm.GetPandora().GetPandoraContentApiImpl()->AddEventContextObject(key, std::move(eventObject));
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void PandoraContentApi::ReplaceEventContextObject(const pandora::Algorithm &algorithm, const std::string &key, const pandora::EventContextObject *const eventObject)
+{
+    algorithm.GetPandora().GetPandoraContentApiImpl()->ReplaceEventContextObject(key, std::move(eventObject));
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void PandoraContentApi::RemoveEventContextObject(const pandora::Algorithm &algorithm, const std::string &key)
+{
+    algorithm.GetPandora().GetPandoraContentApiImpl()->RemoveEventContextObject(key);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

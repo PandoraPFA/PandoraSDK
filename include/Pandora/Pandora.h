@@ -20,12 +20,13 @@ class AlgorithmManager;
 class CaloHitManager;
 class ClusterManager;
 class EnergyCorrectionsPlugin;
+class EventContext;
+class EventContextObject;
 class GeometryManager;
 class MCManager;
 class PandoraApiImpl;
 class PandoraContentApiImpl;
 class PandoraImpl;
-class EventContext;
 class PandoraSettings;
 class ParticleFlowObjectManager;
 class ParticleIdPlugin;
@@ -69,10 +70,12 @@ public:
 
     /**
      *  @brief  Get the pandora event instance
+     *
+     *  @param  key the key associated with the desired event context object
      * 
      *  @return the address of the pandora event instance
      */
-    const EventContext *GetEventContext() const;
+    const EventContextObject *GetEventContextObject(const std::string &key) const;
 
     /**
      *  @brief  Get the pandora settings instance
@@ -147,6 +150,29 @@ private:
      *  @param  the event number of the input data
      */
     StatusCode SetEventInformation(const unsigned int run, const unsigned int subrun, const unsigned int event);
+
+    /**
+     *  @brief  Adds an EventContextObject object to this event context.
+     *
+     *  @param  key the key to associate with the event context object
+     *  @param  eventObject the object to be stored
+     */
+    void AddEventContextObject(const std::string &key, const EventContextObject *const eventObject);
+
+    /**
+     *  @brief  Replaces an EventContextObject object within this event context.
+     *
+     *  @param  key the key of the event context object to replace
+     *  @param  eventObject the new object to be stored
+     */
+    void ReplaceEventContextObject(const std::string &key, const EventContextObject *const eventObject);
+
+    /**
+     *  @brief  Remove an EventContextObject object from this event context.
+     *
+     *  @param  key the key of the event context object to be removed
+     */
+    void RemoveEventContextObject(const std::string &key);
 
     /**
      *  @brief  Read pandora settings
