@@ -53,7 +53,14 @@ public:
      *  @param  key the key to associated with the event object
      *  @param  eventObj the object to be stored
      */
-    void AddEventContextObject(const std::string &key, EventContextObject &eventObject);
+    void AddEventContextObject(const std::string &key, const EventContextObject *const eventObject);
+
+    /**
+     *  @brief  Remove an EventContextObject object from this event context.
+     *
+     *  @param  key the key of the event context object to be removed
+     */
+    void RemoveEventContextObject(const std::string &key);
 
     /**
     *  @brief  Retrieves the EventContextObject object associated with a key.
@@ -81,7 +88,7 @@ private:
      */
     StatusCode ResetForNextEvent();
 
-    typedef std::map<std::string, EventContextObject *> EventContextObjectMap;
+    typedef std::map<std::string, const EventContextObject *> EventContextObjectMap;
 
     EventContextObjectMap m_eventObjectMap; ///< A map to all event objects
     const Pandora *const m_pPandora; ///< The associated pandora object
@@ -98,9 +105,14 @@ class EventContextObject
 {
 public:
     /**
-     *  @brief  Erase all elements from this object, invalidate and references, pointers and iterators
+     *  @brief Default constructor
      */
-    virtual void ResetForNextEvent() = 0;
+    EventContextObject() = default;
+
+    /**
+     *  @brief  Destructor
+     */
+    virtual ~EventContextObject() = default;
 };
 
 } // namespace pandora

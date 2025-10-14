@@ -184,9 +184,11 @@ const PandoraContentApiImpl *Pandora::GetPandoraContentApiImpl() const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-const EventContext *Pandora::GetEventContext() const
+const EventContextObject *Pandora::GetEventContextObject(const std::string &key) const
 {
-    return m_pEventContext;
+    if (!m_pEventContext->DoesKeyExist(key))
+        throw StatusCodeException(STATUS_CODE_NOT_FOUND);
+    return m_pEventContext->GetEventContextObject(key);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -255,6 +257,28 @@ StatusCode Pandora::SetEventInformation(const unsigned int run, const unsigned i
     }
 
     return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void Pandora::AddEventContextObject(const std::string &key, const EventContextObject *const eventObject)
+{
+    m_pEventContext->AddEventContextObject(key, eventObject);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void Pandora::ReplaceEventContextObject(const std::string &key, const EventContextObject *const eventObject)
+{
+    m_pEventContext->RemoveEventContextObject(key);
+    m_pEventContext->AddEventContextObject(key, eventObject);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void Pandora::RemoveEventContextObject(const std::string &key)
+{
+    m_pEventContext->RemoveEventContextObject(key);
 }
 
 } // namespace pandora

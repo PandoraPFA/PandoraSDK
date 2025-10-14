@@ -171,9 +171,31 @@ StatusCode PandoraContentApiImpl::Create(const PARAMETERS &/*parameters*/, const
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-EventContext *PandoraContentApiImpl::GetEventContext() const
+const EventContextObject *PandoraContentApiImpl::GetEventContextObject(const std::string &key) const
 {
-    return const_cast<EventContext *>(m_pPandora->GetEventContext());
+    return m_pPandora->GetEventContextObject(key);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void PandoraContentApiImpl::AddEventContextObject(const std::string &key, const EventContextObject *const eventObject) const
+{
+    m_pPandora->AddEventContextObject(key, eventObject);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void PandoraContentApiImpl::ReplaceEventContextObject(const std::string &key, const EventContextObject *const eventObject) const
+{
+    m_pPandora->RemoveEventContextObject(key);
+    m_pPandora->AddEventContextObject(key, eventObject);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void PandoraContentApiImpl::RemoveEventContextObject(const std::string &key) const
+{
+    m_pPandora->RemoveEventContextObject(key);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

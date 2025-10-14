@@ -37,10 +37,37 @@ public:
      *  @brief  Get the pandora event context instance
      *
      *  @param  algorithm the algorithm calling this function
+     *  @param  key the key associated with the desired event context object
      *
      *  @return the address of the pandora event context instance
      */
-    static pandora::EventContext *GetEventContext(const pandora::Algorithm &algorithm);
+    static const pandora::EventContextObject *GetEventContextObject(const pandora::Algorithm &algorithm, const std::string &key);
+
+    /**
+     *  @brief  Adds an EventContextObject object to this event context.
+     *
+     *  @param  algorithm the algorithm calling this function
+     *  @param  key the key to associate with the event context object
+     *  @param  eventObject the object to be stored
+     */
+    static void AddEventContextObject(const pandora::Algorithm &algorithm, const std::string &key, const pandora::EventContextObject *const eventObject);
+
+    /**
+     *  @brief  Replaces an EventContextObject object within this event context.
+     *
+     *  @param  algorithm the algorithm calling this function
+     *  @param  key the key of the event context object to replace
+     *  @param  eventObject the new object to be stored
+     */
+    static void ReplaceEventContextObject(const pandora::Algorithm &algorithm, const std::string &key, const pandora::EventContextObject *const eventObject);
+
+    /**
+     *  @brief  Remove an EventContextObject object from this event context.
+     *
+     *  @param  algorithm the algorithm calling this function
+     *  @param  key the key of the event context object to be removed
+     */
+    static void RemoveEventContextObject(const pandora::Algorithm &algorithm, const std::string &key);
 
     /**
      *  @brief  Get the pandora settings instance

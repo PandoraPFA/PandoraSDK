@@ -32,36 +32,46 @@ EventContext::~EventContext()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void EventContext::AddEventContextObject(const std::string &key, EventContextObject &eventObject)
+const EventContextObject *EventContext::GetEventContextObject(const std::string &key) const
 {
-    if (this->m_eventObjectMap.find(key) != this->m_eventObjectMap.end())
-        throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
-    this->m_eventObjectMap[key] = &eventObject;
+    if (m_eventObjectMap.find(key) == m_eventObjectMap.end())
+        throw StatusCodeException(STATUS_CODE_NOT_FOUND);
+    return m_eventObjectMap.at(key);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-const EventContextObject *EventContext::GetEventContextObject(const std::string &key) const
+void EventContext::AddEventContextObject(const std::string &key, const EventContextObject *const eventObject)
 {
-    if (this->m_eventObjectMap.find(key) == this->m_eventObjectMap.end())
+    if (m_eventObjectMap.find(key) != m_eventObjectMap.end())
+        throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
+    m_eventObjectMap[std::move(key)] = eventObject;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+void EventContext::RemoveEventContextObject(const std::string &key)
+{
+    if (m_eventObjectMap.find(key) == m_eventObjectMap.end())
         throw StatusCodeException(STATUS_CODE_NOT_FOUND);
-    return this->m_eventObjectMap.at(key);
+
+    m_eventObjectMap.erase(key);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
   
 bool EventContext::DoesKeyExist(const std::string &key) const
 {
-    return this->m_eventObjectMap.find(key) != this->m_eventObjectMap.end();
+    return m_eventObjectMap.find(key) != m_eventObjectMap.end();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 StatusCode EventContext::ResetForNextEvent()
 {
-    for (auto &[key, object] : this->m_eventObjectMap)
-        object->ResetForNextEvent();
-    this->m_eventObjectMap.clear();
+    for (auto &[key, object] : m_eventObjectMap)
+        delete object;
+    m_eventObjectMap.clear();
 
     return STATUS_CODE_SUCCESS;
 }

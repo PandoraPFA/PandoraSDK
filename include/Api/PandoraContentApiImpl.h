@@ -76,9 +76,34 @@ private:
     /**
      *  @brief  Get the pandora event context instance
      *
-     *  @return the address of the pandora event context instance
+     *  @param  key the key associated with the desired event context object
+     *
+     *  @return the address of the pandora event context object instance
      */
-    pandora::EventContext *GetEventContext() const;
+    const EventContextObject *GetEventContextObject(const std::string &key) const;
+
+    /**
+     *  @brief  Adds an EventContextObject object to this event context.
+     *
+     *  @param  key the key to associate with the event context object
+     *  @param  eventObject the object to be stored
+     */
+    void AddEventContextObject(const std::string &key, const EventContextObject *const eventObject) const;
+
+    /**
+     *  @brief  Replaces an EventContextObject object within this event context.
+     *
+     *  @param  key the key of the event context object to replace
+     *  @param  eventObject the new object to be stored
+     */
+    void ReplaceEventContextObject(const std::string &key, const EventContextObject *const eventObject) const;
+
+    /**
+     *  @brief  Remove an EventContextObject object from this event context.
+     *
+     *  @param  key the key of the event context object to be removed
+     */
+    void RemoveEventContextObject(const std::string &key) const;
 
     /**
      *  @brief  Get the pandora settings instance
