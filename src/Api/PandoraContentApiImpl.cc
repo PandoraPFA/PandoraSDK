@@ -187,8 +187,7 @@ void PandoraContentApiImpl::AddEventContextObject(const std::string &key, const 
 
 void PandoraContentApiImpl::ReplaceEventContextObject(const std::string &key, const EventContextObject *const pObject) const
 {
-    m_pPandora->RemoveEventContextObject(key);
-    m_pPandora->AddEventContextObject(key, pObject);
+    m_pPandora->ReplaceEventContextObject(key, pObject);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
