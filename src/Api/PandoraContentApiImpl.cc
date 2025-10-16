@@ -178,17 +178,17 @@ const EventContextObject *PandoraContentApiImpl::GetEventContextObject(const std
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PandoraContentApiImpl::AddEventContextObject(const std::string &key, const EventContextObject *const eventObject) const
+void PandoraContentApiImpl::AddEventContextObject(const std::string &key, const EventContextObject *const pObject) const
 {
-    m_pPandora->AddEventContextObject(key, eventObject);
+    m_pPandora->AddEventContextObject(key, pObject);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PandoraContentApiImpl::ReplaceEventContextObject(const std::string &key, const EventContextObject *const eventObject) const
+void PandoraContentApiImpl::ReplaceEventContextObject(const std::string &key, const EventContextObject *const pObject) const
 {
     m_pPandora->RemoveEventContextObject(key);
-    m_pPandora->AddEventContextObject(key, eventObject);
+    m_pPandora->AddEventContextObject(key, pObject);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

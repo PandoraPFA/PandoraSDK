@@ -261,17 +261,17 @@ StatusCode Pandora::SetEventInformation(const unsigned int run, const unsigned i
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Pandora::AddEventContextObject(const std::string &key, const EventContextObject *const eventObject)
+void Pandora::AddEventContextObject(const std::string &key, const EventContextObject *const pObject)
 {
-    m_pEventContext->AddEventContextObject(key, eventObject);
+    m_pEventContext->AddEventContextObject(key, pObject);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void Pandora::ReplaceEventContextObject(const std::string &key, const EventContextObject *const eventObject)
+void Pandora::ReplaceEventContextObject(const std::string &key, const EventContextObject *const pObject)
 {
     m_pEventContext->RemoveEventContextObject(key);
-    m_pEventContext->AddEventContextObject(key, eventObject);
+    m_pEventContext->AddEventContextObject(key, pObject);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

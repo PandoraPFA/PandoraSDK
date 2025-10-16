@@ -51,9 +51,9 @@ public:
      *  @brief  Adds an EventContextObject object to this event.
      *
      *  @param  key the key to associated with the event object
-     *  @param  eventObj the object to be stored
+     *  @param  pObject the object to be stored
      */
-    void AddEventContextObject(const std::string &key, const EventContextObject *const eventObject);
+    void AddEventContextObject(const std::string &key, const EventContextObject *const pObject);
 
     /**
      *  @brief  Remove an EventContextObject object from this event context.
