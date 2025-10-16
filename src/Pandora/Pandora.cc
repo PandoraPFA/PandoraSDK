@@ -186,9 +186,7 @@ const PandoraContentApiImpl *Pandora::GetPandoraContentApiImpl() const
 
 const EventContextObject *Pandora::GetEventContextObject(const std::string &key) const
 {
-    if (!m_pEventContext->DoesKeyExist(key))
-        throw StatusCodeException(STATUS_CODE_NOT_FOUND);
-    return m_pEventContext->GetEventContextObject(key);
+    return m_pEventContext->GetEventContextObject(key); // may throw STATUS_CODE_NOT_FOUND
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
