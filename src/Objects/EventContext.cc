@@ -41,11 +41,11 @@ const EventContextObject *EventContext::GetEventContextObject(const std::string 
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void EventContext::AddEventContextObject(const std::string &key, const EventContextObject *const eventObject)
+void EventContext::AddEventContextObject(const std::string &key, const EventContextObject *const pObject)
 {
     if (m_eventObjectMap.find(key) != m_eventObjectMap.end())
         throw StatusCodeException(STATUS_CODE_ALREADY_PRESENT);
-    m_eventObjectMap[std::move(key)] = eventObject;
+    m_eventObjectMap[std::move(key)] = pObject;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

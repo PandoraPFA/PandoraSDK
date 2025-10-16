@@ -19,16 +19,16 @@ const pandora::EventContextObject *PandoraContentApi::GetEventContextObject(cons
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PandoraContentApi::AddEventContextObject(const pandora::Algorithm &algorithm, const std::string &key, const pandora::EventContextObject *const eventObject)
+void PandoraContentApi::AddEventContextObject(const pandora::Algorithm &algorithm, const std::string &key, const pandora::EventContextObject *const pObject)
 {
-    algorithm.GetPandora().GetPandoraContentApiImpl()->AddEventContextObject(key, std::move(eventObject));
+    algorithm.GetPandora().GetPandoraContentApiImpl()->AddEventContextObject(key, pObject);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void PandoraContentApi::ReplaceEventContextObject(const pandora::Algorithm &algorithm, const std::string &key, const pandora::EventContextObject *const eventObject)
+void PandoraContentApi::ReplaceEventContextObject(const pandora::Algorithm &algorithm, const std::string &key, const pandora::EventContextObject *const pObject)
 {
-    algorithm.GetPandora().GetPandoraContentApiImpl()->ReplaceEventContextObject(key, std::move(eventObject));
+    algorithm.GetPandora().GetPandoraContentApiImpl()->ReplaceEventContextObject(key, pObject);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

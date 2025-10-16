@@ -155,17 +155,17 @@ private:
      *  @brief  Adds an EventContextObject object to this event context.
      *
      *  @param  key the key to associate with the event context object
-     *  @param  eventObject the object to be stored
+     *  @param  pObject the object to be stored
      */
-    void AddEventContextObject(const std::string &key, const EventContextObject *const eventObject);
+    void AddEventContextObject(const std::string &key, const EventContextObject *const pObject);
 
     /**
      *  @brief  Replaces an EventContextObject object within this event context.
      *
      *  @param  key the key of the event context object to replace
-     *  @param  eventObject the new object to be stored
+     *  @param  pObject the new object to be stored
      */
-    void ReplaceEventContextObject(const std::string &key, const EventContextObject *const eventObject);
+    void ReplaceEventContextObject(const std::string &key, const EventContextObject *const pObject);
 
     /**
      *  @brief  Remove an EventContextObject object from this event context.
