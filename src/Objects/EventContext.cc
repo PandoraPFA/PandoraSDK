@@ -34,9 +34,10 @@ EventContext::~EventContext()
 
 const EventContextObject *EventContext::GetEventContextObject(const std::string &key) const
 {
-    if (m_eventObjectMap.find(key) == m_eventObjectMap.end())
+    const auto iter{m_eventObjectMap.find(key)};
+    if (iter == m_eventObjectMap.end())
         throw StatusCodeException(STATUS_CODE_NOT_FOUND);
-    return m_eventObjectMap.at(key);
+    return iter->second;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -52,10 +53,11 @@ void EventContext::AddEventContextObject(const std::string &key, const EventCont
 
 void EventContext::RemoveEventContextObject(const std::string &key)
 {
-    if (m_eventObjectMap.find(key) == m_eventObjectMap.end())
+    const auto iter{m_eventObjectMap.find(key)};
+    if (iter == m_eventObjectMap.end())
         throw StatusCodeException(STATUS_CODE_NOT_FOUND);
 
-    m_eventObjectMap.erase(key);
+    m_eventObjectMap.erase(iter);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
