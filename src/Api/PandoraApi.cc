@@ -26,6 +26,13 @@ pandora::StatusCode PandoraApi::SetEventInformation(
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+const pandora::EventContextObject *PandoraApi::GetEventContextObject(const pandora::Pandora &pandora, const std::string &key)
+{
+    return pandora.GetPandoraApiImpl()->GetEventContextObject(key);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 pandora::StatusCode PandoraApi::ReadSettings(const pandora::Pandora &pandora, const std::string &xmlFileName)
 {
     return pandora.GetPandoraApiImpl()->ReadSettings(xmlFileName);

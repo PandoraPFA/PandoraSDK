@@ -111,6 +111,13 @@ StatusCode PandoraApiImpl::SetEventInformation(const unsigned int run, const uns
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+const EventContextObject *PandoraApiImpl::GetEventContextObject(const std::string &key) const
+{
+    return m_pPandora->GetEventContextObject(key);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 StatusCode PandoraApiImpl::ReadSettings(const std::string &xmlFileName) const
 {
     return m_pPandora->ReadSettings(xmlFileName);

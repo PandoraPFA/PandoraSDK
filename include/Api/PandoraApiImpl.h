@@ -47,6 +47,15 @@ private:
     StatusCode SetEventInformation(const unsigned int run, const unsigned int subrun, const unsigned int event) const;
 
     /**
+     *  @brief  Get an event context object
+     *
+     *  @param  key the key associated with the desired event context object
+     *
+     *  @return the address of the event context object
+     */
+    const EventContextObject *GetEventContextObject(const std::string &key) const;
+
+    /**
      *  @brief  Read pandora settings
      *
      *  @param  xmlFileName the name of the xml file containing the settings
