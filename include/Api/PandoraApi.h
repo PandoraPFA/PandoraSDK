@@ -64,6 +64,16 @@ public:
         const pandora::Pandora &pandora, const unsigned int run, const unsigned int subrun, const unsigned int event);
 
     /**
+     *  @brief  Get an event context object
+     *
+     *  @param  pandora the pandora instance to get the event context object from
+     *  @param  key the key associated with the desired event context object
+     *
+     *  @return the address of the event context object
+     */
+    static const pandora::EventContextObject *GetEventContextObject(const pandora::Pandora &pandora, const std::string &key);
+
+    /**
      *  @brief  Read pandora settings
      *
      *  @param  pandora the pandora instance to run the algorithms initialize
