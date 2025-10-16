@@ -69,8 +69,8 @@ bool EventContext::DoesKeyExist(const std::string &key) const
 
 StatusCode EventContext::ResetForNextEvent()
 {
-    for (auto &[key, object] : m_eventObjectMap)
-        delete object;
+    for (auto &[key, pObject] : m_eventObjectMap)
+        delete pObject;
     m_eventObjectMap.clear();
 
     return STATUS_CODE_SUCCESS;
