@@ -162,9 +162,9 @@ public:
     StatusCodeException(const StatusCode statusCode);
 
     /**
-     *  @brief  Constructor
+     *  @brief  Destructor
      */
-    ~StatusCodeException() throw();
+    ~StatusCodeException() noexcept = default;
 
     /**
      *  @brief  Get status code
@@ -214,12 +214,6 @@ inline StatusCodeException::StatusCodeException(const StatusCode statusCode) :
 
     free(stackStrings); // malloc()ed by backtrace_symbols
 #endif
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-inline StatusCodeException::~StatusCodeException() throw()
-{
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
