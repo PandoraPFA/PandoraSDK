@@ -52,11 +52,15 @@ endif()
 
 # Installation
 
+# Include standard CMake modules for generating package configuration files.
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+
 # Install the library target.
 install(TARGETS ${PROJECT_NAME}
     EXPORT PandoraSDKTargets
-    LIBRARY DESTINATION lib COMPONENT Runtime
-    ARCHIVE DESTINATION lib COMPONENT Development
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development
     RUNTIME DESTINATION bin COMPONENT Runtime
 )
 
@@ -65,9 +69,6 @@ install(DIRECTORY include/
     DESTINATION include
     COMPONENT Development
 )
-
-# Include standard CMake modules for generating package configuration files.
-include(CMakePackageConfigHelpers)
 
 # Generate the PandoraSDKConfigVersion.cmake file.
 # This file is used by find_package to check version compatibility.
@@ -82,14 +83,14 @@ write_basic_package_version_file(
 configure_package_config_file(
     "cmake/PandoraSDKConfig.cmake.in"
     "PandoraSDKConfig.cmake"
-    INSTALL_DESTINATION lib/cmake/PandoraSDK
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/PandoraSDK
 )
 
 # Install the generated package configuration files.
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/PandoraSDKConfig.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/PandoraSDKConfigVersion.cmake"
-    DESTINATION lib/cmake/PandoraSDK
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/PandoraSDK
     COMPONENT Development
 )
 
@@ -97,6 +98,6 @@ install(FILES
 install(EXPORT PandoraSDKTargets
     FILE PandoraSDKTargets.cmake
     NAMESPACE PandoraPFA::
-    DESTINATION lib/cmake/PandoraSDK
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/PandoraSDK
     COMPONENT Development
 )
