@@ -143,7 +143,10 @@ StatusCode Pandora::ReadSettings(const std::string &xmlFileName)
 
         if (!xmlDocument.LoadFile())
         {
-            std::cout << "Pandora::ReadSettings - Invalid xml file." << std::endl;
+            std::cout << "Pandora::ReadSettings - Invalid xml file.\n" 
+                      << "    Error: " << xmlDocument.ErrorDesc() << "\n"
+                      << "    File:  " << xmlFileName
+                      << " line#: " << xmlDocument.ErrorRow() << std::endl;
             throw StatusCodeException(STATUS_CODE_FAILURE);
         }
 
