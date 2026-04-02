@@ -25,6 +25,7 @@ set(PANDORA_SDK_SRCS
     src/Objects/CaloHit.cc
     src/Objects/CartesianVector.cc
     src/Objects/Cluster.cc
+    src/Objects/EventContext.cc
     src/Objects/Helix.cc
     src/Objects/Histograms.cc
     src/Objects/MCParticle.cc
