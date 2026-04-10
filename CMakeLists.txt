@@ -5,7 +5,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(FATAL_ERROR "PandoraSDK requires an out-of-source build. Please create a separate build directory.")
 endif()
 
-project(PandoraSDK VERSION 4.0.2 LANGUAGES CXX)
+project(PandoraSDK VERSION 05.00.00 LANGUAGES CXX)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Default install path for PandoraSDK" FORCE)
