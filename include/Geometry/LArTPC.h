@@ -8,6 +8,8 @@
 #ifndef PANDORA_LAR_TPC_H
 #define PANDORA_LAR_TPC_H 1
 
+#include "Geometry/LArReadoutVolume.h"
+
 #include "Pandora/ObjectCreation.h"
 
 #include <string>
@@ -25,6 +27,8 @@ template<typename T, typename S> class PandoraObjectFactory;
 class LArTPC
 {
 public:
+    typedef std::vector<LArReadoutVolume> ReadoutVolumes;
+
     /**
      *  @brief  Get the lar volume id, uniquely specifying the lar tpc
      *
@@ -158,6 +162,7 @@ protected:
     float           m_wireAngleW;               ///< The w wire angle to the vertical, units radians
     float           m_sigmaUVW;                 ///< The u, v, w resolution, units mm
     bool            m_isDriftInPositiveX;       ///< Whether the electron drift is in the positive x direction
+    ReadoutVolumes  m_readoutVolumes;           ///< The readout volumes associated with this lar tpc
 
     friend class GeometryManager;
     friend class PandoraObjectFactory<object_creation::Geometry::LArTPC::Parameters, object_creation::Geometry::LArTPC::Object>;
