@@ -4,6 +4,9 @@ set(PANDORA_SDK_SRCS
     src/Api/PandoraContentApi.cc
     src/Api/PandoraContentApiImpl.cc
     src/Geometry/DetectorGap.cc
+    src/Geometry/LArReadoutChannel.cc
+    src/Geometry/LArReadoutUnit.cc
+    src/Geometry/LArReadoutVolume.cc
     src/Geometry/LArTPC.cc
     src/Geometry/SubDetector.cc
     src/Helpers/ClusterFitHelper.cc
