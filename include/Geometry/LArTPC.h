@@ -27,8 +27,6 @@ template<typename T, typename S> class PandoraObjectFactory;
 class LArTPC
 {
 public:
-    typedef std::vector<LArReadoutVolume> ReadoutVolumes;
-
     /**
      *  @brief  Get the lar volume id, uniquely specifying the lar tpc
      *
@@ -134,6 +132,13 @@ public:
      */
     bool IsDriftInPositiveX() const;
 
+    /**
+     *  @brief  Get the readout volumes associated with this LArTPC
+     *
+     *  @return the readout volumes
+     */
+    const LArReadoutVolume::ReadoutVolumes &GetReadoutVolumes() const;
+
 protected:
     /**
      *  @brief  Constructor
@@ -162,7 +167,7 @@ protected:
     float           m_wireAngleW;               ///< The w wire angle to the vertical, units radians
     float           m_sigmaUVW;                 ///< The u, v, w resolution, units mm
     bool            m_isDriftInPositiveX;       ///< Whether the electron drift is in the positive x direction
-    ReadoutVolumes  m_readoutVolumes;           ///< The readout volumes associated with this lar tpc
+    LArReadoutVolume::ReadoutVolumes m_readoutVolumes;  ///< The readout volumes associated with this lar tpc
 
     friend class GeometryManager;
     friend class PandoraObjectFactory<object_creation::Geometry::LArTPC::Parameters, object_creation::Geometry::LArTPC::Object>;
@@ -271,6 +276,13 @@ inline float LArTPC::GetSigmaUVW() const
 inline bool LArTPC::IsDriftInPositiveX() const
 {
     return m_isDriftInPositiveX;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const LArReadoutVolume::ReadoutVolumes &LArTPC::GetReadoutVolumes() const
+{
+    return m_readoutVolumes;
 }
 
 } // namespace pandora
