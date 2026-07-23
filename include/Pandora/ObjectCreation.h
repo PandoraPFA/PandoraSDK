@@ -8,6 +8,8 @@
 #ifndef PANDORA_OBJECT_CREATION_H
 #define PANDORA_OBJECT_CREATION_H 1
 
+#include "Geometry/LArReadoutChannel.h"
+
 #include "Pandora/PandoraInternal.h"
 #include "Pandora/PandoraInputTypes.h"
 #include "Pandora/StatusCodes.h"
@@ -190,6 +192,45 @@ typedef ObjectCreationHelper<TrackParameters, ObjectMetadata, pandora::Track> Tr
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
+ *  @brief  LArReadoutChannelParameters class
+ */
+class LArReadoutChannelParameters
+{
+public:
+    unsigned int m_id;                                                              ///< The channel id
+    pandora::LArReadoutChannel::ViewChannelIntervalArray m_channelIntervalArray;    ///< Per-other-view channel interval array
+};
+
+typedef std::vector<LArReadoutChannelParameters> LArReadoutChannelParametersVector;
+
+/**
+ *  @brief  LArReadoutUnitParameters class
+ */
+class LArReadoutUnitParameters
+{
+public:
+    unsigned int m_id;                                              ///< The readout unit id
+    pandora::HitType m_view;                                        ///< The view of the readout unit
+    LArReadoutChannelParametersVector m_channelParametersVector;    ///< The channels belonging to this readout unit
+};
+
+typedef std::vector<LArReadoutUnitParameters> LArReadoutUnitParametersVector;
+
+/**
+ *  @brief  LArReadoutVolumeParameters class
+ */
+class LArReadoutVolumeParameters
+{
+public:
+    unsigned int m_id;                                              ///< The readout volume id
+    pandora::CartesianVector m_center{0.f, 0.f, 0.f};               ///< The center of the readout volume
+    pandora::CartesianVector m_size{0.f, 0.f, 0.f};                 ///< The size of the readout volume
+    LArReadoutUnitParametersVector m_readoutUnitParametersVector;   ///< The readout units belonging to this readout volume
+};
+
+typedef std::vector<LArReadoutVolumeParameters> LArReadoutVolumeParametersVector;
+
+/**
  *  @brief  Geometry class
  */
 class Geometry
@@ -252,6 +293,7 @@ public:
         pandora::InputFloat             m_wireAngleW;               ///< The w wire angle to the vertical, units radians
         pandora::InputFloat             m_sigmaUVW;                 ///< The u, v, w resolution, units mm
         pandora::InputBool              m_isDriftInPositiveX;       ///< Whether the electron drift is in the positive x direction
+        LArReadoutVolumeParametersVector m_readoutVolumeParametersVector; ///< The readout volumes belonging to this LArTPC
     };
 
     typedef ObjectCreationHelper<LArTPCParameters, ObjectMetadata, pandora::LArTPC> LArTPC;

@@ -28,6 +28,22 @@ LArTPC::LArTPC(const object_creation::Geometry::LArTPC::Parameters &inputParamet
     m_sigmaUVW(inputParameters.m_sigmaUVW.Get()),
     m_isDriftInPositiveX(inputParameters.m_isDriftInPositiveX.Get())
 {
+    for (const auto &volumeParams : inputParameters.m_readoutVolumeParametersVector)
+    {
+        LArReadoutUnit::ReadoutUnits readoutUnits;
+
+        for (const auto &unitParams : volumeParams.m_readoutUnitParametersVector)
+        {
+            LArReadoutChannel::ReadoutChannels readoutChannels;
+
+            for (const auto &channelParams : unitParams.m_channelParametersVector)
+                readoutChannels.emplace_back(channelParams.m_id, channelParams.m_channelIntervalArray);
+
+            readoutUnits.emplace_back(unitParams.m_id, unitParams.m_view, readoutChannels);
+        }
+
+        m_readoutVolumes.emplace_back(volumeParams.m_id, volumeParams.m_center, volumeParams.m_size, readoutUnits);
+    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
