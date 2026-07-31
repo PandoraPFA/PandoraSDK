@@ -25,8 +25,8 @@ public:
     typedef OBJECT Object;
 
     Parameters *NewParameters() const;
-    StatusCode Read(Parameters &parameters, FileReader &fileReader) const;
-    StatusCode Write(const Object *const pObject, FileWriter &fileWriter) const;
+    StatusCode Read(Parameters &parameters, const FieldMap &fields) const;
+    StatusCode Write(const Object *const pObject, FieldMap &fields) const;
 
 private:
     StatusCode Create(const Parameters &parameters, const Object *&pObject) const;
@@ -34,4 +34,4 @@ private:
 
 } // namespace pandora
 
-#endif // #ifndef PANDORA_OBJECT_FACTORY_H
+#endif // #ifndef PANDORA_OBJECT_FACTORIES_H

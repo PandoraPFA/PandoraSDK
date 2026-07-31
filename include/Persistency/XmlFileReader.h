@@ -10,18 +10,22 @@
 
 #include "Helpers/XmlHelper.h"
 
-#include "Objects/CartesianVector.h"
-#include "Objects/TrackState.h"
-
 #include "Pandora/Pandora.h"
 
 #include "Persistency/FileReader.h"
+#include "Persistency/Persistency.h"
 
 namespace pandora
 {
 
 /**
- *  @brief  XmlFileReader class
+ *  @brief  XmlFileReader
+ *
+ *  Reads Pandora objects from an XML file written by XmlFileWriter.
+ *
+ *  Migration registration
+ *  ----------------------
+ *  Identical API to BinaryFileReader::RegisterMigration.
  */
 class XmlFileReader : public FileReader
 {
@@ -39,113 +43,214 @@ public:
      */
     ~XmlFileReader();
 
+    typedef std::function<void(FieldMap &)> MigrationFn;
+
     /**
-     *  @brief  Read a variable from the file
+     *  @brief  Register a migration function for a given component and schema version
      *
-     *  @param  xmlKey the xml key
+     *  @param  componentId the component ID
+     *  @param  fromVersion the schema version to migrate from
+     *  @param  toVersion the schema version to migrate to
+     *  @param  fn the migration function to be called when migrating from fromVersion to toVersion
      */
-    template <typename T>
-    StatusCode ReadVariable(const std::string &xmlKey, T &t);
+    void RegisterMigration(const ComponentId componentId, const unsigned int fromVersion, const unsigned int toVersion, MigrationFn fn);
 
 private:
+    /**
+     *  @brief  Read the header of the file.
+     */
     StatusCode ReadHeader();
+
+    /**
+     *  @brief  Go to the next container in the file.
+     */
     StatusCode GoToNextContainer();
+
+    /**
+     *  @brief  Get the ID of the next container in the file.
+     *
+     *  @return the ID of the next container
+     */
     ContainerId GetNextContainerId();
+
+    /**
+     *  @brief  Go to the specified geometry container in the file.
+     *
+     *  @param  geometryNumber the number of the geometry container to go to
+     */
     StatusCode GoToGeometry(const unsigned int geometryNumber);
+
+    /**
+     *  @brief  Go to the specified event container in the file.
+     *
+     *  @param  eventNumber the number of the event container to go to
+     */
     StatusCode GoToEvent(const unsigned int eventNumber);
+
+    /**
+     *  @brief  Read the next global header component from the file.
+     */
     StatusCode ReadNextGlobalHeaderComponent();
+
+    /**
+     *  @brief  Read the next geometry component from the file.
+     */
     StatusCode ReadNextGeometryComponent();
+
+    /**
+     *  @brief  Read the next event component from the file.
+     */
     StatusCode ReadNextEventComponent();
 
     /**
-     *  @brief  Read file version info from the current position in the file
+     *  @brief  Read the next component from the file.
+     *
+     *  @param  expectedContainer the expected container ID
      */
-    StatusCode ReadVersion();
+    StatusCode ReadNextComponent([[maybe_unused]] const ContainerId expectedContainer);
 
     /**
-     *  @brief  Read a sub detector from the current position in the file
+     *  @brief  Read the fields of the current component from the file.
+     *
+     *  @param  schemaVersion the schema version of the current component
+     *  @param  fields the field map to be populated with the fields of the current component
      */
-    StatusCode ReadSubDetector();
+    StatusCode ReadComponentFields(unsigned int &schemaVersion, FieldMap &fields) const;
 
     /**
-     *  @brief  Read a lar tpc from the current position in the file
+     *  @brief  Apply any registered migrations to the fields of the current component.
+     *
+     *  @param  componentId the component ID of the current component
+     *  @param  fileSchemaVersion the schema version of the current component in the file
+     *  @param  fields the field map to be populated with the fields of the current component
      */
-    StatusCode ReadLArTPC();
+    void ApplyMigrations(const ComponentId componentId, const unsigned int fileSchemaVersion, FieldMap &fields) const;
 
     /**
-     *  @brief  Read a line gap from the current position in the file
+     *  @brief  Read the metadata of the current component from the file.
+     *
+     *  @param  fields the field map to be populated with the fields of the current component
      */
-    StatusCode ReadLineGap();
+    StatusCode ReadMetadata(const FieldMap &fields);
 
     /**
-     *  @brief  Read a box gap from the current position in the file
+     *  @brief  Read the schema registry of the current component from the file.
+     *
+     *  @param  fields the field map to be populated with the fields of the current component
      */
-    StatusCode ReadBoxGap();
+    StatusCode ReadSchemaRegistry(const FieldMap &fields);
 
     /**
-     *  @brief  Read a concentric gap from the current position in the file
+     *  @brief  Read the sub-detector of the current component from the file.
+     *
+     *  @param  fields the field map to be populated with the fields of the current component
      */
-    StatusCode ReadConcentricGap();
+    StatusCode ReadSubDetector(const FieldMap &fields);
 
     /**
-     *  @brief  Read a calo hit from the current position in the file, recreating the stored object
+     *  @breif  Read the LArTPC of the current component from the file.
+     *
+     *  @param  fields the field map to be populated with the fields of the current component
      */
-    StatusCode ReadCaloHit();
+    StatusCode ReadLArTPC(const FieldMap &fields);
 
     /**
-     *  @brief  Read a track from the current position in the file, recreating the stored object
+     *  @brief  Read the line gap of the current component from the file.
+     *
+     *  @param  fields the field map to be populated with the fields of the current component
      */
-    StatusCode ReadTrack();
+    StatusCode ReadLineGap(const FieldMap &fields);
 
     /**
-     *  @brief  Read a mc particle from the current position in the file, recreating the stored object
+     *  @brief  Read the box gap of the current component from the file.
+     *
+     *  @param  fields the field map to be populated with the fields of the current component
      */
-    StatusCode ReadMCParticle();
+    StatusCode ReadBoxGap(const FieldMap &fields);
 
     /**
-     *  @brief  Read a relationship from the current position in the file, recreating the stored relationship
+     *  @brief  Read the concentric gap of the current component from the file.
+     *
+     *  @param  fields the field map to be populated with the fields of the current component
      */
-    StatusCode ReadRelationship();
+    StatusCode ReadConcentricGap(const FieldMap &fields);
 
     /**
-     *  @brief  Read event-level information from the current position in the file, adding it to the pandora instance
+     *  @brief  Read the calo hit of the current component from the file.
+     *
+     *  @param  fields the field map to be populated with the fields of the current component
      */
-    StatusCode ReadEventInformation();
+    StatusCode ReadCaloHit(const FieldMap &fields);
 
-    TiXmlDocument *m_pXmlDocument;      ///< The xml document
-    TiXmlNode *m_pContainerXmlNode;     ///< The document xml node
-    TiXmlElement *m_pCurrentXmlElement; ///< The current xml element
-    bool m_isAtFileStart;               ///< Whether reader is at file start
+    /**
+     *  @brief  Read the track of the current component from the file.
+     *
+     *  @param  fields the field map to be populated with the fields of the current component
+     */
+    StatusCode ReadTrack(const FieldMap &fields);
+
+    /**
+     *  @brief  Read the MC particle of the current component from the file.
+     *
+     *  @param  fields the field map to be populated with the fields of the current component
+     */
+    StatusCode ReadMCParticle(const FieldMap &fields);
+
+    /**
+     *  @brief  Read the relationship of the current component from the file.
+     *
+     *  @param  fields the field map to be populated with the fields of the current component
+     */
+    StatusCode ReadRelationship(const FieldMap &fields);
+
+    /**
+     *  @brief  Read the event information of the current component from the file.
+     *
+     *  @param  fields the field map to be populated with the fields of the current component
+     */
+    StatusCode ReadEventInformation(const FieldMap &fields);
+
+    struct MigrationKey
+    {
+        ComponentId  m_componentId;
+        unsigned int m_fromVersion;
+
+        /**
+         *  @brief  Equality operator for MigrationKey
+         *
+         *  @param  rhs the right hand side of the equality operator
+         *
+         *  @return true if the two migration keys are equal, false otherwise
+         */
+        bool operator==(const MigrationKey &rhs) const
+        {
+            return m_componentId == rhs.m_componentId && m_fromVersion == rhs.m_fromVersion;
+        }
+    };
+
+    struct MigrationKeyHash
+    {
+        /**
+         *  @brief  Hash function for MigrationKey
+         *
+         *  @param  k the migration key to be hashed
+         *
+         *  @return the hash value of the migration key
+         */
+        std::size_t operator()(const MigrationKey &k) const
+        {
+            return std::hash<unsigned int>()(static_cast<unsigned int>(k.m_componentId))
+                ^ (std::hash<unsigned int>()(k.m_fromVersion) << 16);
+        }
+    };
+
+    TiXmlDocument *m_pXmlDocument;
+    TiXmlNode     *m_pContainerXmlNode;
+    TiXmlElement  *m_pCurrentXmlElement;
+    bool           m_isAtFileStart;
+
+    std::unordered_map<MigrationKey, MigrationFn, MigrationKeyHash> m_migrations;
 };
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template <typename T>
-inline StatusCode XmlFileReader::ReadVariable(const std::string &xmlKey, T &t)
-{
-    if (!m_pCurrentXmlElement)
-        return STATUS_CODE_FAILURE;
-
-    return XmlHelper::ReadValue(TiXmlHandle(m_pCurrentXmlElement), xmlKey, t);
-}
-
-template <>
-inline StatusCode XmlFileReader::ReadVariable(const std::string &xmlKey, IntVector &t)
-{
-    if (!m_pCurrentXmlElement)
-        return STATUS_CODE_FAILURE;
-
-    return XmlHelper::ReadVectorOfValues(TiXmlHandle(m_pCurrentXmlElement), xmlKey, t);
-}
-
-template <>
-inline StatusCode XmlFileReader::ReadVariable(const std::string &xmlKey, FloatVector &t)
-{
-    if (!m_pCurrentXmlElement)
-        return STATUS_CODE_FAILURE;
-
-    return XmlHelper::ReadVectorOfValues(TiXmlHandle(m_pCurrentXmlElement), xmlKey, t);
-}
 
 } // namespace pandora
 

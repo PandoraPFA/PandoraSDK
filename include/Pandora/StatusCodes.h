@@ -115,6 +115,7 @@ namespace pandora
     d(STATUS_CODE_OUT_OF_RANGE,             "STATUS_CODE_OUT_OF_RANGE"              )                   \
     d(STATUS_CODE_NOT_ALLOWED,              "STATUS_CODE_NOT_ALLOWED"               )                   \
     d(STATUS_CODE_INVALID_PARAMETER,        "STATUS_CODE_INVALID_PARAMETER"         )                   \
+    d(STATUS_CODE_NOT_IMPLEMENTED,          "STATUS_CODE_NOT_IMPLEMENTED"           )                   \
     d(STATUS_CODE_UNCHANGED,                "STATUS_CODE_UNCHANGED"                 )
 
 /**
