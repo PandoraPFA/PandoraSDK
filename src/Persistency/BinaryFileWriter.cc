@@ -1,7 +1,7 @@
 /**
  *  @file   PandoraSDK/src/Persistency/BinaryFileWriter.cc
  *
- *  @brief  Implementation of the file writer class.
+ *  @brief  Implementation of the binary file writer class.
  *
  *  $Log: $
  */
@@ -19,12 +19,16 @@
 
 #include "Persistency/BinaryFileWriter.h"
 
+#include <cstdint>
+
 namespace pandora
 {
 
-BinaryFileWriter::BinaryFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode,
-    const unsigned int majorVersion, const unsigned int minorVersion) :
-    FileWriter(pandora, fileName, majorVersion, minorVersion)
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+BinaryFileWriter::BinaryFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode) :
+    FileWriter(pandora, fileName),
+    m_containerPosition(0)
 {
     m_fileType = BINARY;
 
@@ -33,9 +37,7 @@ BinaryFileWriter::BinaryFileWriter(const pandora::Pandora &pandora, const std::s
         m_fileStream.open(fileName.c_str(), std::ios::out | std::ios::in | std::ios::binary | std::ios::ate);
 
         if (!m_fileStream.is_open())
-        {
             m_fileStream.open(fileName.c_str(), std::ios::out | std::ios::binary);
-        }
     }
     else if (OVERWRITE == fileMode)
     {
@@ -50,6 +52,9 @@ BinaryFileWriter::BinaryFileWriter(const pandora::Pandora &pandora, const std::s
         throw StatusCodeException(STATUS_CODE_FAILURE);
 
     m_containerPosition = m_fileStream.tellp();
+
+    // Schema version table lives once, in FileWriter (see FileWriter::GetSchemaVersion), so binary and XML writers cannot drift apart.
+    this->PopulateSchemaRegistry();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -82,10 +87,13 @@ StatusCode BinaryFileWriter::WriteFooter()
     if ((HEADER_CONTAINER != m_containerId) && (EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-        this->WriteVariable((HEADER_CONTAINER == m_containerId) ? HEADER_END_COMPONENT
-                : (EVENT_CONTAINER == m_containerId)            ? EVENT_END_COMPONENT
-                                                                : GEOMETRY_END_COMPONENT));
+    const ComponentId endComponentId =
+        (HEADER_CONTAINER == m_containerId) ? HEADER_END_COMPONENT
+      : (EVENT_CONTAINER  == m_containerId) ? EVENT_END_COMPONENT
+                                             : GEOMETRY_END_COMPONENT;
+
+    const FieldMap emptyFields;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteComponent(endComponentId, 0u, emptyFields));
 
     m_containerId = UNKNOWN_CONTAINER;
 
@@ -102,20 +110,105 @@ StatusCode BinaryFileWriter::WriteFooter()
         return STATUS_CODE_FAILURE;
 
     m_containerPosition = m_fileStream.tellp();
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode BinaryFileWriter::WriteComponent(const ComponentId componentId, const unsigned int schemaVersion, const FieldMap &fields)
+{
+    const auto &allFields = fields.GetAllFields();
+
+    const uint32_t cid = static_cast<uint32_t>(componentId);
+    const uint32_t sver = static_cast<uint32_t>(schemaVersion);
+    const uint32_t numFields = static_cast<uint32_t>(allFields.size());
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(cid));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(sver));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(numFields));
+
+    for (const auto &entry : allFields)
+    {
+        const std::string &tag = entry.first;
+        const std::vector<unsigned char> &data = entry.second;
+
+        if (tag.size() > std::numeric_limits<uint16_t>::max())
+            return STATUS_CODE_INVALID_PARAMETER;
+
+        const uint16_t tagLen  = static_cast<uint16_t>(tag.size());
+        const uint32_t dataLen = static_cast<uint32_t>(data.size());
+
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(tagLen));
+        m_fileStream.write(tag.data(), tagLen);
+
+        if (!m_fileStream.good())
+            return STATUS_CODE_FAILURE;
+
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(dataLen));
+        m_fileStream.write(reinterpret_cast<const char *>(data.data()), dataLen);
+
+        if (!m_fileStream.good())
+            return STATUS_CODE_FAILURE;
+    }
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(COMPONENT_END_MARKER));
 
     return STATUS_CODE_SUCCESS;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileWriter::WriteVersion()
+StatusCode BinaryFileWriter::WriteGlobalHeader()
+{
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteHeader(HEADER_CONTAINER));
+
+    if (HEADER_CONTAINER != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteMetadata());
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteSchemaRegistry());
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteFooter());
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode BinaryFileWriter::WriteMetadata()
 {
     if (HEADER_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(VERSION_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(m_fileMajorVersion));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(m_fileMinorVersion));
+    FieldMap fields;
+    fields.Set("producerName", m_metadata.m_producerName);
+    fields.Set("producerVersion", m_metadata.m_producerVersion);
+    fields.Set("creationTimestamp", m_metadata.m_creationTimestamp);
+    fields.Set("description", m_metadata.m_description);
+
+    for (const auto &kv : m_metadata.m_userParameters)
+        fields.Set(std::string("userParam:") + kv.first, kv.second);
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteComponent(METADATA_COMPONENT, 1u, fields));
+
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode BinaryFileWriter::WriteSchemaRegistry()
+{
+    if (HEADER_CONTAINER != m_containerId)
+        return STATUS_CODE_FAILURE;
+
+    FieldMap fields;
+
+    for (const ComponentSchemaVersion &entry : m_schemaRegistry)
+    {
+        const std::string tag = std::to_string(static_cast<uint32_t>(entry.m_componentId));
+        fields.Set(tag, entry.m_schemaVersion);
+    }
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteComponent(SCHEMA_REGISTRY_COMPONENT, 0u, fields));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -127,37 +220,39 @@ StatusCode BinaryFileWriter::WriteSubDetector(const SubDetector *const pSubDetec
     if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(SUB_DETECTOR_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pSubDetectorFactory->Write(pSubDetector, *this));
+    FieldMap fields;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pSubDetectorFactory->Write(pSubDetector, fields));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetSubDetectorName()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetSubDetectorType()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetInnerRCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetInnerZCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetInnerPhiCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetInnerSymmetryOrder()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetOuterRCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetOuterZCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetOuterPhiCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetOuterSymmetryOrder()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->IsMirroredInZ()));
+    fields.Set("subDetectorName", pSubDetector->GetSubDetectorName());
+    fields.Set("subDetectorType", pSubDetector->GetSubDetectorType());
+    fields.Set("innerRCoordinate", pSubDetector->GetInnerRCoordinate());
+    fields.Set("innerZCoordinate", pSubDetector->GetInnerZCoordinate());
+    fields.Set("innerPhiCoordinate", pSubDetector->GetInnerPhiCoordinate());
+    fields.Set("innerSymmetryOrder", pSubDetector->GetInnerSymmetryOrder());
+    fields.Set("outerRCoordinate", pSubDetector->GetOuterRCoordinate());
+    fields.Set("outerZCoordinate", pSubDetector->GetOuterZCoordinate());
+    fields.Set("outerPhiCoordinate", pSubDetector->GetOuterPhiCoordinate());
+    fields.Set("outerSymmetryOrder", pSubDetector->GetOuterSymmetryOrder());
+    fields.Set("isMirroredInZ", pSubDetector->IsMirroredInZ());
 
-    const unsigned int nLayers(pSubDetector->GetNLayers());
-    const SubDetector::SubDetectorLayerVector &subDetectorLayerVector(pSubDetector->GetSubDetectorLayerVector());
+    const SubDetector::SubDetectorLayerVector &layers(pSubDetector->GetSubDetectorLayerVector());
+    const unsigned int nLayers = static_cast<unsigned int>(layers.size());
 
-    if (subDetectorLayerVector.size() != nLayers)
+    if (pSubDetector->GetNLayers() != nLayers)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(nLayers));
+    fields.Set("nLayers", nLayers);
 
-    for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
+    // Each layer is stored under indexed tags so they are individually addressable.
+    for (unsigned int i = 0; i < nLayers; ++i)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerVector.at(iLayer).GetClosestDistanceToIp()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerVector.at(iLayer).GetNRadiationLengths()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerVector.at(iLayer).GetNInteractionLengths()));
+        const std::string prefix("layer" + std::to_string(i) + "_");
+        fields.Set(prefix + "closestDistanceToIp", layers[i].GetClosestDistanceToIp());
+        fields.Set(prefix + "nRadiationLengths", layers[i].GetNRadiationLengths());
+        fields.Set(prefix + "nInteractionLengths", layers[i].GetNInteractionLengths());
     }
 
-    return STATUS_CODE_SUCCESS;
+    return this->WriteComponent(SUB_DETECTOR_COMPONENT, GetSchemaVersion(SUB_DETECTOR_COMPONENT), fields);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -167,26 +262,26 @@ StatusCode BinaryFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
     if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(LAR_TPC_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Write(pLArTPC, *this));
+    FieldMap fields;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Write(pLArTPC, fields));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetLArTPCVolumeId()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetCenterX()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetCenterY()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetCenterZ()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWidthX()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWidthY()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWidthZ()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWirePitchU()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWirePitchV()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWirePitchW()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWireAngleU()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWireAngleV()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWireAngleW()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetSigmaUVW()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->IsDriftInPositiveX()));
+    fields.Set("larTPCVolumeId", pLArTPC->GetLArTPCVolumeId());
+    fields.Set("centerX", pLArTPC->GetCenterX());
+    fields.Set("centerY", pLArTPC->GetCenterY());
+    fields.Set("centerZ", pLArTPC->GetCenterZ());
+    fields.Set("widthX", pLArTPC->GetWidthX());
+    fields.Set("widthY", pLArTPC->GetWidthY());
+    fields.Set("widthZ", pLArTPC->GetWidthZ());
+    fields.Set("wirePitchU", pLArTPC->GetWirePitchU());
+    fields.Set("wirePitchV", pLArTPC->GetWirePitchV());
+    fields.Set("wirePitchW", pLArTPC->GetWirePitchW());
+    fields.Set("wireAngleU", pLArTPC->GetWireAngleU());
+    fields.Set("wireAngleV", pLArTPC->GetWireAngleV());
+    fields.Set("wireAngleW", pLArTPC->GetWireAngleW());
+    fields.Set("sigmaUVW", pLArTPC->GetSigmaUVW());
+    fields.Set("isDriftInPositiveX", pLArTPC->IsDriftInPositiveX());
 
-    return STATUS_CODE_SUCCESS;
+    return this->WriteComponent(LAR_TPC_COMPONENT, GetSchemaVersion(LAR_TPC_COMPONENT), fields);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -196,56 +291,53 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
     if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    const LineGap *pLineGap(nullptr);
-    pLineGap = dynamic_cast<const LineGap *>(pDetectorGap);
-
-    const BoxGap *pBoxGap(nullptr);
-    pBoxGap = dynamic_cast<const BoxGap *>(pDetectorGap);
-
-    const ConcentricGap *pConcentricGap(nullptr);
-    pConcentricGap = dynamic_cast<const ConcentricGap *>(pDetectorGap);
+    const LineGap *const pLineGap = dynamic_cast<const LineGap *>(pDetectorGap);
+    const BoxGap *const pBoxGap = dynamic_cast<const BoxGap *>(pDetectorGap);
+    const ConcentricGap *const pConcentricGap = dynamic_cast<const ConcentricGap *>(pDetectorGap);
 
     if (nullptr != pLineGap)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(LINE_GAP_COMPONENT));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Write(pLineGap, *this));
+        FieldMap fields;
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Write(pLineGap, fields));
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineGapType()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineStartX()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineEndX()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineStartZ()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineEndZ()));
+        fields.Set("lineGapType", pLineGap->GetLineGapType());
+        fields.Set("lineStartX", pLineGap->GetLineStartX());
+        fields.Set("lineEndX", pLineGap->GetLineEndX());
+        fields.Set("lineStartZ", pLineGap->GetLineStartZ());
+        fields.Set("lineEndZ", pLineGap->GetLineEndZ());
+
+        return this->WriteComponent(LINE_GAP_COMPONENT, GetSchemaVersion(LINE_GAP_COMPONENT), fields);
     }
     else if (nullptr != pBoxGap)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(BOX_GAP_COMPONENT));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBoxGapFactory->Write(pBoxGap, *this));
+        FieldMap fields;
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBoxGapFactory->Write(pBoxGap, fields));
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetVertex()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide1()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide2()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide3()));
+        fields.Set("vertex", pBoxGap->GetVertex());
+        fields.Set("side1", pBoxGap->GetSide1());
+        fields.Set("side2", pBoxGap->GetSide2());
+        fields.Set("side3", pBoxGap->GetSide3());
+
+        return this->WriteComponent(BOX_GAP_COMPONENT, GetSchemaVersion(BOX_GAP_COMPONENT), fields);
     }
     else if (nullptr != pConcentricGap)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(CONCENTRIC_GAP_COMPONENT));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pConcentricGapFactory->Write(pConcentricGap, *this));
+        FieldMap fields;
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pConcentricGapFactory->Write(pConcentricGap, fields));
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetMinZCoordinate()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetMaxZCoordinate()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetInnerRCoordinate()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetInnerPhiCoordinate()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetInnerSymmetryOrder()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetOuterRCoordinate()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetOuterPhiCoordinate()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetOuterSymmetryOrder()));
-    }
-    else
-    {
-        return STATUS_CODE_FAILURE;
+        fields.Set("minZCoordinate", pConcentricGap->GetMinZCoordinate());
+        fields.Set("maxZCoordinate", pConcentricGap->GetMaxZCoordinate());
+        fields.Set("innerRCoordinate", pConcentricGap->GetInnerRCoordinate());
+        fields.Set("innerPhiCoordinate", pConcentricGap->GetInnerPhiCoordinate());
+        fields.Set("innerSymmetryOrder", pConcentricGap->GetInnerSymmetryOrder());
+        fields.Set("outerRCoordinate", pConcentricGap->GetOuterRCoordinate());
+        fields.Set("outerPhiCoordinate", pConcentricGap->GetOuterPhiCoordinate());
+        fields.Set("outerSymmetryOrder", pConcentricGap->GetOuterSymmetryOrder());
+
+        return this->WriteComponent(CONCENTRIC_GAP_COMPONENT, GetSchemaVersion(CONCENTRIC_GAP_COMPONENT), fields);
     }
 
-    return STATUS_CODE_SUCCESS;
+    return STATUS_CODE_FAILURE;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -255,32 +347,31 @@ StatusCode BinaryFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(CALO_HIT_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Write(pCaloHit, *this));
+    FieldMap fields;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Write(pCaloHit, fields));
 
-    const CellGeometry cellGeometry(pCaloHit->GetCellGeometry());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(cellGeometry));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetPositionVector()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetExpectedDirection()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetCellNormalVector()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetCellThickness()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetNCellRadiationLengths()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetNCellInteractionLengths()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetTime()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetInputEnergy()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetMipEquivalentEnergy()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetElectromagneticEnergy()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetHadronicEnergy()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->IsDigital()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetHitType()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetHitRegion()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetLayer()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->IsInOuterSamplingLayer()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetParentAddress()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetCellSize0()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetCellSize1()));
+    fields.Set("cellGeometry", pCaloHit->GetCellGeometry());
+    fields.Set("positionVector", pCaloHit->GetPositionVector());
+    fields.Set("expectedDirection", pCaloHit->GetExpectedDirection());
+    fields.Set("cellNormalVector", pCaloHit->GetCellNormalVector());
+    fields.Set("cellThickness", pCaloHit->GetCellThickness());
+    fields.Set("nCellRadiationLengths", pCaloHit->GetNCellRadiationLengths());
+    fields.Set("nCellInteractionLengths", pCaloHit->GetNCellInteractionLengths());
+    fields.Set("time", pCaloHit->GetTime());
+    fields.Set("inputEnergy", pCaloHit->GetInputEnergy());
+    fields.Set("mipEquivalentEnergy", pCaloHit->GetMipEquivalentEnergy());
+    fields.Set("electromagneticEnergy", pCaloHit->GetElectromagneticEnergy());
+    fields.Set("hadronicEnergy", pCaloHit->GetHadronicEnergy());
+    fields.Set("isDigital", pCaloHit->IsDigital());
+    fields.Set("hitType", pCaloHit->GetHitType());
+    fields.Set("hitRegion", pCaloHit->GetHitRegion());
+    fields.Set("layer", pCaloHit->GetLayer());
+    fields.Set("isInOuterSamplingLayer", pCaloHit->IsInOuterSamplingLayer());
+    fields.Set("parentAddress", pCaloHit->GetParentAddress());
+    fields.Set("cellSize0", pCaloHit->GetCellSize0());
+    fields.Set("cellSize1", pCaloHit->GetCellSize1());
 
-    return STATUS_CODE_SUCCESS;
+    return this->WriteComponent(CALO_HIT_COMPONENT, GetSchemaVersion(CALO_HIT_COMPONENT), fields);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -290,26 +381,26 @@ StatusCode BinaryFileWriter::WriteTrack(const Track *const pTrack)
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(TRACK_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pTrackFactory->Write(pTrack, *this));
+    FieldMap fields;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pTrackFactory->Write(pTrack, fields));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetD0()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetZ0()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetParticleId()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetCharge()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetMass()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetMomentumAtDca()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetTrackStateAtStart()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetTrackStateAtEnd()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetTrackStateAtCalorimeter()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetTimeAtCalorimeter()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->ReachesCalorimeter()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->IsProjectedToEndCap()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->CanFormPfo()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->CanFormClusterlessPfo()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetParentAddress()));
+    fields.Set("d0", pTrack->GetD0());
+    fields.Set("z0", pTrack->GetZ0());
+    fields.Set("particleId", pTrack->GetParticleId());
+    fields.Set("charge", pTrack->GetCharge());
+    fields.Set("mass", pTrack->GetMass());
+    fields.Set("momentumAtDca", pTrack->GetMomentumAtDca());
+    fields.Set("trackStateAtStart", pTrack->GetTrackStateAtStart());
+    fields.Set("trackStateAtEnd", pTrack->GetTrackStateAtEnd());
+    fields.Set("trackStateAtCalorimeter", pTrack->GetTrackStateAtCalorimeter());
+    fields.Set("timeAtCalorimeter", pTrack->GetTimeAtCalorimeter());
+    fields.Set("reachesCalorimeter", pTrack->ReachesCalorimeter());
+    fields.Set("isProjectedToEndCap", pTrack->IsProjectedToEndCap());
+    fields.Set("canFormPfo", pTrack->CanFormPfo());
+    fields.Set("canFormClusterlessPfo", pTrack->CanFormClusterlessPfo());
+    fields.Set("parentAddress", pTrack->GetParentAddress());
 
-    return STATUS_CODE_SUCCESS;
+    return this->WriteComponent(TRACK_COMPONENT, GetSchemaVersion(TRACK_COMPONENT), fields);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -319,34 +410,37 @@ StatusCode BinaryFileWriter::WriteMCParticle(const MCParticle *const pMCParticle
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(MC_PARTICLE_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pMCParticleFactory->Write(pMCParticle, *this));
+    FieldMap fields;
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pMCParticleFactory->Write(pMCParticle, fields));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetEnergy()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetMomentum()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetVertex()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetEndpoint()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetParticleId()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetMCParticleType()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetUid()));
+    fields.Set("energy", pMCParticle->GetEnergy());
+    fields.Set("momentum", pMCParticle->GetMomentum());
+    fields.Set("vertex", pMCParticle->GetVertex());
+    fields.Set("endpoint", pMCParticle->GetEndpoint());
+    fields.Set("particleId", pMCParticle->GetParticleId());
+    fields.Set("mcParticleType", pMCParticle->GetMCParticleType());
+    fields.Set("uid", pMCParticle->GetUid());
 
-    return STATUS_CODE_SUCCESS;
+    return this->WriteComponent(MC_PARTICLE_COMPONENT, GetSchemaVersion(MC_PARTICLE_COMPONENT), fields);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileWriter::WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight)
+StatusCode BinaryFileWriter::WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2,
+    const float weight)
 {
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(RELATIONSHIP_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(relationshipId));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(address1));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(address2));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(weight));
+    // Relationships are small and fixed-schema; a FieldMap is still used for
+    // consistency — the reader path is then uniform across all component types.
+    FieldMap fields;
+    fields.Set("relationshipId", static_cast<uint32_t>(relationshipId));
+    fields.Set("address1", reinterpret_cast<uintptr_t>(address1));
+    fields.Set("address2", reinterpret_cast<uintptr_t>(address2));
+    fields.Set("weight", weight);
 
-    return STATUS_CODE_SUCCESS;
+    return this->WriteComponent(RELATIONSHIP_COMPONENT, GetSchemaVersion(RELATIONSHIP_COMPONENT), fields);
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -356,12 +450,12 @@ StatusCode BinaryFileWriter::WriteEventInformation()
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(EVENT_INFO_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(m_pPandora->GetRun()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(m_pPandora->GetSubrun()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(m_pPandora->GetEvent()));
+    FieldMap fields;
+    fields.Set("run", m_pPandora->GetRun());
+    fields.Set("subrun", m_pPandora->GetSubrun());
+    fields.Set("event",  m_pPandora->GetEvent());
 
-    return STATUS_CODE_SUCCESS;
+    return this->WriteComponent(EVENT_INFO_COMPONENT, GetSchemaVersion(EVENT_INFO_COMPONENT), fields);
 }
 
 } // namespace pandora
