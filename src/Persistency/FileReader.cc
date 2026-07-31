@@ -10,13 +10,13 @@
 
 #include "Persistency/FileReader.h"
 
+#include <iostream>
+
 namespace pandora
 {
 
 FileReader::FileReader(const pandora::Pandora &pandora, const std::string &fileName) :
-    Persistency(pandora, fileName),
-    m_fileMajorVersion(1),
-    m_fileMinorVersion(0)
+    Persistency(pandora, fileName)
 {
 }
 
@@ -32,7 +32,14 @@ StatusCode FileReader::ReadGlobalHeader()
 {
     if (HEADER_CONTAINER != this->GetNextContainerId())
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GoToGlobalHeader());
+        const StatusCode seekSc = this->GoToGlobalHeader();
+
+        if (STATUS_CODE_SUCCESS != seekSc)
+        {
+            std::cout << "FileReader::ReadGlobalHeader() — no header container found; "
+                      << "proceeding with default metadata and schema registry." << std::endl;
+            return STATUS_CODE_SUCCESS;
+        }
     }
 
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadHeader());
@@ -47,7 +54,7 @@ StatusCode FileReader::ReadGlobalHeader()
     }
     catch (StatusCodeException &statusCodeException)
     {
-        std::cout << " FileReader::ReadGlobalHeader() encountered unrecognized object in file: " << statusCodeException.ToString() << std::endl;
+        std::cout << "FileReader::ReadGlobalHeader() encountered unrecognized component: " << statusCodeException.ToString() << std::endl;
     }
 
     m_containerId = UNKNOWN_CONTAINER;
@@ -76,7 +83,7 @@ StatusCode FileReader::ReadGeometry()
     }
     catch (StatusCodeException &statusCodeException)
     {
-        std::cout << " FileReader::ReadGeometry() encountered unrecognized object in file: " << statusCodeException.ToString() << std::endl;
+        std::cout << "FileReader::ReadGeometry() encountered unrecognized object in file: " << statusCodeException.ToString() << std::endl;
     }
 
     m_containerId = UNKNOWN_CONTAINER;
@@ -102,7 +109,7 @@ StatusCode FileReader::ReadEvent()
     }
     catch (StatusCodeException &statusCodeException)
     {
-        std::cout << " FileReader::ReadEvent() encountered unrecognized object in file: " << statusCodeException.ToString() << std::endl;
+        std::cout << "FileReader::ReadEvent() encountered unrecognized object in file: " << statusCodeException.ToString() << std::endl;
     }
 
     m_containerId = UNKNOWN_CONTAINER;

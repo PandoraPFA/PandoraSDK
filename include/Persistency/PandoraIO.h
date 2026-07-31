@@ -8,7 +8,9 @@
 #ifndef PANDORA_IO_H
 #define PANDORA_IO_H 1
 
+#include <map>
 #include <string>
+#include <vector>
 
 namespace pandora
 {
@@ -47,7 +49,8 @@ enum ComponentId
     GEOMETRY_END_COMPONENT,
     LAR_TPC_COMPONENT,
     EVENT_INFO_COMPONENT,
-    VERSION_COMPONENT,
+    METADATA_COMPONENT,
+    SCHEMA_REGISTRY_COMPONENT,
     HEADER_END_COMPONENT,
     UNKNOWN_COMPONENT
 };
@@ -92,6 +95,33 @@ enum FileMode
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ *  @brief  Per-component schema version entry.
+ */
+struct ComponentSchemaVersion
+{
+    ComponentId  m_componentId;
+    unsigned int m_schemaVersion;
+};
+
+typedef std::vector<ComponentSchemaVersion> SchemaRegistry;
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ *  @brief  File-level metadata stored in the global header.
+ */
+struct FileMetadata
+{
+    std::string                        m_producerName;
+    std::string                        m_producerVersion;
+    std::string                        m_creationTimestamp;
+    std::string                        m_description;
+    std::map<std::string, std::string> m_userParameters;
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -127,7 +157,7 @@ public:
     const std::string &GetDescription() const;
 
 private:
-    const std::string m_description; ///< Description of the context under which exception was raised
+    const std::string m_description;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

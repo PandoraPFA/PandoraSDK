@@ -10,23 +10,25 @@
 
 #include "Pandora/StatusCodes.h"
 
+#include "Persistency/FieldMap.h"
+
 namespace pandora
 {
-
-class FileReader;
-class FileWriter;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 /**
  *  @brief  ObjectFactory class responsible for extended pandora object creation
+ *
+ *  Subclasses override Read(Parameters &, const FieldMap &) and
+ *  Write(const Object *, FieldMap &) to persist experiment-specific fields.
  */
 template <typename PARAMETERS, typename OBJECT>
 class ObjectFactory
 {
 public:
     typedef PARAMETERS Parameters;
-    typedef OBJECT Object;
+    typedef OBJECT     Object;
 
     /**
      *  @brief  Default constructor
@@ -39,27 +41,27 @@ public:
     virtual ~ObjectFactory();
 
     /**
-     *  @brief  Create new parameters instance on the heap (memory-management to be controlled by user)
-     * 
+     *  @brief  Create new parameters instance on the heap (caller takes ownership)
+     *
      *  @return the address of the new parameters instance
      */
     virtual Parameters *NewParameters() const = 0;
 
     /**
-     *  @brief  Read any additional (derived class only) object parameters from file using the specified file reader
+     *  @brief  Read any additional (derived class only) object parameters from the supplied FieldMap.
      *
      *  @param  parameters the parameters to pass in constructor
-     *  @param  fileReader the file reader, used to extract any additional parameters from file
+     *  @param  fields the field map from which to read the parameters
      */
-    virtual StatusCode Read(Parameters &parameters, FileReader &fileReader) const = 0;
+    virtual StatusCode Read(Parameters &parameters, const FieldMap &fields) const;
 
     /**
-     *  @brief  Persist any additional (derived class only) object parameters using the specified file writer
+     *  @brief  Persist any additional (derived class only) object parameters into the supplied FieldMap.
      *
      *  @param  pObject the address of the object to persist
-     *  @param  fileWriter the file writer
+     *  @param  fields the field map into which to write the parameters
      */
-    virtual StatusCode Write(const Object *const pObject, FileWriter &fileWriter) const = 0;
+    virtual StatusCode Write(const Object *const pObject, FieldMap &fields) const;
 
 protected:
     /**
@@ -91,6 +93,22 @@ inline ObjectFactory<PARAMETERS, OBJECT>::ObjectFactory()
 template <typename PARAMETERS, typename OBJECT>
 inline ObjectFactory<PARAMETERS, OBJECT>::~ObjectFactory()
 {
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename PARAMETERS, typename OBJECT>
+inline StatusCode ObjectFactory<PARAMETERS, OBJECT>::Read(Parameters &/*parameters*/, const FieldMap &/*fields*/) const
+{
+    return STATUS_CODE_SUCCESS;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+template <typename PARAMETERS, typename OBJECT>
+inline StatusCode ObjectFactory<PARAMETERS, OBJECT>::Write(const OBJECT *const /*pObject*/, FieldMap &/*fields*/) const
+{
+    return STATUS_CODE_SUCCESS;
 }
 
 } // namespace pandora

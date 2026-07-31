@@ -10,10 +10,8 @@
 
 #include "Pandora/Pandora.h"
 
-#include "Objects/CartesianVector.h"
-#include "Objects/TrackState.h"
-
 #include "Persistency/FileWriter.h"
+#include "Persistency/Persistency.h"
 
 #include "Xml/tinyxml.h"
 
@@ -21,7 +19,18 @@ namespace pandora
 {
 
 /**
- *  @brief  XmlFileWriter class
+ *  @brief  XmlFileWriter
+ *
+ *  Writes Pandora objects to a self-describing XML file. Document structure:
+ *
+ *  <PandoraFile>
+ *    <Header>
+ *      <Metadata schemaVersion="1">...</Metadata>
+ *      <SchemaRegistry schemaVersion="0">...</SchemaRegistry>
+ *    </Header>
+ *    <Geometry><LArTPC schemaVersion="1">...</LArTPC></Geometry>
+ *    <Event><CaloHit schemaVersion="1">...</CaloHit></Event>
+ *  </PandoraFile>
  */
 class XmlFileWriter : public FileWriter
 {
@@ -29,78 +38,116 @@ public:
     /**
      *  @brief  Constructor
      *
-     *  @param  algorithm the pandora instance to be used alongside the file writer
-     *  @param  fileName the name of the output file
-     *  @param  fileMode the mode for file writing
-     *  @param  majorVersion the major version of the output file
-     *  @param  minorVersion the minor version of the output file
+     *  @param  pandora   the pandora instance
+     *  @param  fileName  the name of the output file
+     *  @param  fileMode  APPEND (default) or OVERWRITE
      */
-    XmlFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode = APPEND,
-        const unsigned int majorVersion = 1, const unsigned int minorVersion = 0);
+    XmlFileWriter(const pandora::Pandora &pandora, const std::string &fileName,
+        const FileMode fileMode = APPEND);
 
     /**
-     *  @brief  Destructor
+     *  @brief  Destructor — saves the XML document to disk
      */
     ~XmlFileWriter();
 
     /**
-     *  @brief  Write a variable to the file
-     *
-     *  @param  xmlKey the xml key
+     *  @brief  Write the global header information to the file
      */
-    template <typename T>
-    StatusCode WriteVariable(const std::string &xmlKey, const T &t);
-
     StatusCode WriteGlobalHeader();
 
 private:
+    /**
+     *  @brief  Write the header of the file.
+     *
+     *  @param  containerId the ID of the container to be written
+     */
     StatusCode WriteHeader(const ContainerId containerId);
+
+    /**
+     *  @brief  Write the footer of the file.
+     */
     StatusCode WriteFooter();
-    StatusCode WriteVersion();
+
+    /**
+     *  @brief  Write the metadata of the current component to the file.
+     */
+    StatusCode WriteMetadata();
+
+    /**
+     *  @brief  Write the schema registry of the current component to the file.
+     */
+    StatusCode WriteSchemaRegistry();
+
+    /**
+     *  @brief  Write the fields of the current component to the file.
+     *
+     *  @param  elementName the name of the XML element to be written
+     *  @param  schemaVersion the schema version of the current component
+     *  @param  fields the field map containing the fields of the current component
+     */
+    StatusCode WriteComponent(const std::string &elementName, const unsigned int schemaVersion, const FieldMap &fields);
+
+    /**
+     *  @brief  Write the sub-detector of the current component to the file.
+     *
+     *  @param  pSubDetector the address of the sub-detector to be written
+     */
     StatusCode WriteSubDetector(const SubDetector *const pSubDetector);
+
+    /**
+     *  @brief  Write the LArTPC of the current component to the file.
+     *
+     *  @param  pLArTPC the address of the LArTPC to be written
+     */
     StatusCode WriteLArTPC(const LArTPC *const pLArTPC);
+
+    /**
+     *  @brief  Write the detector gap of the current component to the file.
+     *
+     *  @param  pDetectorGap the address of the detector gap to be written
+     */
     StatusCode WriteDetectorGap(const DetectorGap *const pDetectorGap);
+
+    /**
+     *  @brief  Write the calo hit of the current component to the file.
+     *
+     *  @param  pCaloHit the address of the calo hit to be written
+     */
     StatusCode WriteCaloHit(const CaloHit *const pCaloHit);
+
+    /**
+     *  @brief  Write the track of the current component to the file.
+     *
+     *  @param  pTrack the address of the track to be written
+     */
     StatusCode WriteTrack(const Track *const pTrack);
+
+    /**
+     *  @brief  Write the MC particle of the current component to the file.
+     *
+     *  @param  pMCParticle the address of the MC particle to be written
+     */
     StatusCode WriteMCParticle(const MCParticle *const pMCParticle);
+
+    /**
+     *  @brief  Write the relationship between objects of the current component to the file.
+     *
+     *  @param  relationshipId the ID of the relationship to be written
+     *  @param  address1 the address of the first object in the relationship
+     *  @param  address2 the address of the second object in the relationship
+     *  @param  weight the weight of the relationship
+     */
     StatusCode WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight);
+
+    /**
+     *  @brief  Write the event information of the current component to the file.
+     */
     StatusCode WriteEventInformation();
 
-    TiXmlDocument *m_pXmlDocument;        ///< The xml document
-    TiXmlElement *m_pContainerXmlElement; ///< The container xml element
-    TiXmlElement *m_pCurrentXmlElement;   ///< The current xml element
+    TiXmlDocument *m_pXmlDocument;
+    TiXmlElement *m_pContainerXmlElement;
+    TiXmlElement *m_pCurrentXmlElement;
 };
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-template <typename T>
-inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const T &t)
-{
-    if (!m_pCurrentXmlElement)
-        return STATUS_CODE_FAILURE;
-
-    TiXmlElement *const pTiXmlElement = new TiXmlElement(xmlKey);
-    pTiXmlElement->LinkEndChild(new TiXmlText(TypeToStringPrecision(t)));
-    m_pCurrentXmlElement->LinkEndChild(pTiXmlElement);
-
-    return STATUS_CODE_SUCCESS;
-}
-
-template <>
-inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const CartesianVector &t)
-{
-    return this->WriteVariable(
-        xmlKey, TypeToStringPrecision(t.GetX()) + " " + TypeToStringPrecision(t.GetY()) + " " + TypeToStringPrecision(t.GetZ()));
-}
-
-template <>
-inline StatusCode XmlFileWriter::WriteVariable(const std::string &xmlKey, const TrackState &t)
-{
-    return this->WriteVariable(xmlKey,
-        TypeToStringPrecision(t.GetPosition().GetX()) + " " + TypeToStringPrecision(t.GetPosition().GetY()) + " " +
-            TypeToStringPrecision(t.GetPosition().GetZ()) + " " + TypeToStringPrecision(t.GetMomentum().GetX()) + " " +
-            TypeToStringPrecision(t.GetMomentum().GetY()) + " " + TypeToStringPrecision(t.GetMomentum().GetZ()));
-}
 
 } // namespace pandora
 
