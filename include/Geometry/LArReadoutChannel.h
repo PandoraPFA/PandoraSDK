@@ -60,6 +60,13 @@ public:
      */
     const ChannelInterval &GetChannelInterval(const pandora::HitType view) const;
 
+    /**
+     *  @brief  Get the channel interval array for all views.
+     *
+     *  @return the channel interval array for all views
+     */
+    const ViewChannelIntervalArray &GetChannelIntervals() const;
+
 private:
     unsigned int m_id;                                  ///< The id of the readout channel
     ViewChannelIntervalArray m_channelIntervalArray;    ///< An array describing the channel id 'intersection' intervals for each view
@@ -70,6 +77,13 @@ private:
 inline unsigned int LArReadoutChannel::GetId() const
 {
     return m_id;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const LArReadoutChannel::ViewChannelIntervalArray &LArReadoutChannel::GetChannelIntervals() const
+{
+    return m_channelIntervalArray;
 }
 
 } // namespace pandora
