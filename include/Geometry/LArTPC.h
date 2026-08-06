@@ -149,6 +149,12 @@ public:
      */
     const LArReadoutVolume &GetReadoutVolume(const unsigned int id) const;
 
+private:
+    /**
+     *  @brief  Set the neighbouring readout volumes for this LArTPC.
+     */
+    void FinalizeReadoutVolumeNeighbours() const;
+
 protected:
     /**
      *  @brief  Constructor
