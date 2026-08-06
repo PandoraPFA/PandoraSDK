@@ -12,6 +12,7 @@
 #include "Geometry/LArReadoutChannel.h"
 
 #include "Pandora/PandoraEnumeratedTypes.h"
+#include "Pandora/StatusCodes.h"
 
 #include <vector>
 
@@ -64,6 +65,16 @@ public:
     const LArReadoutChannel::ReadoutChannels &GetReadoutChannels() const;
 
     /**
+     *  @brief  Get the readout channel associated with the readout unit with the specified id.
+     *
+     *  @param  id the readout channel id
+     *
+     *  @return the readout channel
+     *  @throws StatusCodeException if the specified readout channel id is not present in the readout channels
+     */
+    const LArReadoutChannel &GetReadoutChannel(const unsigned int id) const;
+
+    /**
      *  @brief  Get the parent readout volume to which this readout unit belongs. In a horizontal drift TPC, this would be the APA associated
      *          with the wire plane.
      *
@@ -112,6 +123,16 @@ inline pandora::HitType LArReadoutUnit::GetView() const
 inline const LArReadoutChannel::ReadoutChannels &LArReadoutUnit::GetReadoutChannels() const
 {
     return m_readoutChannels;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const LArReadoutChannel &LArReadoutUnit::GetReadoutChannel(const unsigned int id) const
+{
+    if (id >= m_readoutChannels.size())
+        throw StatusCodeException(STATUS_CODE_NOT_FOUND);
+
+    return m_readoutChannels[id];
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

@@ -78,6 +78,16 @@ public:
      */
     const LArTPC *GetParentTPC() const;
 
+    /**
+     *  @brief  Get the neighbouring readout volume in the specified direction. This function works within either a single physical TPC, or within
+     *          a single virtual TPC (e.g. merged TPCs for slicing).
+     *
+     *  @param  direction the direction of the neighbouring readout volume
+     *
+     *  @return a pointer to the neighbouring readout volume, or nullptr if no neighbour exists in that direction
+     */
+    const LArReadoutVolume *GetNeighbour(ReadoutVolumeNeighbour direction) const;
+
 private:
     /**
      *  @brief  Set the parent TPC to which this readout volume belongs. Only accessible by the friend class LArTPC.
@@ -85,6 +95,14 @@ private:
      *  @param  pParent a pointer to the parent TPC
      */
     void SetParent(const LArTPC *pParent) const;
+
+    /**
+     *  @brief  Set the neighbouring readout volume in the specified direction. Only accessible by the friend class LArTPC.
+     *
+     *  @param  direction the direction of the neighbouring readout volume
+     *  @param  pNeighbour a pointer to the neighbouring readout volume
+     */
+    void SetNeighbour(ReadoutVolumeNeighbour direction, const LArReadoutVolume *pNeighbour) const;
 
     /**
      *  @brief  Finalize the readout volume. This method is called by the parent TPC once all readout volumes have been added. In this way, the
@@ -98,6 +116,7 @@ private:
     pandora::CartesianVector m_size;    ///< The size of the readout volume (x, y, z)
     LArReadoutUnit::ReadoutUnits m_readoutUnits;    ///< The collection of readout units associated with this readout volume
     mutable const LArTPC *m_pParentTPC{nullptr};    ///< A pointer to the parent TPC
+    mutable std::array<const LArReadoutVolume *, 6> m_neighbours{}; ///< The neighbouring readout volumes - nullptr if no neighbour in direction
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -140,6 +159,20 @@ inline const LArTPC *LArReadoutVolume::GetParentTPC() const
 inline void LArReadoutVolume::SetParent(const LArTPC *pParent) const
 {
     m_pParentTPC = pParent;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const LArReadoutVolume *LArReadoutVolume::GetNeighbour(ReadoutVolumeNeighbour direction) const
+{
+    return m_neighbours[static_cast<unsigned int>(direction)];
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline void LArReadoutVolume::SetNeighbour(ReadoutVolumeNeighbour direction, const LArReadoutVolume *pNeighbour) const
+{
+    m_neighbours[static_cast<unsigned int>(direction)] = pNeighbour;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
