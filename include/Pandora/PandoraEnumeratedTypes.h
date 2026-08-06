@@ -151,6 +151,14 @@ enum VertexType
     VERTEX_CUSTOM
 };
 
+/**
+ *  @brief  Readout volume neighbour enum
+ */
+enum class ReadoutVolumeNeighbour : unsigned int
+{
+    PLUS_X, MINUS_X, PLUS_Y, MINUS_Y, PLUS_Z, MINUS_Z
+};
+
 } // namespace pandora
 
 #endif // #ifndef PANDORA_ENUMERATED_TYPES_H
