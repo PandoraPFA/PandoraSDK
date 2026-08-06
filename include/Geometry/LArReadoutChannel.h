@@ -17,6 +17,8 @@
 
 namespace pandora
 {
+class LArReadoutUnit;
+
 /**
  *  @brief  LArReadoutChannel class. This class describes a readout channel for a LARTPC. For example, in a horizontal drift TPC, this class
  *          represents a wire associated with a particular wire plane.
@@ -67,9 +69,25 @@ public:
      */
     const ViewChannelIntervalArray &GetChannelIntervals() const;
 
+    /**
+     *  @brief  Get the parent readout unit (e.g. wire plane) to which this channel belongs.
+     *
+     *  @return a pointer to the parent readout unit
+     */
+    const LArReadoutUnit *GetParentReadoutUnit() const;
+
 private:
+    /**
+     *  @brief  Set the parent readout unit (e.g. wire plane) to which this channel belongs. Only accessible by the friend class LArReadoutUnit.
+     *
+     *  @param  pParent a pointer to the parent readout unit
+     */
+    void SetParent(const LArReadoutUnit *pParent) const;
+    friend class LArReadoutUnit;
+
     unsigned int m_id;                                  ///< The id of the readout channel
     ViewChannelIntervalArray m_channelIntervalArray;    ///< An array describing the channel id 'intersection' intervals for each view
+    mutable const LArReadoutUnit *m_pParentReadoutUnit{nullptr};    ///< Pointer to the parent readout unit (e.g. wire plane) to which this channel belongs
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -84,6 +102,20 @@ inline unsigned int LArReadoutChannel::GetId() const
 inline const LArReadoutChannel::ViewChannelIntervalArray &LArReadoutChannel::GetChannelIntervals() const
 {
     return m_channelIntervalArray;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const LArReadoutUnit *LArReadoutChannel::GetParentReadoutUnit() const
+{
+    return m_pParentReadoutUnit;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline void LArReadoutChannel::SetParent(const LArReadoutUnit *pParent) const
+{
+    m_pParentReadoutUnit = pParent;
 }
 
 } // namespace pandora
