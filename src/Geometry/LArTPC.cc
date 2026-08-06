@@ -42,7 +42,13 @@ LArTPC::LArTPC(const object_creation::Geometry::LArTPC::Parameters &inputParamet
             readoutUnits.emplace_back(unitParams.m_id, unitParams.m_view, readoutChannels);
         }
 
-        m_readoutVolumes.emplace_back(volumeParams.m_id, volumeParams.m_center, volumeParams.m_size, readoutUnits);
+        m_readoutVolumes.emplace(volumeParams.m_id, LArReadoutVolume(volumeParams.m_id, volumeParams.m_center, volumeParams.m_size, readoutUnits));
+    }
+
+    for (const auto &[_, volume] : m_readoutVolumes)
+    {
+        volume.SetParent(this);
+        volume.Finalize();
     }
 }
 

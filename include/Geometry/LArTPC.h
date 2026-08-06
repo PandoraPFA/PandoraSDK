@@ -139,6 +139,16 @@ public:
      */
     const LArReadoutVolume::ReadoutVolumes &GetReadoutVolumes() const;
 
+    /**
+     *  @brief  Get the readout volume associated with this LArTPC with the specified id
+     *
+     *  @param  id the readout volume id
+     *
+     *  @return the readout volume
+     *  @throws StatusCodeException if the specified readout volume id is not present in the readout volumes
+     */
+    const LArReadoutVolume &GetReadoutVolume(const unsigned int id) const;
+
 protected:
     /**
      *  @brief  Constructor
@@ -283,6 +293,18 @@ inline bool LArTPC::IsDriftInPositiveX() const
 inline const LArReadoutVolume::ReadoutVolumes &LArTPC::GetReadoutVolumes() const
 {
     return m_readoutVolumes;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const LArReadoutVolume &LArTPC::GetReadoutVolume(const unsigned int id) const
+{
+    LArReadoutVolume::ReadoutVolumes::const_iterator iter(m_readoutVolumes.find(id));
+
+    if (m_readoutVolumes.end() == iter)
+        throw StatusCodeException(STATUS_CODE_NOT_FOUND);
+
+    return iter->second;
 }
 
 } // namespace pandora
