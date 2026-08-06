@@ -12,8 +12,12 @@
 #include "Geometry/LArReadoutUnit.h"
 #include "Objects/CartesianVector.h"
 
+#include <map>
+
 namespace pandora
 {
+class LArTPC;
+
 /**
  *  @brief  LArReadoutVolume class. This class describes a readout volume for a LArTPC. For example, in a horizontal drift TPC, this class
  *          represents the volume associated with a single APA.
@@ -21,7 +25,7 @@ namespace pandora
 class LArReadoutVolume
 {
 public:
-    typedef std::vector<LArReadoutVolume> ReadoutVolumes;
+    typedef std::map<unsigned int, LArReadoutVolume> ReadoutVolumes;
 
     /**
      *  @brief  Constructor
@@ -67,11 +71,33 @@ public:
      */
     const LArReadoutUnit::ReadoutUnits &GetReadoutUnits() const;
 
+    /**
+     *  @brief  Get the parent TPC to which this readout volume belongs. In a horizontal drift TPC, this would be the TPC associated with the APA.
+     *
+     *  @return a pointer to the parent TPC
+     */
+    const LArTPC *GetParentTPC() const;
+
 private:
+    /**
+     *  @brief  Set the parent TPC to which this readout volume belongs. Only accessible by the friend class LArTPC.
+     *
+     *  @param  pParent a pointer to the parent TPC
+     */
+    void SetParent(const LArTPC *pParent) const;
+
+    /**
+     *  @brief  Finalize the readout volume. This method is called by the parent TPC once all readout volumes have been added. In this way, the
+     *          various links back to parent objects Channel -> Unit -> Volume -> TPC are valid.
+     */
+    void Finalize() const;
+    friend class LArTPC;
+
     unsigned int m_id;                  ///< The id of the readout volume
     pandora::CartesianVector m_center;  ///< The center of the readout volume (x, y, z)
     pandora::CartesianVector m_size;    ///< The size of the readout volume (x, y, z)
     LArReadoutUnit::ReadoutUnits m_readoutUnits;    ///< The collection of readout units associated with this readout volume
+    mutable const LArTPC *m_pParentTPC{nullptr};    ///< A pointer to the parent TPC
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -100,6 +126,31 @@ inline const pandora::CartesianVector &LArReadoutVolume::GetSize() const
 inline const LArReadoutUnit::ReadoutUnits &LArReadoutVolume::GetReadoutUnits() const
 {
     return m_readoutUnits;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const LArTPC *LArReadoutVolume::GetParentTPC() const
+{
+    return m_pParentTPC;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline void LArReadoutVolume::SetParent(const LArTPC *pParent) const
+{
+    m_pParentTPC = pParent;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline void LArReadoutVolume::Finalize() const
+{
+    for (const LArReadoutUnit &unit : m_readoutUnits)
+    {
+        unit.SetParent(this);
+        unit.Finalize();
+    }
 }
 
 } // namespace pandora

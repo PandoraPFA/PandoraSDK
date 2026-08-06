@@ -17,6 +17,8 @@
 
 namespace pandora
 {
+class LArReadoutVolume;
+
 /**
  *  @brief  LArReadoutUnit class. This class describes a readout unit for a LArTPC. For example, in a horizontal drift TPC, this class
  *          represents a wire plane associated with a single APA.
@@ -61,10 +63,34 @@ public:
      */
     const LArReadoutChannel::ReadoutChannels &GetReadoutChannels() const;
 
+    /**
+     *  @brief  Get the parent readout volume to which this readout unit belongs. In a horizontal drift TPC, this would be the APA associated
+     *          with the wire plane.
+     *
+     *  @return a pointer to the parent readout volume
+     */
+    const LArReadoutVolume *GetParentReadoutVolume() const;
+
 private:
+    /**
+     *  @brief  Set the parent readout volume to which this unit. Only accessible by the friend class LArReadoutVolume.
+     *
+     *  @param  pParent a pointer to the parent readout volume
+     */
+    void SetParent(const LArReadoutVolume *pParent) const;
+
+    /**
+     *  @brief  Finalize the readout unit. This method is called by the parent readout volume. In this way, the various links back to parent
+     *          objects Channel -> Unit -> Volume -> TPC are valid.
+     */
+    void Finalize() const;
+    friend class LArReadoutVolume;
+
+
     unsigned int m_id;                  ///< The id of the readout unit
     pandora::HitType m_view;            ///< The view of the readout unit
     LArReadoutChannel::ReadoutChannels m_readoutChannels;   ///< The collection of readout channels associated with this readout unit
+    mutable const LArReadoutVolume *m_pParentReadoutVolume{nullptr};   ///< Pointer to the parent readout volume (e.g. an APA) to which this unit belongs
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -86,6 +112,28 @@ inline pandora::HitType LArReadoutUnit::GetView() const
 inline const LArReadoutChannel::ReadoutChannels &LArReadoutUnit::GetReadoutChannels() const
 {
     return m_readoutChannels;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const LArReadoutVolume *LArReadoutUnit::GetParentReadoutVolume() const
+{
+    return m_pParentReadoutVolume;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline void LArReadoutUnit::SetParent(const LArReadoutVolume *pParent) const
+{
+    m_pParentReadoutVolume = pParent;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline void LArReadoutUnit::Finalize() const
+{
+    for (const LArReadoutChannel &channel : m_readoutChannels)
+        channel.SetParent(this);
 }
 
 } // namespace pandora
