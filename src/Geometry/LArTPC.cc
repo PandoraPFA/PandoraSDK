@@ -41,7 +41,7 @@ LArTPC::LArTPC(const object_creation::Geometry::LArTPC::Parameters &inputParamet
             for (const auto &channelParams : unitParams.m_channelParametersVector)
                 readoutChannels.emplace_back(channelParams.m_id, channelParams.m_channelIntervalArray);
 
-            readoutUnits.emplace_back(unitParams.m_id, unitParams.m_view, readoutChannels);
+            readoutUnits.emplace_back(unitParams.m_id, unitParams.m_view, unitParams.m_referenceCoordinate, unitParams.m_pitch, readoutChannels);
         }
 
         m_readoutVolumes.emplace(volumeParams.m_id, LArReadoutVolume(volumeParams.m_id, volumeParams.m_center, volumeParams.m_size, readoutUnits));
