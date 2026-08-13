@@ -211,6 +211,8 @@ class LArReadoutUnitParameters
 public:
     unsigned int m_id;                                              ///< The readout unit id
     pandora::HitType m_view;                                        ///< The view of the readout unit
+    float m_referenceCoordinate;                                    ///< The reference coordinate of the readout unit
+    float m_pitch;                                                  ///< The signed pitch of the readout unit
     LArReadoutChannelParametersVector m_channelParametersVector;    ///< The channels belonging to this readout unit
 };
 

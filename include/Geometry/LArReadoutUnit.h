@@ -34,9 +34,11 @@ public:
      *
      *  @param  id the readout unit id (e,g, plane id in a horizontal drift TPC)
      *  @param  view the view of the readout unit
+     *  @param  referenceCoordinate the reference coordinate of the readout unit. This is the centre of the first channel in the plane.
+     *  @param  pitch the signed pitch of the readout unit. This is the distance between channels in the plane, with a sign that indicates
      *  @param  readoutChannels the collection of readout channels associated with this readout unit
      */
-    LArReadoutUnit(unsigned int id, pandora::HitType view, const LArReadoutChannel::ReadoutChannels &readoutChannels);
+    LArReadoutUnit(unsigned int id, pandora::HitType view, float referenceCoordinate, float pitch, const LArReadoutChannel::ReadoutChannels &readoutChannels);
 
     /**
      *  @brief  Destructor
@@ -56,6 +58,21 @@ public:
      *  @return the view of the readout unit
      */
     pandora::HitType GetView() const;
+
+    /**
+     *  @brief  Get the reference coordinate of the readout unit. This is the centre of the first channel in the plane.
+     *
+     *  @return the reference coordinate of the readout unit
+     */
+    float GetReferenceCoordinate() const;
+
+    /**
+     *  @brief  Get the signed pitch of the readout unit. This is the distance between channels in the plane, with a sign that indicates
+     *          whether the channel number increases or decreases with increasing coordinate.
+     *
+     *  @return the signed pitch of the readout unit
+     */
+    float GetPitch() const;
 
     /**
      *  @brief  Get the readout channels associated with the readout unit. In a horizontal drift TPC, this would be the collection of wires.
@@ -100,6 +117,8 @@ private:
 
     unsigned int m_id;                  ///< The id of the readout unit
     pandora::HitType m_view;            ///< The view of the readout unit
+    float m_referenceCoordinate;        ///< The reference coordinate of the readout unit
+    float m_pitch;                      ///< The signed pitch of the readout unit
     LArReadoutChannel::ReadoutChannels m_readoutChannels;   ///< The collection of readout channels associated with this readout unit
     mutable const LArReadoutVolume *m_pParentReadoutVolume{nullptr};   ///< Pointer to the parent readout volume (e.g. an APA) to which this unit belongs
 };
@@ -116,6 +135,20 @@ inline unsigned int LArReadoutUnit::GetId() const
 inline pandora::HitType LArReadoutUnit::GetView() const
 {
     return m_view;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LArReadoutUnit::GetReferenceCoordinate() const
+{
+    return m_referenceCoordinate;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline float LArReadoutUnit::GetPitch() const
+{
+    return m_pitch;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

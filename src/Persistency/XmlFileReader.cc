@@ -645,8 +645,6 @@ StatusCode XmlFileReader::ReadLArTPC(const FieldMap &fields)
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Read(*pParameters, fields));
-
         pParameters->m_larTPCVolumeId = fields.GetOrDefault<unsigned int>("larTPCVolumeId", 0u);
         pParameters->m_centerX = fields.GetOrDefault<float>("centerX", 0.f);
         pParameters->m_centerY = fields.GetOrDefault<float>("centerY", 0.f);
@@ -662,6 +660,7 @@ StatusCode XmlFileReader::ReadLArTPC(const FieldMap &fields)
         pParameters->m_wireAngleW = fields.GetOrDefault<float>("wireAngleW", 0.f);
         pParameters->m_sigmaUVW = fields.GetOrDefault<float>("sigmaUVW", 0.f);
         pParameters->m_isDriftInPositiveX = fields.GetOrDefault<bool>("isDriftInPositiveX", false);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Read(*pParameters, fields));
 
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=,
             PandoraApi::Geometry::LArTPC::Create(*m_pPandora, *pParameters, *m_pLArTPCFactory));
