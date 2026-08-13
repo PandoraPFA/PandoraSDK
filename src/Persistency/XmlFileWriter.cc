@@ -421,8 +421,6 @@ StatusCode XmlFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
         return STATUS_CODE_FAILURE;
 
     FieldMap fields;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Write(pLArTPC, fields));
-
     fields.Set("larTPCVolumeId", pLArTPC->GetLArTPCVolumeId());
     fields.Set("centerX", pLArTPC->GetCenterX());
     fields.Set("centerY", pLArTPC->GetCenterY());
@@ -438,6 +436,7 @@ StatusCode XmlFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
     fields.Set("wireAngleW", pLArTPC->GetWireAngleW());
     fields.Set("sigmaUVW", pLArTPC->GetSigmaUVW());
     fields.Set("isDriftInPositiveX", pLArTPC->IsDriftInPositiveX());
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Write(pLArTPC, fields));
 
     return this->WriteComponent("LArTPC", GetSchemaVersion(LAR_TPC_COMPONENT), fields);
 }
