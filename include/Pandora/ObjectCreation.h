@@ -213,6 +213,8 @@ public:
     pandora::HitType m_view;                                        ///< The view of the readout unit
     float m_referenceCoordinate;                                    ///< The reference coordinate of the readout unit
     float m_pitch;                                                  ///< The signed pitch of the readout unit
+    pandora::CartesianVector m_unitCenter{0.f, 0.f, 0.f};           ///< The center of the readout unit's own active-area box (X unused)
+    pandora::CartesianVector m_unitSize{0.f, 0.f, 0.f};             ///< The size of the readout unit's own active-area box (X unused)
     LArReadoutChannelParametersVector m_channelParametersVector;    ///< The channels belonging to this readout unit
 };
 

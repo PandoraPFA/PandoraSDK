@@ -11,6 +11,8 @@
 
 #include "Geometry/LArReadoutChannel.h"
 
+#include "Objects/CartesianVector.h"
+
 #include "Pandora/PandoraEnumeratedTypes.h"
 #include "Pandora/StatusCodes.h"
 
@@ -36,9 +38,12 @@ public:
      *  @param  view the view of the readout unit
      *  @param  referenceCoordinate the reference coordinate of the readout unit. This is the centre of the first channel in the plane.
      *  @param  pitch the signed pitch of the readout unit. This is the distance between channels in the plane, with a sign that indicates
+     *  @param  unitCenter the center of the readout unit's own active-area box.
+     *  @param  unitSize the size of the readout unit's own active-area box.
      *  @param  readoutChannels the collection of readout channels associated with this readout unit
      */
-    LArReadoutUnit(unsigned int id, pandora::HitType view, float referenceCoordinate, float pitch, const LArReadoutChannel::ReadoutChannels &readoutChannels);
+    LArReadoutUnit(unsigned int id, pandora::HitType view, float referenceCoordinate, float pitch, const pandora::CartesianVector &unitCenter,
+        const pandora::CartesianVector &unitSize, const LArReadoutChannel::ReadoutChannels &readoutChannels);
 
     /**
      *  @brief  Destructor
@@ -73,6 +78,20 @@ public:
      *  @return the signed pitch of the readout unit
      */
     float GetPitch() const;
+
+    /**
+     *  @brief  Get the center of the readout unit's own active-area box. This is used to define the readout unit's own coordinate system.
+     *
+     *  @return the center of the readout unit's own active-area box
+     */
+    const pandora::CartesianVector &GetUnitCenter() const;
+
+    /**
+     *  @brief  Get the size of the readout unit's own active-area box. This is used to define the readout unit's own coordinate system.
+     *
+     *  @return the size of the readout unit's own active-area box
+     */
+    const pandora::CartesianVector &GetUnitSize() const;
 
     /**
      *  @brief  Get the readout channels associated with the readout unit. In a horizontal drift TPC, this would be the collection of wires.
@@ -119,6 +138,10 @@ private:
     pandora::HitType m_view;            ///< The view of the readout unit
     float m_referenceCoordinate;        ///< The reference coordinate of the readout unit
     float m_pitch;                      ///< The signed pitch of the readout unit
+
+    pandora::CartesianVector m_unitCenter; ///< The center of the readout unit's own active-area box (X unused)
+    pandora::CartesianVector m_unitSize;   ///< The size of the readout unit's own active-area box (X unused)
+
     LArReadoutChannel::ReadoutChannels m_readoutChannels;   ///< The collection of readout channels associated with this readout unit
     mutable const LArReadoutVolume *m_pParentReadoutVolume{nullptr};   ///< Pointer to the parent readout volume (e.g. an APA) to which this unit belongs
 };
@@ -149,6 +172,20 @@ inline float LArReadoutUnit::GetReferenceCoordinate() const
 inline float LArReadoutUnit::GetPitch() const
 {
     return m_pitch;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const pandora::CartesianVector &LArReadoutUnit::GetUnitCenter() const
+{
+    return m_unitCenter;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline const pandora::CartesianVector &LArReadoutUnit::GetUnitSize() const
+{
+    return m_unitSize;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
