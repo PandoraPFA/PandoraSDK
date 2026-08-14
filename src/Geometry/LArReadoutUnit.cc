@@ -11,11 +11,14 @@
 namespace pandora
 {
 
-LArReadoutUnit::LArReadoutUnit(unsigned int id, HitType view, float referenceCoordinate, float pitch, const LArReadoutChannel::ReadoutChannels &readoutChannels) :
+LArReadoutUnit::LArReadoutUnit(unsigned int id, HitType view, float referenceCoordinate, float pitch, const CartesianVector &unitCenter,
+    const CartesianVector &unitSize, const LArReadoutChannel::ReadoutChannels &readoutChannels) :
     m_id(id),
     m_view(view),
     m_referenceCoordinate(referenceCoordinate),
     m_pitch(pitch),
+    m_unitCenter(unitCenter),
+    m_unitSize(unitSize),
     m_readoutChannels(readoutChannels)
 {
 }
