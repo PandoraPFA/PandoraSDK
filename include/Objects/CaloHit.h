@@ -194,6 +194,13 @@ public:
     bool IsIsolated() const;
 
     /**
+     *  @brief  Whether the calo hit is flagged as possible beam-induced background
+     *
+     *  @return boolean
+     */
+    bool IsPossibleBIB() const;
+
+    /**
      *  @brief  Get the calo hit weight, which may not be unity if the hit has been fragmented
      * 
      *  @return the calo hit weight
@@ -337,6 +344,7 @@ protected:
     float                   m_weight;                   ///< The calo hit weight, which may not be unity if the hit has been fragmented
     MCParticleWeightMap     m_mcParticleWeightMap;      ///< The mc particle weight map
     const void             *m_pParentAddress;           ///< The address of the parent calo hit in the user framework
+    bool                    m_isPossibleBIB;            ///< Whether the calo hit is possible beam-induced background (kept last to preserve member offsets for code built against unpatched headers)
 
     friend class CaloHitMetadata;
     friend class CaloHitManager;
@@ -518,6 +526,13 @@ inline float CaloHit::GetWeight() const
 inline bool CaloHit::IsIsolated() const
 {
     return m_isIsolated;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+inline bool CaloHit::IsPossibleBIB() const
+{
+    return m_isPossibleBIB;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
