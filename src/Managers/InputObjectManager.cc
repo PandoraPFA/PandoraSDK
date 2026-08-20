@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Managers/InputObjectManager.cc
- * 
+ *
  *  @brief  Implementation of the input object manager class.
- * 
+ *
  *  $Log: $
  */
 
@@ -57,8 +57,8 @@ template<typename T>
 StatusCode InputObjectManager<T>::CreateTemporaryListAndSetCurrent(const Algorithm *const pAlgorithm, const ObjectList &objectList,
     std::string &temporaryListName)
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, Manager<T>::CreateTemporaryListAndSetCurrent(pAlgorithm, temporaryListName));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->AddObjectsToList(temporaryListName, objectList));
+    RETURN_ON_ERROR(Manager<T>::CreateTemporaryListAndSetCurrent(pAlgorithm, temporaryListName));
+    RETURN_ON_ERROR(this->AddObjectsToList(temporaryListName, objectList));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -180,7 +180,7 @@ StatusCode InputObjectManager<T>::EraseAllContent()
 template<typename T>
 StatusCode InputObjectManager<T>::CreateInitialLists()
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, Manager<T>::CreateInitialLists());
+    RETURN_ON_ERROR(Manager<T>::CreateInitialLists());
     Manager<T>::m_nameToListMap[m_inputListName] = new ObjectList;
     Manager<T>::m_savedLists.insert(m_inputListName);
 

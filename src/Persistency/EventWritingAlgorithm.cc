@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Persistency/EventWritingAlgorithm.cc
- * 
+ *
  *  @brief  Implementation of the event writing algorithm class.
- * 
+ *
  *  $Log: $
  */
 
@@ -45,12 +45,12 @@ StatusCode EventWritingAlgorithm::Initialize()
         if (BINARY == m_geometryFileType)
         {
             BinaryFileWriter geometryFileWriter(this->GetPandora(), m_geometryFileName, fileMode);
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, geometryFileWriter.WriteGeometry());
+            RETURN_ON_ERROR(geometryFileWriter.WriteGeometry());
         }
         else if (XML == m_geometryFileType)
         {
             XmlFileWriter geometryFileWriter(this->GetPandora(), m_geometryFileName, fileMode);
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, geometryFileWriter.WriteGeometry());
+            RETURN_ON_ERROR(geometryFileWriter.WriteGeometry());
         }
         else
         {
@@ -86,15 +86,15 @@ StatusCode EventWritingAlgorithm::Run()
     if (m_pEventFileWriter && m_shouldWriteEvents)
     {
         const CaloHitList *pCaloHitList(nullptr);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pCaloHitList));
+        RETURN_ON_ERROR(PandoraContentApi::GetCurrentList(*this, pCaloHitList));
 
         const TrackList *pTrackList(nullptr);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pTrackList));
+        RETURN_ON_ERROR(PandoraContentApi::GetCurrentList(*this, pTrackList));
 
         const MCParticleList *pMCParticleList(nullptr);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::GetCurrentList(*this, pMCParticleList));
+        RETURN_ON_ERROR(PandoraContentApi::GetCurrentList(*this, pMCParticleList));
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pEventFileWriter->WriteEvent(*pCaloHitList, *pTrackList, *pMCParticleList,
+        RETURN_ON_ERROR(m_pEventFileWriter->WriteEvent(*pCaloHitList, *pTrackList, *pMCParticleList,
             m_shouldWriteMCRelationships, m_shouldWriteTrackRelationships));
     }
 
@@ -105,12 +105,12 @@ StatusCode EventWritingAlgorithm::Run()
 
 StatusCode EventWritingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
 {
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "ShouldWriteGeometry", m_shouldWriteGeometry));
+    RETURN_ON_ERROR_EXCEPT(XmlHelper::ReadValue(xmlHandle,
+        "ShouldWriteGeometry", m_shouldWriteGeometry), STATUS_CODE_NOT_FOUND);
 
     if (m_shouldWriteGeometry)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        RETURN_ON_ERROR(XmlHelper::ReadValue(xmlHandle,
             "GeometryFileName", m_geometryFileName));
 
         std::string fileExtension(m_geometryFileName.substr(m_geometryFileName.find_last_of(".")));
@@ -131,12 +131,12 @@ StatusCode EventWritingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
         }
     }
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "ShouldWriteEvents", m_shouldWriteEvents));
+    RETURN_ON_ERROR_EXCEPT(XmlHelper::ReadValue(xmlHandle,
+        "ShouldWriteEvents", m_shouldWriteEvents), STATUS_CODE_NOT_FOUND);
 
     if (m_shouldWriteEvents)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle,
+        RETURN_ON_ERROR(XmlHelper::ReadValue(xmlHandle,
             "EventFileName", m_eventFileName));
 
         std::string fileExtension(m_eventFileName.substr(m_eventFileName.find_last_of(".")));
@@ -157,17 +157,17 @@ StatusCode EventWritingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
         }
     }
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "ShouldOverwriteEventFile", m_shouldOverwriteEventFile));
+    RETURN_ON_ERROR_EXCEPT(XmlHelper::ReadValue(xmlHandle,
+        "ShouldOverwriteEventFile", m_shouldOverwriteEventFile), STATUS_CODE_NOT_FOUND);
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "ShouldOverwriteGeometryFile", m_shouldOverwriteGeometryFile));
+    RETURN_ON_ERROR_EXCEPT(XmlHelper::ReadValue(xmlHandle,
+        "ShouldOverwriteGeometryFile", m_shouldOverwriteGeometryFile), STATUS_CODE_NOT_FOUND);
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "ShouldWriteMCRelationships", m_shouldWriteMCRelationships));
+    RETURN_ON_ERROR_EXCEPT(XmlHelper::ReadValue(xmlHandle,
+        "ShouldWriteMCRelationships", m_shouldWriteMCRelationships), STATUS_CODE_NOT_FOUND);
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "ShouldWriteTrackRelationships", m_shouldWriteTrackRelationships));
+    RETURN_ON_ERROR_EXCEPT(XmlHelper::ReadValue(xmlHandle,
+        "ShouldWriteTrackRelationships", m_shouldWriteTrackRelationships), STATUS_CODE_NOT_FOUND);
 
     return STATUS_CODE_SUCCESS;
 }

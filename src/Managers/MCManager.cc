@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Managers/MCManager.cc
- * 
+ *
  *  @brief  Implementation of the mc manager class.
- * 
+ *
  *  $Log: $
  */
 
@@ -25,7 +25,7 @@ MCManager::MCManager(const Pandora *const pPandora) :
     InputObjectManager<MCParticle>(pPandora),
     m_selectedListName("Selected")
 {
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateInitialLists());
+    THROW_ON_ERROR(this->CreateInitialLists());
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ StatusCode MCManager::Create(const object_creation::MCParticle::Parameters &para
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pMCParticle));
+        THROW_ON_ERROR(factory.Create(parameters, pMCParticle));
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(m_inputListName);
 
@@ -101,7 +101,7 @@ StatusCode MCManager::IdentifyPfoTargets()
         MCParticleSet mcPfoSet;
 
         if (pMCParticle->IsRootParticle())
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ApplyPfoSelectionRules(pMCParticle, mcPfoSet));
+            RETURN_ON_ERROR(this->ApplyPfoSelectionRules(pMCParticle, mcPfoSet));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -137,7 +137,7 @@ StatusCode MCManager::SelectPfoTargets()
 
         if (!isPfoTarget && shouldCollapseMCParticlesToPfoTarget)
         {
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->RemoveMCParticleRelationships(pMCParticle));
+            RETURN_ON_ERROR(this->RemoveMCParticleRelationships(pMCParticle));
         }
 
         if (isPfoTarget || !shouldCollapseMCParticlesToPfoTarget)
@@ -147,7 +147,7 @@ StatusCode MCManager::SelectPfoTargets()
     }
 
     // Save selected pfo target list
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SaveList(m_selectedListName, selectedMCPfoList));
+    RETURN_ON_ERROR(this->SaveList(m_selectedListName, selectedMCPfoList));
     m_currentListName = m_selectedListName;
 
     return STATUS_CODE_SUCCESS;
@@ -170,14 +170,14 @@ StatusCode MCManager::ApplyPfoSelectionRules(const MCParticle *const pMCParticle
         (pMCParticle->GetMomentum().GetMagnitude() > selectionMomentum) &&
         !((particleId == PROTON || particleId == NEUTRON) && (pMCParticle->GetEnergy() < selectionEnergyCutOffProtonsNeutrons)))
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTargetInTree(pMCParticle, pMCParticle, true));
+        RETURN_ON_ERROR(this->SetPfoTargetInTree(pMCParticle, pMCParticle, true));
         mcPfoSet.insert(pMCParticle);
     }
     else
     {
         for (const MCParticle *const pDaughterMCParticle : pMCParticle->GetDaughterList())
         {
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ApplyPfoSelectionRules(pDaughterMCParticle, mcPfoSet));
+            RETURN_ON_ERROR(this->ApplyPfoSelectionRules(pDaughterMCParticle, mcPfoSet));
         }
     }
 
@@ -191,18 +191,18 @@ StatusCode MCManager::SetPfoTargetInTree(const MCParticle *const pMCParticle, co
     if (pMCParticle->IsPfoTargetSet())
         return STATUS_CODE_SUCCESS;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pMCParticle)->SetPfoTarget(pPfoTarget));
+    RETURN_ON_ERROR(this->Modifiable(pMCParticle)->SetPfoTarget(pPfoTarget));
 
     for (const MCParticle *const pDaughterMCParticle : pMCParticle->GetDaughterList())
     {
-       PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTargetInTree(pDaughterMCParticle, pPfoTarget));
+       RETURN_ON_ERROR(this->SetPfoTargetInTree(pDaughterMCParticle, pPfoTarget));
     }
 
     if (!onlyDaughters)
     {
         for (const MCParticle *const pParentMCParticle : pMCParticle->GetParentList())
         {
-            PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->SetPfoTargetInTree(pParentMCParticle, pPfoTarget));
+            RETURN_ON_ERROR(this->SetPfoTargetInTree(pParentMCParticle, pPfoTarget));
         }
     }
 
@@ -217,7 +217,7 @@ StatusCode MCManager::AddMCParticleRelationships() const
         return STATUS_CODE_SUCCESS;
 
     const MCParticleList *pInputList(nullptr);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetList(m_inputListName, pInputList));
+    RETURN_ON_ERROR(this->GetList(m_inputListName, pInputList));
 
     for (const MCParticle *const pParentMCParticle : *pInputList)
     {
@@ -277,16 +277,16 @@ StatusCode MCManager::RemoveMCParticleRelationships(const MCParticle *const pMCP
 
     for (const MCParticle *const pParentMCParticle : parentList)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pParentMCParticle)->RemoveDaughter(pMCParticle));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pMCParticle)->RemoveParent(pParentMCParticle));
+        RETURN_ON_ERROR(this->Modifiable(pParentMCParticle)->RemoveDaughter(pMCParticle));
+        RETURN_ON_ERROR(this->Modifiable(pMCParticle)->RemoveParent(pParentMCParticle));
     }
 
     const MCParticleList daughterList(pMCParticle->GetDaughterList());
 
     for (const MCParticle *const pDaughterMCParticle : daughterList)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pDaughterMCParticle)->RemoveParent(pMCParticle));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pMCParticle)->RemoveDaughter(pDaughterMCParticle));
+        RETURN_ON_ERROR(this->Modifiable(pDaughterMCParticle)->RemoveParent(pMCParticle));
+        RETURN_ON_ERROR(this->Modifiable(pMCParticle)->RemoveDaughter(pDaughterMCParticle));
     }
 
     return this->Modifiable(pMCParticle)->RemovePfoTarget();

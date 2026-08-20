@@ -179,9 +179,9 @@ template <>
 inline StatusCode BinaryFileReader::ReadVariable(CartesianVector &t)
 {
     float x, y, z;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(x));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(y));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(z));
+    RETURN_ON_ERROR(this->ReadVariable(x));
+    RETURN_ON_ERROR(this->ReadVariable(y));
+    RETURN_ON_ERROR(this->ReadVariable(z));
     t = CartesianVector(x, y, z);
 
     return STATUS_CODE_SUCCESS;
@@ -191,8 +191,8 @@ template <>
 inline StatusCode BinaryFileReader::ReadVariable(TrackState &t)
 {
     CartesianVector position(0.f, 0.f, 0.f), momentum(0.f, 0.f, 0.f);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(position));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(momentum));
+    RETURN_ON_ERROR(this->ReadVariable(position));
+    RETURN_ON_ERROR(this->ReadVariable(momentum));
     t = TrackState(position, momentum);
 
     return STATUS_CODE_SUCCESS;

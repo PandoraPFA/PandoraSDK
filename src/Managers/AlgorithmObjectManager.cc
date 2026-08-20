@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Managers/AlgorithmObjectManager.cc
- * 
+ *
  *  @brief  Implementation of the algorithm object manager class.
- * 
+ *
  *  $Log: $
  */
 
@@ -49,8 +49,8 @@ StatusCode AlgorithmObjectManager<T>::MoveObjectsToTemporaryListAndSetCurrent(co
     if (objectsToMove.empty())
         return STATUS_CODE_NOT_INITIALIZED;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateTemporaryListAndSetCurrent(pAlgorithm, temporaryListName));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->MoveObjectsBetweenLists(temporaryListName, originalListName, &objectsToMove));
+    RETURN_ON_ERROR(this->CreateTemporaryListAndSetCurrent(pAlgorithm, temporaryListName));
+    RETURN_ON_ERROR(this->MoveObjectsBetweenLists(temporaryListName, originalListName, &objectsToMove));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -304,7 +304,7 @@ template<typename T>
 StatusCode AlgorithmObjectManager<T>::ResetAlgorithmInfo(const Algorithm *const pAlgorithm, bool isAlgorithmFinished)
 {
     ObjectList objectList;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->GetResetDeletionObjects(pAlgorithm, objectList));
+    RETURN_ON_ERROR(this->GetResetDeletionObjects(pAlgorithm, objectList));
 
     for (const T *const pT : objectList)
         delete pT;

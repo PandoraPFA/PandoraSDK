@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Objects/ParticleFlowObject.cc
- * 
+ *
  *  @brief  Implementation of the particle flow object class.
- * 
+ *
  *  $Log: $
  */
 
@@ -42,7 +42,7 @@ ParticleFlowObject::~ParticleFlowObject()
 StatusCode ParticleFlowObject::AlterMetadata(const object_creation::ParticleFlowObject::Metadata &metadata)
 {
     if (!metadata.m_propertiesToAdd.empty() || !metadata.m_propertiesToRemove.empty())
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->UpdatePropertiesMap(metadata));
+        RETURN_ON_ERROR(this->UpdatePropertiesMap(metadata));
 
     if (metadata.m_particleId.IsInitialized())
         m_particleId = metadata.m_particleId.Get();
@@ -87,7 +87,7 @@ ClusterAddressList ParticleFlowObject::GetClusterAddressList() const
         CaloHitAddressList caloHitAddressList;
 
         OrderedCaloHitList orderedCaloHitList(pCluster->GetOrderedCaloHitList());
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, orderedCaloHitList.Add(pCluster->GetIsolatedCaloHitList()));
+        THROW_ON_ERROR(orderedCaloHitList.Add(pCluster->GetIsolatedCaloHitList()));
 
         for (const OrderedCaloHitList::value_type &layerEntry : orderedCaloHitList)
         {

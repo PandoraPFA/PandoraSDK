@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Managers/VertexManager.cc
- * 
+ *
  *  @brief  Implementation of the vertex manager class.
- * 
+ *
  *  $Log: $
  */
 
@@ -20,7 +20,7 @@ namespace pandora
 VertexManager::VertexManager(const Pandora *const pPandora) :
     AlgorithmObjectManager<Vertex>(pPandora)
 {
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateInitialLists());
+    THROW_ON_ERROR(this->CreateInitialLists());
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ StatusCode VertexManager::Create(const object_creation::Vertex::Parameters &para
         if (m_nameToListMap.end() == iter)
              throw StatusCodeException(STATUS_CODE_NOT_INITIALIZED);
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pVertex));
+        THROW_ON_ERROR(factory.Create(parameters, pVertex));
 
         if (!pVertex)
              throw StatusCodeException(STATUS_CODE_FAILURE);

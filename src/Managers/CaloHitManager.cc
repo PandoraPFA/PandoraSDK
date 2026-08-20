@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Managers/CaloHitManager.cc
- * 
+ *
  *  @brief  Implementation of the calo hit manager class.
- * 
+ *
  *  $Log: $
  */
 
@@ -29,7 +29,7 @@ CaloHitManager::CaloHitManager(const Pandora *const pPandora) :
     m_nReclusteringProcesses(0),
     m_pCurrentReclusterMetadata(nullptr)
 {
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateInitialLists());
+    THROW_ON_ERROR(this->CreateInitialLists());
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -48,7 +48,7 @@ StatusCode CaloHitManager::Create(const object_creation::CaloHit::Parameters &pa
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pCaloHit));
+        THROW_ON_ERROR(factory.Create(parameters, pCaloHit));
 
         NameToListMap::iterator inputIter = m_nameToListMap.find(m_inputListName);
 
@@ -59,7 +59,7 @@ StatusCode CaloHitManager::Create(const object_creation::CaloHit::Parameters &pa
         const unsigned int pseudoLayer(m_pPandora->GetPlugins()->HasPseudoLayerPlugin() ?
             m_pPandora->GetPlugins()->GetPseudoLayerPlugin()->GetPseudoLayer(pCaloHit->GetPositionVector()) : 0);
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Modifiable(pCaloHit)->SetPseudoLayer(pseudoLayer));
+        THROW_ON_ERROR(this->Modifiable(pCaloHit)->SetPseudoLayer(pseudoLayer));
 
         inputIter->second->push_back(pCaloHit);
         return STATUS_CODE_SUCCESS;
@@ -221,12 +221,12 @@ StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit
     object_creation::CaloHitFragment::Parameters parameters1;
     parameters1.m_pOriginalCaloHit = pOriginalCaloHit;
     parameters1.m_weight = fraction1;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters1, pDaughterCaloHit1));
+    RETURN_ON_ERROR(factory.Create(parameters1, pDaughterCaloHit1));
 
     object_creation::CaloHitFragment::Parameters parameters2;
     parameters2.m_pOriginalCaloHit = pOriginalCaloHit;
     parameters2.m_weight = 1.f - fraction1;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters2, pDaughterCaloHit2));
+    RETURN_ON_ERROR(factory.Create(parameters2, pDaughterCaloHit2));
 
     if (!pDaughterCaloHit1 || !pDaughterCaloHit2)
         return STATUS_CODE_FAILURE;
@@ -237,11 +237,11 @@ StatusCode CaloHitManager::FragmentCaloHit(const CaloHit *const pOriginalCaloHit
 
     if (m_nReclusteringProcesses > 0)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->Update(caloHitReplacement));
+        RETURN_ON_ERROR(m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->Update(caloHitReplacement));
     }
     else
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Update(caloHitReplacement));
+        RETURN_ON_ERROR(this->Update(caloHitReplacement));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -262,7 +262,7 @@ StatusCode CaloHitManager::MergeCaloHitFragments(const CaloHit *const pFragmentC
     object_creation::CaloHitFragment::Parameters parameters;
     parameters.m_pOriginalCaloHit = pFragmentCaloHit1;
     parameters.m_weight = newWeight;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pMergedCaloHit));
+    RETURN_ON_ERROR(factory.Create(parameters, pMergedCaloHit));
 
     if (!pMergedCaloHit)
         return STATUS_CODE_FAILURE;
@@ -273,11 +273,11 @@ StatusCode CaloHitManager::MergeCaloHitFragments(const CaloHit *const pFragmentC
 
     if (m_nReclusteringProcesses > 0)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->Update(caloHitReplacement));
+        RETURN_ON_ERROR(m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata()->Update(caloHitReplacement));
     }
     else
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Update(caloHitReplacement));
+        RETURN_ON_ERROR(this->Update(caloHitReplacement));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -337,13 +337,13 @@ StatusCode CaloHitManager::InitializeReclustering(const Algorithm *const pAlgori
     const std::string &originalReclusterListName)
 {
     std::string caloHitListName;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->CreateTemporaryListAndSetCurrent(pAlgorithm, clusterList, caloHitListName));
+    RETURN_ON_ERROR(this->CreateTemporaryListAndSetCurrent(pAlgorithm, clusterList, caloHitListName));
     CaloHitList *const pCaloHitList = m_nameToListMap[caloHitListName];
 
     m_pCurrentReclusterMetadata = new ReclusterMetadata(pCaloHitList);
     m_reclusterMetadataList.push_back(m_pCurrentReclusterMetadata);
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCurrentReclusterMetadata->CreateCaloHitMetadata(pCaloHitList, caloHitListName,
+    RETURN_ON_ERROR(m_pCurrentReclusterMetadata->CreateCaloHitMetadata(pCaloHitList, caloHitListName,
         originalReclusterListName, false));
 
     ++m_nReclusteringProcesses;
@@ -361,11 +361,11 @@ StatusCode CaloHitManager::PrepareForClustering(const Algorithm *const pAlgorith
     const CaloHitList &caloHitList(m_pCurrentReclusterMetadata->GetCaloHitList());
 
     std::string caloHitListName;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, InputObjectManager<CaloHit>::CreateTemporaryListAndSetCurrent(pAlgorithm, caloHitList,
+    RETURN_ON_ERROR(InputObjectManager<CaloHit>::CreateTemporaryListAndSetCurrent(pAlgorithm, caloHitList,
         caloHitListName));
     CaloHitList *const pCaloHitList = m_nameToListMap[caloHitListName];
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCurrentReclusterMetadata->CreateCaloHitMetadata(pCaloHitList, caloHitListName,
+    RETURN_ON_ERROR(m_pCurrentReclusterMetadata->CreateCaloHitMetadata(pCaloHitList, caloHitListName,
         newReclusterListName, true));
 
     return STATUS_CODE_SUCCESS;
@@ -379,7 +379,7 @@ StatusCode CaloHitManager::EndReclustering(const Algorithm *const /*const pAlgor
         return STATUS_CODE_SUCCESS;
 
     CaloHitMetadata *pSelectedCaloHitMetaData(nullptr);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCurrentReclusterMetadata->ExtractCaloHitMetadata(selectedReclusterListName,
+    RETURN_ON_ERROR(m_pCurrentReclusterMetadata->ExtractCaloHitMetadata(selectedReclusterListName,
         pSelectedCaloHitMetaData));
 
     m_reclusterMetadataList.pop_back();
@@ -389,12 +389,12 @@ StatusCode CaloHitManager::EndReclustering(const Algorithm *const /*const pAlgor
     {
         m_pCurrentReclusterMetadata = m_reclusterMetadataList.back();
         CaloHitMetadata *const pCurrentCaloHitMetaData = m_pCurrentReclusterMetadata->GetCurrentCaloHitMetadata();
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, pCurrentCaloHitMetaData->Update(*pSelectedCaloHitMetaData));
+        RETURN_ON_ERROR(pCurrentCaloHitMetaData->Update(*pSelectedCaloHitMetaData));
     }
     else
     {
         m_pCurrentReclusterMetadata = nullptr;
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Update(*pSelectedCaloHitMetaData));
+        RETURN_ON_ERROR(this->Update(*pSelectedCaloHitMetaData));
     }
 
     pSelectedCaloHitMetaData->Clear();
@@ -411,7 +411,7 @@ StatusCode CaloHitManager::Update(const CaloHitMetadata &caloHitMetadata)
 
     for (const CaloHitReplacement *const pCaloHitReplacement : caloHitReplacementList)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Update(*pCaloHitReplacement));
+        RETURN_ON_ERROR(this->Update(*pCaloHitReplacement));
     }
 
     const CaloHitUsageMap &caloHitUsageMap(caloHitMetadata.GetCaloHitUsageMap());
@@ -434,7 +434,7 @@ StatusCode CaloHitManager::Update(const CaloHitReplacement &caloHitReplacement)
 {
     for (const NameToListMap::value_type &mapEntry : m_nameToListMap)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Update(mapEntry.second, caloHitReplacement));
+        RETURN_ON_ERROR(this->Update(mapEntry.second, caloHitReplacement));
     }
 
     for (const CaloHit *const pCaloHit : caloHitReplacement.m_oldCaloHits)

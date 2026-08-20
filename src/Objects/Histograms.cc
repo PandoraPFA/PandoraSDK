@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Objects/Histograms.cc
- * 
+ *
  *  @brief  Implementation of histogram classes.
- * 
+ *
  *  $Log: $
  */
 
@@ -51,9 +51,9 @@ Histogram::Histogram(const TiXmlHandle *const pXmlHandle, const std::string &xml
     }
 
     const TiXmlHandle xmlHandle(pXmlElement);
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "NBinsX", m_nBinsX));
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "XLow", m_xLow));
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "XHigh", m_xHigh));
+    THROW_ON_ERROR(XmlHelper::ReadValue(xmlHandle, "NBinsX", m_nBinsX));
+    THROW_ON_ERROR(XmlHelper::ReadValue(xmlHandle, "XLow", m_xLow));
+    THROW_ON_ERROR(XmlHelper::ReadValue(xmlHandle, "XHigh", m_xHigh));
 
     if ((0 >= m_nBinsX) || (m_xHigh - m_xLow < std::numeric_limits<float>::epsilon()))
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
@@ -61,7 +61,7 @@ Histogram::Histogram(const TiXmlHandle *const pXmlHandle, const std::string &xml
     m_xBinWidth = (m_xHigh - m_xLow) / static_cast<float>(m_nBinsX);
 
     FloatVector orderedBinContents;
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadVectorOfValues(xmlHandle, "BinContents", orderedBinContents));
+    THROW_ON_ERROR(XmlHelper::ReadVectorOfValues(xmlHandle, "BinContents", orderedBinContents));
 
     if (orderedBinContents.size() != static_cast<unsigned int>(m_nBinsX) + 2)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
@@ -329,18 +329,18 @@ TwoDHistogram::TwoDHistogram(const TiXmlHandle *const pXmlHandle, const std::str
     }
 
     const TiXmlHandle xmlHandle(pXmlElement);
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "NBinsX", m_nBinsX));
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "XLow", m_xLow));
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "XHigh", m_xHigh));
+    THROW_ON_ERROR(XmlHelper::ReadValue(xmlHandle, "NBinsX", m_nBinsX));
+    THROW_ON_ERROR(XmlHelper::ReadValue(xmlHandle, "XLow", m_xLow));
+    THROW_ON_ERROR(XmlHelper::ReadValue(xmlHandle, "XHigh", m_xHigh));
 
     if ((0 >= m_nBinsX) || (m_xHigh - m_xLow < std::numeric_limits<float>::epsilon()))
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
 
     m_xBinWidth = (m_xHigh - m_xLow) / static_cast<float>(m_nBinsX);
 
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "NBinsY", m_nBinsY));
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "YLow", m_yLow));
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::ReadValue(xmlHandle, "YHigh", m_yHigh));
+    THROW_ON_ERROR(XmlHelper::ReadValue(xmlHandle, "NBinsY", m_nBinsY));
+    THROW_ON_ERROR(XmlHelper::ReadValue(xmlHandle, "YLow", m_yLow));
+    THROW_ON_ERROR(XmlHelper::ReadValue(xmlHandle, "YHigh", m_yHigh));
 
     if ((0 >= m_nBinsY) || (m_yHigh - m_yLow < std::numeric_limits<float>::epsilon()))
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
@@ -349,7 +349,7 @@ TwoDHistogram::TwoDHistogram(const TiXmlHandle *const pXmlHandle, const std::str
 
     typedef std::vector<FloatVector> HistogramEntryList;
     HistogramEntryList histogramEntryList;
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, XmlHelper::Read2DVectorOfValues(xmlHandle, "BinContents", "Row", histogramEntryList));
+    THROW_ON_ERROR(XmlHelper::Read2DVectorOfValues(xmlHandle, "BinContents", "Row", histogramEntryList));
 
     if (histogramEntryList.size() != static_cast<unsigned int>(m_nBinsY) + 2)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
