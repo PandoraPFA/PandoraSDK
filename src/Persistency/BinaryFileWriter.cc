@@ -63,12 +63,12 @@ BinaryFileWriter::~BinaryFileWriter()
 
 StatusCode BinaryFileWriter::WriteHeader(const ContainerId containerId)
 {
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(PANDORA_FILE_HASH));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(containerId));
+    RETURN_ON_ERROR(this->WriteVariable(PANDORA_FILE_HASH));
+    RETURN_ON_ERROR(this->WriteVariable(containerId));
 
     m_containerPosition = m_fileStream.tellp();
     const std::ofstream::pos_type dummyContainerSize(0);
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(dummyContainerSize));
+    RETURN_ON_ERROR(this->WriteVariable(dummyContainerSize));
 
     m_containerId = containerId;
 
@@ -82,8 +82,7 @@ StatusCode BinaryFileWriter::WriteFooter()
     if ((HEADER_CONTAINER != m_containerId) && (EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-        this->WriteVariable((HEADER_CONTAINER == m_containerId) ? HEADER_END_COMPONENT
+    RETURN_ON_ERROR(this->WriteVariable((HEADER_CONTAINER == m_containerId) ? HEADER_END_COMPONENT
                 : (EVENT_CONTAINER == m_containerId)            ? EVENT_END_COMPONENT
                                                                 : GEOMETRY_END_COMPONENT));
 
@@ -95,7 +94,7 @@ StatusCode BinaryFileWriter::WriteFooter()
     if (!m_fileStream.good())
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(containerSize));
+    RETURN_ON_ERROR(this->WriteVariable(containerSize));
     m_fileStream.seekp(0, std::ios::end);
 
     if (!m_fileStream.good())
@@ -113,9 +112,9 @@ StatusCode BinaryFileWriter::WriteVersion()
     if (HEADER_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(VERSION_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(m_fileMajorVersion));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(m_fileMinorVersion));
+    RETURN_ON_ERROR(this->WriteVariable(VERSION_COMPONENT));
+    RETURN_ON_ERROR(this->WriteVariable(m_fileMajorVersion));
+    RETURN_ON_ERROR(this->WriteVariable(m_fileMinorVersion));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -127,20 +126,20 @@ StatusCode BinaryFileWriter::WriteSubDetector(const SubDetector *const pSubDetec
     if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(SUB_DETECTOR_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pSubDetectorFactory->Write(pSubDetector, *this));
+    RETURN_ON_ERROR(this->WriteVariable(SUB_DETECTOR_COMPONENT));
+    RETURN_ON_ERROR(m_pSubDetectorFactory->Write(pSubDetector, *this));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetSubDetectorName()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetSubDetectorType()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetInnerRCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetInnerZCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetInnerPhiCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetInnerSymmetryOrder()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetOuterRCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetOuterZCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetOuterPhiCoordinate()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->GetOuterSymmetryOrder()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pSubDetector->IsMirroredInZ()));
+    RETURN_ON_ERROR(this->WriteVariable(pSubDetector->GetSubDetectorName()));
+    RETURN_ON_ERROR(this->WriteVariable(pSubDetector->GetSubDetectorType()));
+    RETURN_ON_ERROR(this->WriteVariable(pSubDetector->GetInnerRCoordinate()));
+    RETURN_ON_ERROR(this->WriteVariable(pSubDetector->GetInnerZCoordinate()));
+    RETURN_ON_ERROR(this->WriteVariable(pSubDetector->GetInnerPhiCoordinate()));
+    RETURN_ON_ERROR(this->WriteVariable(pSubDetector->GetInnerSymmetryOrder()));
+    RETURN_ON_ERROR(this->WriteVariable(pSubDetector->GetOuterRCoordinate()));
+    RETURN_ON_ERROR(this->WriteVariable(pSubDetector->GetOuterZCoordinate()));
+    RETURN_ON_ERROR(this->WriteVariable(pSubDetector->GetOuterPhiCoordinate()));
+    RETURN_ON_ERROR(this->WriteVariable(pSubDetector->GetOuterSymmetryOrder()));
+    RETURN_ON_ERROR(this->WriteVariable(pSubDetector->IsMirroredInZ()));
 
     const unsigned int nLayers(pSubDetector->GetNLayers());
     const SubDetector::SubDetectorLayerVector &subDetectorLayerVector(pSubDetector->GetSubDetectorLayerVector());
@@ -148,13 +147,13 @@ StatusCode BinaryFileWriter::WriteSubDetector(const SubDetector *const pSubDetec
     if (subDetectorLayerVector.size() != nLayers)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(nLayers));
+    RETURN_ON_ERROR(this->WriteVariable(nLayers));
 
     for (unsigned int iLayer = 0; iLayer < nLayers; ++iLayer)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerVector.at(iLayer).GetClosestDistanceToIp()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerVector.at(iLayer).GetNRadiationLengths()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(subDetectorLayerVector.at(iLayer).GetNInteractionLengths()));
+        RETURN_ON_ERROR(this->WriteVariable(subDetectorLayerVector.at(iLayer).GetClosestDistanceToIp()));
+        RETURN_ON_ERROR(this->WriteVariable(subDetectorLayerVector.at(iLayer).GetNRadiationLengths()));
+        RETURN_ON_ERROR(this->WriteVariable(subDetectorLayerVector.at(iLayer).GetNInteractionLengths()));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -167,24 +166,24 @@ StatusCode BinaryFileWriter::WriteLArTPC(const LArTPC *const pLArTPC)
     if (GEOMETRY_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(LAR_TPC_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Write(pLArTPC, *this));
+    RETURN_ON_ERROR(this->WriteVariable(LAR_TPC_COMPONENT));
+    RETURN_ON_ERROR(m_pLArTPCFactory->Write(pLArTPC, *this));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetLArTPCVolumeId()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetCenterX()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetCenterY()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetCenterZ()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWidthX()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWidthY()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWidthZ()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWirePitchU()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWirePitchV()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWirePitchW()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWireAngleU()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWireAngleV()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetWireAngleW()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->GetSigmaUVW()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLArTPC->IsDriftInPositiveX()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetLArTPCVolumeId()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetCenterX()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetCenterY()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetCenterZ()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetWidthX()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetWidthY()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetWidthZ()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetWirePitchU()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetWirePitchV()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetWirePitchW()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetWireAngleU()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetWireAngleV()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetWireAngleW()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->GetSigmaUVW()));
+    RETURN_ON_ERROR(this->WriteVariable(pLArTPC->IsDriftInPositiveX()));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -207,38 +206,38 @@ StatusCode BinaryFileWriter::WriteDetectorGap(const DetectorGap *const pDetector
 
     if (nullptr != pLineGap)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(LINE_GAP_COMPONENT));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Write(pLineGap, *this));
+        RETURN_ON_ERROR(this->WriteVariable(LINE_GAP_COMPONENT));
+        RETURN_ON_ERROR(m_pLineGapFactory->Write(pLineGap, *this));
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineGapType()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineStartX()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineEndX()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineStartZ()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pLineGap->GetLineEndZ()));
+        RETURN_ON_ERROR(this->WriteVariable(pLineGap->GetLineGapType()));
+        RETURN_ON_ERROR(this->WriteVariable(pLineGap->GetLineStartX()));
+        RETURN_ON_ERROR(this->WriteVariable(pLineGap->GetLineEndX()));
+        RETURN_ON_ERROR(this->WriteVariable(pLineGap->GetLineStartZ()));
+        RETURN_ON_ERROR(this->WriteVariable(pLineGap->GetLineEndZ()));
     }
     else if (nullptr != pBoxGap)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(BOX_GAP_COMPONENT));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pBoxGapFactory->Write(pBoxGap, *this));
+        RETURN_ON_ERROR(this->WriteVariable(BOX_GAP_COMPONENT));
+        RETURN_ON_ERROR(m_pBoxGapFactory->Write(pBoxGap, *this));
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetVertex()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide1()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide2()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pBoxGap->GetSide3()));
+        RETURN_ON_ERROR(this->WriteVariable(pBoxGap->GetVertex()));
+        RETURN_ON_ERROR(this->WriteVariable(pBoxGap->GetSide1()));
+        RETURN_ON_ERROR(this->WriteVariable(pBoxGap->GetSide2()));
+        RETURN_ON_ERROR(this->WriteVariable(pBoxGap->GetSide3()));
     }
     else if (nullptr != pConcentricGap)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(CONCENTRIC_GAP_COMPONENT));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pConcentricGapFactory->Write(pConcentricGap, *this));
+        RETURN_ON_ERROR(this->WriteVariable(CONCENTRIC_GAP_COMPONENT));
+        RETURN_ON_ERROR(m_pConcentricGapFactory->Write(pConcentricGap, *this));
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetMinZCoordinate()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetMaxZCoordinate()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetInnerRCoordinate()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetInnerPhiCoordinate()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetInnerSymmetryOrder()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetOuterRCoordinate()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetOuterPhiCoordinate()));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pConcentricGap->GetOuterSymmetryOrder()));
+        RETURN_ON_ERROR(this->WriteVariable(pConcentricGap->GetMinZCoordinate()));
+        RETURN_ON_ERROR(this->WriteVariable(pConcentricGap->GetMaxZCoordinate()));
+        RETURN_ON_ERROR(this->WriteVariable(pConcentricGap->GetInnerRCoordinate()));
+        RETURN_ON_ERROR(this->WriteVariable(pConcentricGap->GetInnerPhiCoordinate()));
+        RETURN_ON_ERROR(this->WriteVariable(pConcentricGap->GetInnerSymmetryOrder()));
+        RETURN_ON_ERROR(this->WriteVariable(pConcentricGap->GetOuterRCoordinate()));
+        RETURN_ON_ERROR(this->WriteVariable(pConcentricGap->GetOuterPhiCoordinate()));
+        RETURN_ON_ERROR(this->WriteVariable(pConcentricGap->GetOuterSymmetryOrder()));
     }
     else
     {
@@ -255,30 +254,30 @@ StatusCode BinaryFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(CALO_HIT_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Write(pCaloHit, *this));
+    RETURN_ON_ERROR(this->WriteVariable(CALO_HIT_COMPONENT));
+    RETURN_ON_ERROR(m_pCaloHitFactory->Write(pCaloHit, *this));
 
     const CellGeometry cellGeometry(pCaloHit->GetCellGeometry());
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(cellGeometry));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetPositionVector()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetExpectedDirection()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetCellNormalVector()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetCellThickness()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetNCellRadiationLengths()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetNCellInteractionLengths()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetTime()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetInputEnergy()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetMipEquivalentEnergy()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetElectromagneticEnergy()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetHadronicEnergy()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->IsDigital()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetHitType()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetHitRegion()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetLayer()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->IsInOuterSamplingLayer()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetParentAddress()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetCellSize0()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pCaloHit->GetCellSize1()));
+    RETURN_ON_ERROR(this->WriteVariable(cellGeometry));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetPositionVector()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetExpectedDirection()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetCellNormalVector()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetCellThickness()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetNCellRadiationLengths()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetNCellInteractionLengths()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetTime()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetInputEnergy()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetMipEquivalentEnergy()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetElectromagneticEnergy()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetHadronicEnergy()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->IsDigital()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetHitType()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetHitRegion()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetLayer()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->IsInOuterSamplingLayer()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetParentAddress()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetCellSize0()));
+    RETURN_ON_ERROR(this->WriteVariable(pCaloHit->GetCellSize1()));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -290,24 +289,24 @@ StatusCode BinaryFileWriter::WriteTrack(const Track *const pTrack)
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(TRACK_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pTrackFactory->Write(pTrack, *this));
+    RETURN_ON_ERROR(this->WriteVariable(TRACK_COMPONENT));
+    RETURN_ON_ERROR(m_pTrackFactory->Write(pTrack, *this));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetD0()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetZ0()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetParticleId()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetCharge()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetMass()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetMomentumAtDca()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetTrackStateAtStart()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetTrackStateAtEnd()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetTrackStateAtCalorimeter()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetTimeAtCalorimeter()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->ReachesCalorimeter()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->IsProjectedToEndCap()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->CanFormPfo()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->CanFormClusterlessPfo()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pTrack->GetParentAddress()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->GetD0()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->GetZ0()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->GetParticleId()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->GetCharge()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->GetMass()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->GetMomentumAtDca()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->GetTrackStateAtStart()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->GetTrackStateAtEnd()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->GetTrackStateAtCalorimeter()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->GetTimeAtCalorimeter()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->ReachesCalorimeter()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->IsProjectedToEndCap()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->CanFormPfo()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->CanFormClusterlessPfo()));
+    RETURN_ON_ERROR(this->WriteVariable(pTrack->GetParentAddress()));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -319,16 +318,16 @@ StatusCode BinaryFileWriter::WriteMCParticle(const MCParticle *const pMCParticle
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(MC_PARTICLE_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pMCParticleFactory->Write(pMCParticle, *this));
+    RETURN_ON_ERROR(this->WriteVariable(MC_PARTICLE_COMPONENT));
+    RETURN_ON_ERROR(m_pMCParticleFactory->Write(pMCParticle, *this));
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetEnergy()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetMomentum()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetVertex()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetEndpoint()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetParticleId()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetMCParticleType()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(pMCParticle->GetUid()));
+    RETURN_ON_ERROR(this->WriteVariable(pMCParticle->GetEnergy()));
+    RETURN_ON_ERROR(this->WriteVariable(pMCParticle->GetMomentum()));
+    RETURN_ON_ERROR(this->WriteVariable(pMCParticle->GetVertex()));
+    RETURN_ON_ERROR(this->WriteVariable(pMCParticle->GetEndpoint()));
+    RETURN_ON_ERROR(this->WriteVariable(pMCParticle->GetParticleId()));
+    RETURN_ON_ERROR(this->WriteVariable(pMCParticle->GetMCParticleType()));
+    RETURN_ON_ERROR(this->WriteVariable(pMCParticle->GetUid()));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -340,11 +339,11 @@ StatusCode BinaryFileWriter::WriteRelationship(const RelationshipId relationship
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(RELATIONSHIP_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(relationshipId));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(address1));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(address2));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(weight));
+    RETURN_ON_ERROR(this->WriteVariable(RELATIONSHIP_COMPONENT));
+    RETURN_ON_ERROR(this->WriteVariable(relationshipId));
+    RETURN_ON_ERROR(this->WriteVariable(address1));
+    RETURN_ON_ERROR(this->WriteVariable(address2));
+    RETURN_ON_ERROR(this->WriteVariable(weight));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -356,10 +355,10 @@ StatusCode BinaryFileWriter::WriteEventInformation()
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(EVENT_INFO_COMPONENT));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(m_pPandora->GetRun()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(m_pPandora->GetSubrun()));
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(m_pPandora->GetEvent()));
+    RETURN_ON_ERROR(this->WriteVariable(EVENT_INFO_COMPONENT));
+    RETURN_ON_ERROR(this->WriteVariable(m_pPandora->GetRun()));
+    RETURN_ON_ERROR(this->WriteVariable(m_pPandora->GetSubrun()));
+    RETURN_ON_ERROR(this->WriteVariable(m_pPandora->GetEvent()));
 
     return STATUS_CODE_SUCCESS;
 }

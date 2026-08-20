@@ -1,103 +1,228 @@
 /**
  *  @file   PandoraSDK/include/Pandora/StatusCodes.h
- * 
+ *
  *  @brief  Header file defining status codes and relevant preprocessor macros
- * 
+ *
  *  $Log: $
  */
 #ifndef PANDORA_STATUS_CODES_H
 #define PANDORA_STATUS_CODES_H 1
 
 #include <exception>
+#include <iostream>
 #include <string>
+#include <string_view>
 
 #if defined(__GNUC__) && defined(BACKTRACE)
     #include <cstdlib>
     #include <execinfo.h>
 #endif
 
-#define PANDORA_RETURN(StatusCode)                                                                      \
-{                                                                                                       \
-    std::cout << "    in function: " << __FUNCTION__ << std::endl;                                      \
-    std::cout << "    in file:     " << __FILE__ << " line#: " << __LINE__ << std::endl;                \
-    return StatusCode;                                                                                  \
+namespace pandora
+{
+namespace deprecation_markers
+{
+    [[deprecated("Legacy macro.")]]
+    inline void PANDORA_RETURN_is_deprecated() {}
+
+    [[deprecated("Legacy macro. Use 'RETURN_IF' instead.")]]
+    inline void PANDORA_RETURN_IF_is_deprecated() {}
+
+    [[deprecated("Legacy macro. Use 'RETURN_ON_ERROR' instead.")]]
+    inline void PANDORA_RETURN_RESULT_IF_is_deprecated() {}
+
+    [[deprecated("Legacy macro. Use 'RETURN_ON_ERROR_EXCEPT' instead.")]]
+    inline void PANDORA_RETURN_RESULT_IF_AND_IF_is_deprecated() {}
+
+    [[deprecated("Legacy macro.")]]
+    inline void PANDORA_THROW_is_deprecated() {}
+
+    [[deprecated("Legacy macro. Use 'THROW_IF' instead.")]]
+    inline void PANDORA_THROW_IF_is_deprecated() {}
+
+    [[deprecated("Legacy macro. Use 'THROW_ON_ERROR' instead.")]]
+    inline void PANDORA_THROW_RESULT_IF_is_deprecated() {}
+
+    [[deprecated("Legacy macro. Use 'THROW_ON_ERROR_EXCEPT' instead.")]]
+    inline void PANDORA_THROW_RESULT_IF_AND_IF_is_deprecated() {}
+}
 }
 
-#define PANDORA_RETURN_IF(StatusCode, Condition)                                                        \
-{                                                                                                       \
-    if (Condition)                                                                                      \
-    {                                                                                                   \
-        std::cout << #Condition << " return " << StatusCodeToString(StatusCode) << std::endl;           \
-        std::cout << "    in function: " << __FUNCTION__ << std::endl;                                  \
-        std::cout << "    in file:     " << __FILE__ << " line#: " << __LINE__ << std::endl;            \
-        return StatusCode;                                                                              \
-    }                                                                                                   \
+#if defined(__clang__)
+    #define PANDORA_LEGACY_DEPRECATION_PUSH                                                               \
+        _Pragma("clang diagnostic push")                                                                  \
+        _Pragma("clang diagnostic warning \"-Wdeprecated-declarations\"")
+    #define PANDORA_LEGACY_DEPRECATION_POP                                                                \
+        _Pragma("clang diagnostic pop")
+#elif defined(__GNUC__)
+    #define PANDORA_LEGACY_DEPRECATION_PUSH                                                               \
+        _Pragma("GCC diagnostic push")                                                                    \
+        _Pragma("GCC diagnostic warning \"-Wdeprecated-declarations\"")
+    #define PANDORA_LEGACY_DEPRECATION_POP                                                                \
+        _Pragma("GCC diagnostic pop")
+#else
+    #define PANDORA_LEGACY_DEPRECATION_PUSH
+    #define PANDORA_LEGACY_DEPRECATION_POP
+#endif
+
+#define PANDORA_LEGACY_DEPRECATION_MARK(CallExpr)                                                          \
+{                                                                                                          \
+    PANDORA_LEGACY_DEPRECATION_PUSH                                                                        \
+    CallExpr;                                                                                              \
+    PANDORA_LEGACY_DEPRECATION_POP                                                                         \
 }
 
-#define PANDORA_RETURN_RESULT_IF(StatusCode1, Operator, Command)                                        \
-{                                                                                                       \
-    const pandora::StatusCode statusCode(Command);                                                      \
-    if (statusCode Operator StatusCode1)                                                                \
-    {                                                                                                   \
-        std::cout << #Command << " return " << StatusCodeToString(statusCode) << std::endl;             \
-        std::cout << "    in function: " << __FUNCTION__ << std::endl;                                  \
-        std::cout << "    in file:     " << __FILE__ << " line#: " << __LINE__ << std::endl;            \
-        return statusCode;                                                                              \
-    }                                                                                                   \
+namespace pandora::detail
+{
+    inline void LogStatusAction(const std::string_view expression, const std::string_view action, const std::string_view status,
+         const char *const function, const char *const file, const int line)
+    {
+        if (!expression.empty())
+            std::cout << expression << " " << action << " " << status << std::endl;
+
+        std::cout << "    in function: " << function << std::endl;
+        std::cout << "    in file:     " << file << " line#: " << line << std::endl;
+    }
+
+    inline void LogLocation(const char *const function, const char *const file, const int line)
+    {
+        std::cout << "    in function: " << function << std::endl;
+        std::cout << "    in file:     " << file << " line#: " << line << std::endl;
+    }
 }
 
-#define PANDORA_RETURN_RESULT_IF_AND_IF(StatusCode1, StatusCode2, Operator, Command)                    \
-{                                                                                                       \
-    const pandora::StatusCode statusCode(Command);                                                      \
-    if ((statusCode Operator StatusCode1) && (statusCode Operator StatusCode2))                         \
-    {                                                                                                   \
-        std::cout << #Command << " return " << StatusCodeToString(statusCode) << std::endl;             \
-        std::cout << "    in function: " << __FUNCTION__ << std::endl;                                  \
-        std::cout << "    in file:     " << __FILE__ << " line#: " << __LINE__ << std::endl;            \
-        return statusCode;                                                                              \
-    }                                                                                                   \
+#define PANDORA_RETURN(StatusCode)                                                                                                        \
+{                                                                                                                                         \
+    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_RETURN_is_deprecated())                                         \
+    pandora::detail::LogLocation(__FUNCTION__, __FILE__, __LINE__);                                                                       \
+    return StatusCode;                                                                                                                    \
 }
 
-#define PANDORA_THROW(StatusCode)                                                                       \
-{                                                                                                       \
-    std::cout << "    in function: " << __FUNCTION__ << std::endl;                                      \
-    std::cout << "    in file:     " << __FILE__ << " line#: " << __LINE__ << std::endl;                \
-    throw pandora::StatusCodeException(StatusCode);                                                     \
+#define PANDORA_RETURN_IF(StatusCode, Condition)                                                                                          \
+{                                                                                                                                         \
+    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_RETURN_IF_is_deprecated())                                      \
+    if (Condition)                                                                                                                        \
+    {                                                                                                                                     \
+        pandora::detail::LogStatusAction(#Condition, "return", StatusCodeToString(StatusCode), __FUNCTION__, __FILE__, __LINE__);         \
+        return StatusCode;                                                                                                                \
+    }                                                                                                                                     \
 }
 
-#define PANDORA_THROW_IF(StatusCode, Condition)                                                         \
-{                                                                                                       \
-    if (Condition)                                                                                      \
-    {                                                                                                   \
-        std::cout << #Condition << " throw " << StatusCodeToString(StatusCode) << std::endl;            \
-        std::cout << "    in function: " << __FUNCTION__ << std::endl;                                  \
-        std::cout << "    in file:     " << __FILE__ << " line#: " << __LINE__ << std::endl;            \
-        throw pandora::StatusCodeException(StatusCode);                                                 \
-    }                                                                                                   \
+#define PANDORA_RETURN_RESULT_IF(StatusCode1, Operator, Command)                                                                          \
+{                                                                                                                                         \
+    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_RETURN_RESULT_IF_is_deprecated())                               \
+    const pandora::StatusCode statusCode(Command);                                                                                        \
+    if (statusCode Operator StatusCode1)                                                                                                  \
+    {                                                                                                                                     \
+        pandora::detail::LogStatusAction(#Command, "return", StatusCodeToString(statusCode), __FUNCTION__, __FILE__, __LINE__);           \
+        return statusCode;                                                                                                                \
+    }                                                                                                                                     \
 }
 
-#define PANDORA_THROW_RESULT_IF(StatusCode1, Operator, Command)                                         \
-{                                                                                                       \
-    const pandora::StatusCode statusCode(Command);                                                      \
-    if (statusCode Operator StatusCode1)                                                                \
-    {                                                                                                   \
-        std::cout << #Command << " throw " << StatusCodeToString(statusCode) << std::endl;              \
-        std::cout << "    in function: " << __FUNCTION__ << std::endl;                                  \
-        std::cout << "    in file:     " << __FILE__ << " line#: " << __LINE__ << std::endl;            \
-        throw pandora::StatusCodeException(statusCode);                                                 \
-    }                                                                                                   \
+#define PANDORA_RETURN_RESULT_IF_AND_IF(StatusCode1, StatusCode2, Operator, Command)                                                      \
+{                                                                                                                                         \
+    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_RETURN_RESULT_IF_AND_IF_is_deprecated())                        \
+    const pandora::StatusCode statusCode(Command);                                                                                        \
+    if ((statusCode Operator StatusCode1) && (statusCode Operator StatusCode2))                                                           \
+    {                                                                                                                                     \
+        pandora::detail::LogStatusAction(#Command, "return", StatusCodeToString(statusCode), __FUNCTION__, __FILE__, __LINE__);           \
+        return statusCode;                                                                                                                \
+    }                                                                                                                                     \
 }
 
-#define PANDORA_THROW_RESULT_IF_AND_IF(StatusCode1, StatusCode2, Operator, Command)                     \
-{                                                                                                       \
-    const pandora::StatusCode statusCode(Command);                                                      \
-    if ((statusCode Operator StatusCode1) && (statusCode Operator StatusCode2))                         \
-    {                                                                                                   \
-        std::cout << #Command << " throw " << StatusCodeToString(statusCode) << std::endl;              \
-        std::cout << "    in function: " << __FUNCTION__ << std::endl;                                  \
-        std::cout << "    in file:     " << __FILE__ << " line#: " << __LINE__ << std::endl;            \
-        throw pandora::StatusCodeException(statusCode);                                                 \
-    }                                                                                                   \
+#define PANDORA_THROW(StatusCode)                                                                                                         \
+{                                                                                                                                         \
+    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_THROW_is_deprecated())                                          \
+    pandora::detail::LogLocation(__FUNCTION__, __FILE__, __LINE__);                                                                       \
+    throw pandora::StatusCodeException(StatusCode);                                                                                       \
+}
+
+#define PANDORA_THROW_IF(StatusCode, Condition)                                                                                           \
+{                                                                                                                                         \
+    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_THROW_IF_is_deprecated())                                       \
+    if (Condition)                                                                                                                        \
+    {                                                                                                                                     \
+        pandora::detail::LogStatusAction(#Condition, "throw", StatusCodeToString(StatusCode), __FUNCTION__, __FILE__, __LINE__);          \
+        throw pandora::StatusCodeException(StatusCode);                                                                                   \
+    }                                                                                                                                     \
+}
+
+#define PANDORA_THROW_RESULT_IF(StatusCode1, Operator, Command)                                                                           \
+{                                                                                                                                         \
+    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_THROW_RESULT_IF_is_deprecated())                                \
+    const pandora::StatusCode statusCode(Command);                                                                                        \
+    if (statusCode Operator StatusCode1)                                                                                                  \
+    {                                                                                                                                     \
+        pandora::detail::LogStatusAction(#Command, "throw", StatusCodeToString(statusCode), __FUNCTION__, __FILE__, __LINE__);            \
+        throw pandora::StatusCodeException(statusCode);                                                                                   \
+    }                                                                                                                                     \
+}
+
+#define PANDORA_THROW_RESULT_IF_AND_IF(StatusCode1, StatusCode2, Operator, Command)                                                       \
+{                                                                                                                                         \
+    PANDORA_LEGACY_DEPRECATION_MARK(pandora::deprecation_markers::PANDORA_THROW_RESULT_IF_AND_IF_is_deprecated())                         \
+    const pandora::StatusCode statusCode(Command);                                                                                        \
+    if ((statusCode Operator StatusCode1) && (statusCode Operator StatusCode2))                                                           \
+    {                                                                                                                                     \
+        pandora::detail::LogStatusAction(#Command, "throw", StatusCodeToString(statusCode), __FUNCTION__, __FILE__, __LINE__);            \
+        throw pandora::StatusCodeException(statusCode);                                                                                   \
+    }                                                                                                                                     \
+}
+
+#define RETURN_IF(StatusCode, Condition)                                                                                                      \
+{                                                                                                                                                   \
+    if (Condition)                                                                                                                                  \
+    {                                                                                                                                               \
+        const pandora::StatusCode _statusCode(StatusCode);                                                                                          \
+        pandora::detail::LogStatusAction(#Condition, "return", StatusCodeToString(_statusCode), __FUNCTION__, __FILE__, __LINE__);                  \
+        return _statusCode;                                                                                                                         \
+    }                                                                                                                                               \
+}
+
+#define RETURN_ON_ERROR(Command)                                                                                                               \
+{                                                                                                                                                   \
+    if (const auto _status = (Command); _status != pandora::STATUS_CODE_SUCCESS)                                                                    \
+    {                                                                                                                                               \
+        pandora::detail::LogStatusAction(#Command, "return", StatusCodeToString(_status), __FUNCTION__, __FILE__, __LINE__);                        \
+        return _status;                                                                                                                             \
+    }                                                                                                                                               \
+}
+
+#define RETURN_ON_ERROR_EXCEPT(Command, AllowedCode)                                                                                            \
+{                                                                                                                                                   \
+    if (const auto _status = (Command); _status != pandora::STATUS_CODE_SUCCESS && _status != (AllowedCode))                                        \
+    {                                                                                                                                               \
+        pandora::detail::LogStatusAction(#Command, "return", StatusCodeToString(_status), __FUNCTION__, __FILE__, __LINE__);                        \
+        return _status;                                                                                                                             \
+    }                                                                                                                                               \
+}
+
+#define THROW_IF(StatusCode, Condition)                                                                                                       \
+{                                                                                                                                                   \
+    if (Condition)                                                                                                                                  \
+    {                                                                                                                                               \
+        const pandora::StatusCode _statusCode(StatusCode);                                                                                          \
+        pandora::detail::LogStatusAction(#Condition, "throw", StatusCodeToString(_statusCode), __FUNCTION__, __FILE__, __LINE__);                   \
+        throw pandora::StatusCodeException(_statusCode);                                                                                            \
+    }                                                                                                                                               \
+}
+
+#define THROW_ON_ERROR(Command)                                                                                                                \
+{                                                                                                                                                   \
+    if (const auto _status = (Command); _status != pandora::STATUS_CODE_SUCCESS)                                                                    \
+    {                                                                                                                                               \
+        pandora::detail::LogStatusAction(#Command, "throw", StatusCodeToString(_status), __FUNCTION__, __FILE__, __LINE__);                         \
+        throw pandora::StatusCodeException(_status);                                                                                                \
+    }                                                                                                                                               \
+}
+
+#define THROW_ON_ERROR_EXCEPT(Command, AllowedCode)                                                                                             \
+{                                                                                                                                                   \
+    if (const auto _status = (Command); _status != pandora::STATUS_CODE_SUCCESS && _status != (AllowedCode))                                        \
+    {                                                                                                                                               \
+        pandora::detail::LogStatusAction(#Command, "throw", StatusCodeToString(_status), __FUNCTION__, __FILE__, __LINE__);                         \
+        throw pandora::StatusCodeException(_status);                                                                                                \
+    }                                                                                                                                               \
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -140,7 +265,7 @@ enum StatusCode
 
 /**
  *  @brief  Get status code as a string
- * 
+ *
  *  @return The status code string
  */
 std::string StatusCodeToString(const StatusCode statusCode);
@@ -156,7 +281,7 @@ class StatusCodeException
 public:
     /**
      *  @brief  Constructor
-     * 
+     *
      *  @param  statusCode the status code
      */
     StatusCodeException(const StatusCode statusCode);
@@ -168,21 +293,21 @@ public:
 
     /**
      *  @brief  Get status code
-     * 
+     *
      *  @return the status code
      */
     StatusCode GetStatusCode() const;
 
     /**
      *  @brief  Get status code as a string
-     * 
+     *
      *  @return The status code string
      */
     std::string ToString() const;
 
     /**
      *  @brief  Get back trace at point of exception construction (gcc only)
-     * 
+     *
      *  @return The back trace
      */
     const std::string &GetBackTrace() const;
@@ -237,7 +362,6 @@ inline const std::string &StatusCodeException::GetBackTrace() const
     return m_backTrace;
 }
 
-//------------------------------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 inline std::string StatusCodeToString(const StatusCode statusCode)

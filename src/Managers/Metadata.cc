@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Managers/Metadata.cc
- * 
+ *
  *  @brief  Implementation of metadata classes.
- * 
+ *
  *  $Log: $
  */
 
@@ -105,7 +105,7 @@ StatusCode CaloHitMetadata::Update(const CaloHitMetadata &caloHitMetadata)
 
     for (const CaloHitReplacement *const pCaloHitReplacement : caloHitReplacementList)
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->Update(*pCaloHitReplacement));
+        RETURN_ON_ERROR(this->Update(*pCaloHitReplacement));
     }
 
     const CaloHitUsageMap &caloHitUsageMap(caloHitMetadata.GetCaloHitUsageMap());

@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Persistency/EventReadingAlgorithm.cc
- * 
+ *
  *  @brief  Implementation of the event reading algorithm class.
- * 
+ *
  *  $Log: $
  */
 
@@ -40,12 +40,12 @@ StatusCode EventReadingAlgorithm::Initialize()
         if (BINARY == geometryFileType)
         {
             BinaryFileReader fileReader(this->GetPandora(), m_geometryFileName);
-            PANDORA_RETURN_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, fileReader.ReadGeometry());
+            RETURN_ON_ERROR(fileReader.ReadGeometry());
         }
         else if (XML == geometryFileType)
         {
             XmlFileReader fileReader(this->GetPandora(), m_geometryFileName);
-            PANDORA_RETURN_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, fileReader.ReadGeometry());
+            RETURN_ON_ERROR(fileReader.ReadGeometry());
         }
         else
         {
@@ -55,8 +55,8 @@ StatusCode EventReadingAlgorithm::Initialize()
 
     if (!m_eventFileName.empty())
     {
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReplaceEventFileReader(m_eventFileName));
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pEventFileReader->GoToEvent(m_skipToEvent));
+        RETURN_ON_ERROR(this->ReplaceEventFileReader(m_eventFileName));
+        RETURN_ON_ERROR(m_pEventFileReader->GoToEvent(m_skipToEvent));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -77,7 +77,7 @@ StatusCode EventReadingAlgorithm::Run()
             this->MoveToNextEventFile();
         }
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraContentApi::RepeatEventPreparation(*this));
+        RETURN_ON_ERROR(PandoraContentApi::RepeatEventPreparation(*this));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -92,7 +92,7 @@ void EventReadingAlgorithm::MoveToNextEventFile()
 
     m_eventFileName = m_eventFileNameVector.back();
     m_eventFileNameVector.pop_back();
-    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReplaceEventFileReader(m_eventFileName));
+    THROW_ON_ERROR(this->ReplaceEventFileReader(m_eventFileName));
 
     try
     {
@@ -172,7 +172,7 @@ StatusCode EventReadingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
     }
     else
     {
-        PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle, "GeometryFileName", m_geometryFileName));
+        RETURN_ON_ERROR_EXCEPT(XmlHelper::ReadValue(xmlHandle, "GeometryFileName", m_geometryFileName), STATUS_CODE_NOT_FOUND);
     }
 
     if (pExternalParameters && !pExternalParameters->m_eventFileNameList.empty())
@@ -181,7 +181,7 @@ StatusCode EventReadingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
     }
     else
     {
-        PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadVectorOfValues(xmlHandle, "EventFileNameList", m_eventFileNameVector));
+        RETURN_ON_ERROR_EXCEPT(XmlHelper::ReadVectorOfValues(xmlHandle, "EventFileNameList", m_eventFileNameVector), STATUS_CODE_NOT_FOUND);
     }
 
     if (!m_eventFileNameVector.empty())
@@ -197,7 +197,7 @@ StatusCode EventReadingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
     }
     else
     {
-        PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle, "SkipToEvent", m_skipToEvent));
+        RETURN_ON_ERROR_EXCEPT(XmlHelper::ReadValue(xmlHandle, "SkipToEvent", m_skipToEvent), STATUS_CODE_NOT_FOUND);
     }
 
     if (m_geometryFileName.empty() && m_eventFileName.empty())
@@ -206,8 +206,8 @@ StatusCode EventReadingAlgorithm::ReadSettings(const TiXmlHandle xmlHandle)
         return STATUS_CODE_NOT_INITIALIZED;
     }
 
-    PANDORA_RETURN_RESULT_IF_AND_IF(STATUS_CODE_SUCCESS, STATUS_CODE_NOT_FOUND, !=, XmlHelper::ReadValue(xmlHandle,
-        "SkipToEvent", m_skipToEvent));
+    RETURN_ON_ERROR_EXCEPT(XmlHelper::ReadValue(xmlHandle,
+        "SkipToEvent", m_skipToEvent), STATUS_CODE_NOT_FOUND);
 
     return STATUS_CODE_SUCCESS;
 }

@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/src/Managers/GeometryManager.cc
- * 
+ *
  *  @brief  Implementation of the geometry manager class.
- * 
+ *
  *  $Log: $
  */
 
@@ -91,7 +91,7 @@ StatusCode GeometryManager::CreateSubDetector(const object_creation::Geometry::S
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pSubDetector));
+        THROW_ON_ERROR(factory.Create(parameters, pSubDetector));
 
         if (!m_subDetectorMap.insert(SubDetectorMap::value_type(pSubDetector->GetSubDetectorName(), pSubDetector)).second)
             throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -118,7 +118,7 @@ StatusCode GeometryManager::CreateLArTPC(const object_creation::Geometry::LArTPC
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pLArTPC));
+        THROW_ON_ERROR(factory.Create(parameters, pLArTPC));
 
         if (!m_larTPCMap.insert(LArTPCMap::value_type(pLArTPC->GetLArTPCVolumeId(), pLArTPC)).second)
             throw StatusCodeException(STATUS_CODE_FAILURE);
@@ -143,7 +143,7 @@ StatusCode GeometryManager::CreateGap(const PARAMETERS &parameters, const Object
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, factory.Create(parameters, pDetectorGap));
+        THROW_ON_ERROR(factory.Create(parameters, pDetectorGap));
 
         if (!pDetectorGap)
             return STATUS_CODE_FAILURE;
