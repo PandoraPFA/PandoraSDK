@@ -22,10 +22,6 @@ namespace pandora
  *  @brief  XmlFileReader
  *
  *  Reads Pandora objects from an XML file written by XmlFileWriter.
- *
- *  Migration registration
- *  ----------------------
- *  Identical API to BinaryFileReader::RegisterMigration.
  */
 class XmlFileReader : public FileReader
 {
@@ -42,18 +38,6 @@ public:
      *  @brief  Destructor
      */
     ~XmlFileReader();
-
-    typedef std::function<void(FieldMap &)> MigrationFn;
-
-    /**
-     *  @brief  Register a migration function for a given component and schema version
-     *
-     *  @param  componentId the component ID
-     *  @param  fromVersion the schema version to migrate from
-     *  @param  toVersion the schema version to migrate to
-     *  @param  fn the migration function to be called when migrating from fromVersion to toVersion
-     */
-    void RegisterMigration(const ComponentId componentId, const unsigned int fromVersion, const unsigned int toVersion, MigrationFn fn);
 
 private:
     /**
@@ -116,15 +100,6 @@ private:
      *  @param  fields the field map to be populated with the fields of the current component
      */
     StatusCode ReadComponentFields(unsigned int &schemaVersion, FieldMap &fields) const;
-
-    /**
-     *  @brief  Apply any registered migrations to the fields of the current component.
-     *
-     *  @param  componentId the component ID of the current component
-     *  @param  fileSchemaVersion the schema version of the current component in the file
-     *  @param  fields the field map to be populated with the fields of the current component
-     */
-    void ApplyMigrations(const ComponentId componentId, const unsigned int fileSchemaVersion, FieldMap &fields) const;
 
     /**
      *  @brief  Read the metadata of the current component from the file.
@@ -210,46 +185,10 @@ private:
      */
     StatusCode ReadEventInformation(const FieldMap &fields);
 
-    struct MigrationKey
-    {
-        ComponentId  m_componentId;
-        unsigned int m_fromVersion;
-
-        /**
-         *  @brief  Equality operator for MigrationKey
-         *
-         *  @param  rhs the right hand side of the equality operator
-         *
-         *  @return true if the two migration keys are equal, false otherwise
-         */
-        bool operator==(const MigrationKey &rhs) const
-        {
-            return m_componentId == rhs.m_componentId && m_fromVersion == rhs.m_fromVersion;
-        }
-    };
-
-    struct MigrationKeyHash
-    {
-        /**
-         *  @brief  Hash function for MigrationKey
-         *
-         *  @param  k the migration key to be hashed
-         *
-         *  @return the hash value of the migration key
-         */
-        std::size_t operator()(const MigrationKey &k) const
-        {
-            return std::hash<unsigned int>()(static_cast<unsigned int>(k.m_componentId))
-                ^ (std::hash<unsigned int>()(k.m_fromVersion) << 16);
-        }
-    };
-
     TiXmlDocument *m_pXmlDocument;
     TiXmlNode     *m_pContainerXmlNode;
     TiXmlElement  *m_pCurrentXmlElement;
     bool           m_isAtFileStart;
-
-    std::unordered_map<MigrationKey, MigrationFn, MigrationKeyHash> m_migrations;
 };
 
 } // namespace pandora

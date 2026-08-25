@@ -71,6 +71,15 @@ public:
     const SchemaRegistry &GetSchemaRegistry() const;
 
     /**
+     *  @brief  Return the current schema version for a given component type.
+     *
+     *  Single source of truth shared by every reader and writer (binary, XML, and any future format), so schema versions cannot drift
+     *  between formats. Increment a value here (and register a corresponding reader migration in BinaryFileReader/XmlFileReader) when a
+     *  field is removed or its semantics change. Adding a new optional field does not need a bump.
+     */
+    static unsigned int GetSchemaVersion(const ComponentId componentId);
+
+    /**
      *  @brief  Set the factory to use for all instantiations and parameter persistence
      *
      *  @param  pFactory  address of the factory (ownership transferred)
