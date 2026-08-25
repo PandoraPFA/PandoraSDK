@@ -15,6 +15,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <exception>
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -25,9 +26,30 @@ namespace pandora
 namespace
 {
 
+void WarnUnparseable(const std::string &typeName, const std::string &text)
+{
+    std::cout << "XmlFileReader: could not parse \"" << text << "\" as " << typeName << " — substituting zero" << std::endl;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 std::vector<unsigned char> FloatFromString(const std::string &s)
 {
-    float v = s.empty() ? 0.f : std::stof(s);
+    float v(0.f);
+
+    if (!s.empty())
+    {
+        try
+        {
+            v = std::stof(s);
+        }
+        catch (const std::exception &)
+        {
+            WarnUnparseable("float", s);
+            v = 0.f;
+        }
+    }
+
     std::vector<unsigned char> bytes(sizeof(float));
     std::memcpy(bytes.data(), &v, sizeof(float));
     return bytes;
@@ -37,7 +59,21 @@ std::vector<unsigned char> FloatFromString(const std::string &s)
 
 std::vector<unsigned char> Int32FromString(const std::string &s)
 {
-    int32_t v = s.empty() ? 0 : static_cast<int32_t>(std::stol(s));
+    int32_t v(0);
+
+    if (!s.empty())
+    {
+        try
+        {
+            v = static_cast<int32_t>(std::stol(s));
+        }
+        catch (const std::exception &)
+        {
+            WarnUnparseable("int32", s);
+            v = 0;
+        }
+    }
+
     std::vector<unsigned char> bytes(sizeof(int32_t));
     std::memcpy(bytes.data(), &v, sizeof(int32_t));
     return bytes;
@@ -47,7 +83,21 @@ std::vector<unsigned char> Int32FromString(const std::string &s)
 
 std::vector<unsigned char> Uint32FromString(const std::string &s)
 {
-    uint32_t v = s.empty() ? 0u : static_cast<uint32_t>(std::stoul(s));
+    uint32_t v(0u);
+
+    if (!s.empty())
+    {
+        try
+        {
+            v = static_cast<uint32_t>(std::stoul(s));
+        }
+        catch (const std::exception &)
+        {
+            WarnUnparseable("uint32", s);
+            v = 0u;
+        }
+    }
+
     std::vector<unsigned char> bytes(sizeof(uint32_t));
     std::memcpy(bytes.data(), &v, sizeof(uint32_t));
     return bytes;
@@ -57,7 +107,21 @@ std::vector<unsigned char> Uint32FromString(const std::string &s)
 
 std::vector<unsigned char> Uint64FromString(const std::string &s)
 {
-    uint64_t v = s.empty() ? 0ull : static_cast<uint64_t>(std::stoull(s));
+    uint64_t v(0ull);
+
+    if (!s.empty())
+    {
+        try
+        {
+            v = static_cast<uint64_t>(std::stoull(s));
+        }
+        catch (const std::exception &)
+        {
+            WarnUnparseable("uint64", s);
+            v = 0u;
+        }
+    }
+
     std::vector<unsigned char> bytes(sizeof(uint64_t));
     std::memcpy(bytes.data(), &v, sizeof(uint64_t));
     return bytes;
@@ -67,7 +131,21 @@ std::vector<unsigned char> Uint64FromString(const std::string &s)
 
 std::vector<unsigned char> BoolFromString(const std::string &s)
 {
-    uint8_t v = s.empty() ? 0 : static_cast<uint8_t>(std::stoul(s));
+    uint8_t v(0u);
+
+    if (!s.empty())
+    {
+        try
+        {
+            v = static_cast<uint8_t>(std::stoul(s));
+        }
+        catch (const std::exception &)
+        {
+            WarnUnparseable("uint8", s);
+            v = 0u;
+        }
+    }
+
     std::vector<unsigned char> bytes(sizeof(uint8_t));
     std::memcpy(bytes.data(), &v, sizeof(uint8_t));
     return bytes;
@@ -162,9 +240,12 @@ std::vector<unsigned char> FieldTextToBytes(const FieldValueType type, const std
         case FieldValueType::TRACK_STATE:
             return TrackStateFromString(text);
         case FieldValueType::UINT32:
+            return Uint32FromString(text);
         case FieldValueType::UNKNOWN:
         default:
-            return Uint32FromString(text);
+            // No usable type attribute: preserve the text verbatim. A subsequent typed Get<T> will then report
+            // STATUS_CODE_INVALID_PARAMETER on the size mismatch.
+            return StringToBytes(text);
     }
 }
 
