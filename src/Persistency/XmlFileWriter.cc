@@ -21,7 +21,8 @@
 
 #include <cstdint>
 #include <cstring>
-#include <sstream>
+#include <iostream>
+#include <limits>
 
 namespace pandora
 {
@@ -35,8 +36,20 @@ std::string FieldTypeToAttributeString(const FieldValueType type)
     {
         case FieldValueType::FLOAT:
             return "float";
+        case FieldValueType::DOUBLE:
+            return "double";
+        case FieldValueType::INT8:
+            return "int8";
+        case FieldValueType::INT16:
+            return "int16";
         case FieldValueType::INT32:
             return "int32";
+        case FieldValueType::INT64:
+            return "int64";
+        case FieldValueType::UINT8:
+            return "uint8";
+        case FieldValueType::UINT16:
+            return "uint16";
         case FieldValueType::UINT32:
             return "uint32";
         case FieldValueType::UINT64:
@@ -57,8 +70,28 @@ std::string FieldTypeToAttributeString(const FieldValueType type)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+template <typename T>
+bool ExtractValue(const std::vector<unsigned char> &bytes, T &value)
+{
+    if (bytes.size() != sizeof(T))
+    {
+        std::cout << "XmlFileWriter: field is " << bytes.size() << " bytes but its recorded type implies " << sizeof(T) <<
+            " — not written" << std::endl;
+        return false;
+    }
+
+    std::memcpy(&value, bytes.data(), sizeof(T));
+
+    return true;
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 std::string CartesianVectorToString(const std::vector<unsigned char> &bytes)
 {
+    if (bytes.size() != 3 * sizeof(float))
+        return {};
+
     float x = 0.f, y = 0.f, z = 0.f;
     std::memcpy(&x, bytes.data() + 0 * sizeof(float), sizeof(float));
     std::memcpy(&y, bytes.data() + 1 * sizeof(float), sizeof(float));
@@ -70,6 +103,9 @@ std::string CartesianVectorToString(const std::vector<unsigned char> &bytes)
 
 std::string TrackStateToString(const std::vector<unsigned char> &bytes)
 {
+    if (bytes.size() != 6 * sizeof(float))
+        return {};
+
     float f[6] = {};
     for (int i = 0; i < 6; ++i)
         std::memcpy(&f[i], bytes.data() + i * sizeof(float), sizeof(float));
@@ -100,33 +136,60 @@ std::string FieldValueToString(const FieldValueType type, const std::vector<unsi
     {
         case FieldValueType::FLOAT:
         {
-            float v = 0.f;
-            std::memcpy(&v, bytes.data(), sizeof(float));
-            return TypeToStringPrecision(v);
+            float v(0.f);
+            return ExtractValue(bytes, v) ? TypeToStringPrecision(v) : std::string();
+        }
+        case FieldValueType::DOUBLE:
+        {
+            double v(0.0);
+            // Default precision is 12 significant digits, below the 17 a double needs to survive a text round trip.
+            return ExtractValue(bytes, v) ? TypeToStringPrecision(v, std::numeric_limits<double>::max_digits10) : std::string();
+        }
+        case FieldValueType::INT8:
+        {
+            int8_t v(0);
+            // Promote before to_string: std::to_string(int8_t) would otherwise pick the char overload.
+            return ExtractValue(bytes, v) ? std::to_string(static_cast<int>(v)) : std::string();
+        }
+        case FieldValueType::INT16:
+        {
+            int16_t v(0);
+            return ExtractValue(bytes, v) ? std::to_string(v) : std::string();
         }
         case FieldValueType::INT32:
         {
-            int32_t v = 0;
-            std::memcpy(&v, bytes.data(), sizeof(int32_t));
-            return std::to_string(v);
+            int32_t v(0);
+            return ExtractValue(bytes, v) ? std::to_string(v) : std::string();
+        }
+        case FieldValueType::INT64:
+        {
+            int64_t v(0);
+            return ExtractValue(bytes, v) ? std::to_string(v) : std::string();
+        }
+        case FieldValueType::UINT8:
+        {
+            uint8_t v(0);
+            return ExtractValue(bytes, v) ? std::to_string(static_cast<unsigned int>(v)) : std::string();
+        }
+        case FieldValueType::UINT16:
+        {
+            uint16_t v(0);
+            return ExtractValue(bytes, v) ? std::to_string(v) : std::string();
         }
         case FieldValueType::UINT32:
         {
-            uint32_t v = 0;
-            std::memcpy(&v, bytes.data(), sizeof(uint32_t));
-            return std::to_string(v);
+            uint32_t v(0);
+            return ExtractValue(bytes, v) ? std::to_string(v) : std::string();
         }
         case FieldValueType::UINT64:
         {
-            uint64_t v = 0;
-            std::memcpy(&v, bytes.data(), sizeof(uint64_t));
-            return std::to_string(v);
+            uint64_t v(0);
+            return ExtractValue(bytes, v) ? std::to_string(v) : std::string();
         }
         case FieldValueType::BOOL:
         {
-            uint8_t v = 0;
-            std::memcpy(&v, bytes.data(), sizeof(uint8_t));
-            return std::to_string(v);
+            uint8_t v(0);
+            return ExtractValue(bytes, v) ? std::to_string(static_cast<unsigned int>(v)) : std::string();
         }
         case FieldValueType::STRING:
             return StringFieldToString(bytes);
@@ -137,11 +200,8 @@ std::string FieldValueToString(const FieldValueType type, const std::vector<unsi
         case FieldValueType::UNKNOWN:
         default:
         {
-            std::ostringstream oss;
-            oss << std::hex;
-            for (unsigned char b : bytes)
-                oss << static_cast<unsigned int>(b);
-            return oss.str();
+            // Should never get here
+            return {};
         }
     }
 }
@@ -240,6 +300,13 @@ StatusCode XmlFileWriter::WriteComponent(const std::string &elementName,
     for (const auto &entry : fields.GetAllFields())
     {
         const FieldValueType type = fields.GetFieldType(entry.first);
+
+        if (FieldValueType::UNKNOWN == type)
+        {
+            std::cout << "XmlFileWriter: field \"" << entry.first << "\" in <" << elementName <<
+                "> has no recorded value type and cannot be written in a recoverable form" << std::endl;
+            return STATUS_CODE_NOT_IMPLEMENTED;
+        }
 
         TiXmlElement *const pFieldElement = new TiXmlElement(entry.first);
         pFieldElement->SetAttribute("type", FieldTypeToAttributeString(type));
