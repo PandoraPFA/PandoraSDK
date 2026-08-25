@@ -16,6 +16,8 @@
 #include <fstream>
 #include <functional>
 #include <unordered_map>
+#include <string>
+#include <vector>
 
 namespace pandora
 {
@@ -190,6 +192,13 @@ private:
     StatusCode ReadEventInformation(const FieldMap &fields);
 
     /**
+     *  @brief  Resolve the next tag reference, appending to the container dictionary if the tag is written in full.
+     *
+     *  @param  tag to receive the field tag name
+     */
+    StatusCode ReadTagReference(std::string &tag);
+
+    /**
      *  @brief  Read a variable of type T from the file stream. Low-level stream primitive.
      *
      *  @param  t the variable to read into
@@ -198,10 +207,12 @@ private:
     StatusCode ReadVariable(T &t);
 
     static constexpr uint32_t COMPONENT_END_MARKER = 0xDEADBEEFu;
+    static constexpr uint16_t NEW_TAG_MARKER = 0xFFFFu;
 
     std::ifstream::pos_type m_containerPosition;
     std::ifstream::pos_type m_containerSize;
-    std::ifstream           m_fileStream;
+    std::ifstream m_fileStream;
+    std::vector<std::string> m_tagDictionary; ///< Id -> tag, reset at each container header
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

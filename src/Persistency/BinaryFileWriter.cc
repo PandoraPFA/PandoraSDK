@@ -69,6 +69,7 @@ BinaryFileWriter::~BinaryFileWriter()
 StatusCode BinaryFileWriter::WriteHeader(const ContainerId containerId)
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(PANDORA_FILE_HASH));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(PANDORA_BINARY_FORMAT_VERSION));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(containerId));
 
     m_containerPosition = m_fileStream.tellp();
@@ -76,6 +77,9 @@ StatusCode BinaryFileWriter::WriteHeader(const ContainerId containerId)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(dummyContainerSize));
 
     m_containerId = containerId;
+
+    // Tag ids are container-local, so that a reader seeking straight to this container can resolve them.
+    m_tagDictionary.clear();
 
     return STATUS_CODE_SUCCESS;
 }
@@ -132,17 +136,9 @@ StatusCode BinaryFileWriter::WriteComponent(const ComponentId componentId, const
         const std::string &tag = entry.first;
         const std::vector<unsigned char> &data = entry.second;
 
-        if (tag.size() > std::numeric_limits<uint16_t>::max())
-            return STATUS_CODE_INVALID_PARAMETER;
-
-        const uint16_t tagLen  = static_cast<uint16_t>(tag.size());
         const uint32_t dataLen = static_cast<uint32_t>(data.size());
 
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(tagLen));
-        m_fileStream.write(tag.data(), tagLen);
-
-        if (!m_fileStream.good())
-            return STATUS_CODE_FAILURE;
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteTagReference(tag));
 
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(dataLen));
         m_fileStream.write(reinterpret_cast<const char *>(data.data()), dataLen);
@@ -456,6 +452,36 @@ StatusCode BinaryFileWriter::WriteEventInformation()
     fields.Set("event",  m_pPandora->GetEvent());
 
     return this->WriteComponent(EVENT_INFO_COMPONENT, GetSchemaVersion(EVENT_INFO_COMPONENT), fields);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode BinaryFileWriter::WriteTagReference(const std::string &tag)
+{
+    const auto it = m_tagDictionary.find(tag);
+
+    if (it != m_tagDictionary.end())
+        return this->WriteVariable(it->second);
+
+    if (tag.size() > std::numeric_limits<uint16_t>::max())
+        return STATUS_CODE_INVALID_PARAMETER;
+
+    if (m_tagDictionary.size() >= NEW_TAG_MARKER)
+        return STATUS_CODE_OUT_OF_RANGE;
+
+    const uint16_t tagId(static_cast<uint16_t>(m_tagDictionary.size()));
+    const uint16_t tagLen(static_cast<uint16_t>(tag.size()));
+
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(NEW_TAG_MARKER));
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteVariable(tagLen));
+    m_fileStream.write(tag.data(), tagLen);
+
+    if (!m_fileStream.good())
+        return STATUS_CODE_FAILURE;
+
+    m_tagDictionary[tag] = tagId;
+
+    return STATUS_CODE_SUCCESS;
 }
 
 } // namespace pandora

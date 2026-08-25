@@ -14,6 +14,8 @@
 #include "Persistency/Persistency.h"
 
 #include <fstream>
+#include <string>
+#include <unordered_map>
 
 namespace pandora
 {
@@ -21,14 +23,21 @@ namespace pandora
 /**
  *  @brief  BinaryFileWriter
  *
- *  Writes Pandora objects to a compact binary file using tagged-field component records. Layout per component:
+ *  Writes Pandora objects to a compact binary file using tagged-field component records.
+ *
+ *  Tags are per container: the first use of a tag within a container writes the full tag and assigns it an id; subsequent uses write only
+ *  the id. The dictionary resets at every container header, so a reader that seeks directly to a container can still resolve every tag it
+ *  encounters.
+ *
+ *  Layout per component:
  *
  *      [ComponentId  : uint32]
  *      [SchemaVersion: uint32]
  *      [NumFields    : uint32]
  *      repeated NumFields times:
- *          [TagLength : uint16]
- *          [Tag       : char * TagLength]
+ *          [TagId     : uint16]            // NEW_TAG_MARKER (0xFFFF) if not yet seen in this container
+ *          [TagLength : uint16]            // only if TagId == NEW_TAG_MARKER
+ *          [Tag       : char * TagLength]  // only if TagId == NEW_TAG_MARKER
  *          [DataLength: uint32]
  *          [Data      : byte * DataLength]
  *      [END_MARKER   : uint32 = 0xDEADBEEF]
@@ -145,6 +154,13 @@ private:
     StatusCode WriteComponent(const ComponentId componentId, const unsigned int schemaVersion, const FieldMap &fields);
 
     /**
+     *  @brief  Write a reference to a tag into the current container's dictionary on first use.
+     *
+     *  @param  tag the field tag name
+     */
+    StatusCode WriteTagReference(const std::string &tag);
+
+    /**
      *  @brief  Write a variable of type T to the file stream. Low-level stream primitive.
      *
      *  @param  t the variable to write
@@ -153,9 +169,12 @@ private:
     StatusCode WriteVariable(const T &t);
 
     static constexpr uint32_t COMPONENT_END_MARKER = 0xDEADBEEFu;
+    static constexpr uint16_t NEW_TAG_MARKER = 0xFFFFu;
 
     std::ofstream::pos_type m_containerPosition;
-    std::ofstream           m_fileStream;
+    std::ofstream m_fileStream;
+
+    std::unordered_map<std::string, uint16_t> m_tagDictionary; ///< Tag -> id, reset at each container header
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

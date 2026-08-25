@@ -49,6 +49,16 @@ StatusCode BinaryFileReader::ReadHeader()
     if (PANDORA_FILE_HASH != fileHash)
         return STATUS_CODE_FAILURE;
 
+    uint32_t formatVersion(0);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(formatVersion));
+
+    if (PANDORA_BINARY_FORMAT_VERSION != formatVersion)
+    {
+        std::cout << "BinaryFileReader: binary format version " << formatVersion << " in " << m_fileName <<
+            " is not readable by this build (expected " << PANDORA_BINARY_FORMAT_VERSION << ")" << std::endl;
+        return STATUS_CODE_FAILURE;
+    }
+
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(m_containerId));
 
     if ((HEADER_CONTAINER != m_containerId) && (EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
@@ -59,6 +69,8 @@ StatusCode BinaryFileReader::ReadHeader()
 
     if (0 == m_containerSize)
         return STATUS_CODE_FAILURE;
+
+    m_tagDictionary.clear();
 
     return STATUS_CODE_SUCCESS;
 }
@@ -89,6 +101,12 @@ ContainerId BinaryFileReader::GetNextContainerId()
         throw StatusCodeException(hashSc);
 
     if (PANDORA_FILE_HASH != fileHash)
+        throw StatusCodeException(STATUS_CODE_FAILURE);
+
+    uint32_t formatVersion(0);
+    PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(formatVersion));
+
+    if (PANDORA_BINARY_FORMAT_VERSION != formatVersion)
         throw StatusCodeException(STATUS_CODE_FAILURE);
 
     ContainerId containerId(UNKNOWN_CONTAINER);
@@ -165,14 +183,8 @@ StatusCode BinaryFileReader::ReadComponentFields(ComponentId &componentId,
     // Read all tagged fields
     for (uint32_t i = 0; i < numFields; ++i)
     {
-        uint16_t tagLen(0);
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(tagLen));
-
-        std::string tag(tagLen, '\0');
-        m_fileStream.read(&tag[0], tagLen);
-
-        if (!m_fileStream.good())
-            return STATUS_CODE_FAILURE;
+        std::string tag;
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadTagReference(tag));
 
         uint32_t dataLen(0);
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(dataLen));
@@ -697,6 +709,40 @@ StatusCode BinaryFileReader::ReadEventInformation(const FieldMap &fields)
     const unsigned int event  = fields.GetOrDefault<unsigned int>("event",  0u);
 
     return PandoraApi::SetEventInformation(*m_pPandora, run, subrun, event);
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+StatusCode BinaryFileReader::ReadTagReference(std::string &tag)
+{
+    uint16_t tagId(0);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(tagId));
+
+    if (NEW_TAG_MARKER != tagId)
+    {
+        if (tagId >= m_tagDictionary.size())
+        {
+            std::cout << "BinaryFileReader: tag id " << tagId << " outside container dictionary — file may be corrupt" << std::endl;
+            return STATUS_CODE_FAILURE;
+        }
+
+        tag = m_tagDictionary[tagId];
+
+        return STATUS_CODE_SUCCESS;
+    }
+
+    uint16_t tagLen(0);
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(tagLen));
+
+    tag.assign(tagLen, '\0');
+    m_fileStream.read(&tag[0], tagLen);
+
+    if (!m_fileStream.good())
+        return STATUS_CODE_FAILURE;
+
+    m_tagDictionary.push_back(tag);
+
+    return STATUS_CODE_SUCCESS;
 }
 
 } // namespace pandora
