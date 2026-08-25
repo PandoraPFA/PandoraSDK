@@ -202,20 +202,6 @@ XmlFileReader::~XmlFileReader()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void XmlFileReader::RegisterMigration(const ComponentId componentId,
-    const unsigned int fromVersion, const unsigned int toVersion, MigrationFn fn)
-{
-    if (toVersion != fromVersion + 1)
-        throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
-
-    MigrationKey key;
-    key.m_componentId = componentId;
-    key.m_fromVersion = fromVersion;
-    m_migrations[key] = std::move(fn);
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
 StatusCode XmlFileReader::ReadHeader()
 {
     m_pCurrentXmlElement = nullptr;
@@ -346,28 +332,6 @@ StatusCode XmlFileReader::ReadComponentFields(unsigned int &schemaVersion, Field
     }
 
     return STATUS_CODE_SUCCESS;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-void XmlFileReader::ApplyMigrations(const ComponentId componentId,
-    const unsigned int fileSchemaVersion, FieldMap &fields) const
-{
-    unsigned int version = fileSchemaVersion;
-
-    while (true)
-    {
-        MigrationKey key;
-        key.m_componentId = componentId;
-        key.m_fromVersion = version;
-
-        auto it = m_migrations.find(key);
-        if (it == m_migrations.end())
-            break;
-
-        it->second(fields);
-        ++version;
-    }
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------

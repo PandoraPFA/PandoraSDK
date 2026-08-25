@@ -74,6 +74,26 @@ Persistency::~Persistency()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+unsigned int Persistency::GetSchemaVersion(const ComponentId componentId)
+{
+    switch (componentId)
+    {
+        case CALO_HIT_COMPONENT:       return 1;
+        case TRACK_COMPONENT:          return 1;
+        case MC_PARTICLE_COMPONENT:    return 1;
+        case RELATIONSHIP_COMPONENT:   return 1;
+        case SUB_DETECTOR_COMPONENT:   return 1;
+        case LINE_GAP_COMPONENT:       return 1;
+        case BOX_GAP_COMPONENT:        return 1;
+        case CONCENTRIC_GAP_COMPONENT: return 1;
+        case LAR_TPC_COMPONENT:        return 1;
+        case EVENT_INFO_COMPONENT:     return 1;
+        default:                       return 0;
+    }
+}
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 template <typename PARAMETERS, typename OBJECT>
 StatusCode Persistency::SetFactory(ObjectFactory<PARAMETERS, OBJECT> *const pFactory)
 {

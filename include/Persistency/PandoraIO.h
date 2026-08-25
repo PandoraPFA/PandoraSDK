@@ -11,11 +11,18 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 namespace pandora
 {
 
 const std::string PANDORA_FILE_HASH("pandora"); ///< Look for hash each event to check integrity
+
+/**
+ *  @brief  On-disk record layout version for the binary format. Bumped whenever the framing of a component record changes (as opposed to
+ *          the contents of a component, which is covered by per-component schema versions).
+ */
+const uint32_t PANDORA_BINARY_FORMAT_VERSION(1);
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -92,6 +99,18 @@ enum FileMode
     APPEND,
     OVERWRITE,
     UNKNOWN_MODE
+};
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
+/**
+ *  @brief  What a FileReader does when the schema versions recorded in a file's global header cannot be read faithfully by this build.
+ */
+enum SchemaCheckPolicy
+{
+    SCHEMA_CHECK_FAIL, ///< Reject the file (default)
+    SCHEMA_CHECK_WARN, ///< Report the mismatch and continue
+    SCHEMA_CHECK_NONE  ///< Do not check
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
