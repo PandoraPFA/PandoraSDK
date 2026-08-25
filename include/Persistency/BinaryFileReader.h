@@ -24,24 +24,6 @@ namespace pandora
  *  @brief  BinaryFileReader
  *
  *  Reads Pandora objects from a binary file written by BinaryFileWriter.
- *
- *  Migration registration
- *  ----------------------
- *  Call RegisterMigration() to install a schema upgrade function for a given
- *  component type and version transition. Migrations are chained automatically.
- *
- *  Example:
- *  @code
- *      reader.RegisterMigration(CALO_HIT_COMPONENT, 1, 2,
- *          [](FieldMap &fields) {
- *              float v;
- *              if (STATUS_CODE_SUCCESS == fields.Get("mipEnergy", v))
- *              {
- *                  fields.Set("mipEquivalentEnergy", v);
- *                  fields.Remove("mipEnergy");
- *              }
- *          });
- *  @endcode
  */
 class BinaryFileReader : public FileReader
 {
@@ -58,19 +40,6 @@ public:
      *  @brief  Destructor
      */
     ~BinaryFileReader();
-
-    typedef std::function<void(FieldMap &)> MigrationFn;
-
-    /**
-     *  @brief  Register a migration function for a given component type and version transition
-     *
-     *  @param  componentId the component type identifier
-     *  @param  fromVersion the schema version to migrate from
-     *  @param  toVersion the schema version to migrate to
-     *  @param  fn the migration function to apply to the FieldMap
-     */
-    void RegisterMigration(const ComponentId componentId, const unsigned int fromVersion,
-        const unsigned int toVersion, MigrationFn fn);
 
 private:
     /**
@@ -135,15 +104,6 @@ private:
      *  @param  fields the field map to populate with the component fields
      */
     StatusCode ReadComponentFields(ComponentId &componentId, unsigned int &schemaVersion, FieldMap &fields);
-
-    /**
-     *  @brief  Apply any registered migrations to the component fields.
-     *
-     *  @param  componentId the component ID to apply migrations for
-     *  @param  fileSchemaVersion the schema version of the component in the file
-     *  @param  fields the field map to apply migrations to
-     */
-    void ApplyMigrations(const ComponentId componentId, const unsigned int fileSchemaVersion, FieldMap &fields) const;
 
     /**
      *  @brief  Read the metadata from the file.
@@ -237,47 +197,11 @@ private:
     template <typename T>
     StatusCode ReadVariable(T &t);
 
-    struct MigrationKey
-    {
-        ComponentId  m_componentId;
-        unsigned int m_fromVersion;
-
-        /**
-         *  @brief  Equality operator for MigrationKey
-         *
-         *  @param  rhs the right-hand side MigrationKey to compare with
-         *
-         *  @return True if the component ID and from version are equal, false otherwise
-         */
-        bool operator==(const MigrationKey &rhs) const
-        {
-            return m_componentId == rhs.m_componentId && m_fromVersion == rhs.m_fromVersion;
-        }
-    };
-
-    struct MigrationKeyHash
-    {
-        /**
-         *  @brief  Hash function for MigrationKey
-         *
-         *  @param  k the MigrationKey to hash
-         *
-         *  @return The hash value of the MigrationKey
-         */
-        std::size_t operator()(const MigrationKey &k) const
-        {
-            return std::hash<unsigned int>()(static_cast<unsigned int>(k.m_componentId))
-                ^ (std::hash<unsigned int>()(k.m_fromVersion) << 16);
-        }
-    };
-
     static constexpr uint32_t COMPONENT_END_MARKER = 0xDEADBEEFu;
 
     std::ifstream::pos_type m_containerPosition;
     std::ifstream::pos_type m_containerSize;
     std::ifstream           m_fileStream;
-
-    std::unordered_map<MigrationKey, MigrationFn, MigrationKeyHash> m_migrations;
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

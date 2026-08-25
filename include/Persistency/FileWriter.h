@@ -135,15 +135,6 @@ protected:
     virtual StatusCode WriteEventInformation() = 0;
 
     /**
-     *  @brief  Return the current schema version for a given component type.
-     *
-     *  Single source of truth shared by every concrete FileWriter (binary, XML, and any future format), so schema versions cannot drift
-     *  between formats. Increment a value here (and register a corresponding reader migration in BinaryFileReader/XmlFileReader) when a
-     *  field is removed or its semantics change. Adding a new optional field does not need a bump.
-     */
-    static unsigned int GetSchemaVersion(const ComponentId componentId);
-
-    /**
      *  @brief  Populate m_schemaRegistry from GetSchemaVersion() for every persisted component type. Called once by each concrete
      *          writer's constructor, after the output stream/document is ready.
      */
