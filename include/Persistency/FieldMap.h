@@ -34,7 +34,13 @@ enum class FieldValueType : uint8_t
 {
     UNKNOWN,
     FLOAT,
+    DOUBLE,
+    INT8,
+    INT16,
     INT32,
+    INT64,
+    UINT8,
+    UINT16,
     UINT32,
     UINT64,
     BOOL,
@@ -68,6 +74,10 @@ enum class FieldValueType : uint8_t
  *  -------------
  *  Set<T>() records a FieldValueType alongside the raw bytes, inferred from T at compile time (see GetFieldType()). This is used by
  *  XmlFileWriter to format each field correctly and by XmlFileReader to parse it back.
+ *
+ *  The recorded type is exact in both width and signedness, so that the byte count implied by the type always equals the byte count
+ *  actually stored. XmlFileWriter relies on this: it copies sizeof(recorded type) bytes out of the field, and a type narrower or wider
+ *  than the stored data would read past the end of the buffer or silently truncate.
  *
  *  Field order
  *  -----------
@@ -182,6 +192,30 @@ private:
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
+namespace field_map_detail
+{
+
+/**
+ *  @brief  Yields the underlying type of an enum, or T itself for any non-enum T. std::underlying_type is ill-formed for non-enum types, so
+ *          it cannot be named directly in a branch that also compiles for integrals.
+ */
+template <typename T, bool IsEnum = std::is_enum<T>::value>
+struct UnderlyingOrSelf
+{
+    typedef T type;
+};
+
+template <typename T>
+struct UnderlyingOrSelf<T, true>
+{
+    typedef typename std::underlying_type<T>::type type;
+};
+
+} // namespace field_map_detail
+
+
+//------------------------------------------------------------------------------------------------------------------------------------------
+
 template <typename T>
 inline FieldValueType FieldMap::DeduceFieldType()
 {
@@ -189,14 +223,28 @@ inline FieldValueType FieldMap::DeduceFieldType()
         return FieldValueType::BOOL;
 
     if (std::is_floating_point<T>::value)
-        return FieldValueType::FLOAT;
+        return (sizeof(T) == 8) ? FieldValueType::DOUBLE : FieldValueType::FLOAT;
 
-    if (std::is_integral<T>::value || std::is_enum<T>::value || std::is_pointer<T>::value)
+    // Pointer values (e.g. const void *) are rendered the same way as an unsigned integer of the same width
+    if (std::is_pointer<T>::value)
+        return (sizeof(T) == 8) ? FieldValueType::UINT64 : FieldValueType::UINT32;
+
+    if (std::is_integral<T>::value || std::is_enum<T>::value)
     {
-        // Pointer values (e.g. parent-object addresses stored as const void *) are rendered the same way as an unsigned integer of the same
-        // width; signedness only applies to genuine integral/enum types.
-        const bool isSigned = std::is_integral<T>::value && std::is_signed<T>::value;
-        return (sizeof(T) == 8) ? FieldValueType::UINT64 : (isSigned ? FieldValueType::INT32 : FieldValueType::UINT32);
+        // For an enum, signedness is that of the underlying type, not of the enum itself: std::is_signed is false for every enum, which
+        // would otherwise render a negative enumerator as a large unsigned value.
+        typedef typename field_map_detail::UnderlyingOrSelf<T>::type U;
+
+        if (std::is_signed<U>::value)
+        {
+            return (sizeof(T) == 1) ? FieldValueType::INT8  :
+                   (sizeof(T) == 2) ? FieldValueType::INT16 :
+                   (sizeof(T) == 4) ? FieldValueType::INT32 : FieldValueType::INT64;
+        }
+
+        return (sizeof(T) == 1) ? FieldValueType::UINT8  :
+               (sizeof(T) == 2) ? FieldValueType::UINT16 :
+               (sizeof(T) == 4) ? FieldValueType::UINT32 : FieldValueType::UINT64;
     }
 
     return FieldValueType::UNKNOWN;

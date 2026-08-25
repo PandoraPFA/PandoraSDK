@@ -33,122 +33,81 @@ void WarnUnparseable(const std::string &typeName, const std::string &text)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-std::vector<unsigned char> FloatFromString(const std::string &s)
+template <typename T>
+std::vector<unsigned char> BytesFromValue(const T &value)
 {
-    float v(0.f);
-
-    if (!s.empty())
-    {
-        try
-        {
-            v = std::stof(s);
-        }
-        catch (const std::exception &)
-        {
-            WarnUnparseable("float", s);
-            v = 0.f;
-        }
-    }
-
-    std::vector<unsigned char> bytes(sizeof(float));
-    std::memcpy(bytes.data(), &v, sizeof(float));
+    std::vector<unsigned char> bytes(sizeof(T));
+    std::memcpy(bytes.data(), &value, sizeof(T));
     return bytes;
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-std::vector<unsigned char> Int32FromString(const std::string &s)
+template <typename T>
+std::vector<unsigned char> SignedIntegerFromString(const std::string &s, const std::string &typeName)
 {
-    int32_t v(0);
+    long long v(0);
 
     if (!s.empty())
     {
         try
         {
-            v = static_cast<int32_t>(std::stol(s));
+            v = std::stoll(s);
         }
         catch (const std::exception &)
         {
-            WarnUnparseable("int32", s);
+            WarnUnparseable(typeName, s);
             v = 0;
         }
     }
 
-    std::vector<unsigned char> bytes(sizeof(int32_t));
-    std::memcpy(bytes.data(), &v, sizeof(int32_t));
-    return bytes;
+    return BytesFromValue(static_cast<T>(v));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-std::vector<unsigned char> Uint32FromString(const std::string &s)
+template <typename T>
+std::vector<unsigned char> UnsignedIntegerFromString(const std::string &s, const std::string &typeName)
 {
-    uint32_t v(0u);
+    unsigned long long v(0);
 
     if (!s.empty())
     {
         try
         {
-            v = static_cast<uint32_t>(std::stoul(s));
+            v = std::stoull(s);
         }
         catch (const std::exception &)
         {
-            WarnUnparseable("uint32", s);
-            v = 0u;
+            WarnUnparseable(typeName, s);
+            v = 0;
         }
     }
 
-    std::vector<unsigned char> bytes(sizeof(uint32_t));
-    std::memcpy(bytes.data(), &v, sizeof(uint32_t));
-    return bytes;
+    return BytesFromValue(static_cast<T>(v));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-std::vector<unsigned char> Uint64FromString(const std::string &s)
+template <typename T>
+std::vector<unsigned char> FloatingPointFromString(const std::string &s, const std::string &typeName)
 {
-    uint64_t v(0ull);
+    double v(0.0);
 
     if (!s.empty())
     {
         try
         {
-            v = static_cast<uint64_t>(std::stoull(s));
+            v = std::stod(s);
         }
         catch (const std::exception &)
         {
-            WarnUnparseable("uint64", s);
-            v = 0u;
+            WarnUnparseable(typeName, s);
+            v = 0.0;
         }
     }
 
-    std::vector<unsigned char> bytes(sizeof(uint64_t));
-    std::memcpy(bytes.data(), &v, sizeof(uint64_t));
-    return bytes;
-}
-
-//------------------------------------------------------------------------------------------------------------------------------------------
-
-std::vector<unsigned char> BoolFromString(const std::string &s)
-{
-    uint8_t v(0u);
-
-    if (!s.empty())
-    {
-        try
-        {
-            v = static_cast<uint8_t>(std::stoul(s));
-        }
-        catch (const std::exception &)
-        {
-            WarnUnparseable("uint8", s);
-            v = 0u;
-        }
-    }
-
-    std::vector<unsigned char> bytes(sizeof(uint8_t));
-    std::memcpy(bytes.data(), &v, sizeof(uint8_t));
-    return bytes;
+    return BytesFromValue(static_cast<T>(v));
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -201,8 +160,20 @@ FieldValueType FieldTypeFromAttributeString(const char *const pAttr)
 
     if (type == "float")
         return FieldValueType::FLOAT;
+    if (type == "double")
+        return FieldValueType::DOUBLE;
+    if (type == "int8")
+        return FieldValueType::INT8;
+    if (type == "int16")
+        return FieldValueType::INT16;
     if (type == "int32")
         return FieldValueType::INT32;
+    if (type == "int64")
+        return FieldValueType::INT64;
+    if (type == "uint8")
+        return FieldValueType::UINT8;
+    if (type == "uint16")
+        return FieldValueType::UINT16;
     if (type == "uint32")
         return FieldValueType::UINT32;
     if (type == "uint64")
@@ -226,21 +197,33 @@ std::vector<unsigned char> FieldTextToBytes(const FieldValueType type, const std
     switch (type)
     {
         case FieldValueType::FLOAT:
-            return FloatFromString(text);
+            return FloatingPointFromString<float>(text, "float");
+        case FieldValueType::DOUBLE:
+            return FloatingPointFromString<double>(text, "double");
+        case FieldValueType::INT8:
+            return SignedIntegerFromString<int8_t>(text, "int8");
+        case FieldValueType::INT16:
+            return SignedIntegerFromString<int16_t>(text, "int16");
         case FieldValueType::INT32:
-            return Int32FromString(text);
+            return SignedIntegerFromString<int32_t>(text, "int32");
+        case FieldValueType::INT64:
+            return SignedIntegerFromString<int64_t>(text, "int64");
+        case FieldValueType::UINT8:
+            return UnsignedIntegerFromString<uint8_t>(text, "uint8");
+        case FieldValueType::UINT16:
+            return UnsignedIntegerFromString<uint16_t>(text, "uint16");
+        case FieldValueType::UINT32:
+            return UnsignedIntegerFromString<uint32_t>(text, "uint32");
         case FieldValueType::UINT64:
-            return Uint64FromString(text);
+            return UnsignedIntegerFromString<uint64_t>(text, "uint64");
         case FieldValueType::BOOL:
-            return BoolFromString(text);
+            return UnsignedIntegerFromString<uint8_t>(text, "bool");
         case FieldValueType::STRING:
             return StringToBytes(text);
         case FieldValueType::CARTESIAN_VECTOR:
             return CartesianVectorFromString(text);
         case FieldValueType::TRACK_STATE:
             return TrackStateFromString(text);
-        case FieldValueType::UINT32:
-            return Uint32FromString(text);
         case FieldValueType::UNKNOWN:
         default:
             // No usable type attribute: preserve the text verbatim. A subsequent typed Get<T> will then report
