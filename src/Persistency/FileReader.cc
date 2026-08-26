@@ -133,12 +133,21 @@ StatusCode FileReader::ReadGlobalHeader()
 {
     if (HEADER_CONTAINER != this->GetNextContainerId())
     {
-        const StatusCode seekSc = this->GoToGlobalHeader();
+        StatusCode seekSc(STATUS_CODE_SUCCESS);
+
+        try
+        {
+            seekSc = this->GoToGlobalHeader();
+        }
+        catch (const StatusCodeException &statusCodeException)
+        {
+            seekSc = statusCodeException.GetStatusCode();
+        }
 
         if (STATUS_CODE_SUCCESS != seekSc)
         {
-            std::cout << "FileReader::ReadGlobalHeader() — no header container found; "
-                      << "proceeding with default metadata and schema registry." << std::endl;
+            std::cout << "FileReader::ReadGlobalHeader() — no header container found; " <<
+                "proceeding with default metadata and schema registry." << std::endl;
             return STATUS_CODE_SUCCESS;
         }
     }
