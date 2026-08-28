@@ -344,8 +344,6 @@ StatusCode BinaryFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
         return STATUS_CODE_FAILURE;
 
     FieldMap fields;
-    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Write(pCaloHit, fields));
-
     fields.Set("cellGeometry", pCaloHit->GetCellGeometry());
     fields.Set("positionVector", pCaloHit->GetPositionVector());
     fields.Set("expectedDirection", pCaloHit->GetExpectedDirection());
@@ -366,6 +364,7 @@ StatusCode BinaryFileWriter::WriteCaloHit(const CaloHit *const pCaloHit)
     fields.Set("parentAddress", pCaloHit->GetParentAddress());
     fields.Set("cellSize0", pCaloHit->GetCellSize0());
     fields.Set("cellSize1", pCaloHit->GetCellSize1());
+    PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Write(pCaloHit, fields));
 
     return this->WriteComponent(CALO_HIT_COMPONENT, GetSchemaVersion(CALO_HIT_COMPONENT), fields);
 }
