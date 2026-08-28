@@ -555,8 +555,6 @@ StatusCode BinaryFileReader::ReadCaloHit(const FieldMap &fields)
 
     try
     {
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Read(*pParameters, fields));
-
         pParameters->m_cellGeometry = fields.GetOrDefault<CellGeometry>("cellGeometry", RECTANGULAR);
         pParameters->m_positionVector = fields.GetOrDefault<CartesianVector>("positionVector", CartesianVector(0.f, 0.f, 0.f));
         pParameters->m_expectedDirection = fields.GetOrDefault<CartesianVector>("expectedDirection", CartesianVector(0.f, 0.f, 0.f));
@@ -577,6 +575,7 @@ StatusCode BinaryFileReader::ReadCaloHit(const FieldMap &fields)
         pParameters->m_pParentAddress = fields.GetOrDefault<const void *>("parentAddress", nullptr);
         pParameters->m_cellSize0 = fields.GetOrDefault<float>("cellSize0", 0.f);
         pParameters->m_cellSize1 = fields.GetOrDefault<float>("cellSize1", 0.f);
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Read(*pParameters, fields));
 
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::CaloHit::Create(*m_pPandora, *pParameters, *m_pCaloHitFactory));
         delete pParameters;
