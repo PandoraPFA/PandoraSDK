@@ -305,6 +305,7 @@ StatusCode XmlFileWriter::WriteComponent(const std::string &elementName,
         {
             std::cout << "XmlFileWriter: field \"" << entry.first << "\" in <" << elementName <<
                 "> has no recorded value type and cannot be written in a recoverable form" << std::endl;
+            delete pComponentElement;
             return STATUS_CODE_NOT_IMPLEMENTED;
         }
 

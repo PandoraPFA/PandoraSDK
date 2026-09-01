@@ -254,7 +254,7 @@ XmlFileReader::XmlFileReader(const pandora::Pandora &pandora, const std::string 
 
     // Seed the container cursor at the root element's first child so that GetNextContainerId() works correctly before the first
     // GoToNextContainer.
-    m_pContainerXmlNode = TiXmlHandle(m_pXmlDocument).FirstChildElement().FirstChild().Node();
+    m_pContainerXmlNode = TiXmlHandle(m_pXmlDocument).FirstChildElement().FirstChildElement().Node();
 }
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -289,7 +289,7 @@ StatusCode XmlFileReader::GoToNextContainer()
     {
         // First call: position at the first child of the root element.
         if (!m_pContainerXmlNode)
-            m_pContainerXmlNode = TiXmlHandle(m_pXmlDocument).FirstChildElement().FirstChild().Node();
+            m_pContainerXmlNode = TiXmlHandle(m_pXmlDocument).FirstChildElement().FirstChildElement().Node();
 
         m_isAtFileStart = false;
     }
@@ -298,7 +298,7 @@ StatusCode XmlFileReader::GoToNextContainer()
         if (!m_pContainerXmlNode)
             throw StatusCodeException(STATUS_CODE_NOT_FOUND);
 
-        m_pContainerXmlNode = m_pContainerXmlNode->NextSibling();
+        m_pContainerXmlNode = m_pContainerXmlNode->NextSiblingElement();
     }
 
     return STATUS_CODE_SUCCESS;
@@ -406,7 +406,7 @@ StatusCode XmlFileReader::ReadNextComponent([[maybe_unused]] const ContainerId e
     if (!m_pCurrentXmlElement)
     {
         TiXmlHandle localHandle(m_pContainerXmlNode);
-        m_pCurrentXmlElement = localHandle.FirstChild().Element();
+        m_pCurrentXmlElement = localHandle.FirstChildElement().Element();
     }
     else
     {
@@ -417,7 +417,7 @@ StatusCode XmlFileReader::ReadNextComponent([[maybe_unused]] const ContainerId e
     if (!m_pCurrentXmlElement)
     {
         if (m_pContainerXmlNode)
-            m_pContainerXmlNode = m_pContainerXmlNode->NextSibling();
+            m_pContainerXmlNode = m_pContainerXmlNode->NextSiblingElement();
 
         m_containerId = UNKNOWN_CONTAINER;
         return STATUS_CODE_NOT_FOUND;
@@ -575,7 +575,7 @@ StatusCode XmlFileReader::ReadSchemaRegistry(const FieldMap &fields)
                 m_schemaRegistry.push_back(csv);
             }
         }
-        catch (const std::invalid_argument &)
+        catch (const std::exception &)
         {
         }
     }
