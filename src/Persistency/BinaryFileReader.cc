@@ -349,7 +349,7 @@ StatusCode BinaryFileReader::ReadSchemaRegistry(const FieldMap &fields)
                 m_schemaRegistry.push_back(csv);
             }
         }
-        catch (const std::invalid_argument &)
+        catch (const std::exception &)
         {
             // Tag was not a numeric component id — skip
         }
@@ -734,7 +734,8 @@ StatusCode BinaryFileReader::ReadTagReference(std::string &tag)
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(tagLen));
 
     tag.assign(tagLen, '\0');
-    m_fileStream.read(&tag[0], tagLen);
+    if (tagLen > 0)
+        m_fileStream.read(&tag[0], tagLen);
 
     if (!m_fileStream.good())
         return STATUS_CODE_FAILURE;
