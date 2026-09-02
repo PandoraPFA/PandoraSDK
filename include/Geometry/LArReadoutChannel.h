@@ -34,7 +34,7 @@ public:
     /**
      *  @brief  Constructor
      *
-     *  @param  id the readout unit id (e,g, plane id in a horizontal drift TPC)
+     *  @param  id the readout channel id
      *  @param  channelIntervalArray an array describing the channel id interval for channels in other views that this channel can
      *          'intersect'
      */
@@ -46,9 +46,9 @@ public:
     ~LArReadoutChannel();
 
     /**
-     *  @brief  Get the id of the readout unit.
+     *  @brief  Get the id of the readout channel.
      *
-     *  @return the readout unit id
+     *  @return the readout channel id
      */
     unsigned int GetId() const;
 
