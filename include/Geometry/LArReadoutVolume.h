@@ -12,6 +12,7 @@
 #include "Geometry/LArReadoutUnit.h"
 #include "Objects/CartesianVector.h"
 
+#include <array>
 #include <map>
 
 namespace pandora
