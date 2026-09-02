@@ -37,7 +37,8 @@ public:
      *  @param  id the readout unit id (e,g, plane id in a horizontal drift TPC)
      *  @param  view the view of the readout unit
      *  @param  referenceCoordinate the reference coordinate of the readout unit. This is the centre of the first channel in the plane.
-     *  @param  pitch the signed pitch of the readout unit. This is the distance between channels in the plane, with a sign that indicates
+     *  @param  pitch the signed pitch of the readout unit. This is the distance between channels in the plane, with a sign that indicates whether
+     *          the channel number increases or decreases with increasing coordinate.
      *  @param  unitCenter the center of the readout unit's own active-area box.
      *  @param  unitSize the size of the readout unit's own active-area box.
      *  @param  readoutChannels the collection of readout channels associated with this readout unit
