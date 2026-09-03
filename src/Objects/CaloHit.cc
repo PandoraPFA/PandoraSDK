@@ -75,7 +75,8 @@ CaloHit::CaloHit(const object_creation::CaloHit::Parameters &parameters) :
     m_isIsolated(false),
     m_isAvailable(true),
     m_weight(1.f),
-    m_pParentAddress(parameters.m_pParentAddress.Get())
+    m_pParentAddress(parameters.m_pParentAddress.Get()),
+    m_isPossibleBIB(false)
 {
     m_cellLengthScale = this->CalculateCellLengthScale();
 }
@@ -110,7 +111,8 @@ CaloHit::CaloHit(const object_creation::CaloHitFragment::Parameters &parameters)
     m_isAvailable(parameters.m_pOriginalCaloHit->m_isAvailable),
     m_weight(parameters.m_weight.Get() * parameters.m_pOriginalCaloHit->m_weight),
     m_mcParticleWeightMap(parameters.m_pOriginalCaloHit->m_mcParticleWeightMap),
-    m_pParentAddress(parameters.m_pOriginalCaloHit->m_pParentAddress)
+    m_pParentAddress(parameters.m_pOriginalCaloHit->m_pParentAddress),
+    m_isPossibleBIB(parameters.m_pOriginalCaloHit->m_isPossibleBIB)
 {
     for (MCParticleWeightMap::value_type &mapEntry : m_mcParticleWeightMap)
         mapEntry.second = mapEntry.second * parameters.m_weight.Get();
@@ -138,6 +140,9 @@ StatusCode CaloHit::AlterMetadata(const object_creation::CaloHit::Metadata &meta
 
     if (metadata.m_isIsolated.IsInitialized())
         m_isIsolated = metadata.m_isIsolated.Get();
+
+    if (metadata.m_isPossibleBIB.IsInitialized())
+        m_isPossibleBIB = metadata.m_isPossibleBIB.Get();
 
     return STATUS_CODE_SUCCESS;
 }
