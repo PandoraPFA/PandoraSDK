@@ -130,7 +130,8 @@ std::vector<unsigned char> TrackStateFromString(const std::string &s)
 {
     std::istringstream iss(s);
     float f[6] = {};
-    for (int i = 0; i < 6; ++i) iss >> f[i];
+    for (int i = 0; i < 6; ++i)
+        iss >> f[i];
     std::vector<unsigned char> bytes(6 * sizeof(float));
     for (int i = 0; i < 6; ++i)
         std::memcpy(bytes.data() + i * sizeof(float), &f[i], sizeof(float));
@@ -269,11 +270,9 @@ XmlFileReader::~XmlFileReader()
 StatusCode XmlFileReader::ReadHeader()
 {
     m_pCurrentXmlElement = nullptr;
-    m_containerId        = this->GetNextContainerId();
+    m_containerId = this->GetNextContainerId();
 
-    if ((HEADER_CONTAINER   != m_containerId) &&
-        (EVENT_CONTAINER    != m_containerId) &&
-        (GEOMETRY_CONTAINER != m_containerId))
+    if ((HEADER_CONTAINER != m_containerId) && (EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
     return STATUS_CODE_SUCCESS;
@@ -384,9 +383,7 @@ StatusCode XmlFileReader::ReadComponentFields(unsigned int &schemaVersion, Field
         }
     }
 
-    for (TiXmlElement *pChild = m_pCurrentXmlElement->FirstChildElement();
-         nullptr != pChild;
-         pChild = pChild->NextSiblingElement())
+    for (TiXmlElement *pChild = m_pCurrentXmlElement->FirstChildElement(); nullptr != pChild; pChild = pChild->NextSiblingElement())
     {
         const std::string tag(pChild->ValueStr());
         const std::string text(pChild->GetText() ? pChild->GetText() : "");
@@ -534,7 +531,7 @@ StatusCode XmlFileReader::ReadMetadata(const FieldMap &fields)
     for (const auto &entry : fields.GetAllFields())
     {
         const std::string &tag = entry.first;
-        const std::string  prefix = "userParam:";
+        const std::string prefix = "userParam:";
 
         if (tag.size() > prefix.size() && tag.substr(0, prefix.size()) == prefix)
         {
@@ -616,13 +613,12 @@ StatusCode XmlFileReader::ReadSubDetector(const FieldMap &fields)
             const std::string prefix("layer" + std::to_string(i) + "_");
             PandoraApi::Geometry::LayerParameters layerParameters;
             layerParameters.m_closestDistanceToIp = fields.GetOrDefault<float>(prefix + "closestDistanceToIp", 0.f);
-            layerParameters.m_nRadiationLengths = fields.GetOrDefault<float>(prefix + "nRadiationLengths",   0.f);
+            layerParameters.m_nRadiationLengths = fields.GetOrDefault<float>(prefix + "nRadiationLengths", 0.f);
             layerParameters.m_nInteractionLengths = fields.GetOrDefault<float>(prefix + "nInteractionLengths", 0.f);
             pParameters->m_layerParametersVector.push_back(layerParameters);
         }
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            PandoraApi::Geometry::SubDetector::Create(*m_pPandora, *pParameters, *m_pSubDetectorFactory));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::SubDetector::Create(*m_pPandora, *pParameters, *m_pSubDetectorFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -662,8 +658,7 @@ StatusCode XmlFileReader::ReadLArTPC(const FieldMap &fields)
         pParameters->m_isDriftInPositiveX = fields.GetOrDefault<bool>("isDriftInPositiveX", false);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLArTPCFactory->Read(*pParameters, fields));
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            PandoraApi::Geometry::LArTPC::Create(*m_pPandora, *pParameters, *m_pLArTPCFactory));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LArTPC::Create(*m_pPandora, *pParameters, *m_pLArTPCFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -694,11 +689,14 @@ StatusCode XmlFileReader::ReadLineGap(const FieldMap &fields)
         pParameters->m_lineStartZ = fields.GetOrDefault<float>("lineStartZ", 0.f);
         pParameters->m_lineEndZ = fields.GetOrDefault<float>("lineEndZ", 0.f);
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            PandoraApi::Geometry::LineGap::Create(*m_pPandora, *pParameters, *m_pLineGapFactory));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::LineGap::Create(*m_pPandora, *pParameters, *m_pLineGapFactory));
         delete pParameters;
     }
-    catch (StatusCodeException &e) { delete pParameters; return e.GetStatusCode(); }
+    catch (StatusCodeException &e)
+    {
+        delete pParameters;
+        return e.GetStatusCode();
+    }
 
     return STATUS_CODE_SUCCESS;
 }
@@ -721,8 +719,7 @@ StatusCode XmlFileReader::ReadBoxGap(const FieldMap &fields)
         pParameters->m_side2 = fields.GetOrDefault<CartesianVector>("side2", CartesianVector(0.f, 0.f, 0.f));
         pParameters->m_side3 = fields.GetOrDefault<CartesianVector>("side3", CartesianVector(0.f, 0.f, 0.f));
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            PandoraApi::Geometry::BoxGap::Create(*m_pPandora, *pParameters, *m_pBoxGapFactory));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::BoxGap::Create(*m_pPandora, *pParameters, *m_pBoxGapFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -756,8 +753,7 @@ StatusCode XmlFileReader::ReadConcentricGap(const FieldMap &fields)
         pParameters->m_outerPhiCoordinate = fields.GetOrDefault<float>("outerPhiCoordinate", 0.f);
         pParameters->m_outerSymmetryOrder = fields.GetOrDefault<unsigned int>("outerSymmetryOrder", 0u);
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            PandoraApi::Geometry::ConcentricGap::Create(*m_pPandora, *pParameters, *m_pConcentricGapFactory));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Geometry::ConcentricGap::Create(*m_pPandora, *pParameters, *m_pConcentricGapFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -781,9 +777,9 @@ StatusCode XmlFileReader::ReadCaloHit(const FieldMap &fields)
     try
     {
         pParameters->m_cellGeometry = fields.GetOrDefault<CellGeometry>("cellGeometry", RECTANGULAR);
-        pParameters->m_positionVector = fields.GetOrDefault<CartesianVector>("positionVector", CartesianVector(0.f,0.f,0.f));
-        pParameters->m_expectedDirection = fields.GetOrDefault<CartesianVector>("expectedDirection", CartesianVector(0.f,0.f,0.f));
-        pParameters->m_cellNormalVector = fields.GetOrDefault<CartesianVector>("cellNormalVector", CartesianVector(0.f,0.f,0.f));
+        pParameters->m_positionVector = fields.GetOrDefault<CartesianVector>("positionVector", CartesianVector(0.f, 0.f, 0.f));
+        pParameters->m_expectedDirection = fields.GetOrDefault<CartesianVector>("expectedDirection", CartesianVector(0.f, 0.f, 0.f));
+        pParameters->m_cellNormalVector = fields.GetOrDefault<CartesianVector>("cellNormalVector", CartesianVector(0.f, 0.f, 0.f));
         pParameters->m_cellThickness = fields.GetOrDefault<float>("cellThickness", 0.f);
         pParameters->m_nCellRadiationLengths = fields.GetOrDefault<float>("nCellRadiationLengths", 0.f);
         pParameters->m_nCellInteractionLengths = fields.GetOrDefault<float>("nCellInteractionLengths", 0.f);
@@ -802,11 +798,14 @@ StatusCode XmlFileReader::ReadCaloHit(const FieldMap &fields)
         pParameters->m_cellSize1 = fields.GetOrDefault<float>("cellSize1", 0.f);
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pCaloHitFactory->Read(*pParameters, fields));
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            PandoraApi::CaloHit::Create(*m_pPandora, *pParameters, *m_pCaloHitFactory));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::CaloHit::Create(*m_pPandora, *pParameters, *m_pCaloHitFactory));
         delete pParameters;
     }
-    catch (StatusCodeException &e) { delete pParameters; return e.GetStatusCode(); }
+    catch (StatusCodeException &e)
+    {
+        delete pParameters;
+        return e.GetStatusCode();
+    }
 
     return STATUS_CODE_SUCCESS;
 }
@@ -829,10 +828,11 @@ StatusCode XmlFileReader::ReadTrack(const FieldMap &fields)
         pParameters->m_particleId = fields.GetOrDefault<int>("particleId", 0);
         pParameters->m_charge = fields.GetOrDefault<int>("charge", 0);
         pParameters->m_mass = fields.GetOrDefault<float>("mass", 0.f);
-        pParameters->m_momentumAtDca = fields.GetOrDefault<CartesianVector>("momentumAtDca", CartesianVector(0.f,0.f,0.f));
-        pParameters->m_trackStateAtStart = fields.GetOrDefault<TrackState>("trackStateAtStart", TrackState(0.f,0.f,0.f,0.f,0.f,0.f));
-        pParameters->m_trackStateAtEnd = fields.GetOrDefault<TrackState>("trackStateAtEnd", TrackState(0.f,0.f,0.f,0.f,0.f,0.f));
-        pParameters->m_trackStateAtCalorimeter = fields.GetOrDefault<TrackState>("trackStateAtCalorimeter", TrackState(0.f,0.f,0.f,0.f,0.f,0.f));
+        pParameters->m_momentumAtDca = fields.GetOrDefault<CartesianVector>("momentumAtDca", CartesianVector(0.f, 0.f, 0.f));
+        pParameters->m_trackStateAtStart = fields.GetOrDefault<TrackState>("trackStateAtStart", TrackState(0.f, 0.f, 0.f, 0.f, 0.f, 0.f));
+        pParameters->m_trackStateAtEnd = fields.GetOrDefault<TrackState>("trackStateAtEnd", TrackState(0.f, 0.f, 0.f, 0.f, 0.f, 0.f));
+        pParameters->m_trackStateAtCalorimeter =
+            fields.GetOrDefault<TrackState>("trackStateAtCalorimeter", TrackState(0.f, 0.f, 0.f, 0.f, 0.f, 0.f));
         pParameters->m_timeAtCalorimeter = fields.GetOrDefault<float>("timeAtCalorimeter", 0.f);
         pParameters->m_reachesCalorimeter = fields.GetOrDefault<bool>("reachesCalorimeter", false);
         pParameters->m_isProjectedToEndCap = fields.GetOrDefault<bool>("isProjectedToEndCap", false);
@@ -840,8 +840,7 @@ StatusCode XmlFileReader::ReadTrack(const FieldMap &fields)
         pParameters->m_canFormClusterlessPfo = fields.GetOrDefault<bool>("canFormClusterlessPfo", false);
         pParameters->m_pParentAddress = fields.GetOrDefault<const void *>("parentAddress", nullptr);
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            PandoraApi::Track::Create(*m_pPandora, *pParameters, *m_pTrackFactory));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::Track::Create(*m_pPandora, *pParameters, *m_pTrackFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -867,15 +866,14 @@ StatusCode XmlFileReader::ReadMCParticle(const FieldMap &fields)
         PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pMCParticleFactory->Read(*pParameters, fields));
 
         pParameters->m_energy = fields.GetOrDefault<float>("energy", 0.f);
-        pParameters->m_momentum = fields.GetOrDefault<CartesianVector>("momentum", CartesianVector(0.f,0.f,0.f));
-        pParameters->m_vertex = fields.GetOrDefault<CartesianVector>("vertex", CartesianVector(0.f,0.f,0.f));
-        pParameters->m_endpoint = fields.GetOrDefault<CartesianVector>("endpoint", CartesianVector(0.f,0.f,0.f));
+        pParameters->m_momentum = fields.GetOrDefault<CartesianVector>("momentum", CartesianVector(0.f, 0.f, 0.f));
+        pParameters->m_vertex = fields.GetOrDefault<CartesianVector>("vertex", CartesianVector(0.f, 0.f, 0.f));
+        pParameters->m_endpoint = fields.GetOrDefault<CartesianVector>("endpoint", CartesianVector(0.f, 0.f, 0.f));
         pParameters->m_particleId = fields.GetOrDefault<int>("particleId", -std::numeric_limits<int>::max());
         pParameters->m_mcParticleType = fields.GetOrDefault<MCParticleType>("mcParticleType", MC_3D);
         pParameters->m_pParentAddress = fields.GetOrDefault<const void *>("uid", nullptr);
 
-        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            PandoraApi::MCParticle::Create(*m_pPandora, *pParameters, *m_pMCParticleFactory));
+        PANDORA_THROW_RESULT_IF(STATUS_CODE_SUCCESS, !=, PandoraApi::MCParticle::Create(*m_pPandora, *pParameters, *m_pMCParticleFactory));
         delete pParameters;
     }
     catch (StatusCodeException &e)
@@ -928,7 +926,7 @@ StatusCode XmlFileReader::ReadEventInformation(const FieldMap &fields)
 
     const unsigned int run = fields.GetOrDefault<unsigned int>("run", 0u);
     const unsigned int subrun = fields.GetOrDefault<unsigned int>("subrun", 0u);
-    const unsigned int event = fields.GetOrDefault<unsigned int>("event",  0u);
+    const unsigned int event = fields.GetOrDefault<unsigned int>("event", 0u);
 
     return PandoraApi::SetEventInformation(*m_pPandora, run, subrun, event);
 }

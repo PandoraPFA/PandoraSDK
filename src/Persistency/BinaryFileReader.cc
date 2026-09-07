@@ -54,8 +54,8 @@ StatusCode BinaryFileReader::ReadHeader()
 
     if (PANDORA_BINARY_FORMAT_VERSION != formatVersion)
     {
-        std::cout << "BinaryFileReader: binary format version " << formatVersion << " in " << m_fileName <<
-            " is not readable by this build (expected " << PANDORA_BINARY_FORMAT_VERSION << ")" << std::endl;
+        std::cout << "BinaryFileReader: binary format version " << formatVersion << " in " << m_fileName
+                  << " is not readable by this build (expected " << PANDORA_BINARY_FORMAT_VERSION << ")" << std::endl;
         return STATUS_CODE_FAILURE;
     }
 
@@ -168,8 +168,7 @@ StatusCode BinaryFileReader::GoToEvent(const unsigned int eventNumber)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadComponentFields(ComponentId &componentId,
-    unsigned int &schemaVersion, FieldMap &fields)
+StatusCode BinaryFileReader::ReadComponentFields(ComponentId &componentId, unsigned int &schemaVersion, FieldMap &fields)
 {
     // Read component header
     uint32_t cid(0), sver(0), numFields(0);
@@ -177,7 +176,7 @@ StatusCode BinaryFileReader::ReadComponentFields(ComponentId &componentId,
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(sver));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->ReadVariable(numFields));
 
-    componentId   = static_cast<ComponentId>(cid);
+    componentId = static_cast<ComponentId>(cid);
     schemaVersion = static_cast<unsigned int>(sver);
 
     // Read all tagged fields
@@ -213,8 +212,7 @@ StatusCode BinaryFileReader::ReadComponentFields(ComponentId &componentId,
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileReader::ReadNextComponent([[maybe_unused]] const ContainerId expectedContainer,
-    const ComponentId endComponentId)
+StatusCode BinaryFileReader::ReadNextComponent([[maybe_unused]] const ContainerId expectedContainer, const ComponentId endComponentId)
 {
     // Peek at the stream — if at EOF return NOT_FOUND so the loop terminates cleanly.
     if (m_fileStream.peek() == std::ifstream::traits_type::eof())
@@ -248,27 +246,38 @@ StatusCode BinaryFileReader::ReadNextComponent([[maybe_unused]] const ContainerI
     switch (componentId)
     {
         // Global header components
-        case METADATA_COMPONENT:       return this->ReadMetadata(fields);
-        case SCHEMA_REGISTRY_COMPONENT:return this->ReadSchemaRegistry(fields);
+        case METADATA_COMPONENT:
+            return this->ReadMetadata(fields);
+        case SCHEMA_REGISTRY_COMPONENT:
+            return this->ReadSchemaRegistry(fields);
 
         // Geometry components
-        case SUB_DETECTOR_COMPONENT:  return this->ReadSubDetector(fields);
-        case LAR_TPC_COMPONENT:       return this->ReadLArTPC(fields);
-        case LINE_GAP_COMPONENT:      return this->ReadLineGap(fields);
-        case BOX_GAP_COMPONENT:       return this->ReadBoxGap(fields);
-        case CONCENTRIC_GAP_COMPONENT:return this->ReadConcentricGap(fields);
+        case SUB_DETECTOR_COMPONENT:
+            return this->ReadSubDetector(fields);
+        case LAR_TPC_COMPONENT:
+            return this->ReadLArTPC(fields);
+        case LINE_GAP_COMPONENT:
+            return this->ReadLineGap(fields);
+        case BOX_GAP_COMPONENT:
+            return this->ReadBoxGap(fields);
+        case CONCENTRIC_GAP_COMPONENT:
+            return this->ReadConcentricGap(fields);
 
         // Event components
-        case CALO_HIT_COMPONENT:      return this->ReadCaloHit(fields);
-        case TRACK_COMPONENT:         return this->ReadTrack(fields);
-        case MC_PARTICLE_COMPONENT:   return this->ReadMCParticle(fields);
-        case RELATIONSHIP_COMPONENT:  return this->ReadRelationship(fields);
-        case EVENT_INFO_COMPONENT:    return this->ReadEventInformation(fields);
+        case CALO_HIT_COMPONENT:
+            return this->ReadCaloHit(fields);
+        case TRACK_COMPONENT:
+            return this->ReadTrack(fields);
+        case MC_PARTICLE_COMPONENT:
+            return this->ReadMCParticle(fields);
+        case RELATIONSHIP_COMPONENT:
+            return this->ReadRelationship(fields);
+        case EVENT_INFO_COMPONENT:
+            return this->ReadEventInformation(fields);
 
         default:
             // Unknown component — already consumed from stream, just continue.
-            std::cout << "BinaryFileReader: skipping unknown component id "
-                      << static_cast<unsigned int>(componentId) << std::endl;
+            std::cout << "BinaryFileReader: skipping unknown component id " << static_cast<unsigned int>(componentId) << std::endl;
             return STATUS_CODE_SUCCESS;
     }
 }
@@ -301,10 +310,10 @@ StatusCode BinaryFileReader::ReadMetadata(const FieldMap &fields)
     if (HEADER_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
 
-    m_metadata.m_producerName      = fields.GetOrDefault<std::string>("producerName",      std::string());
-    m_metadata.m_producerVersion   = fields.GetOrDefault<std::string>("producerVersion",   std::string());
+    m_metadata.m_producerName = fields.GetOrDefault<std::string>("producerName", std::string());
+    m_metadata.m_producerVersion = fields.GetOrDefault<std::string>("producerVersion", std::string());
     m_metadata.m_creationTimestamp = fields.GetOrDefault<std::string>("creationTimestamp", std::string());
-    m_metadata.m_description       = fields.GetOrDefault<std::string>("description",       std::string());
+    m_metadata.m_description = fields.GetOrDefault<std::string>("description", std::string());
 
     // Recover user parameters: any tag beginning with "userParam:" is a user parameter.
     for (const auto &entry : fields.GetAllFields())
@@ -344,7 +353,7 @@ StatusCode BinaryFileReader::ReadSchemaRegistry(const FieldMap &fields)
             if (STATUS_CODE_SUCCESS == fields.Get(tag, schemaVersion))
             {
                 ComponentSchemaVersion csv;
-                csv.m_componentId   = static_cast<ComponentId>(componentIdVal);
+                csv.m_componentId = static_cast<ComponentId>(componentIdVal);
                 csv.m_schemaVersion = schemaVersion;
                 m_schemaRegistry.push_back(csv);
             }
@@ -609,7 +618,8 @@ StatusCode BinaryFileReader::ReadTrack(const FieldMap &fields)
         pParameters->m_momentumAtDca = fields.GetOrDefault<CartesianVector>("momentumAtDca", CartesianVector(0.f, 0.f, 0.f));
         pParameters->m_trackStateAtStart = fields.GetOrDefault<TrackState>("trackStateAtStart", TrackState(0.f, 0.f, 0.f, 0.f, 0.f, 0.f));
         pParameters->m_trackStateAtEnd = fields.GetOrDefault<TrackState>("trackStateAtEnd", TrackState(0.f, 0.f, 0.f, 0.f, 0.f, 0.f));
-        pParameters->m_trackStateAtCalorimeter = fields.GetOrDefault<TrackState>("trackStateAtCalorimeter", TrackState(0.f, 0.f, 0.f, 0.f, 0.f, 0.f));
+        pParameters->m_trackStateAtCalorimeter =
+            fields.GetOrDefault<TrackState>("trackStateAtCalorimeter", TrackState(0.f, 0.f, 0.f, 0.f, 0.f, 0.f));
         pParameters->m_timeAtCalorimeter = fields.GetOrDefault<float>("timeAtCalorimeter", 0.f);
         pParameters->m_reachesCalorimeter = fields.GetOrDefault<bool>("reachesCalorimeter", false);
         pParameters->m_isProjectedToEndCap = fields.GetOrDefault<bool>("isProjectedToEndCap", false);
@@ -704,7 +714,7 @@ StatusCode BinaryFileReader::ReadEventInformation(const FieldMap &fields)
 
     const unsigned int run = fields.GetOrDefault<unsigned int>("run", 0u);
     const unsigned int subrun = fields.GetOrDefault<unsigned int>("subrun", 0u);
-    const unsigned int event  = fields.GetOrDefault<unsigned int>("event",  0u);
+    const unsigned int event = fields.GetOrDefault<unsigned int>("event", 0u);
 
     return PandoraApi::SetEventInformation(*m_pPandora, run, subrun, event);
 }

@@ -59,8 +59,8 @@ StatusCode FileWriter::WriteGeometry()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode FileWriter::WriteEvent(const CaloHitList &caloHitList, const TrackList &trackList,
-    const MCParticleList &mcParticleList, const bool writeMCRelationships, const bool writeTrackRelationships)
+StatusCode FileWriter::WriteEvent(const CaloHitList &caloHitList, const TrackList &trackList, const MCParticleList &mcParticleList,
+    const bool writeMCRelationships, const bool writeTrackRelationships)
 {
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteHeader(EVENT_CONTAINER));
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteCaloHitList(caloHitList));
@@ -201,8 +201,7 @@ StatusCode FileWriter::WriteCaloHitToMCParticleRelationship(const CaloHit *const
     for (const MCParticle *const pMCParticle : mcParticleVector)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            this->WriteRelationship(CALO_HIT_TO_MC_RELATIONSHIP,
-                pCaloHit->GetParentAddress(), pMCParticle->GetUid(), mcParticleWeightMap.at(pMCParticle)));
+            this->WriteRelationship(CALO_HIT_TO_MC_RELATIONSHIP, pCaloHit->GetParentAddress(), pMCParticle->GetUid(), mcParticleWeightMap.at(pMCParticle)));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -225,8 +224,7 @@ StatusCode FileWriter::WriteTrackToMCParticleRelationship(const Track *const pTr
     for (const MCParticle *const pMCParticle : mcParticleVector)
     {
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            this->WriteRelationship(TRACK_TO_MC_RELATIONSHIP,
-                pTrack->GetParentAddress(), pMCParticle->GetUid(), mcParticleWeightMap.at(pMCParticle)));
+            this->WriteRelationship(TRACK_TO_MC_RELATIONSHIP, pTrack->GetParentAddress(), pMCParticle->GetUid(), mcParticleWeightMap.at(pMCParticle)));
     }
 
     return STATUS_CODE_SUCCESS;
@@ -242,12 +240,11 @@ StatusCode FileWriter::WriteMCParticleRelationships(const MCParticle *const pMCP
     const Uid uid(pMCParticle->GetUid());
 
     for (const MCParticle *const pParentMCParticle : pMCParticle->GetParentList())
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            this->WriteRelationship(MC_PARENT_DAUGHTER_RELATIONSHIP, pParentMCParticle->GetUid(), uid));
+        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteRelationship(MC_PARENT_DAUGHTER_RELATIONSHIP, pParentMCParticle->GetUid(), uid));
 
     for (const MCParticle *const pDaughterMCParticle : pMCParticle->GetDaughterList())
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            this->WriteRelationship(MC_PARENT_DAUGHTER_RELATIONSHIP, uid, pDaughterMCParticle->GetUid()));
+        PANDORA_RETURN_RESULT_IF(
+            STATUS_CODE_SUCCESS, !=, this->WriteRelationship(MC_PARENT_DAUGHTER_RELATIONSHIP, uid, pDaughterMCParticle->GetUid()));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -262,16 +259,16 @@ StatusCode FileWriter::WriteTrackRelationships(const Track *const pTrack)
     const void *const address(pTrack->GetParentAddress());
 
     for (const Track *const pParentTrack : pTrack->GetParentList())
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            this->WriteRelationship(TRACK_PARENT_DAUGHTER_RELATIONSHIP, pParentTrack->GetParentAddress(), address));
+        PANDORA_RETURN_RESULT_IF(
+            STATUS_CODE_SUCCESS, !=, this->WriteRelationship(TRACK_PARENT_DAUGHTER_RELATIONSHIP, pParentTrack->GetParentAddress(), address));
 
     for (const Track *const pDaughterTrack : pTrack->GetDaughterList())
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=,
             this->WriteRelationship(TRACK_PARENT_DAUGHTER_RELATIONSHIP, address, pDaughterTrack->GetParentAddress()));
 
     for (const Track *const pSiblingTrack : pTrack->GetSiblingList())
-        PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=,
-            this->WriteRelationship(TRACK_SIBLING_RELATIONSHIP, address, pSiblingTrack->GetParentAddress()));
+        PANDORA_RETURN_RESULT_IF(
+            STATUS_CODE_SUCCESS, !=, this->WriteRelationship(TRACK_SIBLING_RELATIONSHIP, address, pSiblingTrack->GetParentAddress()));
 
     return STATUS_CODE_SUCCESS;
 }
@@ -280,17 +277,13 @@ StatusCode FileWriter::WriteTrackRelationships(const Track *const pTrack)
 
 void FileWriter::PopulateSchemaRegistry()
 {
-    const ComponentId allComponents[] = {
-        CALO_HIT_COMPONENT, TRACK_COMPONENT, MC_PARTICLE_COMPONENT,
-        RELATIONSHIP_COMPONENT, SUB_DETECTOR_COMPONENT, LINE_GAP_COMPONENT,
-        BOX_GAP_COMPONENT, CONCENTRIC_GAP_COMPONENT, LAR_TPC_COMPONENT,
-        EVENT_INFO_COMPONENT
-    };
+    const ComponentId allComponents[] = {CALO_HIT_COMPONENT, TRACK_COMPONENT, MC_PARTICLE_COMPONENT, RELATIONSHIP_COMPONENT,
+        SUB_DETECTOR_COMPONENT, LINE_GAP_COMPONENT, BOX_GAP_COMPONENT, CONCENTRIC_GAP_COMPONENT, LAR_TPC_COMPONENT, EVENT_INFO_COMPONENT};
 
     for (const ComponentId id : allComponents)
     {
         ComponentSchemaVersion entry;
-        entry.m_componentId   = id;
+        entry.m_componentId = id;
         entry.m_schemaVersion = GetSchemaVersion(id);
         m_schemaRegistry.push_back(entry);
     }

@@ -72,8 +72,7 @@ public:
      *  @param  toVersion the schema version to migrate to (must equal fromVersion + 1)
      *  @param  fn the migration function to apply to the FieldMap
      */
-    void RegisterMigration(const ComponentId componentId, const unsigned int fromVersion,
-        const unsigned int toVersion, MigrationFn fn);
+    void RegisterMigration(const ComponentId componentId, const unsigned int fromVersion, const unsigned int toVersion, MigrationFn fn);
 
     /**
      *  @brief  Set what happens when a file's recorded schema versions cannot be read faithfully by this build.
@@ -182,7 +181,7 @@ private:
 
     struct MigrationKey
     {
-        ComponentId  m_componentId;
+        ComponentId m_componentId;
         unsigned int m_fromVersion;
 
         /**

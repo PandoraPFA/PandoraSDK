@@ -167,8 +167,8 @@ public:
 private:
     struct Entry
     {
-        FieldValueType              m_type;
-        std::vector<unsigned char>  m_bytes;
+        FieldValueType m_type;
+        std::vector<unsigned char> m_bytes;
     };
 
     /**
@@ -186,8 +186,8 @@ private:
      */
     void RecordOrder(const std::string &tag);
 
-    std::vector<std::string>                    m_tagOrder; ///< First-Set order of tags
-    std::unordered_map<std::string, Entry>      m_fields;   ///< Tag -> (type, bytes)
+    std::vector<std::string> m_tagOrder;             ///< First-Set order of tags
+    std::unordered_map<std::string, Entry> m_fields; ///< Tag -> (type, bytes)
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -213,7 +213,6 @@ struct UnderlyingOrSelf<T, true>
 
 } // namespace field_map_detail
 
-
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename T>
@@ -237,14 +236,16 @@ inline FieldValueType FieldMap::DeduceFieldType()
 
         if (std::is_signed<U>::value)
         {
-            return (sizeof(T) == 1) ? FieldValueType::INT8  :
-                   (sizeof(T) == 2) ? FieldValueType::INT16 :
-                   (sizeof(T) == 4) ? FieldValueType::INT32 : FieldValueType::INT64;
+            return (sizeof(T) == 1) ? FieldValueType::INT8
+                : (sizeof(T) == 2)  ? FieldValueType::INT16
+                : (sizeof(T) == 4)  ? FieldValueType::INT32
+                                    : FieldValueType::INT64;
         }
 
-        return (sizeof(T) == 1) ? FieldValueType::UINT8  :
-               (sizeof(T) == 2) ? FieldValueType::UINT16 :
-               (sizeof(T) == 4) ? FieldValueType::UINT32 : FieldValueType::UINT64;
+        return (sizeof(T) == 1) ? FieldValueType::UINT8
+            : (sizeof(T) == 2)  ? FieldValueType::UINT16
+            : (sizeof(T) == 4)  ? FieldValueType::UINT32
+                                : FieldValueType::UINT64;
     }
 
     return FieldValueType::UNKNOWN;
@@ -263,8 +264,7 @@ inline void FieldMap::RecordOrder(const std::string &tag)
 template <typename T>
 inline void FieldMap::Set(const std::string &tag, const T &value)
 {
-    static_assert(std::is_trivially_copyable<T>::value,
-        "FieldMap::Set requires trivially-copyable T; provide a specialisation for compound types");
+    static_assert(std::is_trivially_copyable<T>::value, "FieldMap::Set requires trivially-copyable T; provide a specialisation for compound types");
 
     std::vector<unsigned char> bytes(sizeof(T));
     std::memcpy(bytes.data(), &value, sizeof(T));
@@ -278,11 +278,12 @@ inline void FieldMap::Set(const std::string &tag, const T &value)
 template <typename T>
 inline StatusCode FieldMap::Get(const std::string &tag, T &value) const
 {
-    static_assert(std::is_trivially_copyable<T>::value,
-        "FieldMap::Get requires trivially-copyable T; provide a specialisation for compound types");
+    static_assert(std::is_trivially_copyable<T>::value, "FieldMap::Get requires trivially-copyable T; provide a specialisation for compound types");
     auto it = m_fields.find(tag);
-    if (it == m_fields.end()) return STATUS_CODE_NOT_FOUND;
-    if (it->second.m_bytes.size() != sizeof(T)) return STATUS_CODE_INVALID_PARAMETER;
+    if (it == m_fields.end())
+        return STATUS_CODE_NOT_FOUND;
+    if (it->second.m_bytes.size() != sizeof(T))
+        return STATUS_CODE_INVALID_PARAMETER;
     std::memcpy(&value, it->second.m_bytes.data(), sizeof(T));
     return STATUS_CODE_SUCCESS;
 }
@@ -299,7 +300,7 @@ inline T FieldMap::GetOrDefault(const std::string &tag, const T &defaultValue) c
     if (it == m_fields.end())
         return defaultValue;
 
-    T value{defaultValue};   // copy-construct from default so compound types are always in a valid state before Get overwrites
+    T value{defaultValue}; // copy-construct from default so compound types are always in a valid state before Get overwrites
     const StatusCode sc = this->Get(tag, value);
 
     if (STATUS_CODE_SUCCESS != sc)
@@ -328,7 +329,8 @@ inline void FieldMap::SetRawBytes(const std::string &tag, std::vector<unsigned c
 inline StatusCode FieldMap::GetRawBytes(const std::string &tag, std::vector<unsigned char> &bytes) const
 {
     auto it = m_fields.find(tag);
-    if (it == m_fields.end()) return STATUS_CODE_NOT_FOUND;
+    if (it == m_fields.end())
+        return STATUS_CODE_NOT_FOUND;
     bytes = it->second.m_bytes;
     return STATUS_CODE_SUCCESS;
 }
@@ -338,7 +340,8 @@ inline StatusCode FieldMap::GetRawBytes(const std::string &tag, std::vector<unsi
 inline FieldValueType FieldMap::GetFieldType(const std::string &tag) const
 {
     auto it = m_fields.find(tag);
-    if (it == m_fields.end()) return FieldValueType::UNKNOWN;
+    if (it == m_fields.end())
+        return FieldValueType::UNKNOWN;
     return it->second.m_type;
 }
 

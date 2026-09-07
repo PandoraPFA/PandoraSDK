@@ -42,8 +42,7 @@ public:
      *  @param  fileName  the name of the output file
      *  @param  fileMode  APPEND (default) or OVERWRITE
      */
-    XmlFileWriter(const pandora::Pandora &pandora, const std::string &fileName,
-        const FileMode fileMode = APPEND);
+    XmlFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode = APPEND);
 
     /**
      *  @brief  Destructor — saves the XML document to disk

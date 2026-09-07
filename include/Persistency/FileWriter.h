@@ -126,8 +126,7 @@ protected:
      *  @param  address2 the address of the second object in the relationship
      *  @param  weight the weight of the relationship
      */
-    virtual StatusCode WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2,
-        const float weight = 1.f) = 0;
+    virtual StatusCode WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight = 1.f) = 0;
 
     /**
      *  @brief  Write the event information to the file

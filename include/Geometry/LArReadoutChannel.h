@@ -85,9 +85,9 @@ private:
     void SetParent(const LArReadoutUnit *pParent) const;
     friend class LArReadoutUnit;
 
-    unsigned int m_id;                                  ///< The id of the readout channel
-    ViewChannelIntervalArray m_channelIntervalArray;    ///< An array describing the channel id 'intersection' intervals for each view
-    mutable const LArReadoutUnit *m_pParentReadoutUnit{nullptr};    ///< Pointer to the parent readout unit (e.g. wire plane) to which this channel belongs
+    unsigned int m_id;                               ///< The id of the readout channel
+    ViewChannelIntervalArray m_channelIntervalArray; ///< An array describing the channel id 'intersection' intervals for each view
+    mutable const LArReadoutUnit *m_pParentReadoutUnit{nullptr}; ///< Pointer to the parent readout unit (e.g. wire plane) to which this channel belongs
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -121,4 +121,3 @@ inline void LArReadoutChannel::SetParent(const LArReadoutUnit *pParent) const
 } // namespace pandora
 
 #endif // #ifndef PANDORA_LAR_READOUT_CHANNEL_H
-

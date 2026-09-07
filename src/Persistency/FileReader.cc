@@ -29,8 +29,7 @@ FileReader::~FileReader()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-void FileReader::RegisterMigration(const ComponentId componentId, const unsigned int fromVersion, const unsigned int toVersion,
-    MigrationFn fn)
+void FileReader::RegisterMigration(const ComponentId componentId, const unsigned int fromVersion, const unsigned int toVersion, MigrationFn fn)
 {
     if (toVersion != fromVersion + 1)
         throw StatusCodeException(STATUS_CODE_INVALID_PARAMETER);
@@ -101,8 +100,8 @@ StatusCode FileReader::CheckSchemaCompatibility() const
         if (fileVersion == buildVersion)
             continue;
 
-        std::cout << "FileReader: schema mismatch in " << m_fileName << " for component " << static_cast<unsigned int>(entry.m_componentId) <<
-            " — file v" << fileVersion << ", build v" << buildVersion << ": ";
+        std::cout << "FileReader: schema mismatch in " << m_fileName << " for component " << static_cast<unsigned int>(entry.m_componentId)
+                  << " — file v" << fileVersion << ", build v" << buildVersion << ": ";
 
         if (fileVersion > buildVersion)
         {
@@ -111,8 +110,8 @@ StatusCode FileReader::CheckSchemaCompatibility() const
         }
         else if (!this->HasMigrationPath(entry.m_componentId, fileVersion, buildVersion))
         {
-            std::cout << "no registered migration covers v" << fileVersion << " -> v" << buildVersion <<
-                "; affected fields would read as defaults." << std::endl;
+            std::cout << "no registered migration covers v" << fileVersion << " -> v" << buildVersion
+                      << "; affected fields would read as defaults." << std::endl;
             isFaithful = false;
         }
         else
@@ -146,8 +145,8 @@ StatusCode FileReader::ReadGlobalHeader()
 
         if (STATUS_CODE_SUCCESS != seekSc)
         {
-            std::cout << "FileReader::ReadGlobalHeader() — no header container found; " <<
-                "proceeding with default metadata and schema registry." << std::endl;
+            std::cout << "FileReader::ReadGlobalHeader() — no header container found; "
+                      << "proceeding with default metadata and schema registry." << std::endl;
             return STATUS_CODE_SUCCESS;
         }
     }

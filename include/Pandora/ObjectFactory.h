@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/include/Pandora/ObjectFactory.h
- * 
+ *
  *  @brief  Header file for the object factory class.
- * 
+ *
  *  $Log: $
  */
 #ifndef PANDORA_OBJECT_FACTORY_H
@@ -28,7 +28,7 @@ class ObjectFactory
 {
 public:
     typedef PARAMETERS Parameters;
-    typedef OBJECT     Object;
+    typedef OBJECT Object;
 
     /**
      *  @brief  Default constructor
@@ -98,7 +98,7 @@ inline ObjectFactory<PARAMETERS, OBJECT>::~ObjectFactory()
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename PARAMETERS, typename OBJECT>
-inline StatusCode ObjectFactory<PARAMETERS, OBJECT>::Read(Parameters &/*parameters*/, const FieldMap &/*fields*/) const
+inline StatusCode ObjectFactory<PARAMETERS, OBJECT>::Read(Parameters & /*parameters*/, const FieldMap & /*fields*/) const
 {
     return STATUS_CODE_SUCCESS;
 }
@@ -106,7 +106,7 @@ inline StatusCode ObjectFactory<PARAMETERS, OBJECT>::Read(Parameters &/*paramete
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename PARAMETERS, typename OBJECT>
-inline StatusCode ObjectFactory<PARAMETERS, OBJECT>::Write(const OBJECT *const /*pObject*/, FieldMap &/*fields*/) const
+inline StatusCode ObjectFactory<PARAMETERS, OBJECT>::Write(const OBJECT *const /*pObject*/, FieldMap & /*fields*/) const
 {
     return STATUS_CODE_SUCCESS;
 }

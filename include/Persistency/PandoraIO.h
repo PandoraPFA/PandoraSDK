@@ -8,10 +8,10 @@
 #ifndef PANDORA_IO_H
 #define PANDORA_IO_H 1
 
+#include <cstdint>
 #include <map>
 #include <string>
 #include <vector>
-#include <cstdint>
 
 namespace pandora
 {
@@ -120,7 +120,7 @@ enum SchemaCheckPolicy
  */
 struct ComponentSchemaVersion
 {
-    ComponentId  m_componentId;
+    ComponentId m_componentId;
     unsigned int m_schemaVersion;
 };
 
@@ -133,10 +133,10 @@ typedef std::vector<ComponentSchemaVersion> SchemaRegistry;
  */
 struct FileMetadata
 {
-    std::string                        m_producerName;
-    std::string                        m_producerVersion;
-    std::string                        m_creationTimestamp;
-    std::string                        m_description;
+    std::string m_producerName;
+    std::string m_producerVersion;
+    std::string m_creationTimestamp;
+    std::string m_description;
     std::map<std::string, std::string> m_userParameters;
 };
 

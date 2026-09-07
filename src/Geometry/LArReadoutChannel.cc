@@ -39,4 +39,3 @@ LArReadoutChannel::~LArReadoutChannel()
 }
 
 } // namespace pandora
-

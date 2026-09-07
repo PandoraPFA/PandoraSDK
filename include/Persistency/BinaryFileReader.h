@@ -15,8 +15,8 @@
 
 #include <fstream>
 #include <functional>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace pandora

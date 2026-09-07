@@ -134,17 +134,16 @@ private:
     void Finalize() const;
     friend class LArReadoutVolume;
 
-
-    unsigned int m_id;                  ///< The id of the readout unit
-    pandora::HitType m_view;            ///< The view of the readout unit
-    float m_referenceCoordinate;        ///< The reference coordinate of the readout unit
-    float m_pitch;                      ///< The signed pitch of the readout unit
+    unsigned int m_id;           ///< The id of the readout unit
+    pandora::HitType m_view;     ///< The view of the readout unit
+    float m_referenceCoordinate; ///< The reference coordinate of the readout unit
+    float m_pitch;               ///< The signed pitch of the readout unit
 
     pandora::CartesianVector m_unitCenter; ///< The center of the readout unit's own active-area box (X unused)
     pandora::CartesianVector m_unitSize;   ///< The size of the readout unit's own active-area box (X unused)
 
-    LArReadoutChannel::ReadoutChannels m_readoutChannels;   ///< The collection of readout channels associated with this readout unit
-    mutable const LArReadoutVolume *m_pParentReadoutVolume{nullptr};   ///< Pointer to the parent readout volume (e.g. an APA) to which this unit belongs
+    LArReadoutChannel::ReadoutChannels m_readoutChannels; ///< The collection of readout channels associated with this readout unit
+    mutable const LArReadoutVolume *m_pParentReadoutVolume{nullptr}; ///< Pointer to the parent readout volume (e.g. an APA) to which this unit belongs
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------
@@ -231,4 +230,3 @@ inline void LArReadoutUnit::Finalize() const
 } // namespace pandora
 
 #endif // #ifndef PANDORA_LAR_READOUT_UNIT_H
-
