@@ -11,8 +11,8 @@
 #include "Pandora/ObjectCreation.h"
 #include "Pandora/ObjectFactory.h"
 #include "Pandora/PandoraObjectFactories.h"
-#include "Persistency/PandoraIO.h"
 #include "Pandora/StatusCodes.h"
+#include "Persistency/PandoraIO.h"
 
 #include "Persistency/FieldMap.h"
 
@@ -94,12 +94,12 @@ protected:
     template <typename PARAMETERS, typename OBJECT>
     void ReplaceCurrentFactory(ObjectFactory<PARAMETERS, OBJECT> *const pFactory);
 
-    const Pandora *const  m_pPandora;       ///< Address of pandora instance
-    std::string           m_fileName;       ///< The file name
-    FileType              m_fileType;       ///< The file type (BINARY / XML)
-    ContainerId           m_containerId;    ///< The type of container currently being read/written
-    FileMetadata          m_metadata;       ///< File-level metadata
-    SchemaRegistry        m_schemaRegistry; ///< Per-component schema versions recorded in the global header
+    const Pandora *const m_pPandora; ///< Address of pandora instance
+    std::string m_fileName;          ///< The file name
+    FileType m_fileType;             ///< The file type (BINARY / XML)
+    ContainerId m_containerId;       ///< The type of container currently being read/written
+    FileMetadata m_metadata;         ///< File-level metadata
+    SchemaRegistry m_schemaRegistry; ///< Per-component schema versions recorded in the global header
 
     ObjectFactory<object_creation::CaloHit::Parameters, object_creation::CaloHit::Object> *m_pCaloHitFactory; ///< Address of the calo hit factory
     ObjectFactory<object_creation::Track::Parameters, object_creation::Track::Object> *m_pTrackFactory; ///< Address of the track factory
@@ -108,7 +108,7 @@ protected:
     ObjectFactory<object_creation::Geometry::LArTPC::Parameters, object_creation::Geometry::LArTPC::Object> *m_pLArTPCFactory; ///< Address of the LArTPC factory
     ObjectFactory<object_creation::Geometry::LineGap::Parameters, object_creation::Geometry::LineGap::Object> *m_pLineGapFactory; ///< Address of the line gap factory
     ObjectFactory<object_creation::Geometry::BoxGap::Parameters, object_creation::Geometry::BoxGap::Object> *m_pBoxGapFactory; ///< Address of the box gap factory
-    ObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object>*m_pConcentricGapFactory; ///< Address of the concentric gap factory
+    ObjectFactory<object_creation::Geometry::ConcentricGap::Parameters, object_creation::Geometry::ConcentricGap::Object> *m_pConcentricGapFactory; ///< Address of the concentric gap factory
 };
 
 //------------------------------------------------------------------------------------------------------------------------------------------

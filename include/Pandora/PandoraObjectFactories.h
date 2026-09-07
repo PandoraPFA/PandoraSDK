@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/include/Pandora/PandoraObjectFactories.h
- * 
+ *
  *  @brief  Header file for the pandora object factories classes.
- * 
+ *
  *  $Log: $
  */
 #ifndef PANDORA_OBJECT_FACTORIES_H

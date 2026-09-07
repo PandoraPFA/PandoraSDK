@@ -63,7 +63,7 @@ public:
      *
      *  @return the size of the readout volume (x, y, z)
      */
-     const pandora::CartesianVector &GetSize() const;
+    const pandora::CartesianVector &GetSize() const;
 
     /**
      *  @brief  Get the readout units associated with the readout volume. In a horizontal drift TPC, this would be the collection of wire planes.
@@ -112,11 +112,11 @@ private:
     void Finalize() const;
     friend class LArTPC;
 
-    unsigned int m_id;                  ///< The id of the readout volume
-    pandora::CartesianVector m_center;  ///< The center of the readout volume (x, y, z)
-    pandora::CartesianVector m_size;    ///< The size of the readout volume (x, y, z)
-    LArReadoutUnit::ReadoutUnits m_readoutUnits;    ///< The collection of readout units associated with this readout volume
-    mutable const LArTPC *m_pParentTPC{nullptr};    ///< A pointer to the parent TPC
+    unsigned int m_id;                                              ///< The id of the readout volume
+    pandora::CartesianVector m_center;                              ///< The center of the readout volume (x, y, z)
+    pandora::CartesianVector m_size;                                ///< The size of the readout volume (x, y, z)
+    LArReadoutUnit::ReadoutUnits m_readoutUnits;                    ///< The collection of readout units associated with this readout volume
+    mutable const LArTPC *m_pParentTPC{nullptr};                    ///< A pointer to the parent TPC
     mutable std::array<const LArReadoutVolume *, 6> m_neighbours{}; ///< The neighbouring readout volumes - nullptr if no neighbour in direction
 };
 
@@ -190,4 +190,3 @@ inline void LArReadoutVolume::Finalize() const
 } // namespace pandora
 
 #endif // #ifndef PANDORA_LAR_READOUT_VOLUME_H
-

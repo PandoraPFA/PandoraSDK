@@ -1,13 +1,13 @@
 /**
  *  @file   PandoraSDK/src/Pandora/PandoraObjectFactories.cc
- * 
+ *
  *  @brief  Implementation of the pandora object factory classes
- * 
+ *
  *  $Log: $
  */
 
-#include "Pandora/ObjectCreation.h"
 #include "Pandora/PandoraObjectFactories.h"
+#include "Pandora/ObjectCreation.h"
 
 #include "Geometry/DetectorGap.h"
 #include "Geometry/LArTPC.h"
@@ -32,7 +32,7 @@ typename PandoraObjectFactory<PARAMETERS, OBJECT>::Parameters *PandoraObjectFact
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename PARAMETERS, typename OBJECT>
-StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Read(Parameters &/*parameters*/, const FieldMap &/*fields*/) const
+StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Read(Parameters & /*parameters*/, const FieldMap & /*fields*/) const
 {
     return STATUS_CODE_SUCCESS;
 }
@@ -40,7 +40,7 @@ StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Read(Parameters &/*paramete
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 template <typename PARAMETERS, typename OBJECT>
-StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Write(const Object *const /*pObject*/, FieldMap &/*fields*/) const
+StatusCode PandoraObjectFactory<PARAMETERS, OBJECT>::Write(const Object *const /*pObject*/, FieldMap & /*fields*/) const
 {
     return STATUS_CODE_SUCCESS;
 }

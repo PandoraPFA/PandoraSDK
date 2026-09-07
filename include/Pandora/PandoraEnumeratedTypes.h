@@ -1,8 +1,8 @@
 /**
  *  @file   PandoraSDK/include/Pandora/PandoraEnumeratedTypes.h
- * 
+ *
  *  @brief  Header file for pandora enumerated types
- * 
+ *
  *  $Log: $
  */
 #ifndef PANDORA_ENUMERATED_TYPES_H
@@ -156,7 +156,12 @@ enum VertexType
  */
 enum class ReadoutVolumeNeighbour : unsigned int
 {
-    PLUS_X, MINUS_X, PLUS_Y, MINUS_Y, PLUS_Z, MINUS_Z
+    PLUS_X,
+    MINUS_X,
+    PLUS_Y,
+    MINUS_Y,
+    PLUS_Z,
+    MINUS_Z
 };
 
 } // namespace pandora

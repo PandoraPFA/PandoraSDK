@@ -186,9 +186,9 @@ private:
     StatusCode ReadEventInformation(const FieldMap &fields);
 
     TiXmlDocument *m_pXmlDocument;
-    TiXmlNode     *m_pContainerXmlNode;
-    TiXmlElement  *m_pCurrentXmlElement;
-    bool           m_isAtFileStart;
+    TiXmlNode *m_pContainerXmlNode;
+    TiXmlElement *m_pCurrentXmlElement;
+    bool m_isAtFileStart;
 };
 
 } // namespace pandora

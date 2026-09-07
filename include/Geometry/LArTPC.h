@@ -17,7 +17,8 @@
 namespace pandora
 {
 
-template<typename T, typename S> class PandoraObjectFactory;
+template <typename T, typename S>
+class PandoraObjectFactory;
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -168,22 +169,22 @@ protected:
      */
     virtual ~LArTPC();
 
-    unsigned int    m_larTPCVolumeId;           ///< The lar tpc volume id, must uniquely specify a single lar tpc
-    float           m_centerX;                  ///< The center in x, units mm
-    float           m_centerY;                  ///< The center in y, units mm
-    float           m_centerZ;                  ///< The center in z, units mm
-    float           m_widthX;                   ///< The width in x, units mm
-    float           m_widthY;                   ///< The width in y, units mm
-    float           m_widthZ;                   ///< The width in z, units mm
-    float           m_wirePitchU;               ///< The u wire pitch, units mm
-    float           m_wirePitchV;               ///< The v wire pitch, units mm
-    float           m_wirePitchW;               ///< The w wire pitch, units mm
-    float           m_wireAngleU;               ///< The u wire angle to the vertical, units radians
-    float           m_wireAngleV;               ///< The v wire angle to the vertical, units radians
-    float           m_wireAngleW;               ///< The w wire angle to the vertical, units radians
-    float           m_sigmaUVW;                 ///< The u, v, w resolution, units mm
-    bool            m_isDriftInPositiveX;       ///< Whether the electron drift is in the positive x direction
-    LArReadoutVolume::ReadoutVolumes m_readoutVolumes;  ///< The readout volumes associated with this lar tpc
+    unsigned int m_larTPCVolumeId;                     ///< The lar tpc volume id, must uniquely specify a single lar tpc
+    float m_centerX;                                   ///< The center in x, units mm
+    float m_centerY;                                   ///< The center in y, units mm
+    float m_centerZ;                                   ///< The center in z, units mm
+    float m_widthX;                                    ///< The width in x, units mm
+    float m_widthY;                                    ///< The width in y, units mm
+    float m_widthZ;                                    ///< The width in z, units mm
+    float m_wirePitchU;                                ///< The u wire pitch, units mm
+    float m_wirePitchV;                                ///< The v wire pitch, units mm
+    float m_wirePitchW;                                ///< The w wire pitch, units mm
+    float m_wireAngleU;                                ///< The u wire angle to the vertical, units radians
+    float m_wireAngleV;                                ///< The v wire angle to the vertical, units radians
+    float m_wireAngleW;                                ///< The w wire angle to the vertical, units radians
+    float m_sigmaUVW;                                  ///< The u, v, w resolution, units mm
+    bool m_isDriftInPositiveX;                         ///< Whether the electron drift is in the positive x direction
+    LArReadoutVolume::ReadoutVolumes m_readoutVolumes; ///< The readout volumes associated with this lar tpc
 
     friend class GeometryManager;
     friend class PandoraObjectFactory<object_creation::Geometry::LArTPC::Parameters, object_creation::Geometry::LArTPC::Object>;

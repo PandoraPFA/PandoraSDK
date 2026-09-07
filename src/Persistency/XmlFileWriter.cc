@@ -75,8 +75,8 @@ bool ExtractValue(const std::vector<unsigned char> &bytes, T &value)
 {
     if (bytes.size() != sizeof(T))
     {
-        std::cout << "XmlFileWriter: field is " << bytes.size() << " bytes but its recorded type implies " << sizeof(T) <<
-            " — not written" << std::endl;
+        std::cout << "XmlFileWriter: field is " << bytes.size() << " bytes but its recorded type implies " << sizeof(T) << " — not written"
+                  << std::endl;
         return false;
     }
 
@@ -210,8 +210,7 @@ std::string FieldValueToString(const FieldValueType type, const std::vector<unsi
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-XmlFileWriter::XmlFileWriter(const pandora::Pandora &pandora, const std::string &fileName,
-    const FileMode fileMode) :
+XmlFileWriter::XmlFileWriter(const pandora::Pandora &pandora, const std::string &fileName, const FileMode fileMode) :
     FileWriter(pandora, fileName),
     m_pXmlDocument(nullptr),
     m_pContainerXmlElement(nullptr),
@@ -256,10 +255,10 @@ XmlFileWriter::~XmlFileWriter()
 
 StatusCode XmlFileWriter::WriteHeader(const ContainerId containerId)
 {
-    const std::string key(
-        (HEADER_CONTAINER == containerId) ? "Header"   :
-        (GEOMETRY_CONTAINER == containerId) ? "Geometry" :
-        (EVENT_CONTAINER == containerId) ? "Event"    : "Unknown");
+    const std::string key((HEADER_CONTAINER == containerId) ? "Header"
+            : (GEOMETRY_CONTAINER == containerId)           ? "Geometry"
+            : (EVENT_CONTAINER == containerId)              ? "Event"
+                                                            : "Unknown");
 
     TiXmlElement *const pRoot = m_pXmlDocument->RootElement();
 
@@ -288,8 +287,7 @@ StatusCode XmlFileWriter::WriteFooter()
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode XmlFileWriter::WriteComponent(const std::string &elementName,
-    const unsigned int schemaVersion, const FieldMap &fields)
+StatusCode XmlFileWriter::WriteComponent(const std::string &elementName, const unsigned int schemaVersion, const FieldMap &fields)
 {
     if (!m_pContainerXmlElement)
         return STATUS_CODE_FAILURE;
@@ -303,8 +301,8 @@ StatusCode XmlFileWriter::WriteComponent(const std::string &elementName,
 
         if (FieldValueType::UNKNOWN == type)
         {
-            std::cout << "XmlFileWriter: field \"" << entry.first << "\" in <" << elementName <<
-                "> has no recorded value type and cannot be written in a recoverable form" << std::endl;
+            std::cout << "XmlFileWriter: field \"" << entry.first << "\" in <" << elementName
+                      << "> has no recorded value type and cannot be written in a recoverable form" << std::endl;
             delete pComponentElement;
             return STATUS_CODE_NOT_IMPLEMENTED;
         }
@@ -346,10 +344,10 @@ StatusCode XmlFileWriter::WriteMetadata()
         return STATUS_CODE_FAILURE;
 
     FieldMap fields;
-    fields.Set("producerName",      m_metadata.m_producerName);
-    fields.Set("producerVersion",   m_metadata.m_producerVersion);
+    fields.Set("producerName", m_metadata.m_producerName);
+    fields.Set("producerVersion", m_metadata.m_producerVersion);
     fields.Set("creationTimestamp", m_metadata.m_creationTimestamp);
-    fields.Set("description",       m_metadata.m_description);
+    fields.Set("description", m_metadata.m_description);
 
     for (const auto &kv : m_metadata.m_userParameters)
         fields.Set(std::string("userParam:") + kv.first, kv.second);
@@ -457,7 +455,7 @@ StatusCode XmlFileWriter::WriteDetectorGap(const DetectorGap *const pDetectorGap
         FieldMap fields;
         PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, m_pLineGapFactory->Write(pLineGap, fields));
         fields.Set("lineGapType", pLineGap->GetLineGapType());
-        fields.Set("lineStartX",  pLineGap->GetLineStartX());
+        fields.Set("lineStartX", pLineGap->GetLineStartX());
         fields.Set("lineEndX", pLineGap->GetLineEndX());
         fields.Set("lineStartZ", pLineGap->GetLineStartZ());
         fields.Set("lineEndZ", pLineGap->GetLineEndZ());
@@ -576,8 +574,7 @@ StatusCode XmlFileWriter::WriteMCParticle(const MCParticle *const pMCParticle)
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode XmlFileWriter::WriteRelationship(const RelationshipId relationshipId,
-    const void *address1, const void *address2, const float weight)
+StatusCode XmlFileWriter::WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight)
 {
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;

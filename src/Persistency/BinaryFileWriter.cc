@@ -91,10 +91,9 @@ StatusCode BinaryFileWriter::WriteFooter()
     if ((HEADER_CONTAINER != m_containerId) && (EVENT_CONTAINER != m_containerId) && (GEOMETRY_CONTAINER != m_containerId))
         return STATUS_CODE_FAILURE;
 
-    const ComponentId endComponentId =
-        (HEADER_CONTAINER == m_containerId) ? HEADER_END_COMPONENT
-      : (EVENT_CONTAINER  == m_containerId) ? EVENT_END_COMPONENT
-                                             : GEOMETRY_END_COMPONENT;
+    const ComponentId endComponentId = (HEADER_CONTAINER == m_containerId) ? HEADER_END_COMPONENT
+        : (EVENT_CONTAINER == m_containerId)                               ? EVENT_END_COMPONENT
+                                                                           : GEOMETRY_END_COMPONENT;
 
     const FieldMap emptyFields;
     PANDORA_RETURN_RESULT_IF(STATUS_CODE_SUCCESS, !=, this->WriteComponent(endComponentId, 0u, emptyFields));
@@ -420,8 +419,7 @@ StatusCode BinaryFileWriter::WriteMCParticle(const MCParticle *const pMCParticle
 
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-StatusCode BinaryFileWriter::WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2,
-    const float weight)
+StatusCode BinaryFileWriter::WriteRelationship(const RelationshipId relationshipId, const void *address1, const void *address2, const float weight)
 {
     if (EVENT_CONTAINER != m_containerId)
         return STATUS_CODE_FAILURE;
@@ -447,7 +445,7 @@ StatusCode BinaryFileWriter::WriteEventInformation()
     FieldMap fields;
     fields.Set("run", m_pPandora->GetRun());
     fields.Set("subrun", m_pPandora->GetSubrun());
-    fields.Set("event",  m_pPandora->GetEvent());
+    fields.Set("event", m_pPandora->GetEvent());
 
     return this->WriteComponent(EVENT_INFO_COMPONENT, GetSchemaVersion(EVENT_INFO_COMPONENT), fields);
 }

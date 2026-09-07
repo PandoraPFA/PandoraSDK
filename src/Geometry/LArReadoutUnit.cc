@@ -30,4 +30,3 @@ LArReadoutUnit::~LArReadoutUnit()
 }
 
 } // namespace pandora
-

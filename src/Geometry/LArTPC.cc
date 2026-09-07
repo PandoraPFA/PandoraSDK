@@ -66,10 +66,7 @@ LArTPC::~LArTPC()
 
 void LArTPC::FinalizeReadoutVolumeNeighbours() const
 {
-    auto overlaps = [](float cA, float wA, float cB, float wB)
-    {
-        return std::fabs(cA - cB) < 0.5f * (wA + wB);
-    };
+    auto overlaps = [](float cA, float wA, float cB, float wB) { return std::fabs(cA - cB) < 0.5f * (wA + wB); };
 
     for (const auto &entryA : m_readoutVolumes)
     {
@@ -102,7 +99,7 @@ void LArTPC::FinalizeReadoutVolumeNeighbours() const
                 if (delta > 0.f && delta < bestPlus)
                 {
                     bestPlus = delta;
-                    pNearestPlus  = &volB;
+                    pNearestPlus = &volB;
                 }
                 else if (delta < 0.f && -delta < bestMinus)
                 {
@@ -111,8 +108,10 @@ void LArTPC::FinalizeReadoutVolumeNeighbours() const
                 }
             }
 
-            static const ReadoutVolumeNeighbour plusDirs[3]{ReadoutVolumeNeighbour::PLUS_X, ReadoutVolumeNeighbour::PLUS_Y, ReadoutVolumeNeighbour::PLUS_Z};
-            static const ReadoutVolumeNeighbour minusDirs[3]{ReadoutVolumeNeighbour::MINUS_X, ReadoutVolumeNeighbour::MINUS_Y, ReadoutVolumeNeighbour::MINUS_Z};
+            static const ReadoutVolumeNeighbour plusDirs[3]{
+                ReadoutVolumeNeighbour::PLUS_X, ReadoutVolumeNeighbour::PLUS_Y, ReadoutVolumeNeighbour::PLUS_Z};
+            static const ReadoutVolumeNeighbour minusDirs[3]{
+                ReadoutVolumeNeighbour::MINUS_X, ReadoutVolumeNeighbour::MINUS_Y, ReadoutVolumeNeighbour::MINUS_Z};
 
             volA.SetNeighbour(plusDirs[axis], pNearestPlus);
             volA.SetNeighbour(minusDirs[axis], pNearestMinus);
